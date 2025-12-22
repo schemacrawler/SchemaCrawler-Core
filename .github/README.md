@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD041 -->
 **:star: Star it :arrow_heading_up: if you love it!**
 
-[![Quick Build](https://github.com/schemacrawler/SchemaCrawler-API/workflows/Quick%20Build/badge.svg)](https://github.com/schemacrawler/SchemaCrawler-API/actions?query=workflow%3A%22Quick+Build%22)
+[![Quick Build](https://github.com/schemacrawler/SchemaCrawler-API/actions/workflows/quick-build.yml/badge.svg)](https://github.com/schemacrawler/SchemaCrawler-API/actions/workflows/quick-build.yml)
 [![Codacy Grade](https://app.codacy.com/project/badge/Grade/84c0a068ce9349f2bcaa07b5977bd932)](https://app.codacy.com/gh/schemacrawler/SchemaCrawler-API/dashboard)
 [![Codacy Coverage](https://img.shields.io/codacy/coverage/84c0a068ce9349f2bcaa07b5977bd932)](https://app.codacy.com/gh/schemacrawler/SchemaCrawler-API/dashboard)
 
