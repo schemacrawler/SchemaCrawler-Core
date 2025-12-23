@@ -76,7 +76,7 @@ jobs:
         draft: false
         prerelease: false
         body: |
-          SchemaCrawler API ${{ github.event.release.tag_name }} release at last commit ${{ github.sha }}
+          SchemaCrawler API ${{ github.ref_name }} release at last commit ${{ github.sha }}
           See the change history at https://www.schemacrawler.com/changes-report.html
         generate_release_notes: true
         files: |
