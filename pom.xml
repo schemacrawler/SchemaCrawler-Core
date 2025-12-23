@@ -11,13 +11,13 @@
   <parent>
     <groupId>us.fatehi</groupId>
     <artifactId>schemacrawler-parent</artifactId>
-    <version>17.1.7</version>
+    <version>17.1.8-alpha.1</version>
     <relativePath>./schemacrawler-parent/pom.xml</relativePath>
   </parent>
-  <artifactId>schemacrawler-aggregator</artifactId>
+  <artifactId>schemacrawler-api-aggregator</artifactId>
   <packaging>pom</packaging>
 
-  <name>SchemaCrawler [Aggregator]</name>
+  <name>SchemaCrawler API [Aggregator]</name>
 
   <modules>
     <!-- SchemaCrawler common -->

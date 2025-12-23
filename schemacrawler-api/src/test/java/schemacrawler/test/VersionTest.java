@@ -24,9 +24,15 @@ import us.fatehi.test.utility.extensions.CapturedSystemStreams;
 @CaptureSystemStreams
 public class VersionTest {
 
+  private static final String majorVersion = "17";
+  private static final String semverPatternString =
+      majorVersion
+          + "\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?";
+
   @Test
   public void version(final CapturedSystemStreams streams) throws Exception {
-    final Pattern VERSION = Pattern.compile("SchemaCrawler 17\\.1\\.\\d{1,2}\\R.*", DOTALL);
+    final Pattern VERSION =
+        Pattern.compile("SchemaCrawler " + semverPatternString + "\\R.*", DOTALL);
 
     Version.main(new String[0]);
 
