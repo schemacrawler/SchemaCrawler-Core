@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>us.fatehi</groupId>
+    <artifactId>schemacrawler-parent</artifactId>
+    <version>17.1.7-A</version>
+    <relativePath>../schemacrawler-parent/pom.xml</relativePath>
+  </parent>
+  <artifactId>schemacrawler-tests</artifactId>
+  <packaging>jar</packaging>
+  <name>SchemaCrawler Tests</name>
+  <dependencies>
+
+    <dependency>
+      <groupId>us.fatehi</groupId>
+      <artifactId>schemacrawler-test-utility</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>us.fatehi</groupId>
+      <artifactId>schemacrawler-api</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>us.fatehi</groupId>
+      <artifactId>schemacrawler-tools</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>us.fatehi</groupId>
+      <artifactId>schemacrawler-loader</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>runtime</scope>
+    </dependency>
+
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>tests</shadedClassifierName>
+              <artifactSet>
+                <includes>
+                  <include>us.fatehi:schemacrawler-test-utility:jar:*</include>
+                  <include>us.fatehi:schemacrawler-api:test-jar:*</include>
+                  <include>us.fatehi:schemacrawler-tools:test-jar:*</include>
+                  <include>us.fatehi:schemacrawler-loader:test-jar:*</include>
+                </includes>
+              </artifactSet>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
