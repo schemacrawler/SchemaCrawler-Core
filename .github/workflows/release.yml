@@ -89,6 +89,7 @@ jobs:
         mvn \
           --no-transfer-progress \
           --batch-mode \
+          --projects schemacrawler,schemacrawler-tests-shaded \
           -Dmaven.javadoc.skip=false \
           -Dskip.signing.artifacts=false \
           clean deploy

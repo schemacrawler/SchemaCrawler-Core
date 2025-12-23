@@ -31,6 +31,8 @@
     <module>schemacrawler-tools</module>
     <module>schemacrawler-loader</module>
     <module>schemacrawler</module>
+    <!-- SchemaCrawler shaded tests -->
+    <module>schemacrawler-tests-shaded</module>
   </modules>
 
 </project>
