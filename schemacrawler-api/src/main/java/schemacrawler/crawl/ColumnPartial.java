@@ -18,6 +18,7 @@ import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Table;
+import schemacrawler.schemacrawler.exceptions.NotLoadedException;
 
 final class ColumnPartial extends AbstractDependantObject<Table>
     implements Column, PartialDatabaseObject {

@@ -18,7 +18,6 @@ import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import java.sql.Connection;
 import java.util.Collection;
 import org.junit.jupiter.api.Test;
-import schemacrawler.crawl.NotLoadedException;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
@@ -29,6 +28,7 @@ import schemacrawler.schemacrawler.GrepOptionsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
+import schemacrawler.schemacrawler.exceptions.NotLoadedException;
 import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 

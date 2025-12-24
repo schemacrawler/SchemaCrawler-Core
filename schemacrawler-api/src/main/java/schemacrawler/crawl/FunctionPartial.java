@@ -17,6 +17,7 @@ import schemacrawler.schema.Function;
 import schemacrawler.schema.FunctionParameter;
 import schemacrawler.schema.FunctionReturnType;
 import schemacrawler.schema.RoutineType;
+import schemacrawler.schemacrawler.exceptions.NotLoadedException;
 
 final class FunctionPartial extends RoutinePartial implements Function {
 

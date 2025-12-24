@@ -14,6 +14,7 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.ForeignKeyDeferrability;
 import schemacrawler.schema.ForeignKeyUpdateRule;
 import schemacrawler.schema.TableConstraintType;
+import schemacrawler.schemacrawler.exceptions.NotLoadedException;
 
 /** Represents a foreign-key mapping to a primary key in another table. */
 final class MutableForeignKey extends AbstractTableReference implements ForeignKey {

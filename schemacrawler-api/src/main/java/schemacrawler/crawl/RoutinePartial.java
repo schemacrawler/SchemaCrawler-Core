@@ -16,6 +16,7 @@ import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineBodyType;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.exceptions.NotLoadedException;
 
 abstract class RoutinePartial extends AbstractDatabaseObject
     implements Routine, PartialDatabaseObject {

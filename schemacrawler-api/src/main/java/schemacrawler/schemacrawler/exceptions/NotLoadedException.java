@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.crawl;
+package schemacrawler.schemacrawler.exceptions;
 
 import java.io.Serial;
 import schemacrawler.schema.PartialDatabaseObject;

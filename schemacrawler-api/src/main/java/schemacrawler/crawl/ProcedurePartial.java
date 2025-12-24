@@ -17,6 +17,7 @@ import schemacrawler.schema.Procedure;
 import schemacrawler.schema.ProcedureParameter;
 import schemacrawler.schema.ProcedureReturnType;
 import schemacrawler.schema.RoutineType;
+import schemacrawler.schemacrawler.exceptions.NotLoadedException;
 
 final class ProcedurePartial extends RoutinePartial implements Procedure {
 
