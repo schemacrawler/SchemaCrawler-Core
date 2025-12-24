@@ -64,6 +64,14 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.tools.text.formatter.diagram;
 
   // ServiceLoader providers
+  uses java.sql.Driver;
   uses schemacrawler.tools.catalogloader.CatalogLoader;
+  uses schemacrawler.tools.databaseconnector.DatabaseConnector;
   uses schemacrawler.tools.executable.CommandProvider;
+
+  provides schemacrawler.tools.catalogloader.CatalogLoader with
+      schemacrawler.loader.attributes.AttributesCatalogLoader,
+      schemacrawler.loader.counts.TableRowCountsCatalogLoader,
+      schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoader,
+      schemacrawler.tools.catalogloader.SchemaCrawlerCatalogLoader;
 }
