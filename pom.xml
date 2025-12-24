@@ -23,14 +23,17 @@
     <!-- SchemaCrawler common -->
     <module>schemacrawler-parent</module>
     <module>schemacrawler-jdbc-drivers</module>
+    <!-- SchemaCrawler test modules -->    
     <module>schemacrawler-testdb</module>
     <module>schemacrawler-test-utility</module>
-    <!-- SchemaCrawler jar -->
+    <!-- SchemaCrawler modules -->
     <module>schemacrawler-utility</module>
     <module>schemacrawler-api</module>
     <module>schemacrawler-tools</module>
     <module>schemacrawler-loader</module>
+    <!-- SchemaCrawler jars -->
     <module>schemacrawler</module>
+    <module>schemacrawler-tests</module>
   </modules>
 
 </project>

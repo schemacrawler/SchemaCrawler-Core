@@ -18,7 +18,7 @@
       <artifactId>schemacrawler-test-utility</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
-    </dependency>  
+    </dependency>
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
@@ -30,9 +30,23 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
         <configuration>
           <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <configuration>
+          <skipPublishing>true</skipPublishing>
         </configuration>
       </plugin>
     </plugins>
