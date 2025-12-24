@@ -7,7 +7,7 @@
   <parent>
     <groupId>us.fatehi</groupId>
     <artifactId>schemacrawler-parent</artifactId>
-    <version>17.1.7-B</version>
+    <version>17.1.7-C</version>
     <relativePath>../schemacrawler-parent/pom.xml</relativePath>
   </parent>
   <artifactId>schemacrawler-test-utility</artifactId>
@@ -141,9 +141,23 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
         <configuration>
           <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <configuration>
+          <skipPublishing>true</skipPublishing>
         </configuration>
       </plugin>
     </plugins>
