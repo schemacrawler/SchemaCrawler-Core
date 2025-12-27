@@ -63,7 +63,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   private final NamedObjectList<MutableSynonym> synonyms = new NamedObjectList<>();
   private final NamedObjectList<MutableTable> tables = new NamedObjectList<>();
   private final NamedObjectList<ImmutableDatabaseUser> databaseUsers = new NamedObjectList<>();
-  private final MutableCrawlInfo crawlInfo;
+  private final ImmutableCrawlInfo crawlInfo;
 
   MutableCatalog(
       final String name,
@@ -73,7 +73,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
     this.databaseInfo = requireNonNull(databaseInfo, "No database information provided");
     this.jdbcDriverInfo = requireNonNull(jdbcDriverInfo, "No JDBC driver information provided");
-    crawlInfo = new MutableCrawlInfo(databaseInfo, jdbcDriverInfo);
+    crawlInfo = new ImmutableCrawlInfo(databaseInfo, jdbcDriverInfo);
   }
 
   /** {@inheritDoc} */

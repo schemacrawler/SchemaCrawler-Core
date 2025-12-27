@@ -23,7 +23,6 @@
     <!-- SchemaCrawler common -->
     <module>schemacrawler-parent</module>
     <module>schemacrawler-jdbc-drivers</module>
-		<module>schemacrawler-docs</module>
     <!-- SchemaCrawler test modules -->    
     <module>schemacrawler-testdb</module>
     <module>schemacrawler-test-utility</module>

@@ -34,7 +34,7 @@ import us.fatehi.utility.property.OperatingSystemInfo;
 import us.fatehi.utility.property.ProductVersion;
 
 /** SchemaCrawler crawl information. */
-final class MutableCrawlInfo implements CrawlInfo {
+final class ImmutableCrawlInfo implements CrawlInfo {
 
   @Serial private static final long serialVersionUID = 5982990326485881993L;
 
@@ -57,16 +57,15 @@ final class MutableCrawlInfo implements CrawlInfo {
             .toFormatter();
   }
 
+  private final UUID runId;
   private final Instant crawlTimestamp;
   private final ProductVersion jvmVersion;
   private final ProductVersion operatingSystemVersion;
-  private final UUID runId;
   private final ProductVersion schemaCrawlerVersion;
   private final ProductVersion databaseVersion;
   private final ProductVersion jdbcDriverVersion;
 
-  MutableCrawlInfo(
-      final MutableDatabaseInfo databaseInfo, final MutableJdbcDriverInfo jdbcDriverInfo) {
+  ImmutableCrawlInfo(final ProductVersion databaseInfo, final ProductVersion jdbcDriverInfo) {
     requireNonNull(databaseInfo, "No database information provided");
     requireNonNull(jdbcDriverInfo, "No JDBC driver information provided");
 

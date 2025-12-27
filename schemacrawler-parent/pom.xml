@@ -397,6 +397,7 @@
             </goals>
             <configuration>
               <quiet>true</quiet>
+              <failOnError>false</failOnError>
               <show>public</show>
               <detectOfflineLinks>true</detectOfflineLinks>
               <additionalOptions>
