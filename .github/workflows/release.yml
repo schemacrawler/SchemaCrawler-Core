@@ -69,10 +69,10 @@ jobs:
           See the change history at https://www.schemacrawler.com/changes-report.html
         generate_release_notes: true
         files: |
-          ./schemacrawler-distrib/target/schemacrawler-17.2.2-distribution.zip
-          ./schemacrawler-distrib/target/schemacrawler-17.2.2-distribution.zip.SHA-512
-          ./schemacrawler-distrib/target/schemacrawler-17.2.2-bin.zip
-          ./schemacrawler-distrib/target/schemacrawler-17.2.2-bin.zip.SHA-512
+          ./schemacrawler-distrib/target/schemacrawler-17.2.3-distribution.zip
+          ./schemacrawler-distrib/target/schemacrawler-17.2.3-distribution.zip.SHA-512
+          ./schemacrawler-distrib/target/schemacrawler-17.2.3-bin.zip
+          ./schemacrawler-distrib/target/schemacrawler-17.2.3-bin.zip.SHA-512
 
 # PUBLISH TO CENTRAL REPOSITORY
     - id: publish-to-central
