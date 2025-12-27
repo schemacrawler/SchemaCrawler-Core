@@ -1,3 +1,4 @@
+**/.flattened-pom.xml
 /schemacrawler-db2/*.jar
 /schemacrawler-distrib/*.bnd
 /schemacrawler-distrib/*.jar

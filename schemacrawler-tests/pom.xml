@@ -14,6 +14,7 @@
   <name>SchemaCrawler Tests</name>
 
   <dependencies>
+
     <dependency>
       <groupId>us.fatehi</groupId>
       <artifactId>schemacrawler-test-utility</artifactId>
@@ -55,7 +56,6 @@
               <descriptors>
                 <descriptor>src/assembly/tests-uber-jar.xml</descriptor>
               </descriptors>
-              <!-- similar effect to attaching a shaded classifier -->
               <appendAssemblyId>true</appendAssemblyId>
               <finalName>${project.artifactId}-${project.version}</finalName>
             </configuration>
@@ -65,13 +65,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
-        <version>1.6.0</version>
-        <configuration>
-          <flattenMode>oss</flattenMode>
-          <pomElements>
-            <dependencies>remove</dependencies>
-          </pomElements>
-        </configuration>
+        <version>1.7.3</version>
         <executions>
           <execution>
             <id>flatten</id>
@@ -79,6 +73,12 @@
             <goals>
               <goal>flatten</goal>
             </goals>
+            <configuration>
+              <flattenMode>ossrh</flattenMode>
+              <pomElements>
+                <dependencies>remove</dependencies>
+              </pomElements>
+            </configuration>
           </execution>
           <execution>
             <id>flatten-clean</id>

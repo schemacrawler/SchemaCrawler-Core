@@ -12,6 +12,7 @@
   <artifactId>schemacrawler</artifactId>
   <packaging>jar</packaging>
   <name>SchemaCrawler</name>
+
   <dependencies>
 
     <dependency>
