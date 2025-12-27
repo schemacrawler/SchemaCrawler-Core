@@ -38,8 +38,7 @@ jobs:
           -Dtestcoverage \
           -Dreactor.printOrder \
           -Dmaven.javadoc.skip=false \
-          clean verify \
-          jacoco:report-aggregate
+          clean verify
 
 # GET TEST RESULTS
     - id: upload-coverage-test-results
@@ -47,7 +46,7 @@ jobs:
       uses: actions/upload-artifact@v6
       with:
         name: coverage-test-results
-        path: ./schemacrawler-distrib/target/site/jacoco-aggregate
+        path: ./schemacrawler-verify/target/site/jacoco-aggregate
         retention-days: 5
     - id: publish-coverage-codecov
       name: Upload coverage report to Codecov
