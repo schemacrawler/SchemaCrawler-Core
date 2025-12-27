@@ -11,18 +11,19 @@
 [![The Central Repository](https://img.shields.io/maven-central/v/us.fatehi/schemacrawler)](https://central.sonatype.com/artifact/us.fatehi/schemacrawler)
 
 
-# <img src="https://raw.githubusercontent.com/schemacrawler/SchemaCrawler/main/schemacrawler-website/src/site/resources/images/schemacrawler_logo.png" height="100px" width="100px" valign="middle"/> SchemaCrawler
+# <img src="https://raw.githubusercontent.com/schemacrawler/SchemaCrawler/main/schemacrawler-website/src/site/resources/images/schemacrawler_logo.png" height="100px" width="100px" valign="middle"/> SchemaCrawler - Core
 
-> [!NOTE]  
+> [!NOTE]
 > * Please see the [SchemaCrawler website](https://www.schemacrawler.com/) for more details.
 > * Use the [SchemaCrawler AI MCP Server](https://github.com/schemacrawler/SchemaCrawler-AI-MCP-Server-Usage) to get deep insights into your database
-> * Explore the SchemaCrawler command-line with a [live online tutorial](https://killercoda.com/schemacrawler).
 
 ## About
 
 SchemaCrawler is a free database schema discovery and comprehension tool. SchemaCrawler has a good mix of useful features for data governance. [SchemaCrawler is a Java API](https://dev.to/sualeh/how-to-get-database-metadata-as-java-pojos-24li) that makes working with database metadata as easy as working with plain old Java objects.
 
 SchemaCrawler supports almost any database that has a JDBC driver, but for convenience is [bundled with drivers](https://www.schemacrawler.com/database-support.html) for some commonly used RDBMS systems. SchemaCrawler works with any operating system that supports Java SE 17 or better.
+
+> This project is the core SchemaCrawler API and tool framework. Please look at [schemacrawler/SchemaCrawler](https://github.com/schemacrawler/SchemaCrawler) for multiple database support and tool implementations. These are described on the [SchemaCrawler website](https://www.schemacrawler.com/).
 
 
 ## Licensing
