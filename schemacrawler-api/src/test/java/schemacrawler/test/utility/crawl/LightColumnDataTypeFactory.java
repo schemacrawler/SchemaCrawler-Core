@@ -51,6 +51,14 @@ public class LightColumnDataTypeFactory {
         default -> throw new SQLFeatureNotSupportedException(methodName);
       };
     }
+
+    @Override
+    public String toString() {
+      if (isEnumerated) {
+        return "%s %s".formatted(name, enumValues);
+      }
+      return name;
+    }
   }
 
   public static ColumnDataType columnDataType(final String name) {
