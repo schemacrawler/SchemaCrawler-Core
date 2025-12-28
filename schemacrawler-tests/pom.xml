@@ -82,7 +82,7 @@
               <descriptors>
                 <descriptor>src/assembly/tests-uber-jar.xml</descriptor>
               </descriptors>
-              <appendAssemblyId>true</appendAssemblyId>
+              <appendAssemblyId>false</appendAssemblyId>
               <finalName>${project.artifactId}-${project.version}</finalName>
             </configuration>
           </execution>
