@@ -8,56 +8,71 @@
 
 package schemacrawler.test.utility.crawl;
 
-import static java.lang.reflect.Proxy.newProxyInstance;
-import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.requireNotBlank;
+import static schemacrawler.test.utility.crawl.LightColumnDataTypeFactory.columnDataType;
+import static schemacrawler.test.utility.crawl.LightColumnDataTypeFactory.enumColumnDataType;
 
 import java.io.Serial;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.Objects.requireNonNull;
+
+import static us.fatehi.utility.Utility.requireNotBlank;
+
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
+import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.Identifiers;
-import schemacrawler.utility.JavaSqlTypes;
 
-public class LightColumn implements Column {
+final class LightColumn implements Column {
 
   @Serial private static final long serialVersionUID = -1931193814458050468L;
 
-  public static ColumnDataType integerColumnDataType() {
-    return (ColumnDataType)
-        newProxyInstance(
-            ColumnDataType.class.getClassLoader(),
-            new Class[] {ColumnDataType.class},
-            (proxy, method, args) -> {
-              final String methodName = method.getName();
-              switch (methodName) {
-                case "getName":
-                  return "INTEGER";
-                case "getJavaSqlType":
-                  return new JavaSqlTypes().getFromJavaSqlTypeName("INTEGER");
-                default:
-                  throw new SQLFeatureNotSupportedException(methodName);
-              }
-            });
+  public static LightColumn newColumn(final Table parent, final String name) {
+    return new LightColumn(
+        parent, name, columnDataType("INTEGER"), /* isHidden */ false, /* isGenerated */ false);
+  }
+
+  public static LightColumn newEnumeratedColumn(final Table parent, final String name) {
+    return new LightColumn(
+        parent, name, enumColumnDataType(), /* isHidden */ false, /* isGenerated */ false);
+  }
+
+  public static LightColumn newGeneratedColumn(final Table parent, final String name) {
+    return new LightColumn(
+        parent, name, columnDataType("DATA_TYPE"), /* isHidden */ false, /* isGenerated */ true);
+  }
+
+  public static LightColumn newHiddenColumn(final Table parent, final String name) {
+    return new LightColumn(
+        parent, name, columnDataType("DATA_TYPE"), /* isHidden */ true, /* isGenerated */ false);
   }
 
   private final Table parent;
   private final String name;
+  private final ColumnDataType columnDataType;
+  private final boolean isHidden;
+  private final boolean isGenerated;
 
-  public LightColumn(final Table parent, final String name) {
+  private LightColumn(
+      final Table parent,
+      final String name,
+      final ColumnDataType columnDataType,
+      final boolean isHidden,
+      final boolean isGenerated) {
     this.parent = requireNonNull(parent);
     this.name = requireNotBlank(name, "No name provided");
+    this.columnDataType = requireNonNull(columnDataType, "No column data type provided");
+    this.isHidden = isHidden;
+    this.isGenerated = isGenerated;
   }
 
   @Override
@@ -70,10 +85,7 @@ public class LightColumn implements Column {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if ((obj == null) || (getClass() != obj.getClass())) {
       return false;
     }
     final LightColumn other = (LightColumn) obj;
@@ -97,7 +109,7 @@ public class LightColumn implements Column {
 
   @Override
   public ColumnDataType getColumnDataType() {
-    return integerColumnDataType();
+    return columnDataType;
   }
 
   @Override
@@ -134,7 +146,7 @@ public class LightColumn implements Column {
 
   @Override
   public Collection<Privilege<Column>> getPrivileges() {
-    return new HashSet<>();
+    return Collections.emptyList();
   }
 
   @Override
@@ -194,17 +206,17 @@ public class LightColumn implements Column {
 
   @Override
   public boolean isColumnDataTypeKnown() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean isGenerated() {
-    return false;
+    return isGenerated;
   }
 
   @Override
   public boolean isHidden() {
-    return false;
+    return isHidden;
   }
 
   @Override

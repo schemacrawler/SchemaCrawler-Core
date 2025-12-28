@@ -8,11 +8,6 @@
 
 package schemacrawler.test.utility.crawl;
 
-import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.isBlank;
-import static us.fatehi.utility.Utility.requireNotBlank;
-import static us.fatehi.utility.Utility.trimToEmpty;
-
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,9 +17,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.Objects.requireNonNull;
+
+import static us.fatehi.utility.Utility.isBlank;
+import static us.fatehi.utility.Utility.requireNotBlank;
+import static us.fatehi.utility.Utility.trimToEmpty;
+
 import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -37,7 +40,6 @@ import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.Trigger;
 import schemacrawler.schema.WeakAssociation;
-import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.SchemaReference;
 
 public final class LightTable implements Table {
@@ -47,6 +49,7 @@ public final class LightTable implements Table {
   private final Schema schema;
   private final String name;
   private final List<Column> columns;
+  private final List<Column> hiddenColumns;
   private final Map<String, Object> attributes;
   private final Collection<Trigger> triggers;
   private String definition;
@@ -57,6 +60,7 @@ public final class LightTable implements Table {
     this.name = requireNotBlank(name, "No table name provided");
     attributes = new HashMap<>();
     columns = new ArrayList<>();
+    hiddenColumns = new ArrayList<>();
     triggers = new ArrayList<>();
   }
 
@@ -65,7 +69,25 @@ public final class LightTable implements Table {
   }
 
   public LightColumn addColumn(final String name) {
-    final LightColumn column = new LightColumn(this, name);
+    final LightColumn column = LightColumn.newColumn(this, name);
+    columns.add(column);
+    return column;
+  }
+
+  public LightColumn addGeneratedColumn(final String name) {
+    final LightColumn column = LightColumn.newGeneratedColumn(this, name);
+    columns.add(column);
+    return column;
+  }
+
+  public LightColumn addHiddenColumn(final String name) {
+    final LightColumn column = LightColumn.newHiddenColumn(this, name);
+    hiddenColumns.add(column);
+    return column;
+  }
+
+  public LightColumn addEnumeratedColumn(final String name) {
+    final LightColumn column = LightColumn.newEnumeratedColumn(this, name);
     columns.add(column);
     return column;
   }
@@ -143,7 +165,7 @@ public final class LightTable implements Table {
 
   @Override
   public Collection<Column> getHiddenColumns() {
-    return Collections.emptyList();
+    return new ArrayList<>(hiddenColumns);
   }
 
   @Override
@@ -163,17 +185,11 @@ public final class LightTable implements Table {
 
   @Override
   public PrimaryKey getPrimaryKey() {
-
     return null;
   }
 
   @Override
   public Collection<Privilege<Table>> getPrivileges() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public Collection<DatabaseObject> getUsedByObjects() {
     return Collections.emptyList();
   }
 
@@ -194,7 +210,7 @@ public final class LightTable implements Table {
 
   @Override
   public Collection<TableConstraint> getTableConstraints() {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override
@@ -213,8 +229,13 @@ public final class LightTable implements Table {
   }
 
   @Override
+  public Collection<DatabaseObject> getUsedByObjects() {
+    return Collections.emptyList();
+  }
+
+  @Override
   public Collection<WeakAssociation> getWeakAssociations() {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override

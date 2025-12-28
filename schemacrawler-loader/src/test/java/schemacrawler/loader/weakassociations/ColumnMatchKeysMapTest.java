@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Column;
-import schemacrawler.test.utility.crawl.LightColumn;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class ColumnMatchKeysMapTest {
@@ -52,7 +51,7 @@ public class ColumnMatchKeysMapTest {
         containsInAnyOrder(
             "Table1.EntityId", "Table2.Entity_Id", "Table3.Entity_ID", "Table4.EntityID"));
 
-    final LightColumn column = new LightColumn(table4, "EntityID");
+    final Column column = table4.addColumn("EntityID");
     assertThat(columnMatchKeysMap.containsKey(column), is(true));
     assertThat(
         columnMatchKeysMap.get(column).stream().collect(Collectors.toSet()),
@@ -79,7 +78,7 @@ public class ColumnMatchKeysMapTest {
     assertThat(columnMatchKeysMap.containsKey("entity"), is(false));
     assertThat(columnMatchKeysMap.containsKey(""), is(false));
 
-    final LightColumn column = new LightColumn(table4, "EntityID");
+    final Column column = table4.addColumn("EntityID");
     assertThat(columnMatchKeysMap.containsKey(column), is(false));
   }
 }
