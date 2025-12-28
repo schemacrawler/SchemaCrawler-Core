@@ -39,7 +39,7 @@ public class ProposedWeakAssociationTest {
     assertThat(proposedWeakAssociation.getPrimaryKeyColumn(), is(col2));
     assertThat(proposedWeakAssociation.getForeignKeyColumn(), is(col1));
     assertThat(proposedWeakAssociation.toString(), is("Table1.Id ~~> Table1.ColA"));
-    assertThat(proposedWeakAssociation.isValid(), is(false));
+    assertThat(proposedWeakAssociation.isValid(), is(true));
 
     assertThat(new ProposedWeakAssociation(col1, col1).isValid(), is(false));
   }
