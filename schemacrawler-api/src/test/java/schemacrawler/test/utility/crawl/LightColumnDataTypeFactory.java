@@ -35,7 +35,7 @@ public class LightColumnDataTypeFactory {
 
     ColumnDataTypeInvocationHandler(final String name, final List<String> enumValues) {
       this.name = requireNotBlank(name, "No name provided");
-      isEnumerated = enumValues == null;
+      isEnumerated = enumValues != null;
       this.enumValues = isEnumerated ? enumValues : Collections.emptyList();
     }
 
