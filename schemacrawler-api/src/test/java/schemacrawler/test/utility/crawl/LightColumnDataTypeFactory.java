@@ -48,6 +48,7 @@ public class LightColumnDataTypeFactory {
         case "getJavaSqlType" -> new JavaSqlTypes().getFromJavaSqlTypeName(name);
         case "isEnumerated" -> isEnumerated;
         case "getEnumValues" -> enumValues;
+        case "toString" -> toString();
         default -> throw new SQLFeatureNotSupportedException(methodName);
       };
     }

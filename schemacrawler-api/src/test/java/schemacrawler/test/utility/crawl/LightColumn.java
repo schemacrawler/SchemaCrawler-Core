@@ -116,7 +116,7 @@ final class LightColumn implements Column {
 
   @Override
   public String getDefaultValue() {
-    return "";
+    return null;
   }
 
   @Override
