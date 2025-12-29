@@ -1,0 +1,2 @@
+# SchemaCrawler-Core
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/edc766a7781646739f77bc25c79d1942)](https://app.codacy.com/gh/schemacrawler/SchemaCrawler-Core?utm_source=github.com&utm_medium=referral&utm_content=schemacrawler/SchemaCrawler-Core&utm_campaign=Badge_Grade)
