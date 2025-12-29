@@ -14,7 +14,7 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import schemacrawler.schemacrawler.Options;
 
@@ -84,7 +84,7 @@ public final class Identifiers implements Options, Serializable {
    * @return Reserved words
    */
   public Collection<String> getReservedWords() {
-    return new HashSet<>(reservedWords);
+    return Set.copyOf(reservedWords);
   }
 
   /**

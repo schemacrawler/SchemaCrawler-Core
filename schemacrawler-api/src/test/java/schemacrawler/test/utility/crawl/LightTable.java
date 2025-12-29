@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.ForeignKey;
@@ -138,7 +139,7 @@ public final class LightTable implements Table {
 
   @Override
   public List<Column> getColumns() {
-    return new ArrayList<>(columns);
+    return List.copyOf(columns);
   }
 
   @Override
@@ -163,7 +164,7 @@ public final class LightTable implements Table {
 
   @Override
   public Collection<Column> getHiddenColumns() {
-    return new ArrayList<>(hiddenColumns);
+    return Set.copyOf(hiddenColumns);
   }
 
   @Override
@@ -218,7 +219,7 @@ public final class LightTable implements Table {
 
   @Override
   public Collection<Trigger> getTriggers() {
-    return new ArrayList<>(triggers);
+    return List.copyOf(triggers);
   }
 
   @Override

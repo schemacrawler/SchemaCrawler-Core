@@ -101,7 +101,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   /** {@inheritDoc} */
   @Override
   public Collection<PrimaryKey> getAlternateKeys() {
-    return new HashSet<>(alternateKeys.values());
+    return Set.copyOf(alternateKeys.values());
   }
 
   /** {@inheritDoc} */
@@ -131,7 +131,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   /** {@inheritDoc} */
   @Override
   public Collection<Column> getHiddenColumns() {
-    return new HashSet<>(hiddenColumns.values());
+    return Set.copyOf(hiddenColumns.values());
   }
 
   @Override
@@ -160,7 +160,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   /** {@inheritDoc} */
   @Override
   public Collection<DatabaseObject> getUsedByObjects() {
-    return new HashSet<>(usedByObjects);
+    return Set.copyOf(usedByObjects);
   }
 
   /** {@inheritDoc} */

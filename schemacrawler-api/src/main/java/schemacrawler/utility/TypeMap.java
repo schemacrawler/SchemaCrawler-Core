@@ -15,7 +15,6 @@ import java.sql.JDBCType;
 import java.sql.SQLType;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -149,9 +148,8 @@ public final class TypeMap implements Map<String, Class<?>> {
   public Class<?> get(final Object key) {
     if (containsKey(key)) {
       return sqlTypeMap.get(key);
-    } else {
-      return Object.class;
     }
+    return Object.class;
   }
 
   @Override
@@ -166,7 +164,7 @@ public final class TypeMap implements Map<String, Class<?>> {
 
   @Override
   public Set<String> keySet() {
-    return new HashSet<>(sqlTypeMap.keySet());
+    return Set.copyOf(sqlTypeMap.keySet());
   }
 
   @Override
@@ -199,6 +197,6 @@ public final class TypeMap implements Map<String, Class<?>> {
 
   @Override
   public Collection<Class<?>> values() {
-    return new HashSet<>(sqlTypeMap.values());
+    return Set.copyOf(sqlTypeMap.values());
   }
 }

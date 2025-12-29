@@ -15,6 +15,7 @@ import java.io.Serial;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -88,7 +89,7 @@ abstract class MutableRoutine extends AbstractDatabaseObject implements Routine 
 
   @Override
   public Collection<DatabaseObject> getReferencedObjects() {
-    return new HashSet<>(referencedObjects);
+    return Set.copyOf(referencedObjects);
   }
 
   /** {@inheritDoc} */
