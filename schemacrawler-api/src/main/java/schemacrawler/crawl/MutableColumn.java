@@ -9,8 +9,8 @@
 package schemacrawler.crawl;
 
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Privilege;
@@ -46,7 +46,7 @@ final class MutableColumn extends AbstractColumn<Table> implements Column {
   /** {@inheritDoc} */
   @Override
   public Collection<Privilege<Column>> getPrivileges() {
-    return new ArrayList<>(privileges.values());
+    return List.copyOf(privileges.values());
   }
 
   /** {@inheritDoc} */

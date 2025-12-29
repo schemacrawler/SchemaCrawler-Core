@@ -11,7 +11,6 @@ package schemacrawler.crawl;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.List;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraint;
@@ -38,7 +37,7 @@ class MutableTableConstraint extends AbstractDependantObject<Table> implements T
   /** {@inheritDoc} */
   @Override
   public List<TableConstraintColumn> getConstrainedColumns() {
-    return new ArrayList<>(columns.values());
+    return List.copyOf(columns.values());
   }
 
   /** {@inheritDoc} */

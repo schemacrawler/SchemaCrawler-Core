@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -95,7 +94,7 @@ class MutableIndex extends AbstractDependantObject<Table> implements Index {
   /** {@inheritDoc} */
   @Override
   public final List<IndexColumn> getColumns() {
-    return new ArrayList<>(columns.values());
+    return List.copyOf(columns.values());
   }
 
   /** {@inheritDoc} */

@@ -14,6 +14,7 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import schemacrawler.schema.Catalog;
@@ -79,7 +80,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<ColumnDataType> getColumnDataTypes() {
-    return new ArrayList<>(columnDataTypes.values());
+    return List.copyOf(columnDataTypes.values());
   }
 
   /** {@inheritDoc} */
@@ -108,7 +109,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<DatabaseUser> getDatabaseUsers() {
-    return new ArrayList<>(databaseUsers.values());
+    return List.copyOf(databaseUsers.values());
   }
 
   /** {@inheritDoc} */
@@ -120,7 +121,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<Routine> getRoutines() {
-    return new ArrayList<>(routines.values());
+    return List.copyOf(routines.values());
   }
 
   /** {@inheritDoc} */
@@ -148,13 +149,13 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<Schema> getSchemas() {
-    return new ArrayList<>(schemas.values());
+    return List.copyOf(schemas.values());
   }
 
   /** {@inheritDoc} */
   @Override
   public Collection<Sequence> getSequences() {
-    return new ArrayList<>(sequences.values());
+    return List.copyOf(sequences.values());
   }
 
   /** {@inheritDoc} */
@@ -173,7 +174,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<Synonym> getSynonyms() {
-    return new ArrayList<>(synonyms.values());
+    return List.copyOf(synonyms.values());
   }
 
   /** {@inheritDoc} */
@@ -198,7 +199,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<Table> getTables() {
-    return new ArrayList<>(tables.values());
+    return List.copyOf(tables.values());
   }
 
   /** {@inheritDoc} */

@@ -9,8 +9,8 @@
 package schemacrawler.crawl;
 
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.CheckOptionType;
 import schemacrawler.schema.Schema;
@@ -43,7 +43,7 @@ class MutableView extends MutableTable implements View {
   /** {@inheritDoc} */
   @Override
   public Collection<Table> getTableUsage() {
-    return new ArrayList<>(tableUsage.values());
+    return List.copyOf(tableUsage.values());
   }
 
   /** {@inheritDoc} */

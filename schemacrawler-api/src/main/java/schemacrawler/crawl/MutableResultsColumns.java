@@ -9,7 +9,6 @@
 package schemacrawler.crawl;
 
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +29,7 @@ final class MutableResultsColumns extends AbstractNamedObject implements Results
   /** {@inheritDoc} */
   @Override
   public List<ResultsColumn> getColumns() {
-    return new ArrayList<>(columns.values());
+    return List.copyOf(columns.values());
   }
 
   /** {@inheritDoc} */

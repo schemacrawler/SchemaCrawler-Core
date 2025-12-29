@@ -27,6 +27,7 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -153,8 +154,7 @@ public class DataTypeRetrieverTest {
       final Catalog catalog, final String expectedResultsResource) throws IOException {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
-      final List<ColumnDataType> columnDataTypes =
-          (List<ColumnDataType>) catalog.getColumnDataTypes();
+      final List<ColumnDataType> columnDataTypes = new ArrayList<>(catalog.getColumnDataTypes());
       assertThat("ColumnDataType count does not match", columnDataTypes, hasSize(25));
       Collections.sort(columnDataTypes, NamedObjectSort.alphabetical);
       for (final ColumnDataType columnDataType : columnDataTypes) {

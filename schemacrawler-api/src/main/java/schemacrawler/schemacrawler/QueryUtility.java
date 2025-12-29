@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +143,7 @@ public final class QueryUtility {
     if (table != null) {
       final NamedObjectSort columnsSort =
           NamedObjectSort.getNamedObjectSort(isAlphabeticalSortForTableColumns);
-      final List<Column> columns = table.getColumns();
+      final List<Column> columns = new ArrayList<>(table.getColumns());
       columns.sort(columnsSort);
 
       final Schema schema = table.getSchema();

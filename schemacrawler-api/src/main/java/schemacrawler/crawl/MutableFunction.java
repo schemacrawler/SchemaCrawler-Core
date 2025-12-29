@@ -11,7 +11,6 @@ package schemacrawler.crawl;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.Function;
@@ -37,7 +36,7 @@ final class MutableFunction extends MutableRoutine implements Function {
   /** {@inheritDoc} */
   @Override
   public List<FunctionParameter> getParameters() {
-    return new ArrayList<>(columns.values());
+    return List.copyOf(columns.values());
   }
 
   /** {@inheritDoc} */

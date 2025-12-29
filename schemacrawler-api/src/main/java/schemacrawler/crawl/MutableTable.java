@@ -107,7 +107,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   /** {@inheritDoc} */
   @Override
   public List<Column> getColumns() {
-    return new ArrayList<>(columns.values());
+    return List.copyOf(columns.values());
   }
 
   /** {@inheritDoc} */
@@ -142,7 +142,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   /** {@inheritDoc} */
   @Override
   public Collection<Index> getIndexes() {
-    return new ArrayList<>(indexes.values());
+    return List.copyOf(indexes.values());
   }
 
   /** {@inheritDoc} */
@@ -154,7 +154,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   /** {@inheritDoc} */
   @Override
   public Collection<Privilege<Table>> getPrivileges() {
-    return new ArrayList<>(privileges.values());
+    return List.copyOf(privileges.values());
   }
 
   /** {@inheritDoc} */
@@ -199,7 +199,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   /** {@inheritDoc} */
   @Override
   public Collection<TableConstraint> getTableConstraints() {
-    return new ArrayList<>(constraints.values());
+    return List.copyOf(constraints.values());
   }
 
   /** {@inheritDoc} */
@@ -211,7 +211,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   /** {@inheritDoc} */
   @Override
   public Collection<Trigger> getTriggers() {
-    return new ArrayList<>(triggers.values());
+    return List.copyOf(triggers.values());
   }
 
   /** {@inheritDoc} */
