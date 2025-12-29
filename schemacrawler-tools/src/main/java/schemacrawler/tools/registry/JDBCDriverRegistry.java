@@ -9,7 +9,6 @@
 package schemacrawler.tools.registry;
 
 import java.sql.Driver;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +62,7 @@ public class JDBCDriverRegistry extends BasePluginRegistry {
 
   @Override
   public Collection<PropertyName> getRegisteredPlugins() {
-    return new ArrayList<>(jdbcDrivers);
+    return List.copyOf(jdbcDrivers);
   }
 
   @Override

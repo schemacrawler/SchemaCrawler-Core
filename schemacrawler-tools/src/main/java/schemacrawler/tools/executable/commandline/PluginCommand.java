@@ -123,7 +123,7 @@ public class PluginCommand implements Iterable<PluginCommandOption> {
   }
 
   public Collection<PluginCommandOption> getOptions() {
-    return new ArrayList<>(options);
+    return List.copyOf(options);
   }
 
   @Override

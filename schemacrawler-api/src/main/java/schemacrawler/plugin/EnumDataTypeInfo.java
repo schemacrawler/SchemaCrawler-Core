@@ -36,7 +36,7 @@ public class EnumDataTypeInfo implements TypedObject<EnumDataTypeTypes> {
   }
 
   public List<String> getEnumValues() {
-    return new ArrayList<>(enumValues);
+    return List.copyOf(enumValues);
   }
 
   @Override

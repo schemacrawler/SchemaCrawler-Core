@@ -52,7 +52,7 @@ public final class OutputFormatState implements OutputFormat {
 
   @Override
   public List<String> getFormats() {
-    return new ArrayList<>(formatSpecifiers);
+    return List.copyOf(formatSpecifiers);
   }
 
   /**

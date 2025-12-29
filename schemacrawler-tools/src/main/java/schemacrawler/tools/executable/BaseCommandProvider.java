@@ -11,7 +11,6 @@ package schemacrawler.tools.executable;
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
@@ -39,7 +38,7 @@ public abstract class BaseCommandProvider implements CommandProvider {
 
   @Override
   public final Collection<PropertyName> getSupportedCommands() {
-    return new ArrayList<>(supportedCommands);
+    return List.copyOf(supportedCommands);
   }
 
   @Override

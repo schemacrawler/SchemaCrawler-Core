@@ -13,7 +13,6 @@ import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.sql.DriverPropertyInfo;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,7 +48,7 @@ final class ImmutableJdbcDriverProperty extends AbstractProperty implements Jdbc
   /** {@inheritDoc} */
   @Override
   public Collection<String> getChoices() {
-    return new ArrayList<>(choices);
+    return List.copyOf(choices);
   }
 
   /** {@inheritDoc} */
@@ -58,6 +57,7 @@ final class ImmutableJdbcDriverProperty extends AbstractProperty implements Jdbc
     return (String) super.getValue();
   }
 
+  @Override
   public boolean hasDescription() {
     return !isBlank(getDescription());
   }

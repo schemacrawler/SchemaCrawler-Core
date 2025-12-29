@@ -39,7 +39,7 @@ public class ObjectToString {
     for (int i = 0; i < length; i++) {
       objectList.add(Array.get(array, i));
     }
-    return objectList;
+    return List.copyOf(objectList);
   }
 
   public static List<Class<?>> classHierarchy(final Object object) {
@@ -60,14 +60,14 @@ public class ObjectToString {
   public static List<?> collectionOrArrayToList(final Object object) {
 
     if (!isCollectionOrArray(object)) {
-      return new ArrayList<>();
+      return Collections.emptyList();
     }
 
     if (object instanceof List<?> list) {
-      return list;
+      return List.copyOf(list);
     }
     if (object instanceof Collection<?> collection) {
-      return new ArrayList<>(collection);
+      return List.copyOf(collection);
     }
     // We have checked earlier if this was an array, so at this point we are pretty sure it is an
     // array

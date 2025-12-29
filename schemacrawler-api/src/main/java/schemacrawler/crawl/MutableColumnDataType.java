@@ -18,10 +18,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DataTypeType;
+import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.JavaSqlType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.SearchableType;
-import schemacrawler.schema.Identifiers;
 import us.fatehi.utility.string.StringFormat;
 
 /**
@@ -111,7 +111,7 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
   /** {@inheritDoc} */
   @Override
   public List<String> getEnumValues() {
-    return new ArrayList<>(enumValues);
+    return List.copyOf(enumValues);
   }
 
   /** {@inheritDoc} */

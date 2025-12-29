@@ -11,7 +11,6 @@ package schemacrawler.crawl;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
@@ -82,7 +81,7 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
   /** {@inheritDoc} */
   @Override
   public List<ColumnReference> getColumnReferences() {
-    return new ArrayList<>(columnReferences);
+    return List.copyOf(columnReferences);
   }
 
   @Override
