@@ -31,8 +31,10 @@ import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -577,7 +579,8 @@ public class SchemaCrawlerTest {
         for (final Table table : tables) {
           out.println("%s [%s]".formatted(table.getFullName(), table.getTableType()));
 
-          final Collection<DatabaseObject> usedByObjects = table.getUsedByObjects();
+          final List<DatabaseObject> usedByObjects = new ArrayList<>(table.getUsedByObjects());
+          Collections.sort(usedByObjects); // Sort for test reliability
           for (final DatabaseObject usedByObject : usedByObjects) {
             final String type = MetaDataUtility.getTypeName(usedByObject);
             out.println("  ^ %s [%s]".formatted(usedByObject.getFullName(), type));
