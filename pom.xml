@@ -23,7 +23,7 @@
     <!-- SchemaCrawler common -->
     <module>schemacrawler-parent</module>
     <module>schemacrawler-jdbc-drivers</module>
-    <!-- SchemaCrawler test modules -->    
+    <!-- SchemaCrawler test modules -->
     <module>schemacrawler-testdb</module>
     <module>schemacrawler-test-utility</module>
     <!-- SchemaCrawler modules -->
@@ -32,7 +32,7 @@
     <module>schemacrawler-tools</module>
     <module>schemacrawler-loader</module>
     <!-- SchemaCrawler jars -->
-		<module>schemacrawler-verify</module>
+    <module>schemacrawler-verify</module>
     <module>schemacrawler</module>
     <module>schemacrawler-tests</module>
   </modules>

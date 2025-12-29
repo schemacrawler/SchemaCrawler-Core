@@ -97,8 +97,6 @@ public final class RetrievalCounts extends InclusionCounts {
     }
 
     final Level level = Level.INFO;
-    if (LOGGER.isLoggable(level)) {}
-
     if (LOGGER.isLoggable(level)) {
       final int count = keyCount.get(key);
       final int includedCount = includedKeyCount.get(key);
