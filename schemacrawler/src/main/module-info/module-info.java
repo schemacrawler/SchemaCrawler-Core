@@ -59,4 +59,8 @@ module us.fatehi.schemacrawler.schemacrawler {
       schemacrawler.loader.counts.TableRowCountsCatalogLoader,
       schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoader,
       schemacrawler.tools.catalogloader.SchemaCrawlerCatalogLoader;
+
+  // Allow reflection of schema model
+  opens schemacrawler.schema to
+      tools.jackson.databind;
 }
