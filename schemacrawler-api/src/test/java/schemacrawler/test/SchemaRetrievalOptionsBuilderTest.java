@@ -14,7 +14,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -293,7 +292,7 @@ public class SchemaRetrievalOptionsBuilderTest {
         builder.toOptions().get(SchemaInfoMetadataRetrievalStrategy.foreignKeysRetrievalStrategy);
     assertThat(metadataRetrievalStrategy, is(MetadataRetrievalStrategy.data_dictionary_all));
 
-    assertThat(builder.get(null), is(nullValue()));
+    assertThrows(NullPointerException.class, () -> builder.toOptions().get(null));
 
     // -- Set with variations of null arguments
 

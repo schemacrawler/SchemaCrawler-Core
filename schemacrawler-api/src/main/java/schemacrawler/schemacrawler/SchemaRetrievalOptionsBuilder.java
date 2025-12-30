@@ -131,14 +131,6 @@ public final class SchemaRetrievalOptionsBuilder
     return this;
   }
 
-  public MetadataRetrievalStrategy get(
-      final SchemaInfoMetadataRetrievalStrategy schemaInfoMetadataRetrievalStrategy) {
-    if (schemaInfoMetadataRetrievalStrategy != null) {
-      return metadataRetrievalStrategyMap.get(schemaInfoMetadataRetrievalStrategy);
-    }
-    return null;
-  }
-
   @Override
   public SchemaRetrievalOptions toOptions() {
     return new SchemaRetrievalOptions(this);
