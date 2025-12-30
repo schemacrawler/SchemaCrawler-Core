@@ -65,7 +65,7 @@ public final class UtilityLogger {
       return;
     }
 
-    final String passwordRedacted = "<password provided>";
+    final String redacted = "<REDACTED>";
     final StringJoiner argsList = new StringJoiner(System.lineSeparator());
     for (final Iterator<String> iterator = Arrays.asList(args).iterator(); iterator.hasNext(); ) {
       final String arg = iterator.next();
@@ -73,9 +73,9 @@ public final class UtilityLogger {
         continue;
       }
       if (arg.matches("--password.*=.*")) {
-        argsList.add(passwordRedacted);
+        argsList.add(redacted);
       } else if (arg.startsWith("--password")) {
-        argsList.add(passwordRedacted);
+        argsList.add(redacted);
         if (iterator.hasNext()) {
           // Skip over the password
           iterator.next();

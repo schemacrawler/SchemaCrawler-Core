@@ -100,7 +100,7 @@ class MutableIndex extends AbstractDependantObject<Table> implements Index {
   /** {@inheritDoc} */
   @Override
   public final String getDefinition() {
-    return definition.toString();
+    return definition;
   }
 
   @Override

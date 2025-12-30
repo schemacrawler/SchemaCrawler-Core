@@ -60,7 +60,7 @@ public final class Utility {
    * @return Whether the string is all lowercase.
    */
   public static boolean hasNoUpperCase(final String text) {
-    return text != null && text.equals(text.toLowerCase());
+    return text != null && text.codePoints().allMatch(Character::isLowerCase);
   }
 
   /**
