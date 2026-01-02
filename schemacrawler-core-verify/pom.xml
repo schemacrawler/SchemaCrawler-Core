@@ -1,17 +1,21 @@
-<?xml version="1.0"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>us.fatehi</groupId>
     <artifactId>schemacrawler-parent</artifactId>
     <version>17.4.0</version>
     <relativePath>../schemacrawler-parent/pom.xml</relativePath>
   </parent>
-  <artifactId>schemacrawler-verify</artifactId>
+  <artifactId>schemacrawler-core-verify</artifactId>
   <packaging>jar</packaging>
+
   <name>SchemaCrawler - Verify Uber Jar</name>
+
   <dependencies>
 
     <dependency>
@@ -63,6 +67,7 @@
     </dependency>
 
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -86,34 +91,8 @@
           <skipPublishing>true</skipPublishing>
         </configuration>
       </plugin>
+
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>test-coverage-build</id>
-      <activation>
-        <property>
-          <name>testcoverage</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>${jacoco.version}</version>
-            <executions>
-              <execution>
-                <id>report-aggregate</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>report-aggregate</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+
 </project>

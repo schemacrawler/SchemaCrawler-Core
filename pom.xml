@@ -32,9 +32,9 @@
     <module>schemacrawler-tools</module>
     <module>schemacrawler-loader</module>
     <!-- SchemaCrawler jars -->
-    <module>schemacrawler-verify</module>
     <module>schemacrawler</module>
     <module>schemacrawler-tests</module>
+    <module>schemacrawler-core-verify</module>
   </modules>
 
 </project>
