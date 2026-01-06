@@ -30,6 +30,7 @@ import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Function;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
@@ -55,25 +56,6 @@ import us.fatehi.utility.graph.TreeNode;
 
 @UtilityMarker
 public final class MetaDataUtility {
-
-  public enum ForeignKeyCardinality {
-    unknown(""),
-    zero_one("(0..1)"),
-    zero_many("(0..many)"),
-    one_one("(1..1)"),
-    one_many("(1..many)");
-
-    private final String description;
-
-    ForeignKeyCardinality(final String description) {
-      this.description = requireNonNull(description, "No description provided");
-    }
-
-    @Override
-    public String toString() {
-      return description;
-    }
-  }
 
   public enum SimpleDatabaseObjectType {
     unknown,

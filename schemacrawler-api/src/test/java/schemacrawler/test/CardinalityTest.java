@@ -22,6 +22,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Schema;
@@ -29,7 +30,6 @@ import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.utility.MetaDataUtility;
-import schemacrawler.utility.MetaDataUtility.ForeignKeyCardinality;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 
 @WithTestDatabase(script = "/cardinality.sql")
