@@ -31,6 +31,7 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Function;
+import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.JavaSqlTypeGroup;
@@ -48,7 +49,6 @@ import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TypedObject;
 import schemacrawler.schema.View;
-import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.graph.TreeNode;
@@ -60,7 +60,8 @@ public final class MetaDataUtility {
     unknown(""),
     zero_one("(0..1)"),
     zero_many("(0..many)"),
-    one_one("(1..1)");
+    one_one("(1..1)"),
+    one_many("(1..many)");
 
     private final String description;
 
@@ -107,15 +108,24 @@ public final class MetaDataUtility {
       return ForeignKeyCardinality.unknown;
     }
     final boolean isForeignKeyUnique = isForeignKeyUnique(tableRef);
+    final boolean isForeignKeyNullable = isForeignKeyNullable(tableRef);
     final boolean isColumnReference = tableRef.getDependentTable() instanceof PartialDatabaseObject;
 
     final ForeignKeyCardinality connectivity;
     if (isColumnReference) {
       connectivity = ForeignKeyCardinality.unknown;
     } else if (isForeignKeyUnique) {
-      connectivity = ForeignKeyCardinality.zero_one;
+      if (isForeignKeyNullable) {
+        connectivity = ForeignKeyCardinality.zero_one;
+      } else {
+        connectivity = ForeignKeyCardinality.one_one;
+      }
     } else {
-      connectivity = ForeignKeyCardinality.zero_many;
+      if (isForeignKeyNullable) {
+        connectivity = ForeignKeyCardinality.zero_many;
+      } else {
+        connectivity = ForeignKeyCardinality.one_many;
+      }
     }
     return connectivity;
   }
@@ -260,6 +270,18 @@ public final class MetaDataUtility {
       }
     }
     return inclusionRuleString;
+  }
+
+  public static boolean isForeignKeyNullable(final TableReference tableRef) {
+    if (tableRef == null) {
+      return false;
+    }
+    for (final ColumnReference columnReference : tableRef) {
+      if (columnReference.getForeignKeyColumn().isNullable()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static boolean isForeignKeyUnique(final TableReference tableRef) {
