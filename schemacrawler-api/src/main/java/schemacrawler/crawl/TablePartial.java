@@ -143,7 +143,7 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
 
   @Override
   public boolean hasIndexes() {
-    return false;
+    throw new NotLoadedException(this);
   }
 
   /** {@inheritDoc} */
@@ -154,12 +154,12 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
 
   @Override
   public boolean hasTriggers() {
-    return false;
+    throw new NotLoadedException(this);
   }
 
   @Override
   public boolean isSelfReferencing() {
-    return false;
+    throw new NotLoadedException(this);
   }
 
   @Override
