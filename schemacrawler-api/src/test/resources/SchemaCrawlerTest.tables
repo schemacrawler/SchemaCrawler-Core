@@ -1,60 +1,130 @@
 PUBLIC.BOOKS.AUTHORS [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=Contact details for book authors
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=true
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=Contact details for book authors
 PUBLIC.BOOKS.AUTHORSLIST [view]
-  ~ INSERTABLE_INTO=YES
-  ~ IS_TRIGGER_DELETABLE=NO
-  ~ IS_TRIGGER_INSERTABLE_INTO=NO
-  ~ IS_TRIGGER_UPDATABLE=NO
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=false
+  - has-indexes=false
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ INSERTABLE_INTO=YES
+    ~ IS_TRIGGER_DELETABLE=NO
+    ~ IS_TRIGGER_INSERTABLE_INTO=NO
+    ~ IS_TRIGGER_UPDATABLE=NO
+    ~ READ_ONLY=false
+    ~ REMARKS=
 PUBLIC.BOOKS.BOOKAUTHORS [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=Relationship between books and their authors, 
+  - has-primary-key=false
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=Relationship between books and their authors, 
 along with the latest updated information
 PUBLIC.BOOKS.BOOKS [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=Details for published books
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=true
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=Details for published books
 PUBLIC.BOOKS."Celebrities" [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=
 PUBLIC.BOOKS."Celebrity Updates" [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=
 PUBLIC.BOOKS.COUPONS [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=
 PUBLIC.BOOKS.CUSTOMERDATA [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=
 PUBLIC.BOOKS.CUSTOMERS [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=
 PUBLIC.BOOKS.PUBLISHERS [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=List of book publishers
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=List of book publishers
 PUBLIC.BOOKS.ΒΙΒΛΊΑ [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=
 PUBLIC."PUBLISHER SALES".REGIONS [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=true
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=
 PUBLIC."PUBLISHER SALES".SALES [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=false
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=
 PUBLIC."PUBLISHER SALES".SALESDATA [table]
-  ~ HSQLDB_TYPE=MEMORY
-  ~ READ_ONLY=false
-  ~ REMARKS=
+  - has-primary-key=false
+  - has-indexes=true
+  - has-triggers=false
+  - self-referencing=false
+  - attributes
+    ~ HSQLDB_TYPE=MEMORY
+    ~ READ_ONLY=false
+    ~ REMARKS=
