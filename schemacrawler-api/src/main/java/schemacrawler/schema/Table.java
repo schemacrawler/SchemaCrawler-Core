@@ -10,6 +10,7 @@ package schemacrawler.schema;
 
 import static schemacrawler.schema.TableRelationshipType.child;
 import static schemacrawler.schema.TableRelationshipType.parent;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -183,6 +184,13 @@ public interface Table
    * @return True if the table has an index.
    */
   boolean hasTriggers();
+
+  /**
+   * If the table has foreign keys that reference itself.
+   *
+   * @return True if the table is self-referencing.
+   */
+  boolean isSelfReferencing();
 
   /**
    * Gets an alternate key by unqualified name.

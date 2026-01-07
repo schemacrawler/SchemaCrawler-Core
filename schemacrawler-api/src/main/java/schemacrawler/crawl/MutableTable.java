@@ -64,6 +64,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   private MutablePrimaryKey primaryKey;
   private int sortIndex;
   private TableType tableType = TableType.UNKNOWN; // Default value
+  private boolean isSelfReferencing;
   private String definition;
 
   MutableTable(final Schema schema, final String name) {
@@ -159,12 +160,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
 
   /** {@inheritDoc} */
   @Override
-  public Collection<DatabaseObject> getUsedByObjects() {
-    return Set.copyOf(usedByObjects);
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public Collection<Table> getRelatedTables(final TableRelationshipType tableRelationshipType) {
     final Set<Table> relatedTables = new HashSet<>();
     if (tableRelationshipType != null && tableRelationshipType != TableRelationshipType.none) {
@@ -222,6 +217,12 @@ class MutableTable extends AbstractDatabaseObject implements Table {
 
   /** {@inheritDoc} */
   @Override
+  public Collection<DatabaseObject> getUsedByObjects() {
+    return Set.copyOf(usedByObjects);
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public Collection<WeakAssociation> getWeakAssociations() {
     return getTableReferences(weakAssociations, TableAssociationType.all);
   }
@@ -253,6 +254,11 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   @Override
   public final boolean hasTriggers() {
     return !triggers.isEmpty();
+  }
+
+  @Override
+  public boolean isSelfReferencing() {
+    return isSelfReferencing;
   }
 
   /** {@inheritDoc} */
@@ -367,6 +373,10 @@ class MutableTable extends AbstractDatabaseObject implements Table {
     if (primaryKey != null) {
       this.primaryKey = primaryKey;
     }
+  }
+
+  final void setSelfReferencing() {
+    isSelfReferencing = true;
   }
 
   final void setSortIndex(final int sortIndex) {

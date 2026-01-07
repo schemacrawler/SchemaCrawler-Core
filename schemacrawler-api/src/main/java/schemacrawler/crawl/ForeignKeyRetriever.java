@@ -124,6 +124,10 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     final Table fkTable = fkColumn.getParent();
     final Table pkTable = pkColumn.getParent();
 
+    if (fkTable instanceof MutableTable mutableFkTable && fkTable.equals(pkTable)) {
+      mutableFkTable.setSelfReferencing();
+    }
+
     if (isBlank(foreignKeyName)) {
       foreignKeyName = RetrieverUtility.constructForeignKeyName(fkTable, pkTable);
       LOGGER.log(

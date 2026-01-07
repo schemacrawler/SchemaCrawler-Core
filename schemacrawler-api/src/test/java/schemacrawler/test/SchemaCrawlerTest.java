@@ -604,9 +604,16 @@ public class SchemaCrawlerTest {
         for (final Table table : tables) {
           out.println("%s [%s]".formatted(table.getFullName(), table.getTableType()));
 
+          out.println("  - has-primary-key=%s".formatted(table.hasPrimaryKey()));
+          out.println("  - has-indexes=%s".formatted(table.hasIndexes()));
+          out.println("  - has-triggers=%s".formatted(table.hasTriggers()));
+          out.println("  - self-referencing=%s".formatted(table.isSelfReferencing()));
+
+          out.println("  - attributes");
           final SortedMap<String, Object> tableAttributes = new TreeMap<>(table.getAttributes());
           for (final Entry<String, Object> tableAttribute : tableAttributes.entrySet()) {
-            out.println("  ~ %s=%s".formatted(tableAttribute.getKey(), tableAttribute.getValue()));
+            out.println(
+                "    ~ %s=%s".formatted(tableAttribute.getKey(), tableAttribute.getValue()));
           }
         }
       }
