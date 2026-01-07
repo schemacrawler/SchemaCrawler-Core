@@ -259,7 +259,8 @@ public final class MetaDataUtility {
       return false;
     }
     for (final ColumnReference columnReference : tableRef) {
-      if (columnReference.getForeignKeyColumn().isNullable()) {
+      final Column foreignKeyColumn = columnReference.getForeignKeyColumn();
+      if (!(foreignKeyColumn instanceof PartialDatabaseObject) && foreignKeyColumn.isNullable()) {
         return true;
       }
     }
