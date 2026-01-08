@@ -62,7 +62,5 @@ public interface TableReference
    *
    * @return True if the table is self-referencing.
    */
-  default boolean isSelfReferencing() {
-    return getForeignKeyTable().isSelfReferencing();
-  }
+  boolean isSelfReferencing();
 }
