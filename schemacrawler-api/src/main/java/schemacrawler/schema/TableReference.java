@@ -56,4 +56,13 @@ public interface TableReference
   default Table getReferencedTable() {
     return getPrimaryKeyTable();
   }
+
+  /**
+   * If the table references itself.
+   *
+   * @return True if the table is self-referencing.
+   */
+  default boolean isSelfReferencing() {
+    return getForeignKeyTable().isSelfReferencing();
+  }
 }
