@@ -82,6 +82,7 @@ public class ForeignKeyRetrieverTest {
             out.println("      definition: " + foreignKey.getDefinition());
             out.println("      deferrability: " + foreignKey.getDeferrability());
             out.println("      initially deferred: " + foreignKey.isInitiallyDeferred());
+            out.println("      self-referencing: " + foreignKey.isSelfReferencing());
             out.println("      delete rule: " + foreignKey.getDeleteRule());
             out.println("      update rule: " + foreignKey.getUpdateRule());
 
