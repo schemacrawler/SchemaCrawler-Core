@@ -27,10 +27,12 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
@@ -50,6 +52,7 @@ import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
+import schemacrawler.utility.MetaDataUtility;
 import schemacrawler.utility.NamedObjectSort;
 import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
@@ -88,6 +91,7 @@ public class ForeignKeyRetrieverTest {
 
             out.println("      dependent table: " + foreignKey.getDependentTable());
             out.println("      referenced table: " + foreignKey.getReferencedTable());
+            out.println("      cardinality: " + MetaDataUtility.findForeignKeyCardinality(foreignKey));
             out.println("      column references: ");
             final List<ColumnReference> columnReferences = foreignKey.getColumnReferences();
             for (final ColumnReference columnReference : columnReferences) {
