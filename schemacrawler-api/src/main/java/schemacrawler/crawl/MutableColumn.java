@@ -31,6 +31,7 @@ final class MutableColumn extends AbstractColumn<Table> implements Column {
   private boolean isPartOfIndex;
   private boolean isPartOfPrimaryKey;
   private boolean isPartOfUniqueIndex;
+  private boolean isPartOfSelfReferencingRelationship;
   private Column referencedColumn;
 
   MutableColumn(final Table parent, final String name) {
@@ -91,6 +92,11 @@ final class MutableColumn extends AbstractColumn<Table> implements Column {
     return isPartOfPrimaryKey;
   }
 
+  @Override
+  public boolean isPartOfSelfReferencingRelationship() {
+    return isPartOfSelfReferencingRelationship;
+  }
+
   /** {@inheritDoc} */
   @Override
   public boolean isPartOfUniqueIndex() {
@@ -113,6 +119,10 @@ final class MutableColumn extends AbstractColumn<Table> implements Column {
 
   void markAsPartOfPrimaryKey() {
     isPartOfPrimaryKey = true;
+  }
+
+  void markAsPartOfSelfReferencingRelationship() {
+    isPartOfSelfReferencingRelationship = true;
   }
 
   void markAsPartOfUniqueIndex() {

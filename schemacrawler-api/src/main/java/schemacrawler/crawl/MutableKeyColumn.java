@@ -158,6 +158,12 @@ class MutableKeyColumn extends AbstractDependantObject<Table> implements Column 
 
   /** {@inheritDoc} */
   @Override
+  public boolean isPartOfSelfReferencingRelationship() {
+    return column.isPartOfSelfReferencingRelationship();
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public boolean isPartOfUniqueIndex() {
     return column.isPartOfUniqueIndex();
   }

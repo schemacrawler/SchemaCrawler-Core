@@ -87,11 +87,27 @@ public interface Column extends BaseColumn<Table> {
   boolean isPartOfPrimaryKey();
 
   /**
+   * True if this column is part of a foreign key that references the same table.
+   *
+   * @return If the column is part of a self-referencing relationship
+   */
+  boolean isPartOfSelfReferencingRelationship();
+
+  /**
    * True if this column is part of an unique index.
    *
    * @return If the column is part of an unique index
    */
   boolean isPartOfUniqueIndex();
+
+  /**
+   * True if this column is participates in a primary or foreign key, or an index.
+   *
+   * @return If the column is significant because it is part of a key or index
+   */
+  default boolean isSignificant() {
+    return (isPartOfPrimaryKey() || isPartOfForeignKey() || isPartOfIndex());
+  }
 
   /**
    * Gets a privilege by unqualified name.

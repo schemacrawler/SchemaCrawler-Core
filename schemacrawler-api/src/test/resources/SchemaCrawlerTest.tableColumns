@@ -9,10 +9,15 @@ PUBLIC.BOOKS.AUTHORS.ID
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -31,10 +36,15 @@ PUBLIC.BOOKS.AUTHORS.FIRSTNAME
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
@@ -52,10 +62,15 @@ PUBLIC.BOOKS.AUTHORS.LASTNAME
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=3
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
@@ -73,10 +88,15 @@ PUBLIC.BOOKS.AUTHORS.ADDRESS1
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=4
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
@@ -94,10 +114,15 @@ PUBLIC.BOOKS.AUTHORS.ADDRESS2
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=5
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
@@ -115,10 +140,15 @@ PUBLIC.BOOKS.AUTHORS.CITY
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=6
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
@@ -136,10 +166,15 @@ PUBLIC.BOOKS.AUTHORS.STATE
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=7
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=2
     ~ IS_GENERATED=NEVER
@@ -157,10 +192,15 @@ PUBLIC.BOOKS.AUTHORS.POSTALCODE
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=8
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=10
     ~ IS_GENERATED=NEVER
@@ -178,10 +218,15 @@ PUBLIC.BOOKS.AUTHORS.COUNTRY
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=9
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
@@ -200,10 +245,15 @@ PUBLIC.BOOKS.AUTHORSLIST.ID
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -222,10 +272,15 @@ PUBLIC.BOOKS.AUTHORSLIST.FIRSTNAME
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
@@ -243,10 +298,15 @@ PUBLIC.BOOKS.AUTHORSLIST.LASTNAME
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=3
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
@@ -265,10 +325,15 @@ PUBLIC.BOOKS.BOOKAUTHORS.BOOKID
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=true
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -287,10 +352,15 @@ PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=true
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -309,10 +379,15 @@ PUBLIC.BOOKS.BOOKAUTHORS.SOMEDATA
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=3
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=30
     ~ IS_GENERATED=NEVER
@@ -331,10 +406,15 @@ PUBLIC.BOOKS.BOOKS.ID
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=1
   - remarks=Unique (internal) id for book
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -353,10 +433,15 @@ PUBLIC.BOOKS.BOOKS.TITLE
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=Book title
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
@@ -374,11 +459,16 @@ PUBLIC.BOOKS.BOOKS.DESCRIPTION
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=3
   - remarks=Book description
 (Usually the blurb from the book jacket or promotional materials)
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
@@ -397,10 +487,15 @@ PUBLIC.BOOKS.BOOKS.PUBLISHERID
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=4
   - remarks=Foreign key to the book publisher
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -419,10 +514,15 @@ PUBLIC.BOOKS.BOOKS.PUBLICATIONDATE
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=5
   - remarks=Book publication date
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -441,10 +541,15 @@ PUBLIC.BOOKS.BOOKS.PRICE
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=6
   - remarks=Current price for the book
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -463,10 +568,15 @@ PUBLIC.BOOKS.BOOKS.PREVIOUSEDITIONID
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=true
   - ordinal position=7
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=true
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -486,10 +596,15 @@ PUBLIC.BOOKS."Celebrities"."Id"
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -508,10 +623,15 @@ PUBLIC.BOOKS."Celebrities".NAME
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
@@ -530,10 +650,15 @@ PUBLIC.BOOKS."Celebrity Updates"."Celebrity Id"
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=true
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -552,10 +677,15 @@ PUBLIC.BOOKS."Celebrity Updates"."UPDATE"
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
@@ -574,10 +704,15 @@ PUBLIC.BOOKS.COUPONS.ID
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -596,10 +731,15 @@ PUBLIC.BOOKS.COUPONS.DATA
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=1073741824
     ~ IS_GENERATED=NEVER
@@ -617,10 +757,15 @@ PUBLIC.BOOKS.COUPONS.COUPONS
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=3
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -638,10 +783,15 @@ PUBLIC.BOOKS.COUPONS.BOOKS
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=4
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -660,10 +810,15 @@ PUBLIC.BOOKS.CUSTOMERDATA.ID
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -682,10 +837,15 @@ PUBLIC.BOOKS.CUSTOMERDATA.DATA
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
@@ -705,10 +865,15 @@ PUBLIC.BOOKS.CUSTOMERS.ID
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -727,10 +892,15 @@ PUBLIC.BOOKS.CUSTOMERS.FIRSTNAME
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=100
     ~ IS_GENERATED=NEVER
@@ -749,10 +919,15 @@ PUBLIC.BOOKS.CUSTOMERS.LASTNAME
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=3
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=100
     ~ IS_GENERATED=NEVER
@@ -771,10 +946,15 @@ PUBLIC.BOOKS.CUSTOMERS.AGE
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=4
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -795,10 +975,15 @@ PUBLIC.BOOKS.PUBLISHERS.ID
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=1
   - remarks=Unique (internal) id for book publisher
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -817,10 +1002,15 @@ PUBLIC.BOOKS.PUBLISHERS.PUBLISHER
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=Name of book publisher
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
@@ -839,10 +1029,15 @@ PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΜΟΝΑΔΙΚΌΣ
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -861,10 +1056,15 @@ PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΤΊΤΛΟΣ
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
@@ -882,10 +1082,15 @@ PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΠΕΡΙΓΡΑΦΉ
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=3
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
@@ -903,10 +1108,15 @@ PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΕΚΔΌΤΗΣ
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=true
   - ordinal position=4
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -926,10 +1136,15 @@ PUBLIC."PUBLISHER SALES".REGIONS.CITY
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
@@ -947,10 +1162,15 @@ PUBLIC."PUBLISHER SALES".REGIONS.STATE
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=2
     ~ IS_GENERATED=NEVER
@@ -968,10 +1188,15 @@ PUBLIC."PUBLISHER SALES".REGIONS.POSTALCODE
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=3
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=10
     ~ IS_GENERATED=NEVER
@@ -989,10 +1214,15 @@ PUBLIC."PUBLISHER SALES".REGIONS.COUNTRY
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=true
-  - part of foreign key=false
   - ordinal position=4
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
@@ -1011,10 +1241,15 @@ PUBLIC."PUBLISHER SALES".SALES.POSTALCODE
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=true
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=10
     ~ IS_GENERATED=NEVER
@@ -1032,10 +1267,15 @@ PUBLIC."PUBLISHER SALES".SALES.COUNTRY
   - nullable=false
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=true
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
@@ -1053,10 +1293,15 @@ PUBLIC."PUBLISHER SALES".SALES.BOOKID
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=true
   - ordinal position=3
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -1075,10 +1320,15 @@ PUBLIC."PUBLISHER SALES".SALES.COUPON_ID
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=4
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -1097,10 +1347,15 @@ PUBLIC."PUBLISHER SALES".SALES.PERIODENDDATE
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=5
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -1119,10 +1374,15 @@ PUBLIC."PUBLISHER SALES".SALES.TOTALAMOUNT
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=6
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -1141,10 +1401,15 @@ PUBLIC."PUBLISHER SALES".SALES.SALESDATAID
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=true
   - ordinal position=7
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -1164,10 +1429,15 @@ PUBLIC."PUBLISHER SALES".SALESDATA.SALESDATAID
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=1
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
@@ -1186,10 +1456,15 @@ PUBLIC."PUBLISHER SALES".SALESDATA.YEARLYAMOUNT
   - nullable=true
   - generated=false
   - hidden=false
-  - part of primary key=false
-  - part of foreign key=false
   - ordinal position=2
   - remarks=
+  - participation in relationships and constraints
+    - part of primary key=false
+    - part of foreign key=false
+    - part of index=false
+    - part of unique index=false
+    - part of self-reference=false
+    - is significant=false
   - attibutes=
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER

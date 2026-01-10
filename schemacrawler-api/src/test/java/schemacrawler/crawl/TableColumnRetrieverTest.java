@@ -33,10 +33,12 @@ import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import schemacrawler.inclusionrule.IncludeAll;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
@@ -91,10 +93,16 @@ public class TableColumnRetrieverTest {
             out.println("  - %s=%s".formatted("nullable", column.isNullable()));
             out.println("  - %s=%s".formatted("generated", column.isGenerated()));
             out.println("  - %s=%s".formatted("hidden", column.isHidden()));
-            out.println("  - %s=%s".formatted("part of primary key", column.isPartOfPrimaryKey()));
-            out.println("  - %s=%s".formatted("part of foreign key", column.isPartOfForeignKey()));
             out.println("  - %s=%s".formatted("ordinal position", column.getOrdinalPosition()));
             out.println("  - %s=%s".formatted("remarks", column.getRemarks()));
+            //
+            out.println("  - participation in relationships and constraints");
+            out.println("    - %s=%s".formatted("part of primary key", column.isPartOfPrimaryKey()));
+            out.println("    - %s=%s".formatted("part of foreign key", column.isPartOfForeignKey()));
+            out.println("    - %s=%s".formatted("part of index", column.isPartOfIndex()));
+            out.println("    - %s=%s".formatted("part of unique index", column.isPartOfUniqueIndex()));
+            out.println("    - %s=%s".formatted("part of self-reference", column.isPartOfSelfReferencingRelationship()));
+            out.println("    - %s=%s".formatted("is significant", column.isSignificant()));
 
             out.println("  - %s=%s".formatted("attibutes", ""));
             final SortedMap<String, Object> columnAttributes =
