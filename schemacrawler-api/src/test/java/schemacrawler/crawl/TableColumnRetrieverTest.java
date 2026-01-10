@@ -91,12 +91,24 @@ public class TableColumnRetrieverTest {
             out.println("  - %s=%s".formatted("nullable", column.isNullable()));
             out.println("  - %s=%s".formatted("generated", column.isGenerated()));
             out.println("  - %s=%s".formatted("hidden", column.isHidden()));
-            out.println("  - %s=%s".formatted("part of primary key", column.isPartOfPrimaryKey()));
-            out.println("  - %s=%s".formatted("part of foreign key", column.isPartOfForeignKey()));
             out.println("  - %s=%s".formatted("ordinal position", column.getOrdinalPosition()));
             out.println("  - %s=%s".formatted("remarks", column.getRemarks()));
-
-            out.println("  - %s=%s".formatted("attibutes", ""));
+            //
+            out.println("  - participation in relationships and constraints");
+            out.println(
+                "    - %s=%s".formatted("part of primary key", column.isPartOfPrimaryKey()));
+            out.println(
+                "    - %s=%s".formatted("part of foreign key", column.isPartOfForeignKey()));
+            out.println("    - %s=%s".formatted("part of index", column.isPartOfIndex()));
+            out.println(
+                "    - %s=%s".formatted("part of unique index", column.isPartOfUniqueIndex()));
+            out.println(
+                "    - %s=%s"
+                    .formatted(
+                        "part of self-reference", column.isPartOfSelfReferencingRelationship()));
+            out.println("    - %s=%s".formatted("is significant", column.isSignificant()));
+            //
+            out.println("  - attributes");
             final SortedMap<String, Object> columnAttributes =
                 new TreeMap<>(column.getAttributes());
             for (final Entry<String, Object> columnAttribute : columnAttributes.entrySet()) {
@@ -507,17 +519,21 @@ public class TableColumnRetrieverTest {
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
+    final NamedObjectList<MutableTable> allTables = catalog.getAllTables();
+
     final TableColumnRetriever tableColumnRetriever =
         new TableColumnRetriever(retrieverConnection, catalog, options);
-    tableColumnRetriever.retrieveTableColumns(catalog.getAllTables(), new IncludeAll());
+    tableColumnRetriever.retrieveTableColumns(allTables, new IncludeAll());
 
     // Fix foreign-keys in the original catalog
     final ForeignKeyRetriever foreignKeyRetriever =
         new ForeignKeyRetriever(retrieverConnection, catalog, options);
-    foreignKeyRetriever.retrieveForeignKeys(catalog.getAllTables());
+    foreignKeyRetriever.retrieveForeignKeys(allTables);
     final PrimaryKeyRetriever primaryKeyRetriever =
         new PrimaryKeyRetriever(retrieverConnection, catalog, options);
-    primaryKeyRetriever.retrievePrimaryKeys(catalog.getAllTables());
+    primaryKeyRetriever.retrievePrimaryKeys(allTables);
+    final IndexRetriever indexRetriever = new IndexRetriever(retrieverConnection, catalog, options);
+    indexRetriever.retrieveIndexes(allTables);
 
     verifyRetrieveTableColumns(catalog);
   }

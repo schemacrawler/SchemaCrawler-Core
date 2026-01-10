@@ -242,6 +242,11 @@ final class LightColumn implements Column {
   }
 
   @Override
+  public boolean isPartOfSelfReferencingRelationship() {
+    return false;
+  }
+
+  @Override
   public boolean isPartOfUniqueIndex() {
     return true;
   }

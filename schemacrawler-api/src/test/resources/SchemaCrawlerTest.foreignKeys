@@ -4,6 +4,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKAUTHORS
@@ -20,6 +21,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKAUTHORS
@@ -34,6 +36,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKAUTHORS
@@ -49,6 +52,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: true
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKS
@@ -63,6 +67,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
@@ -77,6 +82,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKAUTHORS
@@ -92,6 +98,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC.BOOKS."Celebrity Updates"
@@ -107,6 +114,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC.BOOKS."Celebrity Updates"
@@ -125,6 +133,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC.BOOKS.ΒΙΒΛΊΑ
@@ -140,6 +149,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC.BOOKS.ΒΙΒΛΊΑ
@@ -158,6 +168,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
@@ -176,6 +187,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
@@ -190,6 +202,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
@@ -204,6 +217,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
@@ -222,6 +236,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      self-referencing: false
       delete rule: no action
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES

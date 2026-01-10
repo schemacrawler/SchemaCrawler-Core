@@ -73,6 +73,12 @@ public final class LightTable implements Table {
     return column;
   }
 
+  public LightColumn addEnumeratedColumn(final String name) {
+    final LightColumn column = LightColumn.newEnumeratedColumn(this, name);
+    columns.add(column);
+    return column;
+  }
+
   public LightColumn addGeneratedColumn(final String name) {
     final LightColumn column = LightColumn.newGeneratedColumn(this, name);
     columns.add(column);
@@ -82,12 +88,6 @@ public final class LightTable implements Table {
   public LightColumn addHiddenColumn(final String name) {
     final LightColumn column = LightColumn.newHiddenColumn(this, name);
     hiddenColumns.add(column);
-    return column;
-  }
-
-  public LightColumn addEnumeratedColumn(final String name) {
-    final LightColumn column = LightColumn.newEnumeratedColumn(this, name);
-    columns.add(column);
     return column;
   }
 
@@ -275,6 +275,11 @@ public final class LightTable implements Table {
   @Override
   public boolean hasTriggers() {
     return !triggers.isEmpty();
+  }
+
+  @Override
+  public boolean isSelfReferencing() {
+    return false;
   }
 
   @Override

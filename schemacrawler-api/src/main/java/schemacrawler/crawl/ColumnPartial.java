@@ -125,6 +125,11 @@ final class ColumnPartial extends AbstractDependantObject<Table>
   }
 
   @Override
+  public boolean isPartOfSelfReferencingRelationship() {
+    throw new NotLoadedException(this);
+  }
+
+  @Override
   public boolean isPartOfUniqueIndex() {
     throw new NotLoadedException(this);
   }

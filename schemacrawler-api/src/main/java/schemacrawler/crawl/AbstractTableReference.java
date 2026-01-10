@@ -34,6 +34,7 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
 
   private final Table pkTable;
   private final SortedSet<ColumnReference> columnReferences;
+  private final boolean isSelfReferencing;
 
   public AbstractTableReference(final String name, final ColumnReference columnReference) {
     super(
@@ -45,6 +46,8 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
     pkTable = columnReference.getPrimaryKeyColumn().getParent();
     columnReferences = new TreeSet<>();
     addColumnReference(columnReference);
+
+    isSelfReferencing = getParent().equals(pkTable);
   }
 
   /**
@@ -92,6 +95,12 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
   @Override
   public Table getPrimaryKeyTable() {
     return pkTable;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isSelfReferencing() {
+    return isSelfReferencing;
   }
 
   /** {@inheritDoc} */

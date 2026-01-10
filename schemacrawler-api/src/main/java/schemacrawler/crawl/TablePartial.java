@@ -97,11 +97,6 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
   }
 
   @Override
-  public Collection<DatabaseObject> getUsedByObjects() {
-    throw new NotLoadedException(this);
-  }
-
-  @Override
   public Collection<Table> getRelatedTables(final TableRelationshipType tableRelationshipType) {
     throw new NotLoadedException(this);
   }
@@ -127,6 +122,11 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
   }
 
   @Override
+  public Collection<DatabaseObject> getUsedByObjects() {
+    throw new NotLoadedException(this);
+  }
+
+  @Override
   public Collection<WeakAssociation> getWeakAssociations() {
     throw new NotLoadedException(this);
   }
@@ -143,7 +143,7 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
 
   @Override
   public boolean hasIndexes() {
-    return false;
+    throw new NotLoadedException(this);
   }
 
   /** {@inheritDoc} */
@@ -154,7 +154,12 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
 
   @Override
   public boolean hasTriggers() {
-    return false;
+    throw new NotLoadedException(this);
+  }
+
+  @Override
+  public boolean isSelfReferencing() {
+    throw new NotLoadedException(this);
   }
 
   @Override
