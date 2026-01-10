@@ -18,7 +18,7 @@ PUBLIC.BOOKS.AUTHORS.ID
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -45,7 +45,7 @@ PUBLIC.BOOKS.AUTHORS.FIRSTNAME
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -71,7 +71,7 @@ PUBLIC.BOOKS.AUTHORS.LASTNAME
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -97,7 +97,7 @@ PUBLIC.BOOKS.AUTHORS.ADDRESS1
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -123,7 +123,7 @@ PUBLIC.BOOKS.AUTHORS.ADDRESS2
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -149,7 +149,7 @@ PUBLIC.BOOKS.AUTHORS.CITY
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -175,7 +175,7 @@ PUBLIC.BOOKS.AUTHORS.STATE
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=2
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -201,7 +201,7 @@ PUBLIC.BOOKS.AUTHORS.POSTALCODE
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=10
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -227,7 +227,7 @@ PUBLIC.BOOKS.AUTHORS.COUNTRY
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -254,7 +254,7 @@ PUBLIC.BOOKS.AUTHORSLIST.ID
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -281,7 +281,7 @@ PUBLIC.BOOKS.AUTHORSLIST.FIRSTNAME
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -307,7 +307,7 @@ PUBLIC.BOOKS.AUTHORSLIST.LASTNAME
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -334,7 +334,7 @@ PUBLIC.BOOKS.BOOKAUTHORS.BOOKID
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -361,7 +361,7 @@ PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -388,7 +388,7 @@ PUBLIC.BOOKS.BOOKAUTHORS.SOMEDATA
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=30
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -415,7 +415,7 @@ PUBLIC.BOOKS.BOOKS.ID
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -442,7 +442,7 @@ PUBLIC.BOOKS.BOOKS.TITLE
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -469,7 +469,7 @@ PUBLIC.BOOKS.BOOKS.DESCRIPTION
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -496,7 +496,7 @@ PUBLIC.BOOKS.BOOKS.PUBLISHERID
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -523,7 +523,7 @@ PUBLIC.BOOKS.BOOKS.PUBLICATIONDATE
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -550,7 +550,7 @@ PUBLIC.BOOKS.BOOKS.PRICE
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -577,7 +577,7 @@ PUBLIC.BOOKS.BOOKS.PREVIOUSEDITIONID
     - part of unique index=true
     - part of self-reference=true
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -605,7 +605,7 @@ PUBLIC.BOOKS."Celebrities"."Id"
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -632,7 +632,7 @@ PUBLIC.BOOKS."Celebrities".NAME
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -659,7 +659,7 @@ PUBLIC.BOOKS."Celebrity Updates"."Celebrity Id"
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -686,7 +686,7 @@ PUBLIC.BOOKS."Celebrity Updates"."UPDATE"
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -713,7 +713,7 @@ PUBLIC.BOOKS.COUPONS.ID
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -740,7 +740,7 @@ PUBLIC.BOOKS.COUPONS.DATA
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=1073741824
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -766,7 +766,7 @@ PUBLIC.BOOKS.COUPONS.COUPONS
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -792,7 +792,7 @@ PUBLIC.BOOKS.COUPONS.BOOKS
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -819,7 +819,7 @@ PUBLIC.BOOKS.CUSTOMERDATA.ID
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -846,7 +846,7 @@ PUBLIC.BOOKS.CUSTOMERDATA.DATA
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=20
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -874,7 +874,7 @@ PUBLIC.BOOKS.CUSTOMERS.ID
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -901,7 +901,7 @@ PUBLIC.BOOKS.CUSTOMERS.FIRSTNAME
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=100
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -928,7 +928,7 @@ PUBLIC.BOOKS.CUSTOMERS.LASTNAME
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=100
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -955,7 +955,7 @@ PUBLIC.BOOKS.CUSTOMERS.AGE
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -984,7 +984,7 @@ PUBLIC.BOOKS.PUBLISHERS.ID
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1011,7 +1011,7 @@ PUBLIC.BOOKS.PUBLISHERS.PUBLISHER
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -1038,7 +1038,7 @@ PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΜΟΝΑΔΙΚΌΣ
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1065,7 +1065,7 @@ PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΤΊΤΛΟΣ
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1091,7 +1091,7 @@ PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΠΕΡΙΓΡΑΦΉ
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=255
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -1117,7 +1117,7 @@ PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΕΚΔΌΤΗΣ
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1145,7 +1145,7 @@ PUBLIC."PUBLISHER SALES".REGIONS.CITY
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1171,7 +1171,7 @@ PUBLIC."PUBLISHER SALES".REGIONS.STATE
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=2
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1197,7 +1197,7 @@ PUBLIC."PUBLISHER SALES".REGIONS.POSTALCODE
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=10
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1223,7 +1223,7 @@ PUBLIC."PUBLISHER SALES".REGIONS.COUNTRY
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1250,7 +1250,7 @@ PUBLIC."PUBLISHER SALES".SALES.POSTALCODE
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=10
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1276,7 +1276,7 @@ PUBLIC."PUBLISHER SALES".SALES.COUNTRY
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=50
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=NO
@@ -1302,7 +1302,7 @@ PUBLIC."PUBLISHER SALES".SALES.BOOKID
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -1329,7 +1329,7 @@ PUBLIC."PUBLISHER SALES".SALES.COUPON_ID
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -1356,7 +1356,7 @@ PUBLIC."PUBLISHER SALES".SALES.PERIODENDDATE
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -1383,7 +1383,7 @@ PUBLIC."PUBLISHER SALES".SALES.TOTALAMOUNT
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -1410,7 +1410,7 @@ PUBLIC."PUBLISHER SALES".SALES.SALESDATAID
     - part of unique index=false
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -1438,7 +1438,7 @@ PUBLIC."PUBLISHER SALES".SALESDATA.SALESDATAID
     - part of unique index=true
     - part of self-reference=false
     - is significant=true
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
@@ -1465,7 +1465,7 @@ PUBLIC."PUBLISHER SALES".SALESDATA.YEARLYAMOUNT
     - part of unique index=false
     - part of self-reference=false
     - is significant=false
-  - attibutes=
+  - attributes
     ~ CHAR_OCTET_LENGTH=0
     ~ IS_GENERATED=NEVER
     ~ IS_NULLABLE=YES
