@@ -359,6 +359,10 @@ class MutableTable extends AbstractDatabaseObject implements Table {
     return columns;
   }
 
+  final void markAsSelfReferencing() {
+    isSelfReferencing = true;
+  }
+
   final void removeTableConstraint(final TableConstraint tableConstraint) {
     constraints.remove(tableConstraint);
   }
@@ -373,10 +377,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
     if (primaryKey != null) {
       this.primaryKey = primaryKey;
     }
-  }
-
-  final void setSelfReferencing() {
-    isSelfReferencing = true;
   }
 
   final void setSortIndex(final int sortIndex) {
