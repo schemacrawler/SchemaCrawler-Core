@@ -1,0 +1,171 @@
+/*
+ * SchemaCrawler
+ * http://www.schemacrawler.com
+ * Copyright (c) 2000-2026, Sualeh Fatehi <sualeh@hotmail.com>.
+ * All rights reserved.
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+package schemacrawler.crawl;
+
+import static java.util.Objects.requireNonNull;
+
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import schemacrawler.schema.Column;
+import schemacrawler.schema.EntityType;
+import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.PartialDatabaseObject;
+import schemacrawler.schema.Table;
+import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+
+/** A matcher that identifies the entity type of each table in the catalog. */
+final class EntityIdentifier extends AbstractRetriever {
+
+  static class TableEntityIdentifier {
+
+    private final Table table;
+
+    private final Set<ForeignKey> importedForeignKeys;
+    private final Set<Column> tablePkColumnNames;
+
+    private final Map<NamedObjectKey, Set<Column>> importedColumnsMap;
+    private final Map<NamedObjectKey, Set<Column>> pkColumnsMap;
+    private final Map<NamedObjectKey, Set<Column>> parentPkColumnsMap;
+
+    TableEntityIdentifier(final Table table) {
+      this.table = requireNonNull(table);
+
+      importedForeignKeys = new HashSet<>();
+      tablePkColumnNames = new HashSet<>();
+
+      importedColumnsMap = new HashMap<>();
+      pkColumnsMap = new HashMap<>();
+      parentPkColumnsMap = new HashMap<>();
+
+      if (table.hasPrimaryKey()) {
+        buildSupportingLookups();
+      }
+    }
+
+    @Override
+    public String toString() {
+      return table.toString();
+    }
+
+    EntityType identifyEntityType() {
+      if (!table.hasPrimaryKey()) {
+        return EntityType.non_entity;
+      }
+
+      for (final ForeignKey fk : importedForeignKeys) {
+        final Set<Column> fkParentColumnNames = pkColumnsMap.get(fk.key());
+        final Set<Column> parentPkColumnNames = parentPkColumnsMap.get(fk.key());
+        final Set<Column> fkChildColumnNames = importedColumnsMap.get(fk.key());
+
+        // Step 1: Check for subtype pattern: Subtype tables inherit their entire
+        // primary key from a single supertype table.
+        // If PK(T) exactly matches the child columns of a FK to a parent
+        // table P, classify T as SUBTYPE of P.
+        if (!parentPkColumnNames.isEmpty()
+            && parentPkColumnNames.equals(fkParentColumnNames)
+            && tablePkColumnNames.equals(fkChildColumnNames)) {
+          return EntityType.subtype;
+        }
+
+        // Step 2: Check for weak entity pattern: Weak entities combine a parent's full
+        // primary key (via identifying FK) with their own discriminator column(s).
+        // Else if PK(T) contains (as a proper subset) the child columns of some FK to
+        // parent P that exactly map to PK(P), classify T as WEAK_ENTITY owned by P.
+        if (!parentPkColumnNames.isEmpty()
+            && parentPkColumnNames.equals(fkParentColumnNames)
+            && tablePkColumnNames.containsAll(fkChildColumnNames)
+            && tablePkColumnNames.size() > fkChildColumnNames.size()) {
+          return EntityType.weak_entity;
+        }
+      }
+
+      // Step 3: Check for strong entity pattern: Strong entities have self-sufficient
+      // primary keys (no FK columns in PK) and low referential connectivity to other
+      // tables.
+      // Else if no FK columns participate in PK(T) AND T has foreign keys to fewer
+      // than 2 other tables, classify T as STRONG_ENTITY. If there are 2 or more
+      // relationships, it may be a bridge table.
+      final boolean pkHasFkColumn =
+          tablePkColumnNames.stream().anyMatch(Column::isPartOfForeignKey);
+
+      if (!pkHasFkColumn) {
+        final Set<Table> referencedTables = new HashSet<>(table.getReferencedTables());
+        // Self-references don't count towards the limit of 2 other tables
+        referencedTables.remove(table);
+        if (referencedTables.size() < 2) {
+          return EntityType.strong_entity;
+        }
+      }
+
+      // Step 4: Default classification: Tables with ambiguous patterns (high
+      // connectivity, composite FK-based PKs, etc.) cannot be confidently
+      // classified.
+      return EntityType.unknown;
+    }
+
+    private void buildSupportingLookups() {
+
+      // Foreign keys imported from other tables
+      for (final ForeignKey fk : table.getImportedForeignKeys()) {
+        if (!fk.isSelfReferencing()) {
+          importedForeignKeys.add(fk);
+        }
+      }
+
+      tablePkColumnNames.addAll(table.getPrimaryKey().getConstrainedColumns());
+
+      for (final ForeignKey fk : importedForeignKeys) {
+        final Set<Column> fkParentColumnNames =
+            fk.getColumnReferences().stream()
+                .map(cr -> cr.getPrimaryKeyColumn())
+                .collect(Collectors.toSet());
+        pkColumnsMap.put(fk.key(), fkParentColumnNames);
+
+        final Set<Column> fkChildColumnNames =
+            fk.getColumnReferences().stream()
+                .map(cr -> cr.getForeignKeyColumn())
+                .collect(Collectors.toSet());
+        importedColumnsMap.put(fk.key(), fkChildColumnNames);
+
+        final Table parentTable = fk.getPrimaryKeyTable();
+        if (!(parentTable instanceof PartialDatabaseObject) && parentTable.hasPrimaryKey()) {
+          final Set<Column> parentPkColumnNames =
+              new HashSet<>(parentTable.getPrimaryKey().getConstrainedColumns());
+          parentPkColumnsMap.put(fk.key(), parentPkColumnNames);
+        } else {
+          parentPkColumnsMap.put(fk.key(), Collections.emptySet());
+        }
+      }
+    }
+  }
+
+  EntityIdentifier(
+      final RetrieverConnection retrieverConnection,
+      final MutableCatalog catalog,
+      final SchemaCrawlerOptions options)
+      throws SQLException {
+    super(retrieverConnection, catalog, options);
+  }
+
+  void identifyEntities() {
+    for (final Table table : catalog.getTables()) {
+      if (table instanceof final MutableTable mutableTable) {
+        final TableEntityIdentifier tableEntityIdentifier = new TableEntityIdentifier(mutableTable);
+        final EntityType entityType = tableEntityIdentifier.identifyEntityType();
+        mutableTable.setEntityType(entityType);
+      }
+    }
+  }
+}

@@ -489,11 +489,19 @@ public final class SchemaCrawler {
   private void postCrawl() throws Exception {
     final TableReferencesMatcher referencesMatcher =
         new TableReferencesMatcher(retrieverConnection, catalog, options);
+    final EntityIdentifier entityIdentificationMatcher =
+        new EntityIdentifier(retrieverConnection, catalog, options);
     taskRunner
         .add(
             "collectTableReferences",
             () -> referencesMatcher.collectTableReferences(),
             retrieveTables)
+        .add(
+            "identifyEntities",
+            () -> entityIdentificationMatcher.identifyEntities(),
+            retrieveTables,
+            retrievePrimaryKeys,
+            retrieveForeignKeys)
         .submit();
   }
 }
