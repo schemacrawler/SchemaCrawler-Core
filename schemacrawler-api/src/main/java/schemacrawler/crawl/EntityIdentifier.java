@@ -60,6 +60,8 @@ final class EntityIdentifier extends AbstractRetriever {
     }
 
     EntityType identifyEntityType() {
+
+      // Step 1: Check for non-entity pattern: Non-entity tables do not have a primary key.
       if (!table.hasPrimaryKey()) {
         return EntityType.non_entity;
       }
@@ -69,20 +71,20 @@ final class EntityIdentifier extends AbstractRetriever {
         final Set<Column> parentPkColumnNames = parentPkColumnsMap.get(fk.key());
         final Set<Column> fkChildColumnNames = importedColumnsMap.get(fk.key());
 
-        // Step 1: Check for subtype pattern: Subtype tables inherit their entire
+        // Step 2: Check for subtype pattern: Subtype tables inherit their entire
         // primary key from a single supertype table.
         // If PK(T) exactly matches the child columns of a FK to a parent
-        // table P, classify T as SUBTYPE of P.
+        // table P primary key PK(P), classify T as SUBTYPE of P.
         if (!parentPkColumnNames.isEmpty()
             && parentPkColumnNames.equals(fkParentColumnNames)
             && tablePkColumnNames.equals(fkChildColumnNames)) {
           return EntityType.subtype;
         }
 
-        // Step 2: Check for weak entity pattern: Weak entities combine a parent's full
+        // Step 3: Check for weak entity pattern: Weak entities combine a parent's full
         // primary key (via identifying FK) with their own discriminator column(s).
         // Else if PK(T) contains (as a proper subset) the child columns of some FK to
-        // parent P that exactly map to PK(P), classify T as WEAK_ENTITY owned by P.
+        // parent P primary key PK(P), classify T as WEAK_ENTITY owned by P.
         if (!parentPkColumnNames.isEmpty()
             && parentPkColumnNames.equals(fkParentColumnNames)
             && tablePkColumnNames.containsAll(fkChildColumnNames)
@@ -91,12 +93,12 @@ final class EntityIdentifier extends AbstractRetriever {
         }
       }
 
-      // Step 3: Check for strong entity pattern: Strong entities have self-sufficient
+      // Step 4: Check for strong entity pattern: Strong entities have self-sufficient
       // primary keys (no FK columns in PK) and low referential connectivity to other
       // tables.
       // Else if no FK columns participate in PK(T) AND T has foreign keys to fewer
-      // than 2 other tables, classify T as STRONG_ENTITY. If there are 2 or more
-      // relationships, it may be a bridge table.
+      // than 2 other tables (excluding self-references), classify T as
+      // STRONG_ENTITY. (If there are 2 or more relationships, it may be a bridge table.)
       final boolean pkHasFkColumn =
           tablePkColumnNames.stream().anyMatch(Column::isPartOfForeignKey);
 
@@ -109,7 +111,7 @@ final class EntityIdentifier extends AbstractRetriever {
         }
       }
 
-      // Step 4: Default classification: Tables with ambiguous patterns (high
+      // Step 5: Default classification: Tables with ambiguous patterns (high
       // connectivity, composite FK-based PKs, etc.) cannot be confidently
       // classified.
       return EntityType.unknown;
