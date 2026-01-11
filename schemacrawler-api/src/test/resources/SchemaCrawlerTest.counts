@@ -56,19 +56,19 @@ schema: PUBLIC.BOOKS
     # exported: 0
     # privileges: 6
   table: PUBLIC.BOOKS.CUSTOMERDATA
-    # columns: 2
-    # constraints: 2
-    # indexes: 1
-    # foreign keys: 0
+    # columns: 3
+    # constraints: 4
+    # indexes: 2
+    # foreign keys: 1
     # imported foreign keys: 0
-    # exported: 0
+    # exported: 1
     # privileges: 6
   table: PUBLIC.BOOKS.CUSTOMERS
     # columns: 4
     # constraints: 4
     # indexes: 1
-    # foreign keys: 0
-    # imported foreign keys: 0
+    # foreign keys: 1
+    # imported foreign keys: 1
     # exported: 0
     # privileges: 6
   table: PUBLIC.BOOKS.PUBLISHERS

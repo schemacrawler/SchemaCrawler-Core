@@ -631,11 +631,11 @@ public class SchemaCrawlerTest {
       "BOOKS",
       "Celebrities",
       "COUPONS",
-      "CUSTOMERDATA",
       "CUSTOMERS",
       "PUBLISHERS",
       "BOOKAUTHORS",
       "Celebrity Updates",
+      "CUSTOMERDATA",
       "ΒΙΒΛΊΑ",
       "AUTHORSLIST"
     };

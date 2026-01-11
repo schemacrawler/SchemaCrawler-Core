@@ -56,7 +56,7 @@ public class SchemaCrawlerReferenceTest {
       }
     }
 
-    assertThat(fkReferenceCount, is(30));
+    assertThat(fkReferenceCount, is(32));
   }
 
   @Test

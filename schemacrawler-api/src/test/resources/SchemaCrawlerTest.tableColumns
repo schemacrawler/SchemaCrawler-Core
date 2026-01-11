@@ -799,8 +799,8 @@ PUBLIC.BOOKS.COUPONS.BOOKS
     ~ REMARKS=
     ~ SQL_DATA_TYPE=50
 
-PUBLIC.BOOKS.CUSTOMERDATA.ID
-  - short name=CUSTOMERDATA.ID
+PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID
+  - short name=CUSTOMERDATA.CUSTOMERID
   - data-type=INTEGER
   - size=32
   - decimal digits=0
@@ -811,6 +811,33 @@ PUBLIC.BOOKS.CUSTOMERDATA.ID
   - generated=false
   - hidden=false
   - ordinal position=1
+  - remarks=
+  - participation in relationships and constraints
+    - part of primary key=true
+    - part of foreign key=true
+    - part of index=true
+    - part of unique index=true
+    - part of self-reference=false
+    - is significant=true
+  - attributes
+    ~ CHAR_OCTET_LENGTH=0
+    ~ IS_GENERATED=NEVER
+    ~ IS_NULLABLE=NO
+    ~ NUM_PREC_RADIX=2
+    ~ REMARKS=
+    ~ SQL_DATA_TYPE=4
+PUBLIC.BOOKS.CUSTOMERDATA.DATAID
+  - short name=CUSTOMERDATA.DATAID
+  - data-type=INTEGER
+  - size=32
+  - decimal digits=0
+  - width=
+  - default value=null
+  - auto-incremented=false
+  - nullable=false
+  - generated=false
+  - hidden=false
+  - ordinal position=2
   - remarks=
   - participation in relationships and constraints
     - part of primary key=true
@@ -837,7 +864,7 @@ PUBLIC.BOOKS.CUSTOMERDATA.DATA
   - nullable=true
   - generated=false
   - hidden=false
-  - ordinal position=2
+  - ordinal position=3
   - remarks=
   - participation in relationships and constraints
     - part of primary key=false

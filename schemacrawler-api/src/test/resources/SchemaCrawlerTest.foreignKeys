@@ -34,7 +34,7 @@ schema: PUBLIC.BOOKS
       table constraint: 
         parent (dependent table): PUBLIC.BOOKS.BOOKAUTHORS
           constrained column: PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID
-    foreign key: SYS_FK_10118
+    foreign key: SYS_FK_10121
       definition: 
       deferrability: not deferrable
       initially deferred: false
@@ -83,7 +83,7 @@ schema: PUBLIC.BOOKS
       table constraint: 
         parent (dependent table): PUBLIC."PUBLISHER SALES".SALES
           constrained column: PUBLIC."PUBLISHER SALES".SALES.BOOKID
-    foreign key: SYS_FK_10118
+    foreign key: SYS_FK_10121
       definition: 
       deferrability: not deferrable
       initially deferred: false
@@ -100,7 +100,7 @@ schema: PUBLIC.BOOKS
         parent (dependent table): PUBLIC.BOOKS.BOOKAUTHORS
           constrained column: PUBLIC.BOOKS.BOOKAUTHORS.BOOKID
   table: PUBLIC.BOOKS."Celebrities"
-    foreign key: SYS_FK_10128
+    foreign key: SYS_FK_10131
       definition: 
       deferrability: not deferrable
       initially deferred: false
@@ -117,7 +117,7 @@ schema: PUBLIC.BOOKS
         parent (dependent table): PUBLIC.BOOKS."Celebrity Updates"
           constrained column: PUBLIC.BOOKS."Celebrity Updates"."Celebrity Id"
   table: PUBLIC.BOOKS."Celebrity Updates"
-    foreign key: SYS_FK_10128
+    foreign key: SYS_FK_10131
       definition: 
       deferrability: not deferrable
       initially deferred: false
@@ -135,7 +135,39 @@ schema: PUBLIC.BOOKS
           constrained column: PUBLIC.BOOKS."Celebrity Updates"."Celebrity Id"
   table: PUBLIC.BOOKS.COUPONS
   table: PUBLIC.BOOKS.CUSTOMERDATA
+    foreign key: FK_CUSTOMER
+      definition: 
+      deferrability: not deferrable
+      initially deferred: false
+      self-referencing: false
+      delete rule: no action
+      update rule: no action
+      dependent table: PUBLIC.BOOKS.CUSTOMERDATA
+      referenced table: PUBLIC.BOOKS.CUSTOMERS
+      cardinality: (1..many)
+      column references: 
+        key sequence: 1
+          PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID --> PUBLIC.BOOKS.CUSTOMERS.ID
+      table constraint: 
+        parent (dependent table): PUBLIC.BOOKS.CUSTOMERDATA
+          constrained column: PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID
   table: PUBLIC.BOOKS.CUSTOMERS
+    foreign key: FK_CUSTOMER
+      definition: 
+      deferrability: not deferrable
+      initially deferred: false
+      self-referencing: false
+      delete rule: no action
+      update rule: no action
+      dependent table: PUBLIC.BOOKS.CUSTOMERDATA
+      referenced table: PUBLIC.BOOKS.CUSTOMERS
+      cardinality: (1..many)
+      column references: 
+        key sequence: 1
+          PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID --> PUBLIC.BOOKS.CUSTOMERS.ID
+      table constraint: 
+        parent (dependent table): PUBLIC.BOOKS.CUSTOMERDATA
+          constrained column: PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID
   table: PUBLIC.BOOKS.PUBLISHERS
     foreign key: FK_ΒΙΒΛΊΑ_PUBLISHERS
       definition: 

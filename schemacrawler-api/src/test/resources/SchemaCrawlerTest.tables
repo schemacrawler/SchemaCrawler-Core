@@ -73,7 +73,7 @@ PUBLIC.BOOKS.COUPONS [table]
     ~ READ_ONLY=false
     ~ REMARKS=
 PUBLIC.BOOKS.CUSTOMERDATA [table]
-  - entity-type=strong_entity
+  - entity-type=weak_entity
   - has-primary-key=true
   - has-indexes=true
   - has-triggers=false

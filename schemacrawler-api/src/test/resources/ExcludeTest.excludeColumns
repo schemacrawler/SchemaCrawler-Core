@@ -85,6 +85,12 @@ schema: PUBLIC.BOOKS
       database type: VARCHAR(20) ARRAY[10]
       type: ARRAY
   table: PUBLIC.BOOKS.CUSTOMERDATA
+    column: PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID
+      database type: INTEGER
+      type: INTEGER
+    column: PUBLIC.BOOKS.CUSTOMERDATA.DATAID
+      database type: INTEGER
+      type: INTEGER
     column: PUBLIC.BOOKS.CUSTOMERDATA.DATA
       database type: VALID_STRING
       type: VARCHAR
