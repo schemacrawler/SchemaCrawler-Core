@@ -32,7 +32,7 @@ PUBLIC.BOOKS.COUPONS
     is initially deferred: false
 PUBLIC.BOOKS.CUSTOMERDATA
   primary key: PK_CUSTOMERDATA
-    columns: [PUBLIC.BOOKS.CUSTOMERDATA.ID]
+    columns: [PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID, PUBLIC.BOOKS.CUSTOMERDATA.DATAID]
     constraint type: primary_key
     is deferrable: false
     is initially deferred: false
@@ -43,7 +43,7 @@ PUBLIC.BOOKS.CUSTOMERS
     is deferrable: false
     is initially deferred: false
 PUBLIC.BOOKS.PUBLISHERS
-  primary key: SYS_PK_10126
+  primary key: SYS_PK_10127
     columns: [PUBLIC.BOOKS.PUBLISHERS.ID]
     constraint type: primary_key
     is deferrable: false

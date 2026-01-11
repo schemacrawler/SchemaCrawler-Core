@@ -604,6 +604,7 @@ public class SchemaCrawlerTest {
         for (final Table table : tables) {
           out.println("%s [%s]".formatted(table.getFullName(), table.getTableType()));
 
+          out.println("  - entity-type=%s".formatted(table.getEntityType()));
           out.println("  - has-primary-key=%s".formatted(table.hasPrimaryKey()));
           out.println("  - has-indexes=%s".formatted(table.hasIndexes()));
           out.println("  - has-triggers=%s".formatted(table.hasTriggers()));
@@ -630,11 +631,11 @@ public class SchemaCrawlerTest {
       "BOOKS",
       "Celebrities",
       "COUPONS",
-      "CUSTOMERDATA",
       "CUSTOMERS",
       "PUBLISHERS",
       "BOOKAUTHORS",
       "Celebrity Updates",
+      "CUSTOMERDATA",
       "ΒΙΒΛΊΑ",
       "AUTHORSLIST"
     };

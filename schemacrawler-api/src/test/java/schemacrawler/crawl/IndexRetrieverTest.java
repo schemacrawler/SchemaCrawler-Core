@@ -137,7 +137,7 @@ public class IndexRetrieverTest {
     // The method should handle non-existent tables and indexes gracefully
     assertDoesNotThrow(() -> edgeCaseRetriever.retrieveIndexInformation());
 
-    assertThat("Should have indexes after edge case test", countAllIndexes(), is(23));
+    assertThat("Should have indexes after edge case test", countAllIndexes(), is(24));
   }
 
   private int countAllIndexes() {

@@ -58,7 +58,7 @@ public class SortingTest {
   public void fkSort(final Connection connection) throws Exception {
 
     final String[] sortedNatural = {
-      "Z_FK_AUTHOR", "SYS_FK_10118",
+      "Z_FK_AUTHOR", "SYS_FK_10121",
     };
 
     final String[] sortedAlpha = Arrays.copyOf(sortedNatural, sortedNatural.length);

@@ -29,6 +29,7 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKeyDeferrability;
 import schemacrawler.schema.ForeignKeyUpdateRule;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.InformationSchemaViews;
@@ -114,8 +115,8 @@ final class ForeignKeyRetriever extends AbstractRetriever {
         lookupOrCreateColumn(pkTableCatalogName, pkTableSchemaName, pkTableName, pkColumnName);
     final Column fkColumn =
         lookupOrCreateColumn(fkTableCatalogName, fkTableSchemaName, fkTableName, fkColumnName);
-    final boolean isPkColumnPartial = pkColumn instanceof ColumnPartial;
-    final boolean isFkColumnPartial = fkColumn instanceof ColumnPartial;
+    final boolean isPkColumnPartial = pkColumn instanceof PartialDatabaseObject;
+    final boolean isFkColumnPartial = fkColumn instanceof PartialDatabaseObject;
 
     if (pkColumn == null || fkColumn == null || isFkColumnPartial && isPkColumnPartial) {
       return false;

@@ -25,7 +25,7 @@ PUBLIC.BOOKS.BOOKAUTHORS
     cardinality: 0
     pages: 0
     index type: other
-  index: SYS_FK_10120
+  index: SYS_FK_10121
     columns: [PUBLIC.BOOKS.BOOKAUTHORS.BOOKID]
     is unique: false
     cardinality: 0
@@ -70,7 +70,7 @@ PUBLIC.BOOKS."Celebrity Updates"
     cardinality: 0
     pages: 0
     index type: other
-  index: SYS_FK_10130
+  index: SYS_FK_10131
     columns: [PUBLIC.BOOKS."Celebrity Updates"."Celebrity Id"]
     is unique: false
     cardinality: 0
@@ -84,8 +84,14 @@ PUBLIC.BOOKS.COUPONS
     pages: 0
     index type: other
 PUBLIC.BOOKS.CUSTOMERDATA
+  index: FK_CUSTOMER
+    columns: [PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID]
+    is unique: false
+    cardinality: 0
+    pages: 0
+    index type: other
   index: PK_CUSTOMERDATA
-    columns: [PUBLIC.BOOKS.CUSTOMERDATA.ID]
+    columns: [PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID, PUBLIC.BOOKS.CUSTOMERDATA.DATAID]
     is unique: true
     cardinality: 0
     pages: 0
@@ -98,7 +104,7 @@ PUBLIC.BOOKS.CUSTOMERS
     pages: 0
     index type: other
 PUBLIC.BOOKS.PUBLISHERS
-  index: SYS_PK_10126
+  index: SYS_PK_10127
     columns: [PUBLIC.BOOKS.PUBLISHERS.ID]
     is unique: true
     cardinality: 0

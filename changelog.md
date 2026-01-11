@@ -7,6 +7,7 @@ SchemaCrawler Core release notes.
 - Infer 1..1 and 1..many cardinalities - fixes https://github.com/schemacrawler/SchemaCrawler/issues/2237
 - Add Table::isSelfReferencing() and TableReference::isSelfReferencing() for tables that reference themselves
 - Add Column::isPartOfSelfReferencingRelationship() and Column::isSignificant()
+- Add Table::getEntityType() which an an inference of how the table may be modeled as an entity
 
 
 <a name="v17.3.0"></a>

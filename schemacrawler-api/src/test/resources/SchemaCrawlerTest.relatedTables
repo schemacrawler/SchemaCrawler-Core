@@ -27,12 +27,12 @@
     # child tables: []
     # parent tables: []
   table: PUBLIC.BOOKS.CUSTOMERDATA
-    # columns: 2
+    # columns: 3
     # child tables: []
-    # parent tables: []
+    # parent tables: [PUBLIC.BOOKS.CUSTOMERS]
   table: PUBLIC.BOOKS.CUSTOMERS
     # columns: 4
-    # child tables: []
+    # child tables: [PUBLIC.BOOKS.CUSTOMERDATA]
     # parent tables: []
   table: PUBLIC.BOOKS.PUBLISHERS
     # columns: 2

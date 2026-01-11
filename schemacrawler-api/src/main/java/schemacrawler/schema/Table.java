@@ -34,13 +34,6 @@ public interface Table
   List<Column> getColumns();
 
   /**
-   * Gets a list of other tables and views, routines and synonyms that use or reference this table.
-   *
-   * @return Collection of using objects.
-   */
-  Collection<DatabaseObject> getUsedByObjects();
-
-  /**
    * Gets child tables which have a foreign key from this table.
    *
    * @return Dependent or child tables.
@@ -48,6 +41,13 @@ public interface Table
   default Collection<Table> getDependentTables() {
     return getRelatedTables(child);
   }
+
+  /**
+   * Gets the entity type of the table.
+   *
+   * @return Entity type
+   */
+  EntityType getEntityType();
 
   /**
    * Gets the list of exported foreign keys. That is, only those whose primary key is referenced in
@@ -149,6 +149,13 @@ public interface Table
    * @return Triggers for the table.
    */
   Collection<Trigger> getTriggers();
+
+  /**
+   * Gets a list of other tables and views, routines and synonyms that use or reference this table.
+   *
+   * @return Collection of using objects.
+   */
+  Collection<DatabaseObject> getUsedByObjects();
 
   /**
    * Gets the list of weak associations.
