@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.PartialDatabaseObject;
@@ -44,6 +45,11 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
   TablePartial(final Table table) {
     this(requireNonNull(table, "No table provided").getSchema(), table.getName());
     addAttributes(table.getAttributes());
+  }
+
+  @Override
+  public EntityType getEntityType() {
+    return EntityType.unknown;
   }
 
   @Override
