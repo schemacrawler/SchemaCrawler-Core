@@ -17,6 +17,6 @@ CREATE TABLE CustomerData
   DataId INTEGER NOT NULL,
   Data VALID_STRING,
   CONSTRAINT PK_CustomerData PRIMARY KEY (CustomerId, DataId),
-  CONSTRAINT FK_Customer FOREIGN KEY (CustomerId) REFERENCES Customers (Id),
+  CONSTRAINT FK_Customer FOREIGN KEY (CustomerId) REFERENCES Customers (Id)
 )
 ;
