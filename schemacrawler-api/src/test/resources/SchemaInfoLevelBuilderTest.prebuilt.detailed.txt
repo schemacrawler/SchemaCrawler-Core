@@ -1,6 +1,6 @@
 detailed
 {
-  "modelTableEntities": true,
+  "modelTableEntities": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,
