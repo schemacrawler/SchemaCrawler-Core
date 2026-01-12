@@ -52,6 +52,7 @@ public enum SchemaInfoRetrieval {
   retrieveUserDefinedColumnDataTypes(other, detailed),
   retrieveViewInformation(table, detailed),
   retrieveViewTableUsage(table, detailed),
+  modelTableEntities(other, detailed),
   ;
 
   private final DatabaseObjectInfoRetrieval databaseObjectInfoRetrieval;

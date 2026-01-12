@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import schemacrawler.schemacrawler.InfoLevel;
 import schemacrawler.schemacrawler.SchemaInfoLevel;
 import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
@@ -40,38 +42,72 @@ public class SchemaInfoLevelBuilderTest {
         is(SchemaInfoLevelBuilder.builder().toOptions()));
   }
 
+  @ParameterizedTest
+  @EnumSource(InfoLevel.class)
+  public void prebuilt(final InfoLevel infoLevel, final TestContext testContext) {
+
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      final SchemaInfoLevelBuilder builder =
+          SchemaInfoLevelBuilder.builder().withTag(infoLevel.name()).withInfoLevel(infoLevel);
+      final SchemaInfoLevel options;
+
+      builder.withInfoLevel(InfoLevel.standard);
+      options = builder.toOptions();
+      assertThat(builder.toString(), equalTo(options.getTag()));
+      assertThat(options.getTag(), equalTo(infoLevel.name()));
+      // Print to actual test results file
+      out.println(options.getTag());
+      out.println(options);
+      out.println();
+    }
+    final String referenceFile = "%s.%s.txt".formatted(testContext.testMethodFullName(), infoLevel);
+    assertThat(outputOf(testout), hasSameContentAs(classpathResource(referenceFile)));
+  }
+
   @Test
-  public void prebuilt() {
-    final SchemaInfoLevel minimum = SchemaInfoLevelBuilder.minimum();
-    assertThat(minimum.getTag(), is("minimum"));
-    assertThat(minimum.is(SchemaInfoRetrieval.retrieveTables), is(true));
-    assertThat(minimum.is(SchemaInfoRetrieval.retrievePrimaryKeys), is(false));
-    assertThat(minimum.is(SchemaInfoRetrieval.retrieveRoutineInformation), is(false));
-    assertThat(minimum.is(SchemaInfoRetrieval.retrieveAdditionalColumnAttributes), is(false));
+  public void schemaInfoLevelTag(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      final SchemaInfoLevelBuilder builder = SchemaInfoLevelBuilder.builder();
+      SchemaInfoLevel options;
 
-    final SchemaInfoLevel standard = SchemaInfoLevelBuilder.standard();
-    assertThat(standard.getTag(), is("standard"));
-    assertThat(standard.is(SchemaInfoRetrieval.retrieveTables), is(true));
-    assertThat(standard.is(SchemaInfoRetrieval.retrievePrimaryKeys), is(true));
-    assertThat(standard.is(SchemaInfoRetrieval.retrieveRoutineInformation), is(false));
-    assertThat(standard.is(SchemaInfoRetrieval.retrieveAdditionalColumnAttributes), is(false));
+      assertThat(builder.toString(), equalTo(""));
 
-    final SchemaInfoLevel detailed = SchemaInfoLevelBuilder.detailed();
-    assertThat(detailed.getTag(), is("detailed"));
-    assertThat(detailed.is(SchemaInfoRetrieval.retrieveTables), is(true));
-    assertThat(detailed.is(SchemaInfoRetrieval.retrievePrimaryKeys), is(true));
-    assertThat(detailed.is(SchemaInfoRetrieval.retrieveRoutineInformation), is(true));
-    assertThat(detailed.is(SchemaInfoRetrieval.retrieveAdditionalColumnAttributes), is(false));
+      options = builder.toOptions();
+      assertThat(builder.toString(), equalTo(options.getTag()));
+      assertThat(options.getTag(), equalTo(""));
+      assertThat(options.toString().replaceAll(lineSeparator(), "\n"), startsWith("{"));
 
-    final SchemaInfoLevel maximum = SchemaInfoLevelBuilder.maximum();
-    assertThat(maximum.getTag(), is("maximum"));
-    assertThat(maximum.is(SchemaInfoRetrieval.retrieveTables), is(true));
-    assertThat(maximum.is(SchemaInfoRetrieval.retrievePrimaryKeys), is(true));
-    assertThat(maximum.is(SchemaInfoRetrieval.retrieveRoutineInformation), is(true));
-    assertThat(maximum.is(SchemaInfoRetrieval.retrieveAdditionalColumnAttributes), is(true));
+      builder.withInfoLevel(InfoLevel.standard);
+      options = builder.toOptions();
+      assertThat(builder.toString(), equalTo(options.getTag()));
+      assertThat(options.getTag(), equalTo("standard"));
+      // Print to actual test results file
+      out.println(options.getTag());
+      out.println(options);
+      out.println();
 
-    assertThat(SchemaInfoLevelBuilder.newSchemaInfoLevel(), is(standard));
-    assertThat(standard.is(null), is(false));
+      builder.withTag("custom");
+      options = builder.toOptions();
+      assertThat(builder.toString(), equalTo(options.getTag()));
+      assertThat(options.getTag(), equalTo("custom"));
+      // Print to actual test results file
+      out.println(options.getTag());
+      out.println(options);
+      out.println();
+
+      builder.withTag("\t\t");
+      options = builder.toOptions();
+      assertThat(builder.toString(), equalTo(options.getTag()));
+      assertThat(options.getTag(), equalTo(""));
+      // Print to actual test results file
+      out.println(options.getTag());
+      out.println(options);
+      out.println();
+    }
+    assertThat(
+        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
   }
 
   @Test
@@ -175,48 +211,37 @@ public class SchemaInfoLevelBuilderTest {
   }
 
   @Test
-  public void schemaInfoLevelTag(final TestContext testContext) {
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
-      final SchemaInfoLevelBuilder builder = SchemaInfoLevelBuilder.builder();
-      SchemaInfoLevel options;
+  public void staticBuilders() {
+    final SchemaInfoLevel minimum = SchemaInfoLevelBuilder.minimum();
+    assertThat(minimum.getTag(), is("minimum"));
+    assertThat(minimum.is(SchemaInfoRetrieval.retrieveTables), is(true));
+    assertThat(minimum.is(SchemaInfoRetrieval.retrievePrimaryKeys), is(false));
+    assertThat(minimum.is(SchemaInfoRetrieval.retrieveRoutineInformation), is(false));
+    assertThat(minimum.is(SchemaInfoRetrieval.retrieveAdditionalColumnAttributes), is(false));
 
-      assertThat(builder.toString(), equalTo(""));
+    final SchemaInfoLevel standard = SchemaInfoLevelBuilder.standard();
+    assertThat(standard.getTag(), is("standard"));
+    assertThat(standard.is(SchemaInfoRetrieval.retrieveTables), is(true));
+    assertThat(standard.is(SchemaInfoRetrieval.retrievePrimaryKeys), is(true));
+    assertThat(standard.is(SchemaInfoRetrieval.retrieveRoutineInformation), is(false));
+    assertThat(standard.is(SchemaInfoRetrieval.retrieveAdditionalColumnAttributes), is(false));
 
-      options = builder.toOptions();
-      assertThat(builder.toString(), equalTo(options.getTag()));
-      assertThat(options.getTag(), equalTo(""));
-      assertThat(options.toString().replaceAll(lineSeparator(), "\n"), startsWith("{"));
+    final SchemaInfoLevel detailed = SchemaInfoLevelBuilder.detailed();
+    assertThat(detailed.getTag(), is("detailed"));
+    assertThat(detailed.is(SchemaInfoRetrieval.retrieveTables), is(true));
+    assertThat(detailed.is(SchemaInfoRetrieval.retrievePrimaryKeys), is(true));
+    assertThat(detailed.is(SchemaInfoRetrieval.retrieveRoutineInformation), is(true));
+    assertThat(detailed.is(SchemaInfoRetrieval.retrieveAdditionalColumnAttributes), is(false));
 
-      builder.withInfoLevel(InfoLevel.standard);
-      options = builder.toOptions();
-      assertThat(builder.toString(), equalTo(options.getTag()));
-      assertThat(options.getTag(), equalTo("standard"));
-      // Print to actual test results file
-      out.println(options.getTag());
-      out.println(options);
-      out.println();
+    final SchemaInfoLevel maximum = SchemaInfoLevelBuilder.maximum();
+    assertThat(maximum.getTag(), is("maximum"));
+    assertThat(maximum.is(SchemaInfoRetrieval.retrieveTables), is(true));
+    assertThat(maximum.is(SchemaInfoRetrieval.retrievePrimaryKeys), is(true));
+    assertThat(maximum.is(SchemaInfoRetrieval.retrieveRoutineInformation), is(true));
+    assertThat(maximum.is(SchemaInfoRetrieval.retrieveAdditionalColumnAttributes), is(true));
 
-      builder.withTag("custom");
-      options = builder.toOptions();
-      assertThat(builder.toString(), equalTo(options.getTag()));
-      assertThat(options.getTag(), equalTo("custom"));
-      // Print to actual test results file
-      out.println(options.getTag());
-      out.println(options);
-      out.println();
-
-      builder.withTag("\t\t");
-      options = builder.toOptions();
-      assertThat(builder.toString(), equalTo(options.getTag()));
-      assertThat(options.getTag(), equalTo(""));
-      // Print to actual test results file
-      out.println(options.getTag());
-      out.println(options);
-      out.println();
-    }
-    assertThat(
-        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+    assertThat(SchemaInfoLevelBuilder.newSchemaInfoLevel(), is(standard));
+    assertThat(standard.is(null), is(false));
   }
 
   @Test
