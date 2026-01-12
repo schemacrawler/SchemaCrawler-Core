@@ -21,6 +21,7 @@ import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleFor
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForSequenceInclusion;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForSynonymInclusion;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForTableInclusion;
+import static schemacrawler.schemacrawler.SchemaInfoRetrieval.modelTableEntities;
 import static schemacrawler.schemacrawler.SchemaInfoRetrieval.retrieveAdditionalColumnAttributes;
 import static schemacrawler.schemacrawler.SchemaInfoRetrieval.retrieveAdditionalColumnMetadata;
 import static schemacrawler.schemacrawler.SchemaInfoRetrieval.retrieveAdditionalDatabaseInfo;
@@ -501,7 +502,8 @@ public final class SchemaCrawler {
             () -> entityIdentificationMatcher.identifyEntities(),
             retrieveTables,
             retrievePrimaryKeys,
-            retrieveForeignKeys)
+            retrieveForeignKeys,
+            modelTableEntities)
         .submit();
   }
 }

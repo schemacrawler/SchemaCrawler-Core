@@ -1,5 +1,6 @@
 standard
 {
+  "modelTableEntities": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,
@@ -36,6 +37,7 @@ standard
 
 custom
 {
+  "modelTableEntities": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,
@@ -72,6 +74,7 @@ custom
 
 
 {
+  "modelTableEntities": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,
