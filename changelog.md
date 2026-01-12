@@ -8,6 +8,7 @@ SchemaCrawler Core release notes.
 - Add Table::isSelfReferencing() and TableReference::isSelfReferencing() for tables that reference themselves
 - Add Column::isPartOfSelfReferencingRelationship() and Column::isSignificant()
 - Add Table::getEntityType() which an an inference of how the table may be modeled as an entity
+- Table entity types are available with detailed info-level
 
 
 <a name="v17.3.0"></a>
