@@ -4,6 +4,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -22,6 +23,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -38,6 +40,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -55,6 +58,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: true
       self-referencing: true
       delete rule: no action
       update rule: no action
@@ -71,6 +75,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: true
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -87,6 +92,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -104,6 +110,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -121,6 +128,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -139,6 +147,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -156,6 +165,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -173,6 +183,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -190,6 +201,7 @@ schema: PUBLIC.BOOKS
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -210,6 +222,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -230,6 +243,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: true
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -246,6 +260,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: true
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -262,6 +277,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -282,6 +298,7 @@ schema: PUBLIC."PUBLISHER SALES"
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: true
       self-referencing: false
       delete rule: no action
       update rule: no action

@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.NamedObject;
+import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.CollectionsUtility;
@@ -35,6 +36,7 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
   private final Table pkTable;
   private final SortedSet<ColumnReference> columnReferences;
   private final boolean isSelfReferencing;
+  private boolean isOptional;
 
   public AbstractTableReference(final String name, final ColumnReference columnReference) {
     super(
@@ -99,6 +101,12 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
 
   /** {@inheritDoc} */
   @Override
+  public boolean isOptional() {
+    return isOptional;
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public boolean isSelfReferencing() {
     return isSelfReferencing;
   }
@@ -115,10 +123,14 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
     }
     // Add a column reference only if they reference the same two tables
     final Table fkTable = getParent();
+    final Column fkColumn = columnReference.getForeignKeyColumn();
     if (pkTable.equals(columnReference.getPrimaryKeyColumn().getParent())
-        && fkTable.equals(columnReference.getForeignKeyColumn().getParent())) {
+        && fkTable.equals(fkColumn.getParent())) {
       columnReferences.add(columnReference);
       addTableConstraintColumn(columnReference);
+      if (!(fkColumn instanceof PartialDatabaseObject) && fkColumn.isNullable()) {
+        isOptional = true;
+      }
       return true;
     }
     LOGGER.log(

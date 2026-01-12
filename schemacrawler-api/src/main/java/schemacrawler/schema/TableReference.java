@@ -58,6 +58,13 @@ public interface TableReference
   }
 
   /**
+   * If the table reference is nullable, or optional.
+   *
+   * @return True if the table reference is optional
+   */
+  boolean isOptional();
+
+  /**
    * If the table references itself.
    *
    * @return True if the table is self-referencing.

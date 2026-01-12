@@ -6,6 +6,7 @@ schema: PUBLIC.SCHEMA1
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -23,6 +24,7 @@ schema: PUBLIC.SCHEMA1
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -41,6 +43,7 @@ schema: PUBLIC.SCHEMA2
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
@@ -58,6 +61,7 @@ schema: PUBLIC.SCHEMA2
       definition: 
       deferrability: not deferrable
       initially deferred: false
+      optional: false
       self-referencing: false
       delete rule: no action
       update rule: no action
