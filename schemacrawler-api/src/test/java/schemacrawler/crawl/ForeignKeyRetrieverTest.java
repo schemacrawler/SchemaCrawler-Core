@@ -27,12 +27,10 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
@@ -85,13 +83,15 @@ public class ForeignKeyRetrieverTest {
             out.println("      definition: " + foreignKey.getDefinition());
             out.println("      deferrability: " + foreignKey.getDeferrability());
             out.println("      initially deferred: " + foreignKey.isInitiallyDeferred());
+            out.println("      optional: " + foreignKey.isOptional());
             out.println("      self-referencing: " + foreignKey.isSelfReferencing());
             out.println("      delete rule: " + foreignKey.getDeleteRule());
             out.println("      update rule: " + foreignKey.getUpdateRule());
 
             out.println("      dependent table: " + foreignKey.getDependentTable());
             out.println("      referenced table: " + foreignKey.getReferencedTable());
-            out.println("      cardinality: " + MetaDataUtility.findForeignKeyCardinality(foreignKey));
+            out.println(
+                "      cardinality: " + MetaDataUtility.findForeignKeyCardinality(foreignKey));
             out.println("      column references: ");
             final List<ColumnReference> columnReferences = foreignKey.getColumnReferences();
             for (final ColumnReference columnReference : columnReferences) {

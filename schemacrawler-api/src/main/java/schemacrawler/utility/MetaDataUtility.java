@@ -90,20 +90,19 @@ public final class MetaDataUtility {
       return ForeignKeyCardinality.unknown;
     }
     final boolean isForeignKeyUnique = isForeignKeyUnique(tableRef);
-    final boolean isForeignKeyNullable = isForeignKeyNullable(tableRef);
     final boolean isColumnReference = tableRef.getDependentTable() instanceof PartialDatabaseObject;
 
     final ForeignKeyCardinality connectivity;
     if (isColumnReference) {
       connectivity = ForeignKeyCardinality.unknown;
     } else if (isForeignKeyUnique) {
-      if (isForeignKeyNullable) {
+      if (tableRef.isOptional()) {
         connectivity = ForeignKeyCardinality.zero_one;
       } else {
         connectivity = ForeignKeyCardinality.one_one;
       }
     } else {
-      if (isForeignKeyNullable) {
+      if (tableRef.isOptional()) {
         connectivity = ForeignKeyCardinality.zero_many;
       } else {
         connectivity = ForeignKeyCardinality.one_many;
@@ -254,27 +253,14 @@ public final class MetaDataUtility {
     return inclusionRuleString;
   }
 
-  public static boolean isForeignKeyNullable(final TableReference tableRef) {
-    if (tableRef == null) {
-      return false;
-    }
-    for (final ColumnReference columnReference : tableRef) {
-      final Column foreignKeyColumn = columnReference.getForeignKeyColumn();
-      if (!(foreignKeyColumn instanceof PartialDatabaseObject) && foreignKeyColumn.isNullable()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public static boolean isForeignKeyUnique(final TableReference tableRef) {
     if (tableRef == null) {
       return false;
     }
     final Table fkTable = tableRef.getForeignKeyTable();
-    final Collection<List<String>> uniqueIndexCoumnNames = uniqueIndexCoumnNames(fkTable);
+    final Collection<List<String>> uniqueIndexColumnNames = uniqueIndexCoumnNames(fkTable);
     final List<String> foreignKeyColumnNames = foreignKeyColumnNames(tableRef);
-    return uniqueIndexCoumnNames.contains(foreignKeyColumnNames);
+    return uniqueIndexColumnNames.contains(foreignKeyColumnNames);
   }
 
   public static boolean isView(final Table table) {
