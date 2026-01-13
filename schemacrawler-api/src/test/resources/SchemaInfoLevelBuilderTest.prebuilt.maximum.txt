@@ -1,6 +1,5 @@
 maximum
 {
-  "modelTableEntities": true,
   "retrieveAdditionalColumnAttributes": true,
   "retrieveAdditionalColumnMetadata": true,
   "retrieveAdditionalDatabaseInfo": true,

@@ -21,11 +21,9 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.loader.weakassociations.ProposedWeakAssociation;
 import schemacrawler.loader.weakassociations.WeakAssociationsAnalyzer;

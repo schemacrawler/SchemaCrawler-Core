@@ -43,22 +43,13 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.tools.utility;
 
   // Export public API packages from schemacrawler-loader
-  exports schemacrawler.loader.attributes;
-  exports schemacrawler.loader.attributes.model;
-  exports schemacrawler.loader.counts;
-  exports schemacrawler.loader.weakassociations;
+  exports schemacrawler.loader.utility;
 
   // ServiceLoader providers
   uses java.sql.Driver;
   uses schemacrawler.tools.catalogloader.CatalogLoader;
   uses schemacrawler.tools.databaseconnector.DatabaseConnector;
   uses schemacrawler.tools.executable.CommandProvider;
-
-  provides schemacrawler.tools.catalogloader.CatalogLoader with
-      schemacrawler.loader.attributes.AttributesCatalogLoader,
-      schemacrawler.loader.counts.TableRowCountsCatalogLoader,
-      schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoader,
-      schemacrawler.tools.catalogloader.SchemaCrawlerCatalogLoader;
 
   // Allow reflection of schema model
   opens schemacrawler.schema to

@@ -9,9 +9,10 @@
 package schemacrawler.loader.counts;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.loader.counts.TableRowCountsUtility.addRowCountToTable;
+import static schemacrawler.loader.utility.TableRowCountsUtility.TABLE_ROW_COUNT_KEY;
 import static schemacrawler.schema.IdentifierQuotingStrategy.quote_all;
 import static schemacrawler.schemacrawler.QueryUtility.executeForLong;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,9 +20,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.Table;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
+import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.Query;
 import schemacrawler.schemacrawler.Retriever;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
@@ -72,6 +73,16 @@ public final class TableRowCountsRetriever {
       }
     } catch (final SQLException e) {
       LOGGER.log(Level.WARNING, "Could not get table row counts", e);
+    }
+  }
+
+  private void addRowCountToTable(final Table table, final long rowCount) {
+    if (table != null) {
+      if (rowCount >= 0) {
+        table.setAttribute(TABLE_ROW_COUNT_KEY, rowCount);
+      } else {
+        table.removeAttribute(TABLE_ROW_COUNT_KEY);
+      }
     }
   }
 }

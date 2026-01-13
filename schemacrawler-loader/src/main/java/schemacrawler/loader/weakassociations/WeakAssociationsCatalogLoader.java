@@ -48,13 +48,15 @@ public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
     pluginCommand.addOption(
         OPTION_WEAK_ASSOCIATIONS,
         Boolean.class,
-        "Analyzes the schema to find weak associations between tables, based on table and column naming patterns",
+        "Analyzes the schema to find weak associations between tables, based on table and column"
+            + " naming patterns",
         "This can be a time consuming operation",
         "Optional, defaults to false");
     pluginCommand.addOption(
         OPTION_INFER_EXTENSION_TABLES,
         Boolean.class,
-        "Infers extension tables that have similarly named primary keys, and reports them as weak associations",
+        "Infers extension tables that have similarly named primary keys, and reports them as weak"
+            + " associations",
         "Optional, defaults to false");
     return pluginCommand;
   }

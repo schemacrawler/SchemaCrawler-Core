@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.string.StringFormat;

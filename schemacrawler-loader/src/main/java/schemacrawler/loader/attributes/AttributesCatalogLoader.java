@@ -112,10 +112,8 @@ public class AttributesCatalogLoader extends BaseCatalogLoader {
 
       final AlternateKeyDefinition alternateKeyDefinition =
           new AlternateKeyDefinition(
-              alternateKeyAttributes.getSchema(),
-              alternateKeyAttributes.getTableName(),
-              alternateKeyAttributes.getName(),
-              alternateKeyAttributes.getColumns());
+              alternateKeyAttributes.getSchema(), alternateKeyAttributes.getTableName(),
+              alternateKeyAttributes.getName(), alternateKeyAttributes.getColumns());
 
       final Optional<PrimaryKey> optionalAlternateKey =
           alternateKeyBuilder.addAlternateKey(alternateKeyDefinition);

@@ -192,10 +192,10 @@ public final class WeakAssociationBuilder implements Builder<TableReference> {
       return Optional.of(optionalMatchingWeakAssociation.get());
     }
     // Add weak association to tables if no matching foreign key is found
-    if (referencedTable instanceof MutableTable table) {
+    if (referencedTable instanceof final MutableTable table) {
       table.addWeakAssociation(weakAssociation);
     }
-    if (dependentTable instanceof MutableTable table) {
+    if (dependentTable instanceof final MutableTable table) {
       table.addWeakAssociation(weakAssociation);
     }
 

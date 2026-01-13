@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
+import schemacrawler.loader.entities.TableEntityIdentifier;
 import schemacrawler.schema.EntityType;
 import schemacrawler.schemacrawler.SchemaReference;
 
@@ -36,8 +37,7 @@ public class EntityIdentifierTest {
     table.addColumn(new MutableColumn(table, "COLUMN1"));
     table.addColumn(new MutableColumn(table, "COLUMN2"));
 
-    final EntityType entityType =
-        new EntityIdentifier.TableEntityIdentifier(table).identifyEntityType();
+    final EntityType entityType = new TableEntityIdentifier(table).identifyEntityType();
     assertThat(entityType, is(EntityType.non_entity));
   }
 
@@ -63,8 +63,7 @@ public class EntityIdentifierTest {
     pk.addColumn(new MutableTableConstraintColumn(pk, id));
     table.setPrimaryKey(pk);
 
-    final EntityType entityType =
-        new EntityIdentifier.TableEntityIdentifier(table).identifyEntityType();
+    final EntityType entityType = new TableEntityIdentifier(table).identifyEntityType();
     assertThat(entityType, is(EntityType.strong_entity));
   }
 
@@ -105,56 +104,8 @@ public class EntityIdentifierTest {
     subtypeTable.addForeignKey(fk);
     subtypeId.setReferencedColumn(parentId);
 
-    final EntityType entityType =
-        new EntityIdentifier.TableEntityIdentifier(subtypeTable).identifyEntityType();
+    final EntityType entityType = new TableEntityIdentifier(subtypeTable).identifyEntityType();
     assertThat(entityType, is(EntityType.subtype));
-  }
-
-  /**
-   * Test for a weak entity table.
-   *
-   * <pre>
-   *   PARENT_TABLE
-   *   ------------
-   *   ID (PK)
-   *
-   *   WEAK_ENTITY_TABLE
-   *   -----------------
-   *   PARENT_ID (PK, FK referencing PARENT_TABLE.ID)
-   *   DISCRIMINATOR (PK)
-   * </pre>
-   */
-  @Test
-  public void testWeakEntity() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-
-    final MutableTable parentTable = new MutableTable(schema, "PARENT_TABLE");
-    final MutableColumn parentId = new MutableColumn(parentTable, "ID");
-    parentTable.addColumn(parentId);
-    final MutablePrimaryKey parentPk = MutablePrimaryKey.newPrimaryKey(parentTable, "PK_PARENT");
-    parentPk.addColumn(new MutableTableConstraintColumn(parentPk, parentId));
-    parentTable.setPrimaryKey(parentPk);
-
-    final MutableTable weakTable = new MutableTable(schema, "WEAK_ENTITY_TABLE");
-    final MutableColumn parentIdInWeak = new MutableColumn(weakTable, "PARENT_ID");
-    final MutableColumn discriminator = new MutableColumn(weakTable, "DISCRIMINATOR");
-    weakTable.addColumn(parentIdInWeak);
-    weakTable.addColumn(discriminator);
-
-    final MutablePrimaryKey weakPk = MutablePrimaryKey.newPrimaryKey(weakTable, "PK_WEAK");
-    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, parentIdInWeak));
-    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, discriminator));
-    weakTable.setPrimaryKey(weakPk);
-
-    final ImmutableColumnReference columnReference =
-        new ImmutableColumnReference(1, parentIdInWeak, parentId);
-    final MutableForeignKey fk = new MutableForeignKey("FK_WEAK", columnReference);
-    weakTable.addForeignKey(fk);
-    parentIdInWeak.setReferencedColumn(parentId);
-
-    final EntityType entityType =
-        new EntityIdentifier.TableEntityIdentifier(weakTable).identifyEntityType();
-    assertThat(entityType, is(EntityType.weak_entity));
   }
 
   /**
@@ -221,8 +172,53 @@ public class EntityIdentifierTest {
     fk2Col.setReferencedColumn(id2);
     fk3Col.setReferencedColumn(id3);
 
-    final EntityType entityType =
-        new EntityIdentifier.TableEntityIdentifier(unknownTable).identifyEntityType();
+    final EntityType entityType = new TableEntityIdentifier(unknownTable).identifyEntityType();
     assertThat(entityType, is(EntityType.unknown));
+  }
+
+  /**
+   * Test for a weak entity table.
+   *
+   * <pre>
+   *   PARENT_TABLE
+   *   ------------
+   *   ID (PK)
+   *
+   *   WEAK_ENTITY_TABLE
+   *   -----------------
+   *   PARENT_ID (PK, FK referencing PARENT_TABLE.ID)
+   *   DISCRIMINATOR (PK)
+   * </pre>
+   */
+  @Test
+  public void testWeakEntity() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+
+    final MutableTable parentTable = new MutableTable(schema, "PARENT_TABLE");
+    final MutableColumn parentId = new MutableColumn(parentTable, "ID");
+    parentTable.addColumn(parentId);
+    final MutablePrimaryKey parentPk = MutablePrimaryKey.newPrimaryKey(parentTable, "PK_PARENT");
+    parentPk.addColumn(new MutableTableConstraintColumn(parentPk, parentId));
+    parentTable.setPrimaryKey(parentPk);
+
+    final MutableTable weakTable = new MutableTable(schema, "WEAK_ENTITY_TABLE");
+    final MutableColumn parentIdInWeak = new MutableColumn(weakTable, "PARENT_ID");
+    final MutableColumn discriminator = new MutableColumn(weakTable, "DISCRIMINATOR");
+    weakTable.addColumn(parentIdInWeak);
+    weakTable.addColumn(discriminator);
+
+    final MutablePrimaryKey weakPk = MutablePrimaryKey.newPrimaryKey(weakTable, "PK_WEAK");
+    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, parentIdInWeak));
+    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, discriminator));
+    weakTable.setPrimaryKey(weakPk);
+
+    final ImmutableColumnReference columnReference =
+        new ImmutableColumnReference(1, parentIdInWeak, parentId);
+    final MutableForeignKey fk = new MutableForeignKey("FK_WEAK", columnReference);
+    weakTable.addForeignKey(fk);
+    parentIdInWeak.setReferencedColumn(parentId);
+
+    final EntityType entityType = new TableEntityIdentifier(weakTable).identifyEntityType();
+    assertThat(entityType, is(EntityType.weak_entity));
   }
 }

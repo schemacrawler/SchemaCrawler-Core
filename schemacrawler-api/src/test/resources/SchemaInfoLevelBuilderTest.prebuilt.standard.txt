@@ -1,6 +1,5 @@
 standard
 {
-  "modelTableEntities": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,
