@@ -9,6 +9,7 @@
 package schemacrawler.loader.counts;
 
 import java.util.function.Predicate;
+import schemacrawler.loader.utility.TableRowCountsUtility;
 import schemacrawler.schema.Table;
 
 public class TableRowCountsFilter implements Predicate<Table> {

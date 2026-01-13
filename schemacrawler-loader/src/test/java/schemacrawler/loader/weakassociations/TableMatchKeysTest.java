@@ -18,9 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
-
 import schemacrawler.schema.Table;
 import schemacrawler.test.utility.crawl.LightTable;
 

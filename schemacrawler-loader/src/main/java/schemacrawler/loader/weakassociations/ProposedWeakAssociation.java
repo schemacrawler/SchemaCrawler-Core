@@ -56,7 +56,7 @@ public final class ProposedWeakAssociation implements ColumnReference {
 
     final boolean isPkColumnPartial = primaryKeyColumn instanceof PartialDatabaseObject;
     final boolean isFkColumnPartial = foreignKeyColumn instanceof PartialDatabaseObject;
-    if ((isFkColumnPartial && isPkColumnPartial)
+    if (isFkColumnPartial && isPkColumnPartial
         || !primaryKeyColumn.isColumnDataTypeKnown()
         || !foreignKeyColumn.isColumnDataTypeKnown()) {
       return false;

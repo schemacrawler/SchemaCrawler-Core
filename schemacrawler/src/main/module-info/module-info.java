@@ -43,11 +43,7 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.tools.utility;
 
   // Export public API packages from schemacrawler-loader
-  exports schemacrawler.loader.attributes;
-  exports schemacrawler.loader.attributes.model;
-  exports schemacrawler.loader.counts;
-  exports schemacrawler.loader.entities;
-  exports schemacrawler.loader.weakassociations;
+  exports schemacrawler.loader.utility;
 
   // ServiceLoader providers
   uses java.sql.Driver;

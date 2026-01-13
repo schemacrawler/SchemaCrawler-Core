@@ -51,11 +51,11 @@ public class WeakAssociationAttributes extends ObjectAttributes {
     return columnReferences;
   }
 
-  public TableAttributes getReferencedTable() {
-    return referencedTable;
-  }
-
   public TableAttributes getDependentTable() {
     return dependentTable;
+  }
+
+  public TableAttributes getReferencedTable() {
+    return referencedTable;
   }
 }

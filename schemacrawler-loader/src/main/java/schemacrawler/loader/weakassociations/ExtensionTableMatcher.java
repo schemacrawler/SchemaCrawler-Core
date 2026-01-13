@@ -9,7 +9,6 @@
 package schemacrawler.loader.weakassociations;
 
 import java.util.function.Predicate;
-
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 
@@ -24,11 +23,7 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
   @Override
   public boolean test(final ProposedWeakAssociation proposedWeakAssociation) {
 
-    if (!inferExtensionTables) {
-      return false;
-    }
-
-    if (proposedWeakAssociation == null) {
+    if (!inferExtensionTables || (proposedWeakAssociation == null)) {
       return false;
     }
 
@@ -46,8 +41,7 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
           foreignKeyColumn.isPartOfPrimaryKey() || foreignKeyColumn.isPartOfUniqueIndex();
       final boolean pkTableSortsFirst = pkTable.compareTo(fkTable) < 0;
       return fkIsUnique && pkTableSortsFirst;
-    } else {
-      return false;
     }
+    return false;
   }
 }
