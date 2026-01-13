@@ -46,6 +46,7 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.loader.attributes;
   exports schemacrawler.loader.attributes.model;
   exports schemacrawler.loader.counts;
+  exports schemacrawler.loader.entities;
   exports schemacrawler.loader.weakassociations;
 
   // ServiceLoader providers

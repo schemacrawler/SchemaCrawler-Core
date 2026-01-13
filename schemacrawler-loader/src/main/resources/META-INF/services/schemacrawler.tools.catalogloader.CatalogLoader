@@ -1,4 +1,4 @@
-schemacrawler.loader.entities.EntitiesLoader
+schemacrawler.loader.entities.EntityModelCatalogLoader
 schemacrawler.loader.counts.TableRowCountsCatalogLoader
 schemacrawler.loader.attributes.AttributesCatalogLoader
 schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoader
