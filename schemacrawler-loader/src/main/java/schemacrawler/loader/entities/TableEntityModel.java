@@ -20,13 +20,17 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.ForeignKeyCardinality;
+import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 
-public final class TableEntityIdentifier {
+public final class TableEntityModel {
 
   private final Table table;
+
+  private final Set<Set<Column>> uniqueKeys = new HashSet<>();
 
   private final Set<ForeignKey> importedForeignKeys;
   private final Set<Column> tablePkColumnNames;
@@ -35,7 +39,7 @@ public final class TableEntityIdentifier {
   private final Map<NamedObjectKey, Set<Column>> pkColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> parentPkColumnsMap;
 
-  public TableEntityIdentifier(final Table table) {
+  public TableEntityModel(final Table table) {
     this.table = requireNonNull(table, "No table provided");
 
     importedForeignKeys = new HashSet<>();
@@ -45,9 +49,8 @@ public final class TableEntityIdentifier {
     pkColumnsMap = new HashMap<>();
     parentPkColumnsMap = new HashMap<>();
 
-    if (table.hasPrimaryKey()) {
-      buildSupportingLookups();
-    }
+    buildSupportingLookups();
+    buildUniquenessLookup();
   }
 
   public EntityType identifyEntityType() {
@@ -109,12 +112,40 @@ public final class TableEntityIdentifier {
     return EntityType.unknown;
   }
 
+  public ForeignKeyCardinality identifyForeignKeyCardinality(final ForeignKey fk) {
+    ForeignKeyCardinality connectivity = ForeignKeyCardinality.unknown;
+    if (fk == null || !importedColumnsMap.containsKey(fk.key())) {
+      return connectivity;
+    }
+
+    final Set<Column> importedColumns = importedColumnsMap.get(fk.key());
+    final boolean isForeignKeyUnique = uniqueKeys.contains(importedColumns);
+    final boolean isForeignKeyOptional = fk.isOptional();
+
+    if (isForeignKeyUnique) {
+      if (isForeignKeyOptional) {
+        connectivity = ForeignKeyCardinality.zero_one;
+      } else {
+        connectivity = ForeignKeyCardinality.one_one;
+      }
+    } else if (isForeignKeyOptional) {
+      connectivity = ForeignKeyCardinality.zero_many;
+    } else {
+      connectivity = ForeignKeyCardinality.one_many;
+    }
+
+    return connectivity;
+  }
+
   @Override
   public String toString() {
     return table.toString();
   }
 
   private void buildSupportingLookups() {
+    if (!table.hasPrimaryKey()) {
+      return;
+    }
 
     // Foreign keys imported from other tables
     for (final ForeignKey fk : table.getImportedForeignKeys()) {
@@ -145,6 +176,23 @@ public final class TableEntityIdentifier {
         parentPkColumnsMap.put(fk.key(), parentPkColumnNames);
       } else {
         parentPkColumnsMap.put(fk.key(), Collections.emptySet());
+      }
+    }
+  }
+
+  /**
+   * Builds a lookup of all known unique column combinations for this table. Uses exact ordered
+   * column sequences (no subsets).
+   */
+  private void buildUniquenessLookup() {
+    if (table.hasPrimaryKey()) {
+      uniqueKeys.add(new HashSet<>(table.getPrimaryKey().getConstrainedColumns()));
+    }
+    if (table.hasIndexes()) {
+      for (final Index index : table.getIndexes()) {
+        if (index.isUnique()) {
+          uniqueKeys.add(new HashSet<>(index.getColumns()));
+        }
       }
     }
   }

@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jspecify.annotations.Nullable;
 import schemacrawler.schema.EntityType;
+import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Table;
 
 /** Helps build the entity model, but does not follow the SchemaCrawler builder pattern. */
@@ -27,6 +29,13 @@ public final class EntityModelBuilder {
     LOGGER.log(Level.FINEST, "Setting entity type <%s> on table <%s>".formatted(entityType, table));
     if (table instanceof final MutableTable mutableTable) {
       mutableTable.setEntityType(entityType);
+    }
+  }
+
+  public void updateForeignKeyCardinality(ForeignKey fk, ForeignKeyCardinality fkCardinality) {
+    LOGGER.log(Level.FINEST, "Setting <%s> on foreign key <%s>".formatted(fkCardinality, fk));
+    if (fk instanceof final AbstractTableReference tableReference) {
+      tableReference.setForeignKeyCardinality(fkCardinality);
     }
   }
 }
