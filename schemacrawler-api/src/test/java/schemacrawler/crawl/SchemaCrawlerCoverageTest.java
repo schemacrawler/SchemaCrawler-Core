@@ -35,6 +35,8 @@ import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
+import schemacrawler.schema.EntityType;
+import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexColumnSortSequence;
@@ -169,9 +171,11 @@ public class SchemaCrawlerCoverageTest {
         jdbcDriverInfo.toString(),
         matchesPattern(
             Pattern.compile(
-                "-- driver: HSQL Database Engine Driver 2.7.4\\R"
-                    + "-- driver class: org.hsqldb.jdbc.JDBCDriver\\R"
-                    + "-- url: jdbc:hsqldb:hsql:\\/\\/0.0.0.0:\\d*/schemacrawler\\d*\\R",
+                """
+                -- driver: HSQL Database Engine Driver 2.7.4\\R\
+                -- driver class: org.hsqldb.jdbc.JDBCDriver\\R\
+                -- url: jdbc:hsqldb:hsql:\\/\\/0.0.0.0:\\d*/schemacrawler\\d*\\R\
+                """,
                 Pattern.DOTALL)));
   }
 
@@ -237,6 +241,25 @@ public class SchemaCrawlerCoverageTest {
     final Sequence sequence = catalog.lookupSequence(schema, "PUBLISHER_ID_SEQ").get();
 
     checkBooleanProperties(sequence, "cycle");
+  }
+
+  @Test
+  public void setEntityModelFields() throws Exception {
+    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
+    final MutableTable table = (MutableTable) catalog.lookupTable(schema, "BOOKAUTHORS").get();
+    final MutableForeignKey foreignKey = table.lookupForeignKey("Z_FK_AUTHOR").get();
+
+    assertThat(table.getEntityType(), is(EntityType.unknown));
+    table.setEntityType(EntityType.strong_entity);
+    assertThat(table.getEntityType(), is(EntityType.strong_entity));
+    table.setEntityType(null);
+    assertThat(table.getEntityType(), is(EntityType.strong_entity));
+
+    assertThat(foreignKey.getForeignKeyCardinality(), is(ForeignKeyCardinality.unknown));
+    foreignKey.setForeignKeyCardinality(ForeignKeyCardinality.one_many);
+    assertThat(foreignKey.getForeignKeyCardinality(), is(ForeignKeyCardinality.one_many));
+    foreignKey.setForeignKeyCardinality(null);
+    assertThat(foreignKey.getForeignKeyCardinality(), is(ForeignKeyCardinality.one_many));
   }
 
   @Test

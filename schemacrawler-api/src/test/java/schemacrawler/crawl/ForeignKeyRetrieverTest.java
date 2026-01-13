@@ -35,6 +35,7 @@ import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
@@ -106,6 +107,7 @@ public class ForeignKeyRetrieverTest {
             }
 
             assertThat(foreignKey.isDeferrable(), is(foreignKey.isInitiallyDeferred()));
+            assertThat(foreignKey.getForeignKeyCardinality(), is(ForeignKeyCardinality.unknown));
           }
         }
       }

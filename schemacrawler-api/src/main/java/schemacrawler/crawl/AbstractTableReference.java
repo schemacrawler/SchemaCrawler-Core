@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
+import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
@@ -37,6 +38,7 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
   private final SortedSet<ColumnReference> columnReferences;
   private final boolean isSelfReferencing;
   private boolean isOptional;
+  private ForeignKeyCardinality fkCardinality;
 
   public AbstractTableReference(final String name, final ColumnReference columnReference) {
     super(
@@ -50,6 +52,7 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
     addColumnReference(columnReference);
 
     isSelfReferencing = getParent().equals(pkTable);
+    fkCardinality = ForeignKeyCardinality.unknown;
   }
 
   /**
@@ -68,7 +71,7 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
       return -1;
     }
 
-    if (obj instanceof TableReference other) {
+    if (obj instanceof final TableReference other) {
       final List<ColumnReference> thisColumnReferences = getColumnReferences();
       final List<ColumnReference> otherColumnReferences = other.getColumnReferences();
 
@@ -87,6 +90,12 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
   @Override
   public List<ColumnReference> getColumnReferences() {
     return List.copyOf(columnReferences);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ForeignKeyCardinality getForeignKeyCardinality() {
+    return fkCardinality;
   }
 
   @Override
@@ -139,6 +148,12 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
             "Column reference <%s> not added, since it is not consistent with <%s --> %s>",
             columnReference, fkTable, pkTable));
     return false;
+  }
+
+  void setForeignKeyCardinality(final ForeignKeyCardinality fkCardinality) {
+    if (fkCardinality != null) {
+      this.fkCardinality = fkCardinality;
+    }
   }
 
   private void addTableConstraintColumn(final ColumnReference columnReference) {
