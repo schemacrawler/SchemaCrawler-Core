@@ -42,6 +42,9 @@ public final class TableEntityModel {
 
   public TableEntityModel(final Table table) {
     this.table = requireNonNull(table, "No table provided");
+    if (table instanceof PartialDatabaseObject) {
+      throw new IllegalArgumentException("Table cannot be partial");
+    }
 
     uniqueKeys = new HashSet<>();
 
