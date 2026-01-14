@@ -19,6 +19,7 @@ import schemacrawler.crawl.EntityModelBuilder;
 import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.ForeignKeyCardinality;
+import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaInfoLevel;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
@@ -95,6 +96,9 @@ public final class EntityModelCatalogLoader extends BaseCatalogLoader {
   private void identifyEntityModels() {
     final EntityModelBuilder modelBuilder = EntityModelBuilder.builder();
     for (final Table table : getCatalog().getTables()) {
+      if (table instanceof PartialDatabaseObject) {
+        continue;
+      }
       final TableEntityModel tableEntityModel = new TableEntityModel(table);
 
       final EntityType entityType = tableEntityModel.identifyEntityType();

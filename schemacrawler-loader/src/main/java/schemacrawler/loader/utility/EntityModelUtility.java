@@ -11,6 +11,7 @@ package schemacrawler.loader.utility;
 import schemacrawler.loader.entities.TableEntityModel;
 import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKeyCardinality;
+import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.UtilityMarker;
@@ -19,7 +20,7 @@ import us.fatehi.utility.UtilityMarker;
 public class EntityModelUtility {
 
   public static EntityType identifyEntityType(final Table table) {
-    if (table == null) {
+    if (table instanceof PartialDatabaseObject) {
       return EntityType.unknown;
     }
 
@@ -33,7 +34,12 @@ public class EntityModelUtility {
       return ForeignKeyCardinality.unknown;
     }
 
-    final TableEntityModel tableEntityModel = new TableEntityModel(fk.getForeignKeyTable());
+    final Table table = fk.getForeignKeyTable();
+    if (table instanceof PartialDatabaseObject) {
+      return ForeignKeyCardinality.unknown;
+    }
+
+    final TableEntityModel tableEntityModel = new TableEntityModel(table);
     final ForeignKeyCardinality fkCardinality = tableEntityModel.identifyForeignKeyCardinality(fk);
     return fkCardinality;
   }
