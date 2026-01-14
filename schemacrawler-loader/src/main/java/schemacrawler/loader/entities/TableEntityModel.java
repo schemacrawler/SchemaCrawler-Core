@@ -25,6 +25,7 @@ import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 
 public final class TableEntityModel {
 
@@ -114,19 +115,15 @@ public final class TableEntityModel {
     return EntityType.unknown;
   }
 
-  public ForeignKeyCardinality identifyForeignKeyCardinality(final ForeignKey fk) {
+  public ForeignKeyCardinality identifyForeignKeyCardinality(final TableReference fk) {
     ForeignKeyCardinality cardinality = ForeignKeyCardinality.unknown;
     if (fk == null) {
       return cardinality;
     }
 
-    // Handle self-references - they are filtered out in an earlier step
     final Set<Column> importedColumns;
     if (!importedColumnsMap.containsKey(fk.key())) {
-      if (!fk.isSelfReferencing()) {
-        return cardinality;
-      }
-      importedColumns = tablePkColumns;
+      importedColumns = getImportedColumns(fk);
     } else {
       importedColumns = importedColumnsMap.get(fk.key());
     }
@@ -173,10 +170,7 @@ public final class TableEntityModel {
               .collect(Collectors.toSet());
       pkColumnsMap.put(fk.key(), fkParentColumns);
 
-      final Set<Column> fkChildColumns =
-          fk.getColumnReferences().stream()
-              .map(ColumnReference::getForeignKeyColumn)
-              .collect(Collectors.toSet());
+      final Set<Column> fkChildColumns = getImportedColumns(fk);
       importedColumnsMap.put(fk.key(), fkChildColumns);
 
       final Table parentTable = fk.getPrimaryKeyTable();
@@ -188,6 +182,14 @@ public final class TableEntityModel {
         parentPkColumnsMap.put(fk.key(), Collections.emptySet());
       }
     }
+  }
+
+  private Set<Column> getImportedColumns(final TableReference fk) {
+    final Set<Column> fkChildColumns =
+        fk.getColumnReferences().stream()
+            .map(ColumnReference::getForeignKeyColumn)
+            .collect(Collectors.toSet());
+    return fkChildColumns;
   }
 
   /**

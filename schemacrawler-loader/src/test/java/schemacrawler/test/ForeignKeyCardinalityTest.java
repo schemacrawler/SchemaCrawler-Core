@@ -33,7 +33,6 @@ import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
-import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.test.utility.extensions.TestContext;
@@ -55,15 +54,8 @@ public class ForeignKeyCardinalityTest {
         for (final Table table : tables) {
           final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
           for (final ForeignKey fk : foreignKeys) {
-            final ForeignKeyCardinality expectedFkCardinality =
-                MetaDataUtility.findForeignKeyCardinality(fk);
             final ForeignKeyCardinality fkCardinality = fk.getForeignKeyCardinality();
-            if (!fkCardinality.equals(expectedFkCardinality)) {
-              out.println(
-                  "%s [%s] - expected [%s]".formatted(fk, fkCardinality, expectedFkCardinality));
-            } else {
-              out.println("%s [%s]".formatted(fk, fkCardinality));
-            }
+            out.println("%s [%s]".formatted(fk, fkCardinality));
           }
         }
       }

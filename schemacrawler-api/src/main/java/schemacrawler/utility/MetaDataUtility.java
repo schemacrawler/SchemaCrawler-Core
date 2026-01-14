@@ -30,13 +30,11 @@ import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseObject;
-import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Function;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.JavaSqlTypeGroup;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
@@ -69,10 +67,6 @@ public final class MetaDataUtility {
 
   private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
 
-  public static Collection<List<String>> allIndexCoumnNames(final Table table) {
-    return indexCoumnNames(table, false);
-  }
-
   public static List<String> columnNames(final Index index) {
     if (index == null) {
       return Collections.emptyList();
@@ -83,32 +77,6 @@ public final class MetaDataUtility {
       columnNames.add(indexColumn.getFullName());
     }
     return columnNames;
-  }
-
-  public static ForeignKeyCardinality findForeignKeyCardinality(final TableReference tableRef) {
-    if (tableRef == null) {
-      return ForeignKeyCardinality.unknown;
-    }
-    final boolean isForeignKeyUnique = isForeignKeyUnique(tableRef);
-    final boolean isColumnReference = tableRef.getDependentTable() instanceof PartialDatabaseObject;
-
-    final ForeignKeyCardinality connectivity;
-    if (isColumnReference) {
-      connectivity = ForeignKeyCardinality.unknown;
-    } else if (isForeignKeyUnique) {
-      if (tableRef.isOptional()) {
-        connectivity = ForeignKeyCardinality.zero_one;
-      } else {
-        connectivity = ForeignKeyCardinality.one_one;
-      }
-    } else {
-      if (tableRef.isOptional()) {
-        connectivity = ForeignKeyCardinality.zero_many;
-      } else {
-        connectivity = ForeignKeyCardinality.one_many;
-      }
-    }
-    return connectivity;
   }
 
   public static List<String> foreignKeyColumnNames(final TableReference tableRef) {
@@ -253,16 +221,6 @@ public final class MetaDataUtility {
     return inclusionRuleString;
   }
 
-  public static boolean isForeignKeyUnique(final TableReference tableRef) {
-    if (tableRef == null) {
-      return false;
-    }
-    final Table fkTable = tableRef.getForeignKeyTable();
-    final Collection<List<String>> uniqueIndexColumnNames = uniqueIndexCoumnNames(fkTable);
-    final List<String> foreignKeyColumnNames = foreignKeyColumnNames(tableRef);
-    return uniqueIndexColumnNames.contains(foreignKeyColumnNames);
-  }
-
   public static boolean isView(final Table table) {
     return table instanceof View;
   }
@@ -395,28 +353,6 @@ public final class MetaDataUtility {
 
     final CrawlInfo crawlInfo = catalog.getCrawlInfo();
     return "Loaded catalog%n%s%n%s".formatted(crawlInfo, countTree);
-  }
-
-  public static Collection<List<String>> uniqueIndexCoumnNames(final Table table) {
-    return indexCoumnNames(table, true);
-  }
-
-  private static Collection<List<String>> indexCoumnNames(
-      final Table table, final boolean includeUniqueOnly) {
-    final List<List<String>> allIndexCoumns = new ArrayList<>();
-    if (table instanceof PartialDatabaseObject) {
-      return allIndexCoumns;
-    }
-
-    for (final Index index : table.getIndexes()) {
-      if (includeUniqueOnly && !index.isUnique()) {
-        continue;
-      }
-
-      final List<String> indexColumns = columnNames(index);
-      allIndexCoumns.add(indexColumns);
-    }
-    return allIndexCoumns;
   }
 
   private MetaDataUtility() {
