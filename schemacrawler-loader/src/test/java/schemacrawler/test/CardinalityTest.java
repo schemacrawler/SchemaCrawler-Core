@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import schemacrawler.loader.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.ForeignKeyCardinality;
@@ -29,7 +30,6 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 
 @WithTestDatabase(script = "/cardinality.sql")
@@ -52,28 +52,33 @@ public class CardinalityTest {
     final Table zeroOneTable = catalog.lookupTable(schema, "ZEROONECHILD").get();
     final ForeignKey zeroOneFk = zeroOneTable.getForeignKeys().iterator().next();
     assertThat(
-        MetaDataUtility.findForeignKeyCardinality(zeroOneFk), is(ForeignKeyCardinality.zero_one));
+        EntityModelUtility.identifyForeignKeyCardinality(zeroOneFk),
+        is(ForeignKeyCardinality.zero_one));
 
     // one_one: Unique, Not Null
     final Table oneOneTable = catalog.lookupTable(schema, "ONEONECHILD").get();
     final ForeignKey oneOneFk = oneOneTable.getForeignKeys().iterator().next();
     assertThat(
-        MetaDataUtility.findForeignKeyCardinality(oneOneFk), is(ForeignKeyCardinality.one_one));
+        EntityModelUtility.identifyForeignKeyCardinality(oneOneFk),
+        is(ForeignKeyCardinality.one_one));
 
     // zero_many: Not Unique, Nullable
     final Table zeroManyTable = catalog.lookupTable(schema, "ZEROMANYCHILD").get();
     final ForeignKey zeroManyFk = zeroManyTable.getForeignKeys().iterator().next();
     assertThat(
-        MetaDataUtility.findForeignKeyCardinality(zeroManyFk), is(ForeignKeyCardinality.zero_many));
+        EntityModelUtility.identifyForeignKeyCardinality(zeroManyFk),
+        is(ForeignKeyCardinality.zero_many));
 
     // one_many: Not Unique, Not Null
     final Table oneManyTable = catalog.lookupTable(schema, "ONEMANYCHILD").get();
     final ForeignKey oneManyFk = oneManyTable.getForeignKeys().iterator().next();
     assertThat(
-        MetaDataUtility.findForeignKeyCardinality(oneManyFk), is(ForeignKeyCardinality.one_many));
+        EntityModelUtility.identifyForeignKeyCardinality(oneManyFk),
+        is(ForeignKeyCardinality.one_many));
 
     // unknown
-    assertThat(MetaDataUtility.findForeignKeyCardinality(null), is(ForeignKeyCardinality.unknown));
+    assertThat(
+        EntityModelUtility.identifyForeignKeyCardinality(null), is(ForeignKeyCardinality.unknown));
   }
 
   @BeforeAll

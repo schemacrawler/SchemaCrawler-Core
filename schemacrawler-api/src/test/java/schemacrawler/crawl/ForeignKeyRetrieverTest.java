@@ -35,6 +35,7 @@ import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
@@ -50,7 +51,6 @@ import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.utility.MetaDataUtility;
 import schemacrawler.utility.NamedObjectSort;
 import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
@@ -90,8 +90,6 @@ public class ForeignKeyRetrieverTest {
 
             out.println("      dependent table: " + foreignKey.getDependentTable());
             out.println("      referenced table: " + foreignKey.getReferencedTable());
-            out.println(
-                "      cardinality: " + MetaDataUtility.findForeignKeyCardinality(foreignKey));
             out.println("      column references: ");
             final List<ColumnReference> columnReferences = foreignKey.getColumnReferences();
             for (final ColumnReference columnReference : columnReferences) {
@@ -106,6 +104,7 @@ public class ForeignKeyRetrieverTest {
             }
 
             assertThat(foreignKey.isDeferrable(), is(foreignKey.isInitiallyDeferred()));
+            assertThat(foreignKey.getForeignKeyCardinality(), is(ForeignKeyCardinality.unknown));
           }
         }
       }

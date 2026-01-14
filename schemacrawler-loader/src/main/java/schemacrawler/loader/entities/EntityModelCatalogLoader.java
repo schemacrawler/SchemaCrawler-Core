@@ -17,6 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.EntityModelBuilder;
 import schemacrawler.schema.EntityType;
+import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaInfoLevel;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
@@ -77,7 +79,7 @@ public final class EntityModelCatalogLoader extends BaseCatalogLoader {
                     config.getBooleanValue(OPTION_ENTITY_MODELS, true);
 
                 if (hasData && identifyEntityModels) {
-                  identifyEntities();
+                  identifyEntityModels();
                 } else {
                   LOGGER.log(
                       Level.INFO, "Not identifying entity models, since this was not requested");
@@ -90,12 +92,18 @@ public final class EntityModelCatalogLoader extends BaseCatalogLoader {
     }
   }
 
-  private void identifyEntities() {
+  private void identifyEntityModels() {
     final EntityModelBuilder modelBuilder = EntityModelBuilder.builder();
     for (final Table table : getCatalog().getTables()) {
-      final TableEntityIdentifier tableEntityIdentifier = new TableEntityIdentifier(table);
-      final EntityType entityType = tableEntityIdentifier.identifyEntityType();
+      final TableEntityModel tableEntityModel = new TableEntityModel(table);
+
+      final EntityType entityType = tableEntityModel.identifyEntityType();
       modelBuilder.updateTableEntity(table, entityType);
+      // For each
+      for (ForeignKey fk : table.getImportedForeignKeys()) {
+        ForeignKeyCardinality fkCardinality = tableEntityModel.identifyForeignKeyCardinality(fk);
+        modelBuilder.updateForeignKeyCardinality(fk, fkCardinality);
+      }
     }
   }
 }

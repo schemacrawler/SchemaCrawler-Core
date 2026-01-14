@@ -8,20 +8,34 @@
 
 package schemacrawler.loader.utility;
 
-import static java.util.Objects.requireNonNull;
-
-import schemacrawler.loader.entities.TableEntityIdentifier;
+import schemacrawler.loader.entities.TableEntityModel;
 import schemacrawler.schema.EntityType;
+import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
 public class EntityModelUtility {
 
   public static EntityType identifyEntityType(final Table table) {
-    requireNonNull(table, "No table provided");
-    final EntityType entityType = new TableEntityIdentifier(table).identifyEntityType();
+    if (table == null) {
+      return EntityType.unknown;
+    }
+
+    final TableEntityModel tableEntityModel = new TableEntityModel(table);
+    final EntityType entityType = tableEntityModel.identifyEntityType();
     return entityType;
+  }
+
+  public static ForeignKeyCardinality identifyForeignKeyCardinality(final TableReference fk) {
+    if (fk == null) {
+      return ForeignKeyCardinality.unknown;
+    }
+
+    final TableEntityModel tableEntityModel = new TableEntityModel(fk.getForeignKeyTable());
+    final ForeignKeyCardinality fkCardinality = tableEntityModel.identifyForeignKeyCardinality(fk);
+    return fkCardinality;
   }
 
   private EntityModelUtility() {

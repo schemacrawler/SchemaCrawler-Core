@@ -12,7 +12,6 @@ schema: PUBLIC.SCHEMA1
       update rule: no action
       dependent table: PUBLIC.SCHEMA1.TABLEB
       referenced table: PUBLIC.SCHEMA1.TABLEA
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.SCHEMA1.TABLEB.ID --> PUBLIC.SCHEMA1.TABLEA.ID
@@ -30,7 +29,6 @@ schema: PUBLIC.SCHEMA1
       update rule: no action
       dependent table: PUBLIC.SCHEMA1.TABLEB
       referenced table: PUBLIC.SCHEMA1.TABLEA
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.SCHEMA1.TABLEB.ID --> PUBLIC.SCHEMA1.TABLEA.ID
@@ -49,7 +47,6 @@ schema: PUBLIC.SCHEMA2
       update rule: no action
       dependent table: PUBLIC.SCHEMA2.TABLEB
       referenced table: PUBLIC.SCHEMA2.TABLEA
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.SCHEMA2.TABLEB.ID --> PUBLIC.SCHEMA2.TABLEA.ID
@@ -67,7 +64,6 @@ schema: PUBLIC.SCHEMA2
       update rule: no action
       dependent table: PUBLIC.SCHEMA2.TABLEB
       referenced table: PUBLIC.SCHEMA2.TABLEA
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.SCHEMA2.TABLEB.ID --> PUBLIC.SCHEMA2.TABLEA.ID

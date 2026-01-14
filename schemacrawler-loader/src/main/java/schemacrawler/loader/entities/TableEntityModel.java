@@ -20,34 +20,40 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.ForeignKeyCardinality;
+import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 
-public final class TableEntityIdentifier {
+public final class TableEntityModel {
 
   private final Table table;
 
+  private final Set<Set<Column>> uniqueKeys;
+
   private final Set<ForeignKey> importedForeignKeys;
-  private final Set<Column> tablePkColumnNames;
+  private final Set<Column> tablePkColumns;
 
   private final Map<NamedObjectKey, Set<Column>> importedColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> pkColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> parentPkColumnsMap;
 
-  public TableEntityIdentifier(final Table table) {
+  public TableEntityModel(final Table table) {
     this.table = requireNonNull(table, "No table provided");
 
+    uniqueKeys = new HashSet<>();
+
     importedForeignKeys = new HashSet<>();
-    tablePkColumnNames = new HashSet<>();
+    tablePkColumns = new HashSet<>();
 
     importedColumnsMap = new HashMap<>();
     pkColumnsMap = new HashMap<>();
     parentPkColumnsMap = new HashMap<>();
 
-    if (table.hasPrimaryKey()) {
-      buildSupportingLookups();
-    }
+    buildSupportingLookups();
+    buildUniquenessLookup();
   }
 
   public EntityType identifyEntityType() {
@@ -59,17 +65,17 @@ public final class TableEntityIdentifier {
     }
 
     for (final ForeignKey fk : importedForeignKeys) {
-      final Set<Column> fkParentColumnNames = pkColumnsMap.get(fk.key());
-      final Set<Column> parentPkColumnNames = parentPkColumnsMap.get(fk.key());
-      final Set<Column> fkChildColumnNames = importedColumnsMap.get(fk.key());
+      final Set<Column> fkParentColumns = pkColumnsMap.get(fk.key());
+      final Set<Column> parentPkColumns = parentPkColumnsMap.get(fk.key());
+      final Set<Column> fkChildColumns = importedColumnsMap.get(fk.key());
 
       // Step 2: Check for subtype pattern: Subtype tables inherit their entire
       // primary key from a single supertype table.
       // If PK(T) exactly matches the child columns of a FK to a parent
       // table P primary key PK(P), classify T as SUBTYPE of P.
-      if (!parentPkColumnNames.isEmpty()
-          && parentPkColumnNames.equals(fkParentColumnNames)
-          && tablePkColumnNames.equals(fkChildColumnNames)) {
+      if (!parentPkColumns.isEmpty()
+          && parentPkColumns.equals(fkParentColumns)
+          && tablePkColumns.equals(fkChildColumns)) {
         return EntityType.subtype;
       }
 
@@ -77,10 +83,10 @@ public final class TableEntityIdentifier {
       // primary key (via identifying FK) with their own discriminator column(s).
       // Else if PK(T) contains (as a proper subset) the child columns of some FK to
       // parent P primary key PK(P), classify T as WEAK_ENTITY owned by P.
-      if (!parentPkColumnNames.isEmpty()
-          && parentPkColumnNames.equals(fkParentColumnNames)
-          && tablePkColumnNames.containsAll(fkChildColumnNames)
-          && tablePkColumnNames.size() > fkChildColumnNames.size()) {
+      if (!parentPkColumns.isEmpty()
+          && parentPkColumns.equals(fkParentColumns)
+          && tablePkColumns.containsAll(fkChildColumns)
+          && tablePkColumns.size() > fkChildColumns.size()) {
         return EntityType.weak_entity;
       }
     }
@@ -92,7 +98,7 @@ public final class TableEntityIdentifier {
     // than 2 other tables (excluding self-references), classify T as
     // STRONG_ENTITY. (If there are 2 or more relationships, it may be a bridge
     // table.)
-    final boolean pkHasFkColumn = tablePkColumnNames.stream().anyMatch(Column::isPartOfForeignKey);
+    final boolean pkHasFkColumn = tablePkColumns.stream().anyMatch(Column::isPartOfForeignKey);
 
     if (!pkHasFkColumn) {
       final Set<Table> referencedTables = new HashSet<>(table.getReferencedTables());
@@ -109,13 +115,43 @@ public final class TableEntityIdentifier {
     return EntityType.unknown;
   }
 
+  public ForeignKeyCardinality identifyForeignKeyCardinality(final TableReference fk) {
+    ForeignKeyCardinality cardinality = ForeignKeyCardinality.unknown;
+    if (fk == null) {
+      return cardinality;
+    }
+
+    final Set<Column> importedColumns;
+    if (!importedColumnsMap.containsKey(fk.key())) {
+      importedColumns = getImportedColumns(fk);
+    } else {
+      importedColumns = importedColumnsMap.get(fk.key());
+    }
+
+    final boolean isForeignKeyUnique = uniqueKeys.contains(importedColumns);
+    final boolean isForeignKeyOptional = fk.isOptional();
+
+    if (isForeignKeyUnique) {
+      if (isForeignKeyOptional) {
+        cardinality = ForeignKeyCardinality.zero_one;
+      } else {
+        cardinality = ForeignKeyCardinality.one_one;
+      }
+    } else if (isForeignKeyOptional) {
+      cardinality = ForeignKeyCardinality.zero_many;
+    } else {
+      cardinality = ForeignKeyCardinality.one_many;
+    }
+
+    return cardinality;
+  }
+
   @Override
   public String toString() {
     return table.toString();
   }
 
   private void buildSupportingLookups() {
-
     // Foreign keys imported from other tables
     for (final ForeignKey fk : table.getImportedForeignKeys()) {
       if (!fk.isSelfReferencing()) {
@@ -123,28 +159,52 @@ public final class TableEntityIdentifier {
       }
     }
 
-    tablePkColumnNames.addAll(table.getPrimaryKey().getConstrainedColumns());
+    if (table.hasPrimaryKey()) {
+      tablePkColumns.addAll(table.getPrimaryKey().getConstrainedColumns());
+    }
 
     for (final ForeignKey fk : importedForeignKeys) {
-      final Set<Column> fkParentColumnNames =
+      final Set<Column> fkParentColumns =
           fk.getColumnReferences().stream()
               .map(ColumnReference::getPrimaryKeyColumn)
               .collect(Collectors.toSet());
-      pkColumnsMap.put(fk.key(), fkParentColumnNames);
+      pkColumnsMap.put(fk.key(), fkParentColumns);
 
-      final Set<Column> fkChildColumnNames =
-          fk.getColumnReferences().stream()
-              .map(ColumnReference::getForeignKeyColumn)
-              .collect(Collectors.toSet());
-      importedColumnsMap.put(fk.key(), fkChildColumnNames);
+      final Set<Column> fkChildColumns = getImportedColumns(fk);
+      importedColumnsMap.put(fk.key(), fkChildColumns);
 
       final Table parentTable = fk.getPrimaryKeyTable();
       if (!(parentTable instanceof PartialDatabaseObject) && parentTable.hasPrimaryKey()) {
-        final Set<Column> parentPkColumnNames =
+        final Set<Column> parentPkColumns =
             new HashSet<>(parentTable.getPrimaryKey().getConstrainedColumns());
-        parentPkColumnsMap.put(fk.key(), parentPkColumnNames);
+        parentPkColumnsMap.put(fk.key(), parentPkColumns);
       } else {
         parentPkColumnsMap.put(fk.key(), Collections.emptySet());
+      }
+    }
+  }
+
+  private Set<Column> getImportedColumns(final TableReference fk) {
+    final Set<Column> fkChildColumns =
+        fk.getColumnReferences().stream()
+            .map(ColumnReference::getForeignKeyColumn)
+            .collect(Collectors.toSet());
+    return fkChildColumns;
+  }
+
+  /**
+   * Builds a lookup of all known unique column combinations for this table. Uses exact ordered
+   * column sequences (no subsets).
+   */
+  private void buildUniquenessLookup() {
+    if (table.hasPrimaryKey()) {
+      uniqueKeys.add(new HashSet<>(table.getPrimaryKey().getConstrainedColumns()));
+    }
+    if (table.hasIndexes()) {
+      for (final Index index : table.getIndexes()) {
+        if (index.isUnique()) {
+          uniqueKeys.add(new HashSet<>(index.getColumns()));
+        }
       }
     }
   }

@@ -10,7 +10,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKAUTHORS
       referenced table: PUBLIC.BOOKS.AUTHORS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID --> PUBLIC.BOOKS.AUTHORS.ID
@@ -29,7 +28,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKAUTHORS
       referenced table: PUBLIC.BOOKS.AUTHORS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID --> PUBLIC.BOOKS.AUTHORS.ID
@@ -46,7 +44,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKAUTHORS
       referenced table: PUBLIC.BOOKS.BOOKS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKAUTHORS.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
@@ -64,7 +61,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKS
       referenced table: PUBLIC.BOOKS.BOOKS
-      cardinality: (0..1)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.PREVIOUSEDITIONID --> PUBLIC.BOOKS.BOOKS.ID
@@ -81,7 +77,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
       referenced table: PUBLIC.BOOKS.BOOKS
-      cardinality: (0..many)
       column references: 
         key sequence: 1
           PUBLIC."PUBLISHER SALES".SALES.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
@@ -98,7 +93,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS.BOOKAUTHORS
       referenced table: PUBLIC.BOOKS.BOOKS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKAUTHORS.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
@@ -116,7 +110,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS."Celebrity Updates"
       referenced table: PUBLIC.BOOKS."Celebrities"
-      cardinality: (1..1)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS."Celebrity Updates"."Celebrity Id" --> PUBLIC.BOOKS."Celebrities"."Id"
@@ -134,7 +127,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS."Celebrity Updates"
       referenced table: PUBLIC.BOOKS."Celebrities"
-      cardinality: (1..1)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS."Celebrity Updates"."Celebrity Id" --> PUBLIC.BOOKS."Celebrities"."Id"
@@ -153,7 +145,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS.CUSTOMERDATA
       referenced table: PUBLIC.BOOKS.CUSTOMERS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID --> PUBLIC.BOOKS.CUSTOMERS.ID
@@ -171,7 +162,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS.CUSTOMERDATA
       referenced table: PUBLIC.BOOKS.CUSTOMERS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID --> PUBLIC.BOOKS.CUSTOMERS.ID
@@ -189,7 +179,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS.ΒΙΒΛΊΑ
       referenced table: PUBLIC.BOOKS.PUBLISHERS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΕΚΔΌΤΗΣ --> PUBLIC.BOOKS.PUBLISHERS.ID
@@ -207,7 +196,6 @@ schema: PUBLIC.BOOKS
       update rule: no action
       dependent table: PUBLIC.BOOKS.ΒΙΒΛΊΑ
       referenced table: PUBLIC.BOOKS.PUBLISHERS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΕΚΔΌΤΗΣ --> PUBLIC.BOOKS.PUBLISHERS.ID
@@ -228,7 +216,6 @@ schema: PUBLIC."PUBLISHER SALES"
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
       referenced table: PUBLIC."PUBLISHER SALES".REGIONS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC."PUBLISHER SALES".SALES.POSTALCODE --> PUBLIC."PUBLISHER SALES".REGIONS.POSTALCODE
@@ -249,7 +236,6 @@ schema: PUBLIC."PUBLISHER SALES"
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
       referenced table: PUBLIC.BOOKS.BOOKS
-      cardinality: (0..many)
       column references: 
         key sequence: 1
           PUBLIC."PUBLISHER SALES".SALES.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
@@ -266,7 +252,6 @@ schema: PUBLIC."PUBLISHER SALES"
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
       referenced table: PUBLIC."PUBLISHER SALES".SALESDATA
-      cardinality: (0..many)
       column references: 
         key sequence: 1
           PUBLIC."PUBLISHER SALES".SALES.SALESDATAID --> PUBLIC."PUBLISHER SALES".SALESDATA.SALESDATAID
@@ -283,7 +268,6 @@ schema: PUBLIC."PUBLISHER SALES"
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
       referenced table: PUBLIC."PUBLISHER SALES".REGIONS
-      cardinality: (1..many)
       column references: 
         key sequence: 1
           PUBLIC."PUBLISHER SALES".SALES.POSTALCODE --> PUBLIC."PUBLISHER SALES".REGIONS.POSTALCODE
@@ -304,7 +288,6 @@ schema: PUBLIC."PUBLISHER SALES"
       update rule: no action
       dependent table: PUBLIC."PUBLISHER SALES".SALES
       referenced table: PUBLIC."PUBLISHER SALES".SALESDATA
-      cardinality: (0..many)
       column references: 
         key sequence: 1
           PUBLIC."PUBLISHER SALES".SALES.SALESDATAID --> PUBLIC."PUBLISHER SALES".SALESDATA.SALESDATAID

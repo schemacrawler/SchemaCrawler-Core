@@ -21,8 +21,6 @@ import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
 import java.sql.Connection;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -30,7 +28,6 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
-import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Index;
@@ -151,8 +148,6 @@ public class MetadataUtilityTest {
         fk.getColumnReferences().toArray(new ColumnReference[0])[0];
     assertThat("Column reference not found", columnReference, notNullValue());
 
-    assertThat(MetaDataUtility.findForeignKeyCardinality(fk), is(ForeignKeyCardinality.zero_one));
-
     assertThat(
         MetaDataUtility.foreignKeyColumnNames(fk),
         containsInAnyOrder("PUBLIC.BOOKS.BOOKS.PREVIOUSEDITIONID"));
@@ -212,18 +207,6 @@ public class MetadataUtilityTest {
 
     final Table table = catalog.lookupTable(schema, "BOOKS").get();
     assertThat("BOOKS Table not found", table, notNullValue());
-
-    assertThat(
-        MetaDataUtility.allIndexCoumnNames(table).stream()
-            .flatMap(List::stream)
-            .collect(Collectors.toSet()),
-        containsInAnyOrder("PUBLIC.BOOKS.BOOKS.ID", "PUBLIC.BOOKS.BOOKS.PREVIOUSEDITIONID"));
-
-    assertThat(
-        MetaDataUtility.uniqueIndexCoumnNames(table).stream()
-            .flatMap(List::stream)
-            .collect(Collectors.toSet()),
-        containsInAnyOrder("PUBLIC.BOOKS.BOOKS.ID", "PUBLIC.BOOKS.BOOKS.PREVIOUSEDITIONID"));
 
     final Index index = table.getIndexes().toArray(new Index[0])[0];
     assertThat("Index not found", index, notNullValue());

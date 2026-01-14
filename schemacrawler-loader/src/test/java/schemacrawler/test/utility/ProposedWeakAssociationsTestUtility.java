@@ -9,13 +9,13 @@
 package schemacrawler.test.utility;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static schemacrawler.utility.MetaDataUtility.findForeignKeyCardinality;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
 import java.util.Arrays;
 import java.util.Collection;
+import schemacrawler.loader.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Schema;
@@ -71,7 +71,9 @@ public class ProposedWeakAssociationsTestUtility {
         out.println("table: " + table.getFullName());
         final Collection<WeakAssociation> weakAssociations = table.getWeakAssociations();
         for (final WeakAssociation weakFk : weakAssociations) {
-          out.println("  weak association (1 to %s):".formatted(findForeignKeyCardinality(weakFk)));
+          out.println(
+              "  weak association (1 to %s):"
+                  .formatted(EntityModelUtility.identifyForeignKeyCardinality(weakFk)));
           for (final ColumnReference weakAssociationColumnReference : weakFk) {
             out.println("    column reference: %s".formatted(weakAssociationColumnReference));
           }

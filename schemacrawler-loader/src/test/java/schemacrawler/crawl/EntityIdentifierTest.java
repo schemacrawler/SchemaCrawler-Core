@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.loader.entities.TableEntityIdentifier;
+import schemacrawler.loader.entities.TableEntityModel;
 import schemacrawler.schema.EntityType;
 import schemacrawler.schemacrawler.SchemaReference;
 
@@ -37,7 +37,7 @@ public class EntityIdentifierTest {
     table.addColumn(new MutableColumn(table, "COLUMN1"));
     table.addColumn(new MutableColumn(table, "COLUMN2"));
 
-    final EntityType entityType = new TableEntityIdentifier(table).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(table).identifyEntityType();
     assertThat(entityType, is(EntityType.non_entity));
   }
 
@@ -63,7 +63,7 @@ public class EntityIdentifierTest {
     pk.addColumn(new MutableTableConstraintColumn(pk, id));
     table.setPrimaryKey(pk);
 
-    final EntityType entityType = new TableEntityIdentifier(table).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(table).identifyEntityType();
     assertThat(entityType, is(EntityType.strong_entity));
   }
 
@@ -104,7 +104,7 @@ public class EntityIdentifierTest {
     subtypeTable.addForeignKey(fk);
     subtypeId.setReferencedColumn(parentId);
 
-    final EntityType entityType = new TableEntityIdentifier(subtypeTable).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(subtypeTable).identifyEntityType();
     assertThat(entityType, is(EntityType.subtype));
   }
 
@@ -172,7 +172,7 @@ public class EntityIdentifierTest {
     fk2Col.setReferencedColumn(id2);
     fk3Col.setReferencedColumn(id3);
 
-    final EntityType entityType = new TableEntityIdentifier(unknownTable).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(unknownTable).identifyEntityType();
     assertThat(entityType, is(EntityType.unknown));
   }
 
@@ -218,7 +218,7 @@ public class EntityIdentifierTest {
     weakTable.addForeignKey(fk);
     parentIdInWeak.setReferencedColumn(parentId);
 
-    final EntityType entityType = new TableEntityIdentifier(weakTable).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(weakTable).identifyEntityType();
     assertThat(entityType, is(EntityType.weak_entity));
   }
 }
