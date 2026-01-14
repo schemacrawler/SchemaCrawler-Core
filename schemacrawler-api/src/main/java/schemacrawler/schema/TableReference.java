@@ -9,6 +9,7 @@
 package schemacrawler.schema;
 
 import java.util.List;
+import us.fatehi.utility.OptionalBoolean;
 
 /** Represents a foreign-key mapping to a primary key in another table. */
 public interface TableReference
@@ -63,6 +64,24 @@ public interface TableReference
   default Table getReferencedTable() {
     return getPrimaryKeyTable();
   }
+
+  /**
+   * If the foreign key is covered by an index. Returns `OptionalBoolean.true_value` if the foreign
+   * key is covered by an index, `OptionalBoolean.false_value` if not, `OptionalBoolean.unkown` if
+   * the metadata is not available.
+   *
+   * @return OptionalBoolean
+   */
+  OptionalBoolean hasIndex();
+
+  /**
+   * If the foreign key is unique. Returns `OptionalBoolean.true_value` if the foreign key is
+   * unique, `OptionalBoolean.false_value` if not, `OptionalBoolean.unkown` if the metadata is not
+   * available.
+   *
+   * @return OptionalBoolean
+   */
+  OptionalBoolean hasUniqueIndex();
 
   /**
    * If the table reference is nullable, or optional.
