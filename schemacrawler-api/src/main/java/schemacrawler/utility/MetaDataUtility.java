@@ -35,6 +35,7 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.JavaSqlTypeGroup;
+import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
@@ -66,6 +67,10 @@ public final class MetaDataUtility {
   }
 
   private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
+
+  public static Collection<List<String>> allIndexCoumnNames(final Table table) {
+    return indexCoumnNames(table, false);
+  }
 
   public static List<String> columnNames(final Index index) {
     if (index == null) {
@@ -200,7 +205,7 @@ public final class MetaDataUtility {
   }
 
   public static String getTypeName(final DatabaseObject databaseObject) {
-    if (databaseObject instanceof TypedObject<?> typedObject) {
+    if (databaseObject instanceof final TypedObject<?> typedObject) {
       return typedObject.getType().toString();
     }
     final SimpleDatabaseObjectType simpleTypeName = getSimpleTypeName(databaseObject);
@@ -212,7 +217,7 @@ public final class MetaDataUtility {
 
   public static String inclusionRuleString(final InclusionRule inclusionRule) {
     String inclusionRuleString = ".*";
-    if (inclusionRule instanceof InclusionRuleWithRegularExpression expression) {
+    if (inclusionRule instanceof final InclusionRuleWithRegularExpression expression) {
       final String schemaInclusionPattern = expression.getInclusionPattern().pattern();
       if (!isBlank(schemaInclusionPattern)) {
         inclusionRuleString = schemaInclusionPattern;
@@ -353,6 +358,24 @@ public final class MetaDataUtility {
 
     final CrawlInfo crawlInfo = catalog.getCrawlInfo();
     return "Loaded catalog%n%s%n%s".formatted(crawlInfo, countTree);
+  }
+
+  private static Collection<List<String>> indexCoumnNames(
+      final Table table, final boolean includeUniqueOnly) {
+    final List<List<String>> allIndexCoumns = new ArrayList<>();
+    if (table instanceof PartialDatabaseObject) {
+      return allIndexCoumns;
+    }
+
+    for (final Index index : table.getIndexes()) {
+      if (includeUniqueOnly && !index.isUnique()) {
+        continue;
+      }
+
+      final List<String> indexColumns = columnNames(index);
+      allIndexCoumns.add(indexColumns);
+    }
+    return allIndexCoumns;
   }
 
   private MetaDataUtility() {
