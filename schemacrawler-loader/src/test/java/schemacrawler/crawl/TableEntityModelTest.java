@@ -121,7 +121,7 @@ public class TableEntityModelTest {
     final TableEntityModel model = new TableEntityModel(table);
 
     // 1. One-Many (Not unique, Not optional)
-    assertThat(model.identifyForeignKeyCardinality(fk), is(ForeignKeyCardinality.one_many));
+    assertThat(model.inferForeignKeyCardinality(fk), is(ForeignKeyCardinality.one_many));
 
     // 2. Zero-Many (Not unique, Optional)
     col1.setNullable(true);
@@ -137,7 +137,7 @@ public class TableEntityModelTest {
         new MutableForeignKey("FK2", new ImmutableColumnReference(1, col2, parentCol1));
     table2.addForeignKey(fk2);
     TableEntityModel model2 = new TableEntityModel(table2);
-    assertThat(model2.identifyForeignKeyCardinality(fk2), is(ForeignKeyCardinality.zero_many));
+    assertThat(model2.inferForeignKeyCardinality(fk2), is(ForeignKeyCardinality.zero_many));
 
     // 3. One-One (Unique, Not optional)
     final MutableTable table3 = new MutableTable(schema, "TABLE3");
@@ -152,7 +152,7 @@ public class TableEntityModelTest {
         new MutableForeignKey("FK3", new ImmutableColumnReference(1, col3, parentCol1));
     table3.addForeignKey(fk3);
     TableEntityModel model3 = new TableEntityModel(table3);
-    assertThat(model3.identifyForeignKeyCardinality(fk3), is(ForeignKeyCardinality.one_one));
+    assertThat(model3.inferForeignKeyCardinality(fk3), is(ForeignKeyCardinality.one_one));
 
     // 4. Zero-One (Unique, Optional)
     final MutableTable table4 = new MutableTable(schema, "TABLE4");
@@ -167,9 +167,9 @@ public class TableEntityModelTest {
         new MutableForeignKey("FK4", new ImmutableColumnReference(1, col4, parentCol1));
     table4.addForeignKey(fk4);
     TableEntityModel model4 = new TableEntityModel(table4);
-    assertThat(model4.identifyForeignKeyCardinality(fk4), is(ForeignKeyCardinality.zero_one));
+    assertThat(model4.inferForeignKeyCardinality(fk4), is(ForeignKeyCardinality.zero_one));
 
     // 5. Null FK
-    assertThat(model.identifyForeignKeyCardinality(null), is(ForeignKeyCardinality.unknown));
+    assertThat(model.inferForeignKeyCardinality(null), is(ForeignKeyCardinality.unknown));
   }
 }

@@ -38,7 +38,7 @@ public class EntityIdentifierTest {
     table.addColumn(new MutableColumn(table, "COLUMN1"));
     table.addColumn(new MutableColumn(table, "COLUMN2"));
 
-    final EntityType entityType = new TableEntityModel(table).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(table).inferEntityType();
     assertThat(entityType, is(EntityType.non_entity));
   }
 
@@ -64,7 +64,7 @@ public class EntityIdentifierTest {
     pk.addColumn(new MutableTableConstraintColumn(pk, id));
     table.setPrimaryKey(pk);
 
-    final EntityType entityType = new TableEntityModel(table).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(table).inferEntityType();
     assertThat(entityType, is(EntityType.strong_entity));
   }
 
@@ -105,7 +105,7 @@ public class EntityIdentifierTest {
     subtypeTable.addForeignKey(fk);
     subtypeId.setReferencedColumn(parentId);
 
-    final EntityType entityType = new TableEntityModel(subtypeTable).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(subtypeTable).inferEntityType();
     assertThat(entityType, is(EntityType.subtype));
   }
 
@@ -173,7 +173,7 @@ public class EntityIdentifierTest {
     fk2Col.setReferencedColumn(id2);
     fk3Col.setReferencedColumn(id3);
 
-    final EntityType entityType = new TableEntityModel(unknownTable).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(unknownTable).inferEntityType();
     assertThat(entityType, is(EntityType.unknown));
   }
 
@@ -219,7 +219,7 @@ public class EntityIdentifierTest {
     weakTable.addForeignKey(fk);
     parentIdInWeak.setReferencedColumn(parentId);
 
-    final EntityType entityType = new TableEntityModel(weakTable).identifyEntityType();
+    final EntityType entityType = new TableEntityModel(weakTable).inferEntityType();
     assertThat(entityType, is(EntityType.weak_entity));
   }
 

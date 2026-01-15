@@ -108,7 +108,7 @@ public final class TableEntityModel {
     return OptionalBoolean.fromBoolean(uniqueIndexes.contains(importedColumns));
   }
 
-  public EntityType identifyEntityType() {
+  public EntityType inferEntityType() {
 
     // Step 1: Check for non-entity pattern: Non-entity tables do not have a primary
     // key.
@@ -173,7 +173,7 @@ public final class TableEntityModel {
    * @param fk Foreign key
    * @return Foreign key cardinality
    */
-  public ForeignKeyCardinality identifyForeignKeyCardinality(final TableReference fk) {
+  public ForeignKeyCardinality inferForeignKeyCardinality(final TableReference fk) {
 
     if (fk == null) {
       return ForeignKeyCardinality.unknown;

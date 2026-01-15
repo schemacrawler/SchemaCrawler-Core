@@ -102,12 +102,11 @@ public final class EntityModelCatalogLoader extends BaseCatalogLoader {
       }
       final TableEntityModel tableEntityModel = new TableEntityModel(table);
 
-      final EntityType entityType = tableEntityModel.identifyEntityType();
+      final EntityType entityType = tableEntityModel.inferEntityType();
       modelBuilder.updateTableEntity(table, entityType);
 
       for (final ForeignKey fk : table.getImportedForeignKeys()) {
-        final ForeignKeyCardinality fkCardinality =
-            tableEntityModel.identifyForeignKeyCardinality(fk);
+        final ForeignKeyCardinality fkCardinality = tableEntityModel.inferForeignKeyCardinality(fk);
         modelBuilder.updateForeignKeyCardinality(fk, fkCardinality);
 
         final OptionalBoolean coveredByIndex = tableEntityModel.foreignKeyCoveredByIndex(fk);

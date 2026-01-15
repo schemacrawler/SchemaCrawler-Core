@@ -4,7 +4,7 @@ SchemaCrawler Core release notes.
 
 <a name="v17.4.0"></a>
 ## Release 17.4.0 - 2026-01-05
-- Infer 1..1 and 1..many cardinalities - fixes https://github.com/schemacrawler/SchemaCrawler/issues/2237
+- Infer 1..1 and 1..many cardinalities - fixes [issue #2237](https://github.com/schemacrawler/SchemaCrawler/issues/2237)
 - Add methods to identify table self-references
   - `Table::isSelfReferencing()`
   - `Column::isPartOfSelfReferencingRelationship()`
@@ -16,6 +16,7 @@ SchemaCrawler Core release notes.
   - `TableReference::getForeignKeyCardinality()`
   - `TableReference::hasUniqueIndex()`
   - `TableReference::hasIndex()`
+- Add `EntityModelUtility` with methods to obtain information useful in entity modeling
 
 
 <a name="v17.3.0"></a>

@@ -73,7 +73,7 @@ public class ProposedWeakAssociationsTestUtility {
         for (final WeakAssociation weakFk : weakAssociations) {
           out.println(
               "  weak association (1 to %s):"
-                  .formatted(EntityModelUtility.identifyForeignKeyCardinality(weakFk)));
+                  .formatted(EntityModelUtility.inferCardinality(weakFk)));
           for (final ColumnReference weakAssociationColumnReference : weakFk) {
             out.println("    column reference: %s".formatted(weakAssociationColumnReference));
           }
