@@ -1,0 +1,175 @@
+/*
+ * SchemaCrawler
+ * http://www.schemacrawler.com
+ * Copyright (c) 2000-2026, Sualeh Fatehi <sualeh@hotmail.com>.
+ * All rights reserved.
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+package schemacrawler.crawl;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+import org.junit.jupiter.api.Test;
+import schemacrawler.loader.entities.TableEntityModel;
+import schemacrawler.schema.ForeignKeyCardinality;
+import schemacrawler.schemacrawler.SchemaReference;
+import us.fatehi.utility.OptionalBoolean;
+
+public class TableEntityModelTest {
+
+  @Test
+  public void testForeignKeyCoveredByIndex() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+    final MutableTable table = new MutableTable(schema, "TABLE");
+    final MutableColumn col1 = new MutableColumn(table, "COL1");
+    table.addColumn(col1);
+
+    final MutableTable parentTable = new MutableTable(schema, "PARENT");
+    final MutableColumn parentCol1 = new MutableColumn(parentTable, "COL1");
+    parentTable.addColumn(parentCol1);
+
+    final ImmutableColumnReference columnReference =
+        new ImmutableColumnReference(1, col1, parentCol1);
+    final MutableForeignKey fk = new MutableForeignKey("FK", columnReference);
+    table.addForeignKey(fk);
+
+    final TableEntityModel model = new TableEntityModel(table);
+
+    // No index yet
+    assertThat(model.foreignKeyCoveredByIndex(fk), is(OptionalBoolean.false_value));
+
+    // Add index
+    final MutableIndex index = new MutableIndex(table, "IDX");
+    index.addColumn(new MutableIndexColumn(index, col1));
+    table.addIndex(index);
+
+    final TableEntityModel modelWithIndex = new TableEntityModel(table);
+    assertThat(modelWithIndex.foreignKeyCoveredByIndex(fk), is(OptionalBoolean.true_value));
+  }
+
+  @Test
+  public void testForeignKeyCoveredByUniqueIndex() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+    final MutableTable table = new MutableTable(schema, "TABLE");
+    final MutableColumn col1 = new MutableColumn(table, "COL1");
+    table.addColumn(col1);
+
+    final MutableTable parentTable = new MutableTable(schema, "PARENT");
+    final MutableColumn parentCol1 = new MutableColumn(parentTable, "COL1");
+    parentTable.addColumn(parentCol1);
+
+    final ImmutableColumnReference columnReference =
+        new ImmutableColumnReference(1, col1, parentCol1);
+    final MutableForeignKey fk = new MutableForeignKey("FK", columnReference);
+    table.addForeignKey(fk);
+
+    final TableEntityModel model = new TableEntityModel(table);
+
+    // No index yet
+    assertThat(model.foreignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
+
+    // Add non-unique index
+    final MutableIndex index = new MutableIndex(table, "IDX");
+    index.addColumn(new MutableIndexColumn(index, col1));
+    index.setUnique(false);
+    table.addIndex(index);
+
+    final TableEntityModel modelWithIndex = new TableEntityModel(table);
+    assertThat(modelWithIndex.foreignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
+
+    // Add unique index
+    index.setUnique(true);
+    final TableEntityModel modelWithUniqueIndex = new TableEntityModel(table);
+    assertThat(
+        modelWithUniqueIndex.foreignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.true_value));
+
+    // Test PK as unique index
+    final MutableTable tableWithPk = new MutableTable(schema, "TABLE_PK");
+    final MutableColumn pkCol = new MutableColumn(tableWithPk, "PK_COL");
+    tableWithPk.addColumn(pkCol);
+    final MutablePrimaryKey pk = MutablePrimaryKey.newPrimaryKey(tableWithPk, "PK");
+    pk.addColumn(new MutableTableConstraintColumn(pk, pkCol));
+    tableWithPk.setPrimaryKey(pk);
+
+    final ImmutableColumnReference fkPkRef = new ImmutableColumnReference(1, pkCol, parentCol1);
+    final MutableForeignKey fkPk = new MutableForeignKey("FK_PK", fkPkRef);
+    tableWithPk.addForeignKey(fkPk);
+
+    final TableEntityModel modelWithPk = new TableEntityModel(tableWithPk);
+    assertThat(modelWithPk.foreignKeyCoveredByUniqueIndex(fkPk), is(OptionalBoolean.true_value));
+  }
+
+  @Test
+  public void testIdentifyForeignKeyCardinality() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+    final MutableTable table = new MutableTable(schema, "TABLE");
+    final MutableColumn col1 = new MutableColumn(table, "COL1");
+    col1.setNullable(false); // Required
+    table.addColumn(col1);
+
+    final MutableTable parentTable = new MutableTable(schema, "PARENT");
+    final MutableColumn parentCol1 = new MutableColumn(parentTable, "COL1");
+    parentTable.addColumn(parentCol1);
+
+    final ImmutableColumnReference columnReference =
+        new ImmutableColumnReference(1, col1, parentCol1);
+    final MutableForeignKey fk = new MutableForeignKey("FK", columnReference);
+    table.addForeignKey(fk);
+
+    final TableEntityModel model = new TableEntityModel(table);
+
+    // 1. One-Many (Not unique, Not optional)
+    assertThat(model.identifyForeignKeyCardinality(fk), is(ForeignKeyCardinality.one_many));
+
+    // 2. Zero-Many (Not unique, Optional)
+    col1.setNullable(true);
+    // TableEntityModel caches optionality from fk.isOptional() which relies on col.isNullable()
+    // but TableEntityModel also caches importedColumnsMap.
+    // We need a new model or a new FK if we want to test changes after model construction,
+    // although TableEntityModel.identifyForeignKeyCardinality(fk) calls findOrGetImportedKeys(fk).
+    final MutableTable table2 = new MutableTable(schema, "TABLE2");
+    final MutableColumn col2 = new MutableColumn(table2, "COL2");
+    col2.setNullable(true);
+    table2.addColumn(col2);
+    final MutableForeignKey fk2 =
+        new MutableForeignKey("FK2", new ImmutableColumnReference(1, col2, parentCol1));
+    table2.addForeignKey(fk2);
+    TableEntityModel model2 = new TableEntityModel(table2);
+    assertThat(model2.identifyForeignKeyCardinality(fk2), is(ForeignKeyCardinality.zero_many));
+
+    // 3. One-One (Unique, Not optional)
+    final MutableTable table3 = new MutableTable(schema, "TABLE3");
+    final MutableColumn col3 = new MutableColumn(table3, "COL3");
+    col3.setNullable(false);
+    table3.addColumn(col3);
+    final MutableIndex uniqueIdx3 = new MutableIndex(table3, "UIDX3");
+    uniqueIdx3.addColumn(new MutableIndexColumn(uniqueIdx3, col3));
+    uniqueIdx3.setUnique(true);
+    table3.addIndex(uniqueIdx3);
+    final MutableForeignKey fk3 =
+        new MutableForeignKey("FK3", new ImmutableColumnReference(1, col3, parentCol1));
+    table3.addForeignKey(fk3);
+    TableEntityModel model3 = new TableEntityModel(table3);
+    assertThat(model3.identifyForeignKeyCardinality(fk3), is(ForeignKeyCardinality.one_one));
+
+    // 4. Zero-One (Unique, Optional)
+    final MutableTable table4 = new MutableTable(schema, "TABLE4");
+    final MutableColumn col4 = new MutableColumn(table4, "COL4");
+    col4.setNullable(true);
+    table4.addColumn(col4);
+    final MutableIndex uniqueIdx4 = new MutableIndex(table4, "UIDX4");
+    uniqueIdx4.addColumn(new MutableIndexColumn(uniqueIdx4, col4));
+    uniqueIdx4.setUnique(true);
+    table4.addIndex(uniqueIdx4);
+    final MutableForeignKey fk4 =
+        new MutableForeignKey("FK4", new ImmutableColumnReference(1, col4, parentCol1));
+    table4.addForeignKey(fk4);
+    TableEntityModel model4 = new TableEntityModel(table4);
+    assertThat(model4.identifyForeignKeyCardinality(fk4), is(ForeignKeyCardinality.zero_one));
+
+    // 5. Null FK
+    assertThat(model.identifyForeignKeyCardinality(null), is(ForeignKeyCardinality.unknown));
+  }
+}

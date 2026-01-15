@@ -10,6 +10,7 @@ package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.loader.entities.TableEntityModel;
@@ -220,5 +221,13 @@ public class EntityIdentifierTest {
 
     final EntityType entityType = new TableEntityModel(weakTable).identifyEntityType();
     assertThat(entityType, is(EntityType.weak_entity));
+  }
+
+  @Test
+  public void testTablePartial() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+    final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL");
+
+    assertThrows(IllegalArgumentException.class, () -> new TableEntityModel(table));
   }
 }

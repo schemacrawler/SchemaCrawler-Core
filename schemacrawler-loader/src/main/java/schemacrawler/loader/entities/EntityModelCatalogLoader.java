@@ -26,6 +26,7 @@ import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.catalogloader.BaseCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
+import us.fatehi.utility.OptionalBoolean;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
@@ -103,10 +104,18 @@ public final class EntityModelCatalogLoader extends BaseCatalogLoader {
 
       final EntityType entityType = tableEntityModel.identifyEntityType();
       modelBuilder.updateTableEntity(table, entityType);
-      // For each
-      for (ForeignKey fk : table.getImportedForeignKeys()) {
-        ForeignKeyCardinality fkCardinality = tableEntityModel.identifyForeignKeyCardinality(fk);
+
+      for (final ForeignKey fk : table.getImportedForeignKeys()) {
+        final ForeignKeyCardinality fkCardinality =
+            tableEntityModel.identifyForeignKeyCardinality(fk);
         modelBuilder.updateForeignKeyCardinality(fk, fkCardinality);
+
+        final OptionalBoolean coveredByIndex = tableEntityModel.foreignKeyCoveredByIndex(fk);
+        modelBuilder.updateForeignKeyIndexCoverage(fk, coveredByIndex);
+
+        final OptionalBoolean coveredByUniqueIndex =
+            tableEntityModel.foreignKeyCoveredByUniqueIndex(fk);
+        modelBuilder.updateForeignKeyUniqueIndexCoverage(fk, coveredByUniqueIndex);
       }
     }
   }
