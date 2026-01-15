@@ -13,14 +13,12 @@ import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
-import java.util.Collection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
-import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
@@ -41,7 +39,7 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 @WithTestDatabase
 @ResolveTestContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ForeignKeyCardinalityTest {
+public class ForeignKeyModelTest {
 
   private Catalog catalog;
 
@@ -50,12 +48,12 @@ public class ForeignKeyCardinalityTest {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
       for (final Schema schema : catalog.getSchemas()) {
-        final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
-        for (final Table table : tables) {
-          final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
-          for (final ForeignKey fk : foreignKeys) {
-            final ForeignKeyCardinality fkCardinality = fk.getForeignKeyCardinality();
-            out.println("%s [%s]".formatted(fk, fkCardinality));
+        for (final Table table : catalog.getTables(schema)) {
+          for (final ForeignKey fk : table.getForeignKeys()) {
+            out.println("%s".formatted(fk));
+            out.println("  - cardinality=%s".formatted(fk.getForeignKeyCardinality()));
+            out.println("  - has index=%s".formatted(fk.hasIndex()));
+            out.println("  - has unique index=%s".formatted(fk.hasUniqueIndex()));
           }
         }
       }
