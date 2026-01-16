@@ -10,12 +10,9 @@ SchemaCrawler Core release notes.
   - `Column::isPartOfSelfReferencingRelationship()`
   - `TableReference::isSelfReferencing()`
 - Add a number of entity model inferences to the catalog model
-  - `Table::getEntityType()`
   - `Column::isSignificant()`
   - `TableReference::isOptional()`
   - `TableReference::getForeignKeyCardinality()`
-  - `TableReference::hasUniqueIndex()`
-  - `TableReference::hasIndex()`
 - Add `EntityModelUtility` with methods to obtain information useful in entity modeling
 
 

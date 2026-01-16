@@ -16,7 +16,6 @@ import static schemacrawler.schemacrawler.SchemaInfoRetrieval.retrieveTables;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.EntityModelBuilder;
-import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.PartialDatabaseObject;
@@ -26,7 +25,6 @@ import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.catalogloader.BaseCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
-import us.fatehi.utility.OptionalBoolean;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
@@ -102,19 +100,9 @@ public final class EntityModelCatalogLoader extends BaseCatalogLoader {
       }
       final TableEntityModel tableEntityModel = new TableEntityModel(table);
 
-      final EntityType entityType = tableEntityModel.inferEntityType();
-      modelBuilder.updateTableEntity(table, entityType);
-
       for (final ForeignKey fk : table.getImportedForeignKeys()) {
         final ForeignKeyCardinality fkCardinality = tableEntityModel.inferForeignKeyCardinality(fk);
         modelBuilder.updateForeignKeyCardinality(fk, fkCardinality);
-
-        final OptionalBoolean coveredByIndex = tableEntityModel.foreignKeyCoveredByIndex(fk);
-        modelBuilder.updateForeignKeyIndexCoverage(fk, coveredByIndex);
-
-        final OptionalBoolean coveredByUniqueIndex =
-            tableEntityModel.foreignKeyCoveredByUniqueIndex(fk);
-        modelBuilder.updateForeignKeyUniqueIndexCoverage(fk, coveredByUniqueIndex);
       }
     }
   }

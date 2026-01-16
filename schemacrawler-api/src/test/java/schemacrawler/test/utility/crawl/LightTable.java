@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.Set;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
-import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
@@ -113,11 +112,6 @@ public final class LightTable implements Table {
     }
     final LightTable other = (LightTable) obj;
     return Objects.equals(name, other.name) && Objects.equals(schema, other.schema);
-  }
-
-  @Override
-  public EntityType getEntityType() {
-    return EntityType.unknown;
   }
 
   @Override

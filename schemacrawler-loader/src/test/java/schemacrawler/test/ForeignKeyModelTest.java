@@ -52,8 +52,6 @@ public class ForeignKeyModelTest {
           for (final ForeignKey fk : table.getForeignKeys()) {
             out.println("%s".formatted(fk));
             out.println("  - cardinality=%s".formatted(fk.getForeignKeyCardinality()));
-            out.println("  - has index=%s".formatted(fk.hasIndex()));
-            out.println("  - has unique index=%s".formatted(fk.hasUniqueIndex()));
           }
         }
       }

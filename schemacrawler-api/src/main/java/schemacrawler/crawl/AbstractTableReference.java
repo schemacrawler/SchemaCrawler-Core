@@ -25,7 +25,6 @@ import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.CollectionsUtility;
-import us.fatehi.utility.OptionalBoolean;
 import us.fatehi.utility.string.StringFormat;
 
 /** Represents a foreign-key mapping to a primary key in another table. */
@@ -40,8 +39,6 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
   private final boolean isSelfReferencing;
   private boolean isOptional;
   private ForeignKeyCardinality fkCardinality;
-  private OptionalBoolean hasIndex;
-  private OptionalBoolean hasUniqueIndex;
 
   public AbstractTableReference(final String name, final ColumnReference columnReference) {
     super(
@@ -113,18 +110,6 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
 
   /** {@inheritDoc} */
   @Override
-  public OptionalBoolean hasIndex() {
-    return hasIndex;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public OptionalBoolean hasUniqueIndex() {
-    return hasUniqueIndex;
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public boolean isOptional() {
     return isOptional;
   }
@@ -168,18 +153,6 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
   void setForeignKeyCardinality(final ForeignKeyCardinality fkCardinality) {
     if (fkCardinality != null) {
       this.fkCardinality = fkCardinality;
-    }
-  }
-
-  void setHasIndex(final OptionalBoolean hasIndex) {
-    if (hasIndex != null) {
-      this.hasIndex = hasIndex;
-    }
-  }
-
-  void setHasUniqueIndex(final OptionalBoolean hasUniqueIndex) {
-    if (hasUniqueIndex != null) {
-      this.hasUniqueIndex = hasUniqueIndex;
     }
   }
 
