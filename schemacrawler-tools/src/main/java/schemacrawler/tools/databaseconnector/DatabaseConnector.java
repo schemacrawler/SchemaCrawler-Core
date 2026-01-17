@@ -125,13 +125,14 @@ public abstract class DatabaseConnector implements Options {
     // Connect using connection options provided from the command-line,
     // provided configuration, and bundled configuration
     final DatabaseConnectionSourceBuilder dbConnectionSourceBuilder;
-    if (connectionOptions instanceof DatabaseUrlConnectionOptions databaseUrlConnectionOptions) {
+    if (connectionOptions
+        instanceof final DatabaseUrlConnectionOptions databaseUrlConnectionOptions) {
 
       final String connectionUrl = databaseUrlConnectionOptions.connectionUrl();
 
       dbConnectionSourceBuilder = DatabaseConnectionSourceBuilder.builder(connectionUrl);
     } else if (connectionOptions
-        instanceof DatabaseServerHostConnectionOptions serverHostConnectionOptions) {
+        instanceof final DatabaseServerHostConnectionOptions serverHostConnectionOptions) {
 
       final String host = serverHostConnectionOptions.host();
       final Integer port = serverHostConnectionOptions.port();
