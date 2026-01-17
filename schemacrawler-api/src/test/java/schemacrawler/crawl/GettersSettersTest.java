@@ -27,7 +27,9 @@ import com.openpojo.validation.test.impl.SetterTester;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import schemacrawler.test.utility.DisableLogging;
 
+@DisableLogging
 public class GettersSettersTest {
 
   private static class FilterPackageClasses implements PojoClassFilter {
