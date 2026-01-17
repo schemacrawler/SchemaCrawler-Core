@@ -15,7 +15,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.7.8</version>
+      <version>42.7.9</version>
     </dependency>
     <dependency>
       <groupId>com.mysql</groupId>
@@ -72,7 +72,7 @@
     <dependency>
       <groupId>com.ibm.informix</groupId>
       <artifactId>jdbc</artifactId>
-      <version>4.50.12</version>
+      <version>4.50.13</version>
     </dependency>
     <dependency>
       <groupId>net.snowflake</groupId>
