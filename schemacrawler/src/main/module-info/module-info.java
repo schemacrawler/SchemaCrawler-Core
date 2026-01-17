@@ -43,6 +43,8 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.tools.utility;
 
   // Export public API packages from schemacrawler-loader
+  exports schemacrawler.ermodel.model;
+  exports schemacrawler.ermodel.utility;
   exports schemacrawler.loader.utility;
 
   // ServiceLoader providers

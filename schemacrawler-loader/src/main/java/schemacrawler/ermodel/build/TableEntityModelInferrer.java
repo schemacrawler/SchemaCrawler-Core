@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.ermodel.model;
+package schemacrawler.ermodel.build;
 
 import static java.util.Objects.requireNonNull;
 
@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.ForeignKeyCardinality;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
@@ -30,7 +32,7 @@ import us.fatehi.utility.OptionalBoolean;
  * Algorithm for identifying entity types and foreign key cardinality and other attributes for a
  * table.
  */
-public final class TableEntityModel {
+public final class TableEntityModelInferrer {
 
   private final Table table;
 
@@ -49,7 +51,7 @@ public final class TableEntityModel {
    *
    * @param table Table, cannot be null or partial
    */
-  public TableEntityModel(final Table table) {
+  public TableEntityModelInferrer(final Table table) {
     this.table = requireNonNull(table, "No table provided");
     if (table instanceof PartialDatabaseObject) {
       throw new IllegalArgumentException("Table cannot be partial");
