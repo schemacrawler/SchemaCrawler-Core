@@ -53,6 +53,12 @@ module us.fatehi.schemacrawler.schemacrawler {
   uses schemacrawler.tools.databaseconnector.DatabaseConnector;
   uses schemacrawler.tools.executable.CommandProvider;
 
+  provides schemacrawler.tools.catalogloader.CatalogLoader with
+      schemacrawler.loader.attributes.AttributesCatalogLoader,
+      schemacrawler.loader.counts.TableRowCountsCatalogLoader,
+      schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoader,
+      schemacrawler.tools.catalogloader.SchemaCrawlerCatalogLoader;
+
   // Allow reflection of schema model
   opens schemacrawler.schema to
       tools.jackson.databind;
