@@ -35,7 +35,6 @@ import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexColumnSortSequence;
@@ -240,19 +239,6 @@ public class SchemaCrawlerCoverageTest {
     final Sequence sequence = catalog.lookupSequence(schema, "PUBLISHER_ID_SEQ").get();
 
     checkBooleanProperties(sequence, "cycle");
-  }
-
-  @Test
-  public void setEntityModelFields() throws Exception {
-    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
-    final MutableTable table = (MutableTable) catalog.lookupTable(schema, "BOOKAUTHORS").get();
-    final MutableForeignKey foreignKey = table.lookupForeignKey("Z_FK_AUTHOR").get();
-
-    assertThat(foreignKey.getForeignKeyCardinality(), is(ForeignKeyCardinality.unknown));
-    foreignKey.setForeignKeyCardinality(ForeignKeyCardinality.one_many);
-    assertThat(foreignKey.getForeignKeyCardinality(), is(ForeignKeyCardinality.one_many));
-    foreignKey.setForeignKeyCardinality(null);
-    assertThat(foreignKey.getForeignKeyCardinality(), is(ForeignKeyCardinality.one_many));
   }
 
   @Test

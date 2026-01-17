@@ -6,11 +6,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.utility;
+package schemacrawler.ermodel.utility;
 
-import schemacrawler.loader.entities.TableEntityModel;
-import schemacrawler.schema.EntityType;
-import schemacrawler.schema.ForeignKeyCardinality;
+import schemacrawler.ermodel.build.TableEntityModelInferrer;
+import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.ForeignKeyCardinality;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
@@ -37,7 +37,7 @@ public class EntityModelUtility {
       return OptionalBoolean.unknown;
     }
 
-    final TableEntityModel tableEntityModel = new TableEntityModel(table);
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final OptionalBoolean coveredByIndex = tableEntityModel.foreignKeyCoveredByIndex(fk);
     return coveredByIndex;
   }
@@ -58,7 +58,7 @@ public class EntityModelUtility {
       return OptionalBoolean.unknown;
     }
 
-    final TableEntityModel tableEntityModel = new TableEntityModel(table);
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final OptionalBoolean coveredByIndex = tableEntityModel.foreignKeyCoveredByUniqueIndex(fk);
     return coveredByIndex;
   }
@@ -74,7 +74,7 @@ public class EntityModelUtility {
       return EntityType.unknown;
     }
 
-    final TableEntityModel tableEntityModel = new TableEntityModel(table);
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final EntityType entityType = tableEntityModel.inferEntityType();
     return entityType;
   }
@@ -95,7 +95,7 @@ public class EntityModelUtility {
       return ForeignKeyCardinality.unknown;
     }
 
-    final TableEntityModel tableEntityModel = new TableEntityModel(table);
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final ForeignKeyCardinality fkCardinality = tableEntityModel.inferForeignKeyCardinality(fk);
     return fkCardinality;
   }

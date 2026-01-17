@@ -1,4 +1,4 @@
-package schemacrawler.schema;
+package schemacrawler.ermodel.model;
 
 /** Represents the entity type of a table. */
 public enum EntityType {

@@ -12,8 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.loader.entities.TableEntityModel;
-import schemacrawler.schema.ForeignKeyCardinality;
+import schemacrawler.ermodel.build.TableEntityModelInferrer;
+import schemacrawler.ermodel.model.ForeignKeyCardinality;
 import schemacrawler.schemacrawler.SchemaReference;
 import us.fatehi.utility.OptionalBoolean;
 
@@ -35,7 +35,7 @@ public class TableEntityModelTest {
     final MutableForeignKey fk = new MutableForeignKey("FK", columnReference);
     table.addForeignKey(fk);
 
-    final TableEntityModel model = new TableEntityModel(table);
+    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
 
     // No index yet
     assertThat(model.foreignKeyCoveredByIndex(fk), is(OptionalBoolean.false_value));
@@ -45,7 +45,7 @@ public class TableEntityModelTest {
     index.addColumn(new MutableIndexColumn(index, col1));
     table.addIndex(index);
 
-    final TableEntityModel modelWithIndex = new TableEntityModel(table);
+    final TableEntityModelInferrer modelWithIndex = new TableEntityModelInferrer(table);
     assertThat(modelWithIndex.foreignKeyCoveredByIndex(fk), is(OptionalBoolean.true_value));
   }
 
@@ -65,7 +65,7 @@ public class TableEntityModelTest {
     final MutableForeignKey fk = new MutableForeignKey("FK", columnReference);
     table.addForeignKey(fk);
 
-    final TableEntityModel model = new TableEntityModel(table);
+    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
 
     // No index yet
     assertThat(model.foreignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
@@ -76,12 +76,12 @@ public class TableEntityModelTest {
     index.setUnique(false);
     table.addIndex(index);
 
-    final TableEntityModel modelWithIndex = new TableEntityModel(table);
+    final TableEntityModelInferrer modelWithIndex = new TableEntityModelInferrer(table);
     assertThat(modelWithIndex.foreignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
 
     // Add unique index
     index.setUnique(true);
-    final TableEntityModel modelWithUniqueIndex = new TableEntityModel(table);
+    final TableEntityModelInferrer modelWithUniqueIndex = new TableEntityModelInferrer(table);
     assertThat(
         modelWithUniqueIndex.foreignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.true_value));
 
@@ -97,7 +97,7 @@ public class TableEntityModelTest {
     final MutableForeignKey fkPk = new MutableForeignKey("FK_PK", fkPkRef);
     tableWithPk.addForeignKey(fkPk);
 
-    final TableEntityModel modelWithPk = new TableEntityModel(tableWithPk);
+    final TableEntityModelInferrer modelWithPk = new TableEntityModelInferrer(tableWithPk);
     assertThat(modelWithPk.foreignKeyCoveredByUniqueIndex(fkPk), is(OptionalBoolean.true_value));
   }
 
@@ -118,7 +118,7 @@ public class TableEntityModelTest {
     final MutableForeignKey fk = new MutableForeignKey("FK", columnReference);
     table.addForeignKey(fk);
 
-    final TableEntityModel model = new TableEntityModel(table);
+    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
 
     // 1. One-Many (Not unique, Not optional)
     assertThat(model.inferForeignKeyCardinality(fk), is(ForeignKeyCardinality.one_many));
@@ -136,7 +136,7 @@ public class TableEntityModelTest {
     final MutableForeignKey fk2 =
         new MutableForeignKey("FK2", new ImmutableColumnReference(1, col2, parentCol1));
     table2.addForeignKey(fk2);
-    TableEntityModel model2 = new TableEntityModel(table2);
+    TableEntityModelInferrer model2 = new TableEntityModelInferrer(table2);
     assertThat(model2.inferForeignKeyCardinality(fk2), is(ForeignKeyCardinality.zero_many));
 
     // 3. One-One (Unique, Not optional)
@@ -151,7 +151,7 @@ public class TableEntityModelTest {
     final MutableForeignKey fk3 =
         new MutableForeignKey("FK3", new ImmutableColumnReference(1, col3, parentCol1));
     table3.addForeignKey(fk3);
-    TableEntityModel model3 = new TableEntityModel(table3);
+    TableEntityModelInferrer model3 = new TableEntityModelInferrer(table3);
     assertThat(model3.inferForeignKeyCardinality(fk3), is(ForeignKeyCardinality.one_one));
 
     // 4. Zero-One (Unique, Optional)
@@ -166,7 +166,7 @@ public class TableEntityModelTest {
     final MutableForeignKey fk4 =
         new MutableForeignKey("FK4", new ImmutableColumnReference(1, col4, parentCol1));
     table4.addForeignKey(fk4);
-    TableEntityModel model4 = new TableEntityModel(table4);
+    TableEntityModelInferrer model4 = new TableEntityModelInferrer(table4);
     assertThat(model4.inferForeignKeyCardinality(fk4), is(ForeignKeyCardinality.zero_one));
 
     // 5. Null FK
