@@ -26,15 +26,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -73,31 +70,6 @@ public class MetadataUtilityTest {
   }
 
   @Test
-  public void columnsListAsStringFk() throws Exception {
-
-    final Schema schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
-    assertThat("BOOKS Schema not found", schema, notNullValue());
-
-    final Table table = catalog.lookupTable(schema, "BOOKS").get();
-    assertThat("BOOKS Table not found", table, notNullValue());
-
-    final ForeignKey fk = table.getForeignKeys().toArray(new ForeignKey[0])[0];
-    assertThat("Foreign key not found", fk, notNullValue());
-
-    final String columnsListAsStringChild =
-        MetaDataUtility.getColumnsListAsString(fk, TableRelationshipType.child, identifiers);
-    assertThat(columnsListAsStringChild, is("'PREVIOUSEDITIONID'"));
-
-    final String columnsListAsStringParent =
-        MetaDataUtility.getColumnsListAsString(fk, TableRelationshipType.parent, identifiers);
-    assertThat(columnsListAsStringParent, is("'ID'"));
-
-    final String columnsListAsStringNone =
-        MetaDataUtility.getColumnsListAsString(fk, TableRelationshipType.none, identifiers);
-    assertThat(columnsListAsStringNone, is(""));
-  }
-
-  @Test
   public void columnsListAsStringIndex() throws Exception {
 
     final Schema schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
@@ -112,45 +84,6 @@ public class MetadataUtilityTest {
     final String columnsListAsStringChild =
         MetaDataUtility.getColumnsListAsString(index, identifiers);
     assertThat(columnsListAsStringChild, is("'ID'"));
-  }
-
-  @Test
-  public void columnsListAsStringTable() throws Exception {
-
-    final Schema schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
-    assertThat("BOOKS Schema not found", schema, notNullValue());
-
-    final Table table = catalog.lookupTable(schema, "BOOKS").get();
-    assertThat("BOOKS Table not found", table, notNullValue());
-
-    final String columnsListAsStringChild =
-        MetaDataUtility.getColumnsListAsString(table, identifiers);
-    assertThat(
-        columnsListAsStringChild,
-        is(
-            "'ID', 'TITLE', 'DESCRIPTION', 'PUBLISHERID', 'PUBLICATIONDATE', 'PRICE',"
-                + " 'PREVIOUSEDITIONID'"));
-  }
-
-  @Test
-  public void fkUtilities() throws Exception {
-
-    final Schema schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
-    assertThat("BOOKS Schema not found", schema, notNullValue());
-
-    final Table table = catalog.lookupTable(schema, "BOOKS").get();
-    assertThat("BOOKS Table not found", table, notNullValue());
-
-    final ForeignKey fk = table.getForeignKeys().toArray(new ForeignKey[0])[0];
-    assertThat("Foreign key not found", fk, notNullValue());
-
-    final ColumnReference columnReference =
-        fk.getColumnReferences().toArray(new ColumnReference[0])[0];
-    assertThat("Column reference not found", columnReference, notNullValue());
-
-    assertThat(
-        MetaDataUtility.foreignKeyColumnNames(fk),
-        containsInAnyOrder("PUBLIC.BOOKS.BOOKS.PREVIOUSEDITIONID"));
   }
 
   @BeforeAll

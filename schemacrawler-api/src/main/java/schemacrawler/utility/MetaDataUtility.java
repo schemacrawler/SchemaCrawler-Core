@@ -27,7 +27,6 @@ import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Function;
@@ -35,7 +34,6 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.JavaSqlTypeGroup;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
@@ -45,8 +43,6 @@ import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintColumn;
-import schemacrawler.schema.TableReference;
-import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TypedObject;
 import schemacrawler.schema.View;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -68,10 +64,6 @@ public final class MetaDataUtility {
 
   private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
 
-  public static Collection<List<String>> allIndexCoumnNames(final Table table) {
-    return indexCoumnNames(table, false);
-  }
-
   public static List<String> columnNames(final Index index) {
     if (index == null) {
       return Collections.emptyList();
@@ -80,17 +72,6 @@ public final class MetaDataUtility {
     final List<String> columnNames = new ArrayList<>();
     for (final Column indexColumn : index) {
       columnNames.add(indexColumn.getFullName());
-    }
-    return columnNames;
-  }
-
-  public static List<String> foreignKeyColumnNames(final TableReference tableRef) {
-    if (tableRef == null) {
-      return Collections.emptyList();
-    }
-    final List<String> columnNames = new ArrayList<>();
-    for (final ColumnReference columnReference : tableRef) {
-      columnNames.add(columnReference.getForeignKeyColumn().getFullName());
     }
     return columnNames;
   }
@@ -112,22 +93,6 @@ public final class MetaDataUtility {
   }
 
   /**
-   * Gets a comma-separated list of columns for a table.
-   *
-   * @param table Table
-   * @param identifiers Identifier quoting strategy
-   * @return Comma-separated list of columns
-   */
-  public static String getColumnsListAsString(final Table table, final Identifiers identifiers) {
-
-    requireNonNull(table, "No table provided");
-    requireNonNull(identifiers, "No identifier quoting strategy provided");
-
-    final List<Column> columns = table.getColumns();
-    return joinColumns(columns, false, identifiers);
-  }
-
-  /**
    * Gets a comma-separated list of columns for an index.
    *
    * @param tableConstraint Table constraint
@@ -141,40 +106,6 @@ public final class MetaDataUtility {
     requireNonNull(identifiers, "No identifier quoting strategy provided");
 
     final List<TableConstraintColumn> columns = tableConstraint.getConstrainedColumns();
-    return joinColumns(columns, false, identifiers);
-  }
-
-  /**
-   * Gets a comma-separated list of columns for a foreign key.
-   *
-   * @param fk Foreign key
-   * @param relationshipType Table relationship type
-   * @param identifiers Identifier quoting strategy
-   * @return Comma-separated list of columns
-   */
-  public static String getColumnsListAsString(
-      final TableReference fk,
-      final TableRelationshipType relationshipType,
-      final Identifiers identifiers) {
-
-    requireNonNull(fk, "No foreign key provided");
-    requireNonNull(identifiers, "No identifier quoting strategy provided");
-    if (relationshipType == null || relationshipType == TableRelationshipType.none) {
-      return "";
-    }
-
-    final List<Column> columns = new ArrayList<>();
-    for (final ColumnReference columnReference : fk.getColumnReferences()) {
-      switch (relationshipType) {
-        case parent:
-          columns.add(columnReference.getPrimaryKeyColumn());
-          break;
-        case child:
-          columns.add(columnReference.getForeignKeyColumn());
-          break;
-        default:
-      }
-    }
     return joinColumns(columns, false, identifiers);
   }
 
@@ -358,24 +289,6 @@ public final class MetaDataUtility {
 
     final CrawlInfo crawlInfo = catalog.getCrawlInfo();
     return "Loaded catalog%n%s%n%s".formatted(crawlInfo, countTree);
-  }
-
-  private static Collection<List<String>> indexCoumnNames(
-      final Table table, final boolean includeUniqueOnly) {
-    final List<List<String>> allIndexCoumns = new ArrayList<>();
-    if (table instanceof PartialDatabaseObject) {
-      return allIndexCoumns;
-    }
-
-    for (final Index index : table.getIndexes()) {
-      if (includeUniqueOnly && !index.isUnique()) {
-        continue;
-      }
-
-      final List<String> indexColumns = columnNames(index);
-      allIndexCoumns.add(indexColumns);
-    }
-    return allIndexCoumns;
   }
 
   private MetaDataUtility() {
