@@ -12,8 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.loader.entities.TableEntityModel;
-import schemacrawler.schema.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.TableEntityModel;
 import schemacrawler.schemacrawler.SchemaReference;
 import us.fatehi.utility.OptionalBoolean;
 

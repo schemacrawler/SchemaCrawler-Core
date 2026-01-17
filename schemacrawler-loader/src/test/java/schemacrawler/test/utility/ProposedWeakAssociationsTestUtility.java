@@ -15,7 +15,7 @@ import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
 import java.util.Arrays;
 import java.util.Collection;
-import schemacrawler.loader.utility.EntityModelUtility;
+import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Schema;

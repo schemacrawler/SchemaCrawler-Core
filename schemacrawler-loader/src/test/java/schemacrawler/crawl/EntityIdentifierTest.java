@@ -13,8 +13,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.loader.entities.TableEntityModel;
-import schemacrawler.schema.EntityType;
+import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.TableEntityModel;
 import schemacrawler.schemacrawler.SchemaReference;
 
 public class EntityIdentifierTest {

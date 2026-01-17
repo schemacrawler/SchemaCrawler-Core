@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.entities;
+package schemacrawler.ermodel.model;
 
 import static java.util.Objects.requireNonNull;
 
@@ -18,9 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKey;
-import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PartialDatabaseObject;
