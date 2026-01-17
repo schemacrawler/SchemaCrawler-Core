@@ -40,20 +40,41 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 @WithTestDatabase
 @ResolveTestContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ForeignKeyModelTest {
+public class CatalogEntityModelUtilityTest {
 
   private Catalog catalog;
 
   @Test
-  public void fkCardinality(final TestContext testContext) throws Exception {
+  public void catalogModelFk(final TestContext testContext) throws Exception {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
       for (final Schema schema : catalog.getSchemas()) {
         for (final Table table : catalog.getTables(schema)) {
           for (final ForeignKey fk : table.getForeignKeys()) {
-            out.println("%s".formatted(fk));
+            out.println(fk);
             out.println("  - cardinality=%s".formatted(EntityModelUtility.inferCardinality(fk)));
+            out.println("  - covered by index=%s".formatted(EntityModelUtility.coveredByIndex(fk)));
+            out.println(
+                "  - covered by unique index=%s"
+                    .formatted(EntityModelUtility.coveredByUniqueIndex(fk)));
           }
+        }
+      }
+    }
+    assertThat(
+        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+  }
+
+  @Test
+  public void catalogModelTables(final TestContext testContext) throws Exception {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      for (final Schema schema : catalog.getSchemas()) {
+        for (final Table table : catalog.getTables(schema)) {
+          out.println(table);
+          out.println("  - entity type=%s".formatted(EntityModelUtility.inferEntityType(table)));
+          out.println(
+              "  - is bridge table=%s".formatted(EntityModelUtility.inferBridgeTable(table)));
         }
       }
     }

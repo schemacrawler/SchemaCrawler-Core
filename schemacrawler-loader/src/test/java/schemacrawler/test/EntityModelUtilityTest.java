@@ -110,6 +110,19 @@ public class EntityModelUtilityTest {
   }
 
   @Test
+  public void testInferBridgeTable() {
+    final Schema schema = catalog.lookupSchema("PUBLIC.PUBLIC").get();
+
+    final Table bridgeTable = catalog.lookupTable(schema, "BRIDGE").get();
+    assertThat(EntityModelUtility.inferBridgeTable(bridgeTable), is(OptionalBoolean.true_value));
+
+    final Table parentTable = catalog.lookupTable(schema, "PARENT").get();
+    assertThat(EntityModelUtility.inferBridgeTable(parentTable), is(OptionalBoolean.false_value));
+
+    assertThat(EntityModelUtility.inferBridgeTable(null), is(OptionalBoolean.unknown));
+  }
+
+  @Test
   public void testInferEntityType() {
     final Schema schema = catalog.lookupSchema("PUBLIC.PUBLIC").get();
 
