@@ -27,7 +27,6 @@ import java.util.Set;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.DatabaseObject;
-import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObject;
@@ -65,7 +64,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   private MutablePrimaryKey primaryKey;
   private int sortIndex;
   private TableType tableType;
-  private EntityType entityType;
   private boolean isSelfReferencing;
   private String definition;
 
@@ -76,7 +74,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
     // Set default values
     definition = "";
     tableType = TableType.UNKNOWN;
-    entityType = EntityType.unknown;
   }
 
   /**
@@ -102,12 +99,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
     }
 
     return comparison;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public EntityType getEntityType() {
-    return entityType;
   }
 
   /** {@inheritDoc} */
@@ -381,12 +372,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   final void setDefinition(final String definition) {
     if (!hasDefinition() && !isBlank(definition)) {
       this.definition = definition;
-    }
-  }
-
-  final void setEntityType(final EntityType entityType) {
-    if (entityType != null) {
-      this.entityType = entityType;
     }
   }
 

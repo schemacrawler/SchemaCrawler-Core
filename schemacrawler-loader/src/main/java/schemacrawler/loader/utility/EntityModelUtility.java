@@ -14,33 +14,89 @@ import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
+import us.fatehi.utility.OptionalBoolean;
 import us.fatehi.utility.UtilityMarker;
 
+/** Utility for inferring entity model information from tables and foreign keys. */
 @UtilityMarker
 public class EntityModelUtility {
 
-  public static EntityType identifyEntityType(final Table table) {
-    if (table instanceof PartialDatabaseObject) {
+  /**
+   * Checks if a foreign key is covered by an index.
+   *
+   * @param fk Foreign key
+   * @return Whether the foreign key is covered by an index
+   */
+  public static OptionalBoolean coveredByIndex(final TableReference fk) {
+    if (fk == null) {
+      return OptionalBoolean.unknown;
+    }
+
+    final Table table = fk.getForeignKeyTable();
+    if (table == null || table instanceof PartialDatabaseObject) {
+      return OptionalBoolean.unknown;
+    }
+
+    final TableEntityModel tableEntityModel = new TableEntityModel(table);
+    final OptionalBoolean coveredByIndex = tableEntityModel.foreignKeyCoveredByIndex(fk);
+    return coveredByIndex;
+  }
+
+  /**
+   * Checks if a foreign key is covered by a unique index.
+   *
+   * @param fk Foreign key
+   * @return Whether the foreign key is covered by a unique index
+   */
+  public static OptionalBoolean coveredByUniqueIndex(final TableReference fk) {
+    if (fk == null) {
+      return OptionalBoolean.unknown;
+    }
+
+    final Table table = fk.getForeignKeyTable();
+    if (table == null || table instanceof PartialDatabaseObject) {
+      return OptionalBoolean.unknown;
+    }
+
+    final TableEntityModel tableEntityModel = new TableEntityModel(table);
+    final OptionalBoolean coveredByIndex = tableEntityModel.foreignKeyCoveredByUniqueIndex(fk);
+    return coveredByIndex;
+  }
+
+  /**
+   * Infers the entity type of a table.
+   *
+   * @param table Table
+   * @return Inferred entity type
+   */
+  public static EntityType inferEntityType(final Table table) {
+    if (table == null || table instanceof PartialDatabaseObject) {
       return EntityType.unknown;
     }
 
     final TableEntityModel tableEntityModel = new TableEntityModel(table);
-    final EntityType entityType = tableEntityModel.identifyEntityType();
+    final EntityType entityType = tableEntityModel.inferEntityType();
     return entityType;
   }
 
-  public static ForeignKeyCardinality identifyForeignKeyCardinality(final TableReference fk) {
+  /**
+   * Infers the cardinality of a foreign key.
+   *
+   * @param fk Foreign key
+   * @return Inferred cardinality
+   */
+  public static ForeignKeyCardinality inferCardinality(final TableReference fk) {
     if (fk == null) {
       return ForeignKeyCardinality.unknown;
     }
 
     final Table table = fk.getForeignKeyTable();
-    if (table instanceof PartialDatabaseObject) {
+    if (table == null || table instanceof PartialDatabaseObject) {
       return ForeignKeyCardinality.unknown;
     }
 
     final TableEntityModel tableEntityModel = new TableEntityModel(table);
-    final ForeignKeyCardinality fkCardinality = tableEntityModel.identifyForeignKeyCardinality(fk);
+    final ForeignKeyCardinality fkCardinality = tableEntityModel.inferForeignKeyCardinality(fk);
     return fkCardinality;
   }
 

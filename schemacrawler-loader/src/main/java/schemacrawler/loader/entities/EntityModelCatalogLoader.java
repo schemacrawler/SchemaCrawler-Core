@@ -16,7 +16,6 @@ import static schemacrawler.schemacrawler.SchemaInfoRetrieval.retrieveTables;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.EntityModelBuilder;
-import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.PartialDatabaseObject;
@@ -101,11 +100,8 @@ public final class EntityModelCatalogLoader extends BaseCatalogLoader {
       }
       final TableEntityModel tableEntityModel = new TableEntityModel(table);
 
-      final EntityType entityType = tableEntityModel.identifyEntityType();
-      modelBuilder.updateTableEntity(table, entityType);
-      // For each
-      for (ForeignKey fk : table.getImportedForeignKeys()) {
-        ForeignKeyCardinality fkCardinality = tableEntityModel.identifyForeignKeyCardinality(fk);
+      for (final ForeignKey fk : table.getImportedForeignKeys()) {
+        final ForeignKeyCardinality fkCardinality = tableEntityModel.inferForeignKeyCardinality(fk);
         modelBuilder.updateForeignKeyCardinality(fk, fkCardinality);
       }
     }

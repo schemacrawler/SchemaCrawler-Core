@@ -35,7 +35,6 @@ import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.EntityType;
 import schemacrawler.schema.ForeignKeyCardinality;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
@@ -248,12 +247,6 @@ public class SchemaCrawlerCoverageTest {
     final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
     final MutableTable table = (MutableTable) catalog.lookupTable(schema, "BOOKAUTHORS").get();
     final MutableForeignKey foreignKey = table.lookupForeignKey("Z_FK_AUTHOR").get();
-
-    assertThat(table.getEntityType(), is(EntityType.unknown));
-    table.setEntityType(EntityType.strong_entity);
-    assertThat(table.getEntityType(), is(EntityType.strong_entity));
-    table.setEntityType(null);
-    assertThat(table.getEntityType(), is(EntityType.strong_entity));
 
     assertThat(foreignKey.getForeignKeyCardinality(), is(ForeignKeyCardinality.unknown));
     foreignKey.setForeignKeyCardinality(ForeignKeyCardinality.one_many);

@@ -43,13 +43,6 @@ public interface Table
   }
 
   /**
-   * Gets the entity type of the table.
-   *
-   * @return Entity type
-   */
-  EntityType getEntityType();
-
-  /**
    * Gets the list of exported foreign keys. That is, only those whose primary key is referenced in
    * another table.
    *

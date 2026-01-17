@@ -1,0 +1,34 @@
+PUBLIC.BOOKS.BOOKAUTHORS.Z_FK_AUTHOR
+  - cardinality=(1..many)
+PUBLIC.BOOKS.BOOKS.FK_PREVIOUSEDITION
+  - cardinality=(0..1)
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_BOOK
+  - cardinality=(0..many)
+PUBLIC.BOOKS.BOOKAUTHORS.SYS_FK_10121
+  - cardinality=(1..many)
+PUBLIC.BOOKS."Celebrity Updates".SYS_FK_10131
+  - cardinality=(1..1)
+PUBLIC.BOOKS.CUSTOMERDATA.FK_CUSTOMER
+  - cardinality=(1..many)
+PUBLIC.BOOKS.ΒΙΒΛΊΑ.FK_ΒΙΒΛΊΑ_PUBLISHERS
+  - cardinality=(1..many)
+PUBLIC.BOOKS.BOOKAUTHORS.Z_FK_AUTHOR
+  - cardinality=(1..many)
+PUBLIC.BOOKS.BOOKAUTHORS.SYS_FK_10121
+  - cardinality=(1..many)
+PUBLIC.BOOKS."Celebrity Updates".SYS_FK_10131
+  - cardinality=(1..1)
+PUBLIC.BOOKS.CUSTOMERDATA.FK_CUSTOMER
+  - cardinality=(1..many)
+PUBLIC.BOOKS.ΒΙΒΛΊΑ.FK_ΒΙΒΛΊΑ_PUBLISHERS
+  - cardinality=(1..many)
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_REGIONS
+  - cardinality=(1..many)
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_SALESDATA
+  - cardinality=(0..many)
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_BOOK
+  - cardinality=(0..many)
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_SALESDATA
+  - cardinality=(0..many)
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_REGIONS
+  - cardinality=(1..many)
