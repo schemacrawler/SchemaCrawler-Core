@@ -1,0 +1,68 @@
+PUBLIC.BOOKS.BOOKAUTHORS.Z_FK_AUTHOR
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC.BOOKS.BOOKS.FK_PREVIOUSEDITION
+  - cardinality=(0..1)
+  - covered by index=true_value
+  - covered by unique index=true_value
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_BOOK
+  - cardinality=(0..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC.BOOKS.BOOKAUTHORS.SYS_FK_10121
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC.BOOKS."Celebrity Updates".SYS_FK_10131
+  - cardinality=(1..1)
+  - covered by index=true_value
+  - covered by unique index=true_value
+PUBLIC.BOOKS.CUSTOMERDATA.FK_CUSTOMER
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC.BOOKS.ΒΙΒΛΊΑ.FK_ΒΙΒΛΊΑ_PUBLISHERS
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC.BOOKS.BOOKAUTHORS.Z_FK_AUTHOR
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC.BOOKS.BOOKAUTHORS.SYS_FK_10121
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC.BOOKS."Celebrity Updates".SYS_FK_10131
+  - cardinality=(1..1)
+  - covered by index=true_value
+  - covered by unique index=true_value
+PUBLIC.BOOKS.CUSTOMERDATA.FK_CUSTOMER
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC.BOOKS.ΒΙΒΛΊΑ.FK_ΒΙΒΛΊΑ_PUBLISHERS
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_REGIONS
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_SALESDATA
+  - cardinality=(0..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_BOOK
+  - cardinality=(0..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_SALESDATA
+  - cardinality=(0..many)
+  - covered by index=true_value
+  - covered by unique index=false_value
+PUBLIC."PUBLISHER SALES".SALES.FK_SALES_REGIONS
+  - cardinality=(1..many)
+  - covered by index=true_value
+  - covered by unique index=false_value

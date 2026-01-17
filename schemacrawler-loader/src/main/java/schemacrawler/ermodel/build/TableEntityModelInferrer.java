@@ -108,6 +108,55 @@ public final class TableEntityModelInferrer {
     return OptionalBoolean.fromBoolean(uniqueIndexes.contains(importedColumns));
   }
 
+  /**
+   * Identifies if a table is a bridge table. A table T is treated as a bridge for an M..N
+   * relationship between two tables if:
+   *
+   * <ul>
+   *   <li>T has at least two foreign keys, each to a different parent table; and
+   *   <li>there is a primary key or unique index whose columns are exactly those two foreign key
+   *       columns; and
+   *   <li>there are no other columns in T that participate in the PK/unique index beyond those two
+   *       FKs.
+   * </ul>
+   *
+   * @return Whether the table is a bridge table
+   */
+  public boolean inferBridgeTable() {
+    if (importedForeignKeys.size() < 2) {
+      return false;
+    }
+
+    final long countDistinctFk =
+        importedForeignKeys.stream().map(ForeignKey::getPrimaryKeyTable).distinct().count();
+    if (countDistinctFk < 2) {
+      return false;
+    }
+
+    for (final ForeignKey fk1 : importedForeignKeys) {
+      for (final ForeignKey fk2 : importedForeignKeys) {
+        if (fk1.equals(fk2) || fk1.getPrimaryKeyTable().equals(fk2.getPrimaryKeyTable())) {
+          continue;
+        }
+
+        final Set<Column> combinedFkColumns = new HashSet<>(importedColumnsMap.get(fk1.key()));
+        combinedFkColumns.addAll(importedColumnsMap.get(fk2.key()));
+
+        if (uniqueIndexes.contains(combinedFkColumns)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Identifies the entity type of a table. The algorithm uses a set of rules to classify the table
+   * into one of several predefined entity types.
+   *
+   * @return Entity type
+   */
   public EntityType inferEntityType() {
 
     // Step 1: Check for non-entity pattern: Non-entity tables do not have a primary

@@ -65,19 +65,19 @@ public class EntityModelUtility {
   }
 
   /**
-   * Infers the entity type of a table.
+   * Infers if the table is a bridge table.
    *
    * @param table Table
-   * @return Inferred entity type
+   * @return Inferred bridge table type
    */
-  public static EntityType inferEntityType(final Table table) {
+  public static OptionalBoolean inferBridgeTable(final Table table) {
     if (table == null || isPartial(table)) {
-      return EntityType.unknown;
+      return OptionalBoolean.unknown;
     }
 
     final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
-    final EntityType entityType = tableEntityModel.inferEntityType();
-    return entityType;
+    final boolean isBridgeTable = tableEntityModel.inferBridgeTable();
+    return OptionalBoolean.fromBoolean(isBridgeTable);
   }
 
   /**
@@ -99,6 +99,22 @@ public class EntityModelUtility {
     final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final ForeignKeyCardinality fkCardinality = tableEntityModel.inferForeignKeyCardinality(fk);
     return fkCardinality;
+  }
+
+  /**
+   * Infers the entity type of a table.
+   *
+   * @param table Table
+   * @return Inferred entity type
+   */
+  public static EntityType inferEntityType(final Table table) {
+    if (table == null || isPartial(table)) {
+      return EntityType.unknown;
+    }
+
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
+    final EntityType entityType = tableEntityModel.inferEntityType();
+    return entityType;
   }
 
   private EntityModelUtility() {

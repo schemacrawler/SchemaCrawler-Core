@@ -1,0 +1,42 @@
+PUBLIC.BOOKS.AUTHORS
+  - entity type=strong_entity
+  - is bridge table=false_value
+PUBLIC.BOOKS.BOOKS
+  - entity type=strong_entity
+  - is bridge table=false_value
+PUBLIC.BOOKS."Celebrities"
+  - entity type=strong_entity
+  - is bridge table=false_value
+PUBLIC.BOOKS.COUPONS
+  - entity type=strong_entity
+  - is bridge table=false_value
+PUBLIC.BOOKS.CUSTOMERS
+  - entity type=strong_entity
+  - is bridge table=false_value
+PUBLIC.BOOKS.PUBLISHERS
+  - entity type=strong_entity
+  - is bridge table=false_value
+PUBLIC.BOOKS.BOOKAUTHORS
+  - entity type=non_entity
+  - is bridge table=true_value
+PUBLIC.BOOKS."Celebrity Updates"
+  - entity type=subtype
+  - is bridge table=false_value
+PUBLIC.BOOKS.CUSTOMERDATA
+  - entity type=weak_entity
+  - is bridge table=false_value
+PUBLIC.BOOKS.ΒΙΒΛΊΑ
+  - entity type=strong_entity
+  - is bridge table=false_value
+PUBLIC.BOOKS.AUTHORSLIST
+  - entity type=non_entity
+  - is bridge table=false_value
+PUBLIC."PUBLISHER SALES".REGIONS
+  - entity type=strong_entity
+  - is bridge table=false_value
+PUBLIC."PUBLISHER SALES".SALESDATA
+  - entity type=non_entity
+  - is bridge table=false_value
+PUBLIC."PUBLISHER SALES".SALES
+  - entity type=non_entity
+  - is bridge table=false_value

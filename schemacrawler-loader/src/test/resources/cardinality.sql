@@ -46,3 +46,20 @@ CREATE TABLE OneManyChild
   CONSTRAINT FK_OneManyChild_Parent FOREIGN KEY (ParentId) REFERENCES Parent (Id)
 )
 ;
+
+CREATE TABLE AnotherParent
+(
+  Id INTEGER NOT NULL,
+  CONSTRAINT PK_AnotherParent PRIMARY KEY (Id)
+)
+;
+
+CREATE TABLE Bridge
+(
+  ParentId INTEGER NOT NULL,
+  AnotherParentId INTEGER NOT NULL,
+  CONSTRAINT PK_Bridge PRIMARY KEY (ParentId, AnotherParentId),
+  CONSTRAINT FK_Bridge_Parent FOREIGN KEY (ParentId) REFERENCES Parent (Id),
+  CONSTRAINT FK_Bridge_AnotherParent FOREIGN KEY (AnotherParentId) REFERENCES AnotherParent (Id)
+)
+;
