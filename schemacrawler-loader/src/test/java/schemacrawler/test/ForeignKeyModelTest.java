@@ -16,6 +16,7 @@ import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
@@ -51,7 +52,7 @@ public class ForeignKeyModelTest {
         for (final Table table : catalog.getTables(schema)) {
           for (final ForeignKey fk : table.getForeignKeys()) {
             out.println("%s".formatted(fk));
-            out.println("  - cardinality=%s".formatted(fk.getForeignKeyCardinality()));
+            out.println("  - cardinality=%s".formatted(EntityModelUtility.inferCardinality(fk)));
           }
         }
       }

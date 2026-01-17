@@ -35,13 +35,6 @@ public interface TableReference
   }
 
   /**
-   * Gets the foreign key cardinality if computed, otherwise returns unknown.
-   *
-   * @return Foreign key cardinality
-   */
-  ForeignKeyCardinality getForeignKeyCardinality();
-
-  /**
    * Gets the dependent table with an imported foreign key.
    *
    * @return Dependent table.

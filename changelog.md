@@ -3,7 +3,7 @@
 SchemaCrawler Core release notes.
 
 <a name="v17.4.0"></a>
-## Release 17.4.0 - 2026-01-05
+## Release 17.4.0 - 2026-01-16
 - Infer 1..1 and 1..many cardinalities - fixes [issue #2237](https://github.com/schemacrawler/SchemaCrawler/issues/2237)
 - Add methods to identify table self-references
   - `Table::isSelfReferencing()`
@@ -12,7 +12,6 @@ SchemaCrawler Core release notes.
 - Add a number of entity model inferences to the catalog model
   - `Column::isSignificant()`
   - `TableReference::isOptional()`
-  - `TableReference::getForeignKeyCardinality()`
 - Add `EntityModelUtility` with methods to obtain information useful in entity modeling
 
 

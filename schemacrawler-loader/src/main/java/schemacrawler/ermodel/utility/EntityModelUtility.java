@@ -6,11 +6,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.utility;
+package schemacrawler.ermodel.utility;
 
-import schemacrawler.loader.entities.TableEntityModel;
-import schemacrawler.schema.EntityType;
-import schemacrawler.schema.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.TableEntityModel;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
