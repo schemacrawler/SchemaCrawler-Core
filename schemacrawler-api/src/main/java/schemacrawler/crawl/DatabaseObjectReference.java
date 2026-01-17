@@ -9,6 +9,7 @@
 package schemacrawler.crawl;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -33,7 +34,7 @@ class DatabaseObjectReference<D extends DatabaseObject> implements Serializable 
         new SoftReference<>(requireNonNull(databaseObject, "Database object not provided"));
 
     this.partial = requireNonNull(partial, "Partial database object not provided");
-    if (!(partial instanceof PartialDatabaseObject)) {
+    if (!isPartial(partial)) {
       throw new IllegalArgumentException("Partial database object not provided");
     }
 

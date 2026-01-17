@@ -9,12 +9,12 @@
 package schemacrawler.filter;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Reducer;
 import schemacrawler.schema.ReducibleCollection;
 import schemacrawler.schema.Table;
@@ -84,7 +84,7 @@ final class TablesReducer implements Reducer<Table> {
     for (int i = 0; i < depth; i++) {
       for (final Table table : new HashSet<>(includedTables)) {
         for (final Table relatedTable : table.getRelatedTables(tableRelationshipType)) {
-          if (!isTablePartial(relatedTable)) {
+          if (!isPartial(relatedTable)) {
             includedTables.add(relatedTable);
           }
         }
@@ -92,9 +92,5 @@ final class TablesReducer implements Reducer<Table> {
     }
 
     return includedTables;
-  }
-
-  private boolean isTablePartial(final Table table) {
-    return table instanceof PartialDatabaseObject;
   }
 }

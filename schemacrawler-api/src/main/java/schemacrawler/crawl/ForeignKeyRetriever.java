@@ -11,6 +11,7 @@ package schemacrawler.crawl;
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.schemacrawler.InformationSchemaKey.FOREIGN_KEYS;
 import static schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy.foreignKeysRetrievalStrategy;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 import static schemacrawler.utility.MetaDataUtility.isView;
 import static us.fatehi.utility.Utility.isBlank;
 
@@ -29,7 +30,6 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKeyDeferrability;
 import schemacrawler.schema.ForeignKeyUpdateRule;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.InformationSchemaViews;
@@ -115,8 +115,8 @@ final class ForeignKeyRetriever extends AbstractRetriever {
         lookupOrCreateColumn(pkTableCatalogName, pkTableSchemaName, pkTableName, pkColumnName);
     final Column fkColumn =
         lookupOrCreateColumn(fkTableCatalogName, fkTableSchemaName, fkTableName, fkColumnName);
-    final boolean isPkColumnPartial = pkColumn instanceof PartialDatabaseObject;
-    final boolean isFkColumnPartial = fkColumn instanceof PartialDatabaseObject;
+    final boolean isPkColumnPartial = isPartial(pkColumn);
+    final boolean isFkColumnPartial = isPartial(fkColumn);
 
     if (pkColumn == null || fkColumn == null || isFkColumnPartial && isPkColumnPartial) {
       return false;

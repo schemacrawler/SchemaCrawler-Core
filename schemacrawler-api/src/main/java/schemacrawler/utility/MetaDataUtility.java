@@ -33,6 +33,7 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.JavaSqlTypeGroup;
+import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
@@ -142,6 +143,10 @@ public final class MetaDataUtility {
       }
     }
     return inclusionRuleString;
+  }
+
+  public static boolean isPartial(final DatabaseObject databaseObject) {
+    return databaseObject instanceof PartialDatabaseObject;
   }
 
   public static boolean isView(final Table table) {
