@@ -10,6 +10,7 @@ package schemacrawler.crawl;
 
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.crawl.RetrieverUtility.lookupOrCreateColumn;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
@@ -23,7 +24,6 @@ import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
@@ -111,8 +111,8 @@ public final class WeakAssociationBuilder implements Builder<TableReference> {
       return this;
     }
 
-    final boolean isFkColumnPartial = fkColumn instanceof PartialDatabaseObject;
-    final boolean isPkColumnPartial = pkColumn instanceof PartialDatabaseObject;
+    final boolean isFkColumnPartial = isPartial(fkColumn);
+    final boolean isPkColumnPartial = isPartial(pkColumn);
     if (isFkColumnPartial && isPkColumnPartial) {
       return this;
     }

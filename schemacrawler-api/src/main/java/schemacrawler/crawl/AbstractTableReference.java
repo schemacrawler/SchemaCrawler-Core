@@ -9,6 +9,7 @@
 package schemacrawler.crawl;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.Serial;
 import java.util.Iterator;
@@ -20,7 +21,6 @@ import java.util.logging.Logger;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.CollectionsUtility;
@@ -128,7 +128,7 @@ abstract class AbstractTableReference extends MutableTableConstraint implements 
         && fkTable.equals(fkColumn.getParent())) {
       columnReferences.add(columnReference);
       addTableConstraintColumn(columnReference);
-      if (!(fkColumn instanceof PartialDatabaseObject) && fkColumn.isNullable()) {
+      if (!isPartial(fkColumn) && fkColumn.isNullable()) {
         isOptional = true;
       }
       return true;

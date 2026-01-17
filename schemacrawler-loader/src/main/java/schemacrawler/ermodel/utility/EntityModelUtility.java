@@ -8,10 +8,11 @@
 
 package schemacrawler.ermodel.utility;
 
+import static schemacrawler.utility.MetaDataUtility.isPartial;
+
 import schemacrawler.ermodel.build.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.ForeignKeyCardinality;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.OptionalBoolean;
@@ -33,7 +34,7 @@ public class EntityModelUtility {
     }
 
     final Table table = fk.getForeignKeyTable();
-    if (table == null || table instanceof PartialDatabaseObject) {
+    if (table == null || isPartial(table)) {
       return OptionalBoolean.unknown;
     }
 
@@ -54,7 +55,7 @@ public class EntityModelUtility {
     }
 
     final Table table = fk.getForeignKeyTable();
-    if (table == null || table instanceof PartialDatabaseObject) {
+    if (table == null || isPartial(table)) {
       return OptionalBoolean.unknown;
     }
 
@@ -70,7 +71,7 @@ public class EntityModelUtility {
    * @return Inferred entity type
    */
   public static EntityType inferEntityType(final Table table) {
-    if (table == null || table instanceof PartialDatabaseObject) {
+    if (table == null || isPartial(table)) {
       return EntityType.unknown;
     }
 
@@ -91,7 +92,7 @@ public class EntityModelUtility {
     }
 
     final Table table = fk.getForeignKeyTable();
-    if (table == null || table instanceof PartialDatabaseObject) {
+    if (table == null || isPartial(table)) {
       return ForeignKeyCardinality.unknown;
     }
 

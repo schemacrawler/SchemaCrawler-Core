@@ -9,12 +9,12 @@
 package schemacrawler.loader.weakassociations;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.Serial;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.PartialDatabaseObject;
 
 public final class ProposedWeakAssociation implements ColumnReference {
 
@@ -54,8 +54,8 @@ public final class ProposedWeakAssociation implements ColumnReference {
       return false;
     }
 
-    final boolean isPkColumnPartial = primaryKeyColumn instanceof PartialDatabaseObject;
-    final boolean isFkColumnPartial = foreignKeyColumn instanceof PartialDatabaseObject;
+    final boolean isPkColumnPartial = isPartial(primaryKeyColumn);
+    final boolean isFkColumnPartial = isPartial(foreignKeyColumn);
     if (isFkColumnPartial && isPkColumnPartial
         || !primaryKeyColumn.isColumnDataTypeKnown()
         || !foreignKeyColumn.isColumnDataTypeKnown()) {

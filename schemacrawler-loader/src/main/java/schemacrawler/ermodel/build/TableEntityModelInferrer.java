@@ -9,6 +9,7 @@
 package schemacrawler.ermodel.build;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,7 +24,6 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.OptionalBoolean;
@@ -53,7 +53,7 @@ public final class TableEntityModelInferrer {
    */
   public TableEntityModelInferrer(final Table table) {
     this.table = requireNonNull(table, "No table provided");
-    if (table instanceof PartialDatabaseObject) {
+    if (isPartial(table)) {
       throw new IllegalArgumentException("Table cannot be partial");
     }
 
@@ -246,7 +246,7 @@ public final class TableEntityModelInferrer {
       findOrGetImportedKeys(fk);
 
       final Table parentTable = fk.getPrimaryKeyTable();
-      if (!(parentTable instanceof PartialDatabaseObject) && parentTable.hasPrimaryKey()) {
+      if (!isPartial(parentTable) && parentTable.hasPrimaryKey()) {
         final Set<Column> parentPkColumns =
             new HashSet<>(parentTable.getPrimaryKey().getConstrainedColumns());
         parentPkColumnsMap.put(fk.key(), parentPkColumns);
