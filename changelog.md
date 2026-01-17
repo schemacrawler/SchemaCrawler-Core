@@ -13,6 +13,7 @@ SchemaCrawler Core release notes.
   - `Column::isSignificant()`
   - `TableReference::isOptional()`
 - Add `EntityModelUtility` with methods to obtain information useful in entity modeling
+- Remove unused methods from `MetaDataUtility`
 
 
 <a name="v17.3.0"></a>

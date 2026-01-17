@@ -18,7 +18,6 @@ import static us.fatehi.utility.Utility.isBlank;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,18 +62,6 @@ public final class MetaDataUtility {
   }
 
   private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
-
-  public static List<String> columnNames(final Index index) {
-    if (index == null) {
-      return Collections.emptyList();
-    }
-
-    final List<String> columnNames = new ArrayList<>();
-    for (final Column indexColumn : index) {
-      columnNames.add(indexColumn.getFullName());
-    }
-    return columnNames;
-  }
 
   /**
    * Gets a comma-separated list of columns for an index.

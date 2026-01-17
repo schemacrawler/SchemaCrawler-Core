@@ -9,7 +9,6 @@
 package schemacrawler.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -130,20 +129,5 @@ public class MetadataUtilityTest {
     }
     assertThat(
         outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
-  }
-
-  @Test
-  public void tableUtilities() throws Exception {
-
-    final Schema schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
-    assertThat("BOOKS Schema not found", schema, notNullValue());
-
-    final Table table = catalog.lookupTable(schema, "BOOKS").get();
-    assertThat("BOOKS Table not found", table, notNullValue());
-
-    final Index index = table.getIndexes().toArray(new Index[0])[0];
-    assertThat("Index not found", index, notNullValue());
-
-    assertThat(MetaDataUtility.columnNames(index), containsInAnyOrder("PUBLIC.BOOKS.BOOKS.ID"));
   }
 }
