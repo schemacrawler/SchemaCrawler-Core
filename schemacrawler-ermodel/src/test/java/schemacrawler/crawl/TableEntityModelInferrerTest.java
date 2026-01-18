@@ -12,7 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.ermodel.build.TableEntityModelInferrer;
+
+import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.ForeignKeyCardinality;
 import schemacrawler.schemacrawler.SchemaReference;
