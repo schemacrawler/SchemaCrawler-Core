@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns="http://maven.apache.org/POM/4.0.0"
- xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>us.fatehi</groupId>
     <artifactId>schemacrawler-parent</artifactId>
     <version>17.4.0</version>
     <relativePath>../schemacrawler-parent/pom.xml</relativePath>
   </parent>
-  <artifactId>schemacrawler-tools</artifactId>
+  <artifactId>schemacrawler-ermodel</artifactId>
   <packaging>jar</packaging>
-  <name>SchemaCrawler Tools</name>
+
+  <name>SchemaCrawler ER Model</name>
+
   <dependencies>
+
     <dependency>
       <groupId>us.fatehi</groupId>
-      <artifactId>schemacrawler-ermodel</artifactId>
+      <artifactId>schemacrawler-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
