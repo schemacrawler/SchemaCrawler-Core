@@ -42,6 +42,7 @@ public final class TableEntityModelInferrer {
   private final Set<ForeignKey> importedForeignKeys;
 
   private final Set<Column> tablePkColumns;
+
   private final Map<NamedObjectKey, Set<Column>> importedColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> pkColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> parentPkColumnsMap;
@@ -72,43 +73,6 @@ public final class TableEntityModelInferrer {
   }
 
   /**
-   * Checks if the columns of a foreign key are covered by an index on this table.
-   *
-   * @param fk Foreign key, can be null
-   * @return Whether the foreign key columns are covered by an index
-   */
-  public OptionalBoolean foreignKeyCoveredByIndex(final TableReference fk) {
-
-    if (fk == null) {
-      return OptionalBoolean.unknown;
-    }
-
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
-    for (final Set<Column> indexColumns : indexes) {
-      if (indexColumns.containsAll(importedColumns)) {
-        return OptionalBoolean.true_value;
-      }
-    }
-    return OptionalBoolean.false_value;
-  }
-
-  /**
-   * Checks if the columns of a foreign key are covered by a unique index on this table.
-   *
-   * @param fk Foreign key, can be null
-   * @return Whether the foreign key columns are covered by a unique index
-   */
-  public OptionalBoolean foreignKeyCoveredByUniqueIndex(final TableReference fk) {
-
-    if (fk == null) {
-      return OptionalBoolean.unknown;
-    }
-
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
-    return OptionalBoolean.fromBoolean(uniqueIndexes.contains(importedColumns));
-  }
-
-  /**
    * Identifies if a table is a bridge table. A table T is treated as a bridge for an M..N
    * relationship between two tables if:
    *
@@ -116,7 +80,7 @@ public final class TableEntityModelInferrer {
    *   <li>T has at least two foreign keys, each to a different parent table; and
    *   <li>there is a primary key or unique index whose columns are exactly those two foreign key
    *       columns; and
-   *   <li>there are no other columns in T that participate in the PK/unique index beyond those two
+   *   <li>there are no other columns in T that participate in the PK/ unique index beyond those two
    *       FKs.
    * </ul>
    *
@@ -247,6 +211,43 @@ public final class TableEntityModelInferrer {
     }
 
     return cardinality;
+  }
+
+  /**
+   * Checks if the columns of a foreign key are covered by an index on this table.
+   *
+   * @param fk Foreign key, can be null
+   * @return Whether the foreign key columns are covered by an index
+   */
+  public OptionalBoolean isForeignKeyCoveredByIndex(final TableReference fk) {
+
+    if (fk == null) {
+      return OptionalBoolean.unknown;
+    }
+
+    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    for (final Set<Column> indexColumns : indexes) {
+      if (indexColumns.containsAll(importedColumns)) {
+        return OptionalBoolean.true_value;
+      }
+    }
+    return OptionalBoolean.false_value;
+  }
+
+  /**
+   * Checks if the columns of a foreign key are covered by a unique index on this table.
+   *
+   * @param fk Foreign key, can be null
+   * @return Whether the foreign key columns are covered by a unique index
+   */
+  public OptionalBoolean isForeignKeyCoveredByUniqueIndex(final TableReference fk) {
+
+    if (fk == null) {
+      return OptionalBoolean.unknown;
+    }
+
+    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    return OptionalBoolean.fromBoolean(uniqueIndexes.contains(importedColumns));
   }
 
   @Override

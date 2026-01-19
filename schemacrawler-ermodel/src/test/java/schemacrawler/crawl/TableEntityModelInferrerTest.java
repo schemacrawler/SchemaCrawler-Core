@@ -39,7 +39,7 @@ public class TableEntityModelInferrerTest {
     final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
 
     // No index yet
-    assertThat(model.foreignKeyCoveredByIndex(fk), is(OptionalBoolean.false_value));
+    assertThat(model.isForeignKeyCoveredByIndex(fk), is(OptionalBoolean.false_value));
 
     // Add index
     final MutableIndex index = new MutableIndex(table, "IDX");
@@ -47,7 +47,7 @@ public class TableEntityModelInferrerTest {
     table.addIndex(index);
 
     final TableEntityModelInferrer modelWithIndex = new TableEntityModelInferrer(table);
-    assertThat(modelWithIndex.foreignKeyCoveredByIndex(fk), is(OptionalBoolean.true_value));
+    assertThat(modelWithIndex.isForeignKeyCoveredByIndex(fk), is(OptionalBoolean.true_value));
   }
 
   @Test
@@ -69,7 +69,7 @@ public class TableEntityModelInferrerTest {
     final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
 
     // No index yet
-    assertThat(model.foreignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
+    assertThat(model.isForeignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
 
     // Add non-unique index
     final MutableIndex index = new MutableIndex(table, "IDX");
@@ -78,13 +78,14 @@ public class TableEntityModelInferrerTest {
     table.addIndex(index);
 
     final TableEntityModelInferrer modelWithIndex = new TableEntityModelInferrer(table);
-    assertThat(modelWithIndex.foreignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
+    assertThat(
+        modelWithIndex.isForeignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
 
     // Add unique index
     index.setUnique(true);
     final TableEntityModelInferrer modelWithUniqueIndex = new TableEntityModelInferrer(table);
     assertThat(
-        modelWithUniqueIndex.foreignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.true_value));
+        modelWithUniqueIndex.isForeignKeyCoveredByUniqueIndex(fk), is(OptionalBoolean.true_value));
 
     // Test PK as unique index
     final MutableTable tableWithPk = new MutableTable(schema, "TABLE_PK");
@@ -99,7 +100,7 @@ public class TableEntityModelInferrerTest {
     tableWithPk.addForeignKey(fkPk);
 
     final TableEntityModelInferrer modelWithPk = new TableEntityModelInferrer(tableWithPk);
-    assertThat(modelWithPk.foreignKeyCoveredByUniqueIndex(fkPk), is(OptionalBoolean.true_value));
+    assertThat(modelWithPk.isForeignKeyCoveredByUniqueIndex(fkPk), is(OptionalBoolean.true_value));
   }
 
   @Test

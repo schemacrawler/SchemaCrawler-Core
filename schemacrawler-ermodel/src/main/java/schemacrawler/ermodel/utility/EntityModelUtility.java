@@ -39,7 +39,7 @@ public class EntityModelUtility {
     }
 
     final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
-    final OptionalBoolean coveredByIndex = tableEntityModel.foreignKeyCoveredByIndex(fk);
+    final OptionalBoolean coveredByIndex = tableEntityModel.isForeignKeyCoveredByIndex(fk);
     return coveredByIndex;
   }
 
@@ -60,7 +60,7 @@ public class EntityModelUtility {
     }
 
     final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
-    final OptionalBoolean coveredByIndex = tableEntityModel.foreignKeyCoveredByUniqueIndex(fk);
+    final OptionalBoolean coveredByIndex = tableEntityModel.isForeignKeyCoveredByUniqueIndex(fk);
     return coveredByIndex;
   }
 
