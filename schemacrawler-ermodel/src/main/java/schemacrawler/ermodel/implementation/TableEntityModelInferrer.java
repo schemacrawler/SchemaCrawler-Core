@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.ForeignKeyCardinality;
 import schemacrawler.schema.Column;
@@ -309,8 +308,9 @@ public final class TableEntityModelInferrer {
     return importedColumnsMap.computeIfAbsent(
         fk.key(),
         k ->
-            fk.getColumnReferences().stream()
-                .map(ColumnReference::getForeignKeyColumn)
-                .collect(Collectors.toUnmodifiableSet()));
+            Set.copyOf(
+                fk.getColumnReferences().stream()
+                    .map(ColumnReference::getForeignKeyColumn)
+                    .toList()));
   }
 }
