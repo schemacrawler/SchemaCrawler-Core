@@ -9,19 +9,13 @@
 package schemacrawler.tools.databaseconnector;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.tools.executable.commandline.PluginCommand.newDatabasePluginCommand;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
-import schemacrawler.schemacrawler.Options;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.ConfigurationException;
@@ -31,56 +25,20 @@ import us.fatehi.utility.datasource.DatabaseConnectionSourceBuilder;
 import us.fatehi.utility.datasource.DatabaseServerType;
 import us.fatehi.utility.datasource.UserCredentials;
 
-public abstract class DatabaseConnector implements Options {
+public abstract class DatabaseConnector {
 
-  private final DatabaseServerType dbServerType;
-  private final Predicate<String> supportsUrl;
-  private final BiConsumer<InformationSchemaViewsBuilder, Connection>
-      informationSchemaViewsBuildProcess;
-  private final BiConsumer<SchemaRetrievalOptionsBuilder, Connection>
-      schemaRetrievalOptionsBuildProcess;
-  private final Consumer<LimitOptionsBuilder> limitOptionsBuildProcess;
-  private final Supplier<DatabaseConnectionSourceBuilder> dbConnectionSourceBuildProcess;
+  private final DatabaseConnectorOptions options;
 
-  protected DatabaseConnector(
-      final DatabaseServerType dbServerType,
-      final Predicate<String> supportsUrl,
-      final BiConsumer<InformationSchemaViewsBuilder, Connection>
-          informationSchemaViewsBuildProcess,
-      final BiConsumer<SchemaRetrievalOptionsBuilder, Connection>
-          schemaRetrievalOptionsBuildProcess,
-      final Consumer<LimitOptionsBuilder> limitOptionsBuildProcess,
-      final Supplier<DatabaseConnectionSourceBuilder> connectionSourceBuildProcess) {
-    this.dbServerType = requireNonNull(dbServerType, "No database server type provided");
-
-    this.supportsUrl = requireNonNull(supportsUrl, "No predicate for URL support provided");
-
-    this.informationSchemaViewsBuildProcess =
-        requireNonNull(
-            informationSchemaViewsBuildProcess,
-            "No information schema views build process provided");
-
-    this.schemaRetrievalOptionsBuildProcess =
-        requireNonNull(
-            schemaRetrievalOptionsBuildProcess,
-            "No schema retrieval options build process provided");
-
-    this.limitOptionsBuildProcess =
-        requireNonNull(limitOptionsBuildProcess, "No limit options build process provided");
-
-    dbConnectionSourceBuildProcess =
-        requireNonNull(
-            connectionSourceBuildProcess, "No database connection source builder provided");
+  protected DatabaseConnector(final DatabaseConnectorOptions options) {
+    this.options = requireNonNull(options, "No database connector options provided");
   }
 
   public final DatabaseServerType getDatabaseServerType() {
-    return dbServerType;
+    return options.dbServerType();
   }
 
-  public PluginCommand getHelpCommand() {
-
-    final PluginCommand pluginCommand = newDatabasePluginCommand(dbServerType);
-    return pluginCommand;
+  public final PluginCommand getHelpCommand() {
+    return options.helpCommand();
   }
 
   /**
@@ -93,20 +51,20 @@ public abstract class DatabaseConnector implements Options {
       final Connection connection) {
 
     final DatabaseConnectionSourceBuilder dbConnectionSourceBuilder =
-        dbConnectionSourceBuildProcess.get();
+        options.dbConnectionSourceBuildProcess().get();
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
-            .withFunction(informationSchemaViewsBuildProcess, connection)
+            .withFunction(options.informationSchemaViewsBuildProcess(), connection)
             .toOptions();
     final SchemaRetrievalOptionsBuilder schemaRetrievalOptionsBuilder =
         SchemaRetrievalOptionsBuilder.builder()
-            .withDatabaseServerType(dbServerType)
+            .withDatabaseServerType(options.dbServerType())
             .withInformationSchemaViews(informationSchemaViews)
             .withConnectionInitializer(dbConnectionSourceBuilder.getConnectionInitializer())
             .fromConnnection(connection);
 
     // Allow database plugins to intercept and do further customization
-    schemaRetrievalOptionsBuildProcess.accept(schemaRetrievalOptionsBuilder, connection);
+    options.schemaRetrievalOptionsBuildProcess().accept(schemaRetrievalOptionsBuilder, connection);
 
     return schemaRetrievalOptionsBuilder;
   }
@@ -118,7 +76,7 @@ public abstract class DatabaseConnector implements Options {
    * @param userCredentials Username and password
    * @return Database connection source
    */
-  public DatabaseConnectionSource newDatabaseConnectionSource(
+  public final DatabaseConnectionSource newDatabaseConnectionSource(
       final DatabaseConnectionOptions connectionOptions, final UserCredentials userCredentials) {
     requireNonNull(connectionOptions, "No database connection options provided");
 
@@ -154,31 +112,31 @@ public abstract class DatabaseConnector implements Options {
     return databaseConnectionSource;
   }
 
-  public final SchemaCrawlerOptions setSchemaCrawlerOptionsDefaults(
-      final SchemaCrawlerOptions schemaCrawlerOptions) {
-    final LimitOptionsBuilder limitOptionsBuilder =
-        LimitOptionsBuilder.builder().fromOptions(schemaCrawlerOptions.limitOptions());
-    limitOptionsBuildProcess.accept(limitOptionsBuilder);
-
-    return schemaCrawlerOptions.withLimitOptions(limitOptionsBuilder.toOptions());
-  }
-
   public final boolean supportsUrl(final String url) {
     if (isBlank(url)) {
       return false;
     }
-    return supportsUrl.test(url);
+    return options.supportsUrl().test(url);
   }
 
   @Override
-  public String toString() {
-    if (dbServerType.isUnknownDatabaseSystem()) {
+  public final String toString() {
+    if (options.dbServerType().isUnknownDatabaseSystem()) {
       return "Database connector for unknown database system type";
     }
-    return "Database connector for " + dbServerType;
+    return "Database connector for " + options.dbServerType();
+  }
+
+  public final SchemaCrawlerOptions withSchemaCrawlerOptionsDefaults(
+      final SchemaCrawlerOptions schemaCrawlerOptions) {
+    final LimitOptionsBuilder limitOptionsBuilder =
+        LimitOptionsBuilder.builder().fromOptions(schemaCrawlerOptions.limitOptions());
+    options.limitOptionsBuildProcess().accept(limitOptionsBuilder);
+
+    return schemaCrawlerOptions.withLimitOptions(limitOptionsBuilder.toOptions());
   }
 
   protected DatabaseConnectionSourceBuilder databaseConnectionSourceBuilder() {
-    return dbConnectionSourceBuildProcess.get();
+    return options.dbConnectionSourceBuildProcess().get();
   }
 }

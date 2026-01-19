@@ -119,10 +119,10 @@ public class DatabaseConnectionSourceBuilderTest {
   public void urlx() throws SQLException {
 
     final Map<String, String> defaultMap = new HashMap<>();
-    defaultMap.put("key", "default-value");
+    defaultMap.put("publishedJdbcDriverProperty", "default-value");
 
     final Map<String, String> map = new HashMap<>();
-    map.put("key", "value");
+    map.put("publishedJdbcDriverProperty", "value");
 
     final DatabaseConnectionSourceBuilder builder =
         DatabaseConnectionSourceBuilder.builder("jdbc:test-db:${host}:${port}/${database}");
@@ -135,7 +135,8 @@ public class DatabaseConnectionSourceBuilderTest {
     builder.withUrlx(map);
     assertThat(builder.toUrlx(), is(map));
     final TestConnection connection = builder.build().get().unwrap(TestConnection.class);
-    assertThat(connection.getConnectionProperties(), hasEntry("key", "value"));
+    assertThat(
+        connection.getConnectionProperties(), hasEntry("publishedJdbcDriverProperty", "value"));
 
     builder.withUrlx(null);
     assertThat(builder.toUrlx(), is(defaultMap));

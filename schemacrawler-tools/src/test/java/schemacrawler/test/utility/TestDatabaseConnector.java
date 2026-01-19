@@ -8,7 +8,10 @@
 
 package schemacrawler.test.utility;
 
+import java.util.Set;
 import schemacrawler.tools.databaseconnector.DatabaseConnector;
+import schemacrawler.tools.databaseconnector.DatabaseConnectorOptions;
+import schemacrawler.tools.databaseconnector.DatabaseConnectorOptionsBuilder;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import us.fatehi.utility.datasource.DatabaseConnectionSourceBuilder;
 import us.fatehi.utility.datasource.DatabaseServerType;
@@ -22,26 +25,32 @@ import us.fatehi.utility.datasource.DatabaseServerType;
  */
 public final class TestDatabaseConnector extends DatabaseConnector {
 
-  public TestDatabaseConnector() throws Exception {
-    super(
-        new DatabaseServerType("test-db", "Test Database"),
-        url -> url != null && url.startsWith("jdbc:test-db:"),
-        (informationSchemaViewsBuilder, connection) ->
-            informationSchemaViewsBuilder.fromResourceFolder("/test-db.information_schema"),
-        (schemaRetrievalOptionsBuilder, connection) -> {},
-        limitOptionsBuilder -> {},
-        () -> DatabaseConnectionSourceBuilder.builder("jdbc:test-db:${database}"));
-    forceInstantiationFailureIfConfigured();
-  }
+  private static DatabaseConnectorOptions databaseConnectorOptions() {
+    final DatabaseServerType dbServerType = new DatabaseServerType("test-db", "Test Database");
 
-  @Override
-  public PluginCommand getHelpCommand() {
-    final PluginCommand pluginCommand = super.getHelpCommand();
+    final DatabaseConnectionSourceBuilder connectionSourceBuilder =
+        DatabaseConnectionSourceBuilder.builder("jdbc:test-db:${database}")
+            .withAdditionalDriverProperties(Set.of("unpublishedJdbcDriverProperty"));
+
+    final PluginCommand pluginCommand = PluginCommand.newDatabasePluginCommand(dbServerType);
     pluginCommand.addOption(
         "server",
         String.class,
         "--server=test-db%n" + "Loads SchemaCrawler plug-in for Test Database");
-    return pluginCommand;
+
+    return DatabaseConnectorOptionsBuilder.builder(dbServerType)
+        .withHelpCommand(pluginCommand)
+        .withUrlSupportPredicate(url -> url != null && url.startsWith("jdbc:test-db:"))
+        .withInformationSchemaViewsBuilder(
+            (informationSchemaViewsBuilder, connection) ->
+                informationSchemaViewsBuilder.fromResourceFolder("/test-db.information_schema"))
+        .withDatabaseConnectionSourceBuilder(() -> connectionSourceBuilder)
+        .build();
+  }
+
+  public TestDatabaseConnector() throws Exception {
+    super(databaseConnectorOptions());
+    forceInstantiationFailureIfConfigured();
   }
 
   private void forceInstantiationFailureIfConfigured() {

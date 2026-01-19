@@ -8,21 +8,18 @@
 
 package schemacrawler.tools.databaseconnector;
 
-import us.fatehi.utility.datasource.DatabaseConnectionSourceBuilder;
 import us.fatehi.utility.datasource.DatabaseServerType;
 
 public final class UnknownDatabaseConnector extends DatabaseConnector {
 
   public static final DatabaseConnector UNKNOWN = new UnknownDatabaseConnector();
 
+  private static DatabaseConnectorOptions databaseConnectorOptions() {
+    return DatabaseConnectorOptionsBuilder.builder(DatabaseServerType.UNKNOWN).build();
+  }
+
   /** Constructor for unknown databases. Bypass the null-checks of the main constructor */
   private UnknownDatabaseConnector() {
-    super(
-        DatabaseServerType.UNKNOWN,
-        url -> false,
-        (informationSchemaViewsBuilder, connection) -> {},
-        (schemaRetrievalOptionsBuilder, connection) -> {},
-        limitOptionsBuilder -> {},
-        () -> DatabaseConnectionSourceBuilder.builder(""));
+    super(databaseConnectorOptions());
   }
 }

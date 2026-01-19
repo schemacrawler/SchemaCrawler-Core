@@ -9,16 +9,18 @@
 package us.fatehi.utility.datasource;
 
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,24 +34,19 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
 
   protected static Properties createConnectionProperties(
       final String connectionUrl,
+      final Set<String> additionalDriverProperties,
       final Map<String, String> connectionProperties,
       final String user,
       final String password) {
+
     final List<String> skipProperties =
         List.of("server", "host", "port", "database", "urlx", "user", "password", "url");
     final Properties jdbcConnectionProperties;
     try {
       final Driver jdbcDriver = getJdbcDriver(connectionUrl);
-      final DriverPropertyInfo[] propertyInfo =
-          jdbcDriver.getPropertyInfo(connectionUrl, new Properties());
-      final Map<String, Boolean> jdbcDriverProperties = new HashMap<>();
-      for (final DriverPropertyInfo driverPropertyInfo : propertyInfo) {
-        final String jdbcPropertyName = driverPropertyInfo.name.toLowerCase();
-        if (skipProperties.contains(jdbcPropertyName)) {
-          continue;
-        }
-        jdbcDriverProperties.put(jdbcPropertyName, driverPropertyInfo.required);
-      }
+      final Set<String> jdbcDriverProperties =
+          getJdbcDriverProperties(
+              jdbcDriver, connectionUrl, additionalDriverProperties, skipProperties);
 
       jdbcConnectionProperties = new Properties();
       if (user != null) {
@@ -58,12 +55,24 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
       if (password != null) {
         jdbcConnectionProperties.setProperty("password", password);
       }
+
       if (connectionProperties != null) {
+        // For security, user and password need to come from the credentials
+        connectionProperties.remove("user");
+        connectionProperties.remove("password");
+
         for (final Map.Entry<String, String> connectionProperty : connectionProperties.entrySet()) {
           final String property = connectionProperty.getKey();
           final String value = connectionProperty.getValue();
-          if (jdbcDriverProperties.containsKey(property.toLowerCase()) && value != null) {
+          if (jdbcDriverProperties.contains(property.toLowerCase()) && value != null) {
             jdbcConnectionProperties.setProperty(property, value);
+          } else {
+            // No security issues, since user and password have been removed from connection
+            // properties
+            LOGGER.log(
+                Level.CONFIG,
+                new StringFormat(
+                    "Skipping database connection property, <%s>=<%s>", property, value));
           }
         }
       }
@@ -118,6 +127,31 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
               .formatted(connectionUrl),
           e);
     }
+  }
+
+  private static Set<String> getJdbcDriverProperties(
+      final Driver jdbcDriver,
+      final String connectionUrl,
+      final Set<String> additionalDriverProperties,
+      final List<String> skipProperties)
+      throws SQLException {
+    final DriverPropertyInfo[] propertyInfo =
+        jdbcDriver.getPropertyInfo(connectionUrl, new Properties());
+    final Set<String> jdbcDriverProperties = new HashSet<>();
+    for (final DriverPropertyInfo driverPropertyInfo : propertyInfo) {
+      final String jdbcPropertyName = driverPropertyInfo.name;
+      if (skipProperties != null && skipProperties.contains(jdbcPropertyName)) {
+        continue;
+      }
+      jdbcDriverProperties.add(jdbcPropertyName.toLowerCase());
+    }
+    if (additionalDriverProperties != null) {
+      additionalDriverProperties.stream()
+          .filter(property -> !isBlank(property))
+          .map(property -> property.toLowerCase())
+          .forEach(jdbcDriverProperties::add);
+    }
+    return jdbcDriverProperties;
   }
 
   private static Properties safeProperties(final Properties properties) {

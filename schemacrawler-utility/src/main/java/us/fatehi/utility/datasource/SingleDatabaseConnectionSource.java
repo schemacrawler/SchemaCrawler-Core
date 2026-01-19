@@ -14,6 +14,7 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +29,7 @@ final class SingleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
 
   SingleDatabaseConnectionSource(
       final String connectionUrl,
+      final Set<String> additionalDriverProperties,
       final Map<String, String> connectionProperties,
       final UserCredentials userCredentials,
       final Consumer<Connection> connectionInitializer) {
@@ -38,7 +40,8 @@ final class SingleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
     final String user = userCredentials.user();
     final String password = userCredentials.password();
     final Properties jdbcConnectionProperties =
-        createConnectionProperties(connectionUrl, connectionProperties, user, password);
+        createConnectionProperties(
+            connectionUrl, additionalDriverProperties, connectionProperties, user, password);
     connection = getConnection(connectionUrl, jdbcConnectionProperties);
   }
 
