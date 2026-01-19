@@ -15,7 +15,7 @@ import schemacrawler.schema.Table;
 
 public interface ERModel {
 
-  Collection<Relationship> getRelationships();
+  <R extends Relationship> Collection<R> getRelationships();
 
   <E extends Entity> Collection<E> getStrongEntities();
 
@@ -26,6 +26,10 @@ public interface ERModel {
   <T extends Table> Collection<T> getTables();
 
   <E extends Entity> Collection<E> getWeakEntities();
+
+  <R extends Relationship> Optional<R> lookupByBridgeTable(Schema schema, String tableName);
+
+  <R extends Relationship> Optional<R> lookupByBridgeTable(Table table);
 
   <E extends Entity> Optional<E> lookupEntity(Schema schema, String tableName);
 

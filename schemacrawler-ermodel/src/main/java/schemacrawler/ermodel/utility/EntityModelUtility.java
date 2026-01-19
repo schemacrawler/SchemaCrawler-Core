@@ -10,7 +10,7 @@ package schemacrawler.ermodel.utility;
 
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
-import schemacrawler.ermodel.build.TableEntityModelInferrer;
+import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.ForeignKeyCardinality;
 import schemacrawler.schema.Table;

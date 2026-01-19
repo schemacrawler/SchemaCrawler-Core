@@ -9,17 +9,10 @@
 package schemacrawler.ermodel.model;
 
 import java.util.Collection;
-import schemacrawler.schema.AttributedObject;
-import schemacrawler.schema.DescribedObject;
-import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.Table;
 import schemacrawler.schema.TypedObject;
 
 /** Conceptual entity backed by a SchemaCrawler table. */
-public interface Entity
-    extends NamedObject, AttributedObject, DescribedObject, TypedObject<EntityType> {
-
-  Table getTable();
+public interface Entity extends TableBacked, TypedObject<EntityType> {
 
   Collection<Relationship> getOutgoingRelationships();
 }

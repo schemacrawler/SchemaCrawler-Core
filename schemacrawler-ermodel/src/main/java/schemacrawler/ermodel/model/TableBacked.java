@@ -8,16 +8,16 @@
 
 package schemacrawler.ermodel.model;
 
+import java.util.Collection;
 import schemacrawler.schema.AttributedObject;
+import schemacrawler.schema.Column;
 import schemacrawler.schema.DescribedObject;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.TypedObject;
+import schemacrawler.schema.Table;
 
-/** Base relationship abstraction. */
-public interface Relationship
-    extends NamedObject, AttributedObject, DescribedObject, TypedObject<RelationshipCardinality> {
+public interface TableBacked extends NamedObject, AttributedObject, DescribedObject {
 
-  Entity getLeftEntity();
+  Collection<Column> getAttributeColumns();
 
-  Entity getRightEntity();
+  Table getTable();
 }

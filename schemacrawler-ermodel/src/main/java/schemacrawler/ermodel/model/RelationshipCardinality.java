@@ -23,6 +23,19 @@ public enum RelationshipCardinality {
   one_many("(1..many)"),
   many_many("(many..many)");
 
+  public static RelationshipCardinality from(final ForeignKeyCardinality fkCardinality) {
+    if (fkCardinality == null) {
+      return unknown;
+    }
+    return switch (fkCardinality) {
+      case one_one -> one_one;
+      case one_many -> one_many;
+      case zero_one -> zero_one;
+      case zero_many -> zero_many;
+      default -> unknown;
+    };
+  }
+
   private final String description;
 
   RelationshipCardinality(final String description) {

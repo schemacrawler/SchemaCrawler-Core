@@ -37,7 +37,7 @@ public enum EntityType {
 
   private final String description;
 
-  private EntityType(String description) {
+  EntityType(final String description) {
     this.description = description;
   }
 

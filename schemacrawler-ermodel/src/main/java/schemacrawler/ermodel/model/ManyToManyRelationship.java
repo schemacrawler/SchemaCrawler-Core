@@ -11,7 +11,9 @@ package schemacrawler.ermodel.model;
 import schemacrawler.schema.Table;
 
 /** Conceptual many-to-many pattern: A <-> B via bridge table. */
-public interface ManyToManyRelationship extends Relationship {
+public interface ManyToManyRelationship extends TableBacked, Relationship {
 
-  Table getBridgeTable();
+  default Table getBridgeTable() {
+    return getTable();
+  }
 }
