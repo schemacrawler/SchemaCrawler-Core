@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.ermodel.implementation;
+package schemacrawler.ermodel.build;
 
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
