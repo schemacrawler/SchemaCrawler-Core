@@ -87,9 +87,19 @@ public class DatabaseConnectorTest {
   }
 
   @Test
+  @DisplayName("DatabaseConnector with additional properties")
+  public void urlxAdditional() throws Exception {
+    // See schemacrawler.test.utility.TestDatabaseConnector
+    urlxTest(
+        Map.of("unpublishedJdbcDriverProperty", "value", "publishedJdbcDriverProperty", "value"),
+        false);
+  }
+
+  @Test
   @DisplayName("DatabaseConnector with known properties")
   public void urlxKnown() throws Exception {
-    urlxTest(Map.of("key", "value"), false);
+    // See us.fatehi.test.utility.TestDatabaseDriver
+    urlxTest(Map.of("publishedJdbcDriverProperty", "value"), false);
   }
 
   @Test
@@ -101,7 +111,7 @@ public class DatabaseConnectorTest {
   @Test
   @DisplayName("DatabaseConnector with unknown properties")
   public void urlxUnknown() throws Exception {
-    urlxTest(Map.of("unknown-key", "value"), true);
+    urlxTest(Map.of("unknownJdbcDriverProperty", "value"), true);
   }
 
   private void urlxTest(final Map<String, String> connectionProperties, final boolean returnsEmpty)

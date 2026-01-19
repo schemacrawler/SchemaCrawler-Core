@@ -8,6 +8,7 @@
 
 package schemacrawler.test.utility;
 
+import java.util.Set;
 import schemacrawler.tools.databaseconnector.DatabaseConnector;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorOptions;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorOptionsBuilder;
@@ -26,13 +27,17 @@ public final class TestDatabaseConnector extends DatabaseConnector {
 
   private static DatabaseConnectorOptions databaseConnectorOptions() {
     final DatabaseServerType dbServerType = new DatabaseServerType("test-db", "Test Database");
+
+    final DatabaseConnectionSourceBuilder connectionSourceBuilder =
+        DatabaseConnectionSourceBuilder.builder("jdbc:test-db:${database}")
+            .withAdditionalDriverProperties(Set.of("unpublishedJdbcDriverProperty"));
+
     return DatabaseConnectorOptionsBuilder.builder(dbServerType)
         .withSupportsUrlPredicate(url -> url != null && url.startsWith("jdbc:test-db:"))
         .withInformationSchemaViewsBuilder(
             (informationSchemaViewsBuilder, connection) ->
                 informationSchemaViewsBuilder.fromResourceFolder("/test-db.information_schema"))
-        .withDatabaseConnectionSourceBuild(
-            () -> DatabaseConnectionSourceBuilder.builder("jdbc:test-db:${database}"))
+        .withDatabaseConnectionSourceBuilder(() -> connectionSourceBuilder)
         .build();
   }
 

@@ -9,6 +9,7 @@
 package us.fatehi.utility.datasource;
 
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -125,14 +126,17 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
         jdbcDriver.getPropertyInfo(connectionUrl, new Properties());
     final Set<String> jdbcDriverProperties = new HashSet<>();
     for (final DriverPropertyInfo driverPropertyInfo : propertyInfo) {
-      final String jdbcPropertyName = driverPropertyInfo.name.toLowerCase();
-      if (skipProperties.contains(jdbcPropertyName)) {
+      final String jdbcPropertyName = driverPropertyInfo.name;
+      if (skipProperties != null && skipProperties.contains(jdbcPropertyName)) {
         continue;
       }
-      jdbcDriverProperties.add(jdbcPropertyName);
+      jdbcDriverProperties.add(jdbcPropertyName.toLowerCase());
     }
     if (additionalDriverProperties != null) {
-      jdbcDriverProperties.addAll(additionalDriverProperties);
+      additionalDriverProperties.stream()
+          .filter(property -> !isBlank(property))
+          .map(property -> property.toLowerCase())
+          .forEach(jdbcDriverProperties::add);
     }
     return jdbcDriverProperties;
   }

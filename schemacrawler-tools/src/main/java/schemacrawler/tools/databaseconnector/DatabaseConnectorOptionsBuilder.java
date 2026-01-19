@@ -85,7 +85,7 @@ public class DatabaseConnectorOptionsBuilder
         helpCommand);
   }
 
-  public DatabaseConnectorOptionsBuilder withDatabaseConnectionSourceBuild(
+  public DatabaseConnectorOptionsBuilder withDatabaseConnectionSourceBuilder(
       final Supplier<DatabaseConnectionSourceBuilder> process) {
     if (process != null) {
       dbConnectionSourceBuildProcess = process;

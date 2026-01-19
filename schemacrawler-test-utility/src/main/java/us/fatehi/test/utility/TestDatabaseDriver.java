@@ -99,7 +99,7 @@ public class TestDatabaseDriver implements Driver {
   @Override
   public DriverPropertyInfo[] getPropertyInfo(final String url, final java.util.Properties info)
       throws SQLException {
-    return new DriverPropertyInfo[] {new DriverPropertyInfo("key", "")};
+    return new DriverPropertyInfo[] {new DriverPropertyInfo("publishedJdbcDriverProperty", "")};
   }
 
   @Override
