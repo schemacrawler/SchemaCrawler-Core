@@ -38,6 +38,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
       final Map<String, String> connectionProperties,
       final String user,
       final String password) {
+
     final List<String> skipProperties =
         List.of("server", "host", "port", "database", "urlx", "user", "password", "url");
     final Properties jdbcConnectionProperties;
@@ -54,12 +55,24 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
       if (password != null) {
         jdbcConnectionProperties.setProperty("password", password);
       }
+
       if (connectionProperties != null) {
+        // For security, user and password need to come from the credentials
+        connectionProperties.remove("user");
+        connectionProperties.remove("password");
+
         for (final Map.Entry<String, String> connectionProperty : connectionProperties.entrySet()) {
           final String property = connectionProperty.getKey();
           final String value = connectionProperty.getValue();
           if (jdbcDriverProperties.contains(property.toLowerCase()) && value != null) {
             jdbcConnectionProperties.setProperty(property, value);
+          } else {
+            // No security issues, since user and password have been removed from connection
+            // properties
+            LOGGER.log(
+                Level.CONFIG,
+                new StringFormat(
+                    "Skipping database connection property, <%s>=<%s>", property, value));
           }
         }
       }
