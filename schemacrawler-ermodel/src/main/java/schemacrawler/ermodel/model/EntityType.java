@@ -16,7 +16,7 @@ public enum EntityType {
    */
   unknown("unknown"),
   /** Tables without a primary key. */
-  non_entity("unknown"),
+  non_entity("not an entity"),
   /**
    * Subtype tables inherit their entire primary key from a single supertype table. The primary key
    * of the subtype table exactly matches the child columns of a foreign key to the supertype table.

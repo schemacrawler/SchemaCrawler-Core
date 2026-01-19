@@ -14,24 +14,23 @@ import schemacrawler.schema.Table;
 
 public interface ERModel {
 
-  <E extends Entity> Collection<E> getEntities();
+  Collection<Entity> getEntities();
 
-  <E extends Entity> Collection<E> getEntitiesByType(EntityType entityType);
+  Collection<Entity> getEntitiesByType(EntityType entityType);
 
-  <R extends Relationship> Collection<R> getRelationships();
+  Collection<Relationship> getRelationships();
 
-  <R extends Relationship> Collection<R> getRelationshipsByType(
-      RelationshipCardinality cardinality);
+  Collection<Relationship> getRelationshipsByType(RelationshipCardinality cardinality);
 
-  <E extends EntitySubtype> Collection<E> getSubtypesOf(Entity supertype);
+  Collection<EntitySubtype> getSubtypesOf(Entity supertype);
 
-  <T extends Table> Collection<T> getTables();
+  Collection<Table> getTables();
 
-  <R extends Relationship> Optional<R> lookupByBridgeTable(Table table);
+  Optional<Relationship> lookupByBridgeTable(Table table);
 
-  <R extends Relationship> Optional<R> lookupByBridgeTableName(String tableName);
+  Optional<Relationship> lookupByBridgeTableName(String tableName);
 
-  <E extends Entity> Optional<E> lookupEntity(String entityName);
+  Optional<Entity> lookupEntity(String entityName);
 
-  <E extends Entity> Optional<E> lookupEntity(Table table);
+  Optional<Entity> lookupEntity(Table table);
 }

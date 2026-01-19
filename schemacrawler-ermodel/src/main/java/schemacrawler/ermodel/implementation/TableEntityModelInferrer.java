@@ -258,14 +258,13 @@ public final class TableEntityModelInferrer {
   /** Builds a lookup of all known index column combinations for this table. */
   private void buildIndexesLookup() {
     if (table.hasPrimaryKey()) {
-      final HashSet<Column> pkColumns =
-          new HashSet<>(table.getPrimaryKey().getConstrainedColumns());
+      final Set<Column> pkColumns = Set.copyOf(table.getPrimaryKey().getConstrainedColumns());
       uniqueIndexes.add(pkColumns);
       indexes.add(pkColumns);
     }
     if (table.hasIndexes()) {
       for (final Index index : table.getIndexes()) {
-        final Set<Column> indexColumns = new HashSet<>(index.getColumns());
+        final Set<Column> indexColumns = Set.copyOf(index.getColumns());
         indexes.add(indexColumns);
         if (index.isUnique()) {
           uniqueIndexes.add(indexColumns);
@@ -288,9 +287,8 @@ public final class TableEntityModelInferrer {
 
     for (final ForeignKey fk : importedForeignKeys) {
       final Set<Column> fkParentColumns =
-          fk.getColumnReferences().stream()
-              .map(ColumnReference::getPrimaryKeyColumn)
-              .collect(Collectors.toSet());
+          Set.copyOf(
+              fk.getColumnReferences().stream().map(ColumnReference::getPrimaryKeyColumn).toList());
       pkColumnsMap.put(fk.key(), fkParentColumns);
 
       findOrGetImportedKeys(fk);
@@ -298,7 +296,7 @@ public final class TableEntityModelInferrer {
       final Table parentTable = fk.getPrimaryKeyTable();
       if (!isPartial(parentTable) && parentTable.hasPrimaryKey()) {
         final Set<Column> parentPkColumns =
-            new HashSet<>(parentTable.getPrimaryKey().getConstrainedColumns());
+            Set.copyOf(parentTable.getPrimaryKey().getConstrainedColumns());
         parentPkColumnsMap.put(fk.key(), parentPkColumns);
       } else {
         parentPkColumnsMap.put(fk.key(), Collections.emptySet());
@@ -308,17 +306,11 @@ public final class TableEntityModelInferrer {
 
   private Set<Column> findOrGetImportedKeys(final TableReference fk) {
     requireNonNull(fk, "No foreign key provided");
-
-    final Set<Column> importedColumns;
-    if (importedColumnsMap.containsKey(fk.key())) {
-      importedColumns = importedColumnsMap.get(fk.key());
-    } else {
-      importedColumns =
-          fk.getColumnReferences().stream()
-              .map(ColumnReference::getForeignKeyColumn)
-              .collect(Collectors.toSet());
-      importedColumnsMap.put(fk.key(), importedColumns);
-    }
-    return importedColumns;
+    return importedColumnsMap.computeIfAbsent(
+        fk.key(),
+        k ->
+            fk.getColumnReferences().stream()
+                .map(ColumnReference::getForeignKeyColumn)
+                .collect(Collectors.toUnmodifiableSet()));
   }
 }

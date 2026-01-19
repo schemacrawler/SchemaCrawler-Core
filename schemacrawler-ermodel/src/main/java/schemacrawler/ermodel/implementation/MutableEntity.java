@@ -32,10 +32,11 @@ class MutableEntity extends AbstractTableBacked implements Entity {
     return entityType;
   }
 
+  private static final EnumSet<EntityType> VALID_ENTITY_TYPES =
+      EnumSet.of(EntityType.strong_entity, EntityType.weak_entity, EntityType.subtype);
+
   void setEntityType(final EntityType entityType) {
-    if (entityType == null
-        || !EnumSet.of(EntityType.strong_entity, EntityType.weak_entity, EntityType.subtype)
-            .contains(entityType)) {
+    if (entityType == null || !VALID_ENTITY_TYPES.contains(entityType)) {
       throw new ConfigurationException("Not a valid entity type <%s>".formatted(entityType));
     }
     this.entityType = entityType;

@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntitySubtype;
@@ -46,9 +45,10 @@ public class MutableERModel implements ERModel {
     if (entityType == null) {
       return Collections.emptySet();
     }
-    return entitiesMap.values().stream()
-        .filter(entity -> entity.getType().equals(entityType))
-        .collect(Collectors.toSet());
+    return Set.copyOf(
+        entitiesMap.values().stream()
+            .filter(entity -> entity.getType().equals(entityType))
+            .toList());
   }
 
   @Override
@@ -62,9 +62,10 @@ public class MutableERModel implements ERModel {
     if (cardinality == null) {
       return Collections.emptySet();
     }
-    return relationshipsMap.values().stream()
-        .filter(relationship -> relationship.getType().equals(cardinality))
-        .collect(Collectors.toSet());
+    return Set.copyOf(
+        relationshipsMap.values().stream()
+            .filter(relationship -> relationship.getType().equals(cardinality))
+            .toList());
   }
 
   @Override
@@ -72,9 +73,10 @@ public class MutableERModel implements ERModel {
     if (supertype == null) {
       return Collections.emptySet();
     }
-    return getSubtypes().stream()
-        .filter(subtype -> subtype.getSupertype().equals(supertype))
-        .collect(Collectors.toSet());
+    return Set.copyOf(
+        getSubtypes().stream()
+            .filter(subtype -> subtype.getSupertype().equals(supertype))
+            .toList());
   }
 
   @Override
@@ -138,6 +140,6 @@ public class MutableERModel implements ERModel {
     return entitiesMap.values().stream()
         .filter(entity -> EntityType.subtype.equals(entity.getType()))
         .map(entity -> (EntitySubtype) entity)
-        .collect(Collectors.toSet());
+        .toList();
   }
 }
