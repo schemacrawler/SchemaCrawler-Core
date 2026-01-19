@@ -57,7 +57,7 @@ public class DatabaseConnectorTest {
     final SchemaCrawlerOptions schemaCrawlerOptions =
         SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
     assertThat(
-        databaseConnector.setSchemaCrawlerOptionsDefaults(schemaCrawlerOptions),
+        databaseConnector.withSchemaCrawlerOptionsDefaults(schemaCrawlerOptions),
         is(not(nullValue())));
 
     assertThat(databaseConnector.supportsUrl("jdbc:test-db:somevalue"), is(true));

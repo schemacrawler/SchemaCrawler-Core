@@ -40,8 +40,8 @@ public final class TableEntityModelInferrer {
   private final Set<Set<Column>> indexes;
 
   private final Set<ForeignKey> importedForeignKeys;
-  private final Set<Column> tablePkColumns;
 
+  private final Set<Column> tablePkColumns;
   private final Map<NamedObjectKey, Set<Column>> importedColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> pkColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> parentPkColumnsMap;

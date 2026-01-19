@@ -9,6 +9,8 @@
 package schemacrawler.test.utility;
 
 import schemacrawler.tools.databaseconnector.DatabaseConnector;
+import schemacrawler.tools.databaseconnector.DatabaseConnectorOptions;
+import schemacrawler.tools.databaseconnector.DatabaseConnectorOptionsBuilder;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import us.fatehi.utility.datasource.DatabaseConnectionSourceBuilder;
 import us.fatehi.utility.datasource.DatabaseServerType;
@@ -22,15 +24,20 @@ import us.fatehi.utility.datasource.DatabaseServerType;
  */
 public final class TestDatabaseConnector extends DatabaseConnector {
 
+  private static DatabaseConnectorOptions databaseConnectorOptions() {
+    final DatabaseServerType dbServerType = new DatabaseServerType("test-db", "Test Database");
+    return DatabaseConnectorOptionsBuilder.builder(dbServerType)
+        .withSupportsUrlPredicate(url -> url != null && url.startsWith("jdbc:test-db:"))
+        .withInformationSchemaViewsBuilder(
+            (informationSchemaViewsBuilder, connection) ->
+                informationSchemaViewsBuilder.fromResourceFolder("/test-db.information_schema"))
+        .withDatabaseConnectionSourceBuild(
+            () -> DatabaseConnectionSourceBuilder.builder("jdbc:test-db:${database}"))
+        .build();
+  }
+
   public TestDatabaseConnector() throws Exception {
-    super(
-        new DatabaseServerType("test-db", "Test Database"),
-        url -> url != null && url.startsWith("jdbc:test-db:"),
-        (informationSchemaViewsBuilder, connection) ->
-            informationSchemaViewsBuilder.fromResourceFolder("/test-db.information_schema"),
-        (schemaRetrievalOptionsBuilder, connection) -> {},
-        limitOptionsBuilder -> {},
-        () -> DatabaseConnectionSourceBuilder.builder("jdbc:test-db:${database}"));
+    super(databaseConnectorOptions());
     forceInstantiationFailureIfConfigured();
   }
 
