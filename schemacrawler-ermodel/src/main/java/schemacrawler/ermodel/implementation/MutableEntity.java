@@ -9,11 +9,9 @@
 package schemacrawler.ermodel.implementation;
 
 import java.io.Serial;
-import java.util.Collection;
 import java.util.EnumSet;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityType;
-import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.exceptions.ConfigurationException;
 
@@ -27,11 +25,6 @@ class MutableEntity extends AbstractTableBacked implements Entity {
   public MutableEntity(final Table table) {
     super(table);
     entityType = EntityType.unknown;
-  }
-
-  @Override
-  public Collection<Relationship> getOutgoingRelationships() {
-    throw new UnsupportedOperationException("TODO: NOT IMPLEMENTED");
   }
 
   @Override

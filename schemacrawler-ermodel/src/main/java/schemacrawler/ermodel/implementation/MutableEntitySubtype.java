@@ -24,6 +24,6 @@ final class MutableEntitySubtype extends MutableEntity implements EntitySubtype 
 
   void setSupertype(final Entity supertype) {
     this.supertype = requireNonNull(supertype, "No syper-type provided");
-    // TODO: Add additional check for matching primary key columns
+    // No additional check for matching primary key columns
   }
 }

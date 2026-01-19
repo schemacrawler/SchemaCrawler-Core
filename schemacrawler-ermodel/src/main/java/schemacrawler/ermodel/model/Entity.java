@@ -8,11 +8,7 @@
 
 package schemacrawler.ermodel.model;
 
-import java.util.Collection;
 import schemacrawler.schema.TypedObject;
 
 /** Conceptual entity backed by a SchemaCrawler table. */
-public interface Entity extends TableBacked, TypedObject<EntityType> {
-
-  Collection<Relationship> getOutgoingRelationships();
-}
+public interface Entity extends TableBacked, TypedObject<EntityType> {}
