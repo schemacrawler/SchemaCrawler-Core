@@ -103,7 +103,19 @@ public class DatabaseConnectorOptionsBuilder
 
   public DatabaseConnectorOptionsBuilder withInformationSchemaViewsBuilder(
       final BiConsumer<InformationSchemaViewsBuilder, Connection> process) {
-    informationSchemaViewsBuildProcess = process;
+    if (process != null) {
+      informationSchemaViewsBuildProcess = process;
+    }
+    return this;
+  }
+
+  public DatabaseConnectorOptionsBuilder withInformationSchemaViewsFromResourceFolder(
+      final String resourceFolder) {
+    if (!isBlank(resourceFolder)) {
+      informationSchemaViewsBuildProcess =
+          (informationSchemaViewsBuilder, connection) ->
+              informationSchemaViewsBuilder.fromResourceFolder(resourceFolder);
+    }
     return this;
   }
 
@@ -123,17 +135,17 @@ public class DatabaseConnectorOptionsBuilder
     return this;
   }
 
-  public DatabaseConnectorOptionsBuilder withUrlSupportPredicate(
-      final Predicate<String> supportsUrl) {
-    if (supportsUrl != null) {
-      this.supportsUrl = supportsUrl;
+  public DatabaseConnectorOptionsBuilder withUrlStartsWith(final String urlStartsWith) {
+    if (!isBlank(urlStartsWith)) {
+      supportsUrl = url -> url != null && url.startsWith(urlStartsWith);
     }
     return this;
   }
 
-  public DatabaseConnectorOptionsBuilder withUrlStartsWith(final String urlStartsWith) {
-    if (!isBlank(urlStartsWith)) {
-      supportsUrl = url -> url != null && url.startsWith(urlStartsWith);
+  public DatabaseConnectorOptionsBuilder withUrlSupportPredicate(
+      final Predicate<String> supportsUrl) {
+    if (supportsUrl != null) {
+      this.supportsUrl = supportsUrl;
     }
     return this;
   }

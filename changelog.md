@@ -2,6 +2,12 @@
 
 SchemaCrawler Core release notes.
 
+<a name="v17.5.0"></a>
+## Release 17.5.0 - 2026-01-19
+- Re-organize database connector options into a builder to avoid too many arguments
+- Allow for connection properties that are not published by the JDBC driver - fixes #40
+
+
 <a name="v17.4.0"></a>
 ## Release 17.4.0 - 2026-01-16
 - Infer 1..1 and 1..many cardinalities - fixes [issue #2237](https://github.com/schemacrawler/SchemaCrawler/issues/2237)

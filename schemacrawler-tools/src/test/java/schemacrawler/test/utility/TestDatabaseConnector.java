@@ -41,9 +41,7 @@ public final class TestDatabaseConnector extends DatabaseConnector {
     return DatabaseConnectorOptionsBuilder.builder(dbServerType)
         .withHelpCommand(pluginCommand)
         .withUrlSupportPredicate(url -> url != null && url.startsWith("jdbc:test-db:"))
-        .withInformationSchemaViewsBuilder(
-            (informationSchemaViewsBuilder, connection) ->
-                informationSchemaViewsBuilder.fromResourceFolder("/test-db.information_schema"))
+        .withInformationSchemaViewsFromResourceFolder("/test-db.information_schema")
         .withDatabaseConnectionSourceBuilder(() -> connectionSourceBuilder)
         .build();
   }
