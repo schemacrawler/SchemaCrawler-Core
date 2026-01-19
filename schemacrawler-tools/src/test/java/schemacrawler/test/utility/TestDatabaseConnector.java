@@ -32,8 +32,15 @@ public final class TestDatabaseConnector extends DatabaseConnector {
         DatabaseConnectionSourceBuilder.builder("jdbc:test-db:${database}")
             .withAdditionalDriverProperties(Set.of("unpublishedJdbcDriverProperty"));
 
+    final PluginCommand pluginCommand = PluginCommand.newDatabasePluginCommand(dbServerType);
+    pluginCommand.addOption(
+        "server",
+        String.class,
+        "--server=test-db%n" + "Loads SchemaCrawler plug-in for Test Database");
+
     return DatabaseConnectorOptionsBuilder.builder(dbServerType)
-        .withSupportsUrlPredicate(url -> url != null && url.startsWith("jdbc:test-db:"))
+        .withHelpCommand(pluginCommand)
+        .withUrlSupportPredicate(url -> url != null && url.startsWith("jdbc:test-db:"))
         .withInformationSchemaViewsBuilder(
             (informationSchemaViewsBuilder, connection) ->
                 informationSchemaViewsBuilder.fromResourceFolder("/test-db.information_schema"))
@@ -44,16 +51,6 @@ public final class TestDatabaseConnector extends DatabaseConnector {
   public TestDatabaseConnector() throws Exception {
     super(databaseConnectorOptions());
     forceInstantiationFailureIfConfigured();
-  }
-
-  @Override
-  public PluginCommand getHelpCommand() {
-    final PluginCommand pluginCommand = super.getHelpCommand();
-    pluginCommand.addOption(
-        "server",
-        String.class,
-        "--server=test-db%n" + "Loads SchemaCrawler plug-in for Test Database");
-    return pluginCommand;
   }
 
   private void forceInstantiationFailureIfConfigured() {

@@ -10,6 +10,7 @@ package schemacrawler.tools.databaseconnector;
 
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.tools.executable.commandline.PluginCommand.newDatabasePluginCommand;
+import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.util.function.BiConsumer;
@@ -122,10 +123,17 @@ public class DatabaseConnectorOptionsBuilder
     return this;
   }
 
-  public DatabaseConnectorOptionsBuilder withSupportsUrlPredicate(
+  public DatabaseConnectorOptionsBuilder withUrlSupportPredicate(
       final Predicate<String> supportsUrl) {
     if (supportsUrl != null) {
       this.supportsUrl = supportsUrl;
+    }
+    return this;
+  }
+
+  public DatabaseConnectorOptionsBuilder withUrlStartsWith(final String urlStartsWith) {
+    if (!isBlank(urlStartsWith)) {
+      supportsUrl = url -> url != null && url.startsWith(urlStartsWith);
     }
     return this;
   }

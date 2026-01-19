@@ -37,7 +37,7 @@ public abstract class DatabaseConnector {
     return options.dbServerType();
   }
 
-  public PluginCommand getHelpCommand() {
+  public final PluginCommand getHelpCommand() {
     return options.helpCommand();
   }
 
@@ -76,7 +76,7 @@ public abstract class DatabaseConnector {
    * @param userCredentials Username and password
    * @return Database connection source
    */
-  public DatabaseConnectionSource newDatabaseConnectionSource(
+  public final DatabaseConnectionSource newDatabaseConnectionSource(
       final DatabaseConnectionOptions connectionOptions, final UserCredentials userCredentials) {
     requireNonNull(connectionOptions, "No database connection options provided");
 
@@ -120,7 +120,7 @@ public abstract class DatabaseConnector {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     if (options.dbServerType().isUnknownDatabaseSystem()) {
       return "Database connector for unknown database system type";
     }
