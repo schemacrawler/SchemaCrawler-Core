@@ -12,8 +12,10 @@ import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.sql.Connection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import us.fatehi.utility.Builder;
 import us.fatehi.utility.TemplatingUtility;
@@ -44,6 +46,7 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
   private String providedHost;
   private Integer providedPort;
   private Map<String, String> providedUrlx;
+  private Set<String> additionalDriverProperties;
 
   private DatabaseConnectionSourceBuilder(final String connectionUrlTemplate) {
     this.connectionUrlTemplate = connectionUrlTemplate;
@@ -51,6 +54,7 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
     defaultDatabase = "";
     userCredentials = new MultiUseUserCredentials();
     connectionInitializer = connection -> {};
+    additionalDriverProperties = Collections.emptySet();
   }
 
   @Override
@@ -59,12 +63,26 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
     final Map<String, String> connectionUrlx = toUrlx();
     final DatabaseConnectionSource databaseConnectionSource =
         DatabaseConnectionSources.newDatabaseConnectionSource(
-            connectionUrl, connectionUrlx, userCredentials, connectionInitializer);
+            connectionUrl,
+            additionalDriverProperties,
+            connectionUrlx,
+            userCredentials,
+            connectionInitializer);
     return databaseConnectionSource;
   }
 
   public Consumer<Connection> getConnectionInitializer() {
     return connectionInitializer;
+  }
+
+  public DatabaseConnectionSourceBuilder withAdditionalDriverProperties(
+      final Set<String> additionalDriverProperties) {
+    if (additionalDriverProperties == null) {
+      this.additionalDriverProperties = Collections.emptySet();
+    } else {
+      this.additionalDriverProperties = additionalDriverProperties;
+    }
+    return this;
   }
 
   public DatabaseConnectionSourceBuilder withConnectionInitializer(

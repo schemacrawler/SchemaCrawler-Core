@@ -19,6 +19,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -38,6 +39,7 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
 
   SimpleDatabaseConnectionSource(
       final String connectionUrl,
+      final Set<String> additionalDriverProperties,
       final Map<String, String> connectionProperties,
       final UserCredentials userCredentials,
       final Consumer<Connection> connectionInitializer) {
@@ -56,7 +58,8 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
     }
 
     jdbcConnectionProperties =
-        createConnectionProperties(connectionUrl, connectionProperties, user, password);
+        createConnectionProperties(
+            connectionUrl, additionalDriverProperties, connectionProperties, user, password);
 
     connectionPool = new LinkedBlockingDeque<>();
     usedConnections = new LinkedBlockingDeque<>();

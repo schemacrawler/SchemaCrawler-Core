@@ -15,10 +15,11 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +33,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
 
   protected static Properties createConnectionProperties(
       final String connectionUrl,
+      final Set<String> additionalDriverProperties,
       final Map<String, String> connectionProperties,
       final String user,
       final String password) {
@@ -40,16 +42,9 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     final Properties jdbcConnectionProperties;
     try {
       final Driver jdbcDriver = getJdbcDriver(connectionUrl);
-      final DriverPropertyInfo[] propertyInfo =
-          jdbcDriver.getPropertyInfo(connectionUrl, new Properties());
-      final Map<String, Boolean> jdbcDriverProperties = new HashMap<>();
-      for (final DriverPropertyInfo driverPropertyInfo : propertyInfo) {
-        final String jdbcPropertyName = driverPropertyInfo.name.toLowerCase();
-        if (skipProperties.contains(jdbcPropertyName)) {
-          continue;
-        }
-        jdbcDriverProperties.put(jdbcPropertyName, driverPropertyInfo.required);
-      }
+      final Set<String> jdbcDriverProperties =
+          getJdbcDriverProperties(
+              jdbcDriver, connectionUrl, additionalDriverProperties, skipProperties);
 
       jdbcConnectionProperties = new Properties();
       if (user != null) {
@@ -62,7 +57,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
         for (final Map.Entry<String, String> connectionProperty : connectionProperties.entrySet()) {
           final String property = connectionProperty.getKey();
           final String value = connectionProperty.getValue();
-          if (jdbcDriverProperties.containsKey(property.toLowerCase()) && value != null) {
+          if (jdbcDriverProperties.contains(property.toLowerCase()) && value != null) {
             jdbcConnectionProperties.setProperty(property, value);
           }
         }
@@ -118,6 +113,28 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
               .formatted(connectionUrl),
           e);
     }
+  }
+
+  private static Set<String> getJdbcDriverProperties(
+      final Driver jdbcDriver,
+      final String connectionUrl,
+      final Set<String> additionalDriverProperties,
+      final List<String> skipProperties)
+      throws SQLException {
+    final DriverPropertyInfo[] propertyInfo =
+        jdbcDriver.getPropertyInfo(connectionUrl, new Properties());
+    final Set<String> jdbcDriverProperties = new HashSet<>();
+    for (final DriverPropertyInfo driverPropertyInfo : propertyInfo) {
+      final String jdbcPropertyName = driverPropertyInfo.name.toLowerCase();
+      if (skipProperties.contains(jdbcPropertyName)) {
+        continue;
+      }
+      jdbcDriverProperties.add(jdbcPropertyName);
+    }
+    if (additionalDriverProperties != null) {
+      jdbcDriverProperties.addAll(additionalDriverProperties);
+    }
+    return jdbcDriverProperties;
   }
 
   private static Properties safeProperties(final Properties properties) {

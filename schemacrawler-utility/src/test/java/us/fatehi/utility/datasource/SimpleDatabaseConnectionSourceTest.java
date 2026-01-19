@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.Collections;
 import java.util.HashMap;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,11 @@ public class SimpleDatabaseConnectionSourceTest {
         RuntimeException.class,
         () ->
             new SimpleDatabaseConnectionSource(
-                "<bad-url>", null, new MultiUseUserCredentials("user", "!"), connection -> {}));
+                "<bad-url>",
+                Collections.emptySet(),
+                null,
+                new MultiUseUserCredentials("user", "!"),
+                connection -> {}));
   }
 
   @Test
@@ -75,6 +80,7 @@ public class SimpleDatabaseConnectionSourceTest {
     databaseConnectionSource =
         new SimpleDatabaseConnectionSource(
             connectionUrl,
+            Collections.emptySet(),
             new HashMap<>(),
             new MultiUseUserCredentials(userName, password),
             connection -> {});
