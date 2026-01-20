@@ -189,7 +189,7 @@ public final class TableEntityModelInferrer {
    */
   public ForeignKeyCardinality inferForeignKeyCardinality(final TableReference fk) {
 
-    if ((fk == null) || isPartial(table) || !fk.getForeignKeyTable().equals(table)) {
+    if (!isFkValid(fk)) {
       return ForeignKeyCardinality.unknown;
     }
 
@@ -222,7 +222,7 @@ public final class TableEntityModelInferrer {
    */
   public OptionalBoolean isForeignKeyCoveredByIndex(final TableReference fk) {
 
-    if ((fk == null) || isPartial(table) || !fk.getForeignKeyTable().equals(table)) {
+    if (!isFkValid(fk)) {
       return OptionalBoolean.unknown;
     }
 
@@ -243,7 +243,7 @@ public final class TableEntityModelInferrer {
    */
   public OptionalBoolean isForeignKeyCoveredByUniqueIndex(final TableReference fk) {
 
-    if ((fk == null) || isPartial(table) || !fk.getForeignKeyTable().equals(table)) {
+    if (!isFkValid(fk)) {
       return OptionalBoolean.unknown;
     }
 
@@ -314,5 +314,11 @@ public final class TableEntityModelInferrer {
                 fk.getColumnReferences().stream()
                     .map(ColumnReference::getForeignKeyColumn)
                     .toList()));
+  }
+
+  private boolean isFkValid(final TableReference fk) {
+    final boolean isNotValid =
+        fk == null || isPartial(table) || !fk.getForeignKeyTable().equals(table);
+    return !isNotValid;
   }
 }
