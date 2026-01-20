@@ -307,7 +307,7 @@ public final class TableEntityModelInferrer {
     requireNonNull(fk, "No foreign key provided");
     return importedColumnsMap.computeIfAbsent(
         fk.key(),
-        k ->
+        key ->
             Set.copyOf(
                 fk.getColumnReferences().stream()
                     .map(ColumnReference::getForeignKeyColumn)

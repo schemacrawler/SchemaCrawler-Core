@@ -12,8 +12,8 @@ final class MutableManyToManyRelationship extends AbstractTableBacked
     implements ManyToManyRelationship {
 
   @Serial private static final long serialVersionUID = 867546565892159921L;
-  private Entity leftEntity;
 
+  private Entity leftEntity;
   private Entity rightEntity;
 
   public MutableManyToManyRelationship(final Table table) {

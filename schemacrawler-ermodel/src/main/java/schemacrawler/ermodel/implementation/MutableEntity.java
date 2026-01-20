@@ -9,11 +9,9 @@
 package schemacrawler.ermodel.implementation;
 
 import java.io.Serial;
-import java.util.EnumSet;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.schema.Table;
-import schemacrawler.schemacrawler.exceptions.ConfigurationException;
 
 /** Conceptual entity backed by a SchemaCrawler table. */
 class MutableEntity extends AbstractTableBacked implements Entity {
@@ -32,13 +30,10 @@ class MutableEntity extends AbstractTableBacked implements Entity {
     return entityType;
   }
 
-  private static final EnumSet<EntityType> VALID_ENTITY_TYPES =
-      EnumSet.of(EntityType.strong_entity, EntityType.weak_entity, EntityType.subtype);
-
   void setEntityType(final EntityType entityType) {
-    if (entityType == null || !VALID_ENTITY_TYPES.contains(entityType)) {
-      throw new ConfigurationException("Not a valid entity type <%s>".formatted(entityType));
+    if (entityType != null) {
+      this.entityType = entityType;
     }
-    this.entityType = entityType;
+    // No checks done about setting entity type for unknown or non entities
   }
 }

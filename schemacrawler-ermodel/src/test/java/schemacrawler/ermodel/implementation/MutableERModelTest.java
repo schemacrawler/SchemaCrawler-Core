@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
-import schemacrawler.schemacrawler.exceptions.ConfigurationException;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.test.utility.crawl.LightTable;
 import schemacrawler.test.utility.crawl.LightTableReference;
@@ -55,8 +54,13 @@ public class MutableERModelTest {
     entity.setEntityType(EntityType.strong_entity);
     assertThat(entity.getType(), is(EntityType.strong_entity));
 
-    assertThrows(ConfigurationException.class, () -> entity.setEntityType(null));
-    assertThrows(ConfigurationException.class, () -> entity.setEntityType(EntityType.unknown));
+    // No change when null is set
+    entity.setEntityType(null);
+    assertThat(entity.getType(), is(EntityType.strong_entity));
+
+    // Possible to set to any type of entity
+    entity.setEntityType(EntityType.unknown);
+    assertThat(entity.getType(), is(EntityType.unknown));
   }
 
   @Test

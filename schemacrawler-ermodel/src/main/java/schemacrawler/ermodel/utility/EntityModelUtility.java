@@ -8,11 +8,15 @@
 
 package schemacrawler.ermodel.utility;
 
+import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
+import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
+import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.OptionalBoolean;
@@ -21,6 +25,11 @@ import us.fatehi.utility.UtilityMarker;
 /** Utility for inferring entity model information from tables and foreign keys. */
 @UtilityMarker
 public class EntityModelUtility {
+
+  public static ERModel buildERModel(final Catalog catalog) {
+    requireNonNull(catalog, "No catalog provided");
+    return new ERModelBuilder(catalog).build();
+  }
 
   /**
    * Checks if a foreign key is covered by an index.
