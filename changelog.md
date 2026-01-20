@@ -6,6 +6,8 @@ SchemaCrawler Core release notes.
 ## Release 17.5.0 - 2026-01-19
 - Re-organize database connector options into a builder to avoid too many arguments
 - Allow for connection properties that are not published by the JDBC driver - fixes #40
+- Complete first implementation of ERModel
+- Deprecate `Table::getWeakAssociations()` for removal
 
 
 <a name="v17.4.0"></a>
