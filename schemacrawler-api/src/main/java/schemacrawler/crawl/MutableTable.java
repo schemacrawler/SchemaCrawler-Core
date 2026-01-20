@@ -225,6 +225,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
 
   /** {@inheritDoc} */
   @Override
+  @Deprecated(forRemoval = true)
   public Collection<WeakAssociation> getWeakAssociations() {
     return getTableReferences(weakAssociations, TableAssociationType.all);
   }

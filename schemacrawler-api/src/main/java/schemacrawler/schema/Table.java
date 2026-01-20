@@ -155,6 +155,7 @@ public interface Table
    *
    * @return Weak associations of the table.
    */
+  @Deprecated(forRemoval = true)
   Collection<WeakAssociation> getWeakAssociations();
 
   /**

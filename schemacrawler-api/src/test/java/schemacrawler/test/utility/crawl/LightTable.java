@@ -233,6 +233,7 @@ public final class LightTable implements Table {
   }
 
   @Override
+  @Deprecated(forRemoval = true)
   public Collection<WeakAssociation> getWeakAssociations() {
     return Collections.emptyList();
   }
