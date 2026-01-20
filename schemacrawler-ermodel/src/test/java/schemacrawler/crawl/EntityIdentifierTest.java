@@ -112,6 +112,21 @@ public class EntityIdentifierTest {
     assertThat(entityType, is(EntityType.subtype));
   }
 
+  @Test
+  public void testTablePartial() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+    final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL_1");
+    final TablePartial table2 = new TablePartial(schema, "TABLE_PARTIAL_2");
+    final TableReference ref = new LightTableReference("REF", table, table2);
+
+    TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
+    assertThat(modelInferrer.inferBridgeTable(), is(false));
+    assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
+    assertThat(modelInferrer.inferForeignKeyCardinality(ref), is(ForeignKeyCardinality.unknown));
+    assertThat(modelInferrer.isForeignKeyCoveredByIndex(ref), is(OptionalBoolean.unknown));
+    assertThat(modelInferrer.isForeignKeyCoveredByUniqueIndex(ref), is(OptionalBoolean.unknown));
+  }
+
   /**
    * Test for an unknown entity table (high connectivity).
    *
@@ -180,6 +195,23 @@ public class EntityIdentifierTest {
     assertThat(entityType, is(EntityType.unknown));
   }
 
+  @Test
+  public void testUnrelatedFk() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+
+    final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL");
+    final TablePartial tableUnrelated1 = new TablePartial(schema, "TABLE_UNRELATED_1");
+    final TablePartial tableUnrelated2 = new TablePartial(schema, "TABLE_UNRELATED_2");
+    final TableReference ref = new LightTableReference("REF", tableUnrelated1, tableUnrelated2);
+
+    TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
+    assertThat(modelInferrer.inferBridgeTable(), is(false));
+    assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
+    assertThat(modelInferrer.inferForeignKeyCardinality(ref), is(ForeignKeyCardinality.unknown));
+    assertThat(modelInferrer.isForeignKeyCoveredByIndex(ref), is(OptionalBoolean.unknown));
+    assertThat(modelInferrer.isForeignKeyCoveredByUniqueIndex(ref), is(OptionalBoolean.unknown));
+  }
+
   /**
    * Test for a weak entity table.
    *
@@ -224,21 +256,5 @@ public class EntityIdentifierTest {
 
     final EntityType entityType = new TableEntityModelInferrer(weakTable).inferEntityType();
     assertThat(entityType, is(EntityType.weak_entity));
-  }
-
-  @Test
-  public void testTablePartial() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL");
-    final TablePartial table2 = new TablePartial(schema, "TABLE_PARTIAL_2");
-    final TableReference ref = new LightTableReference("REF", table, table2);
-
-    TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
-    assertThat(modelInferrer.inferBridgeTable(), is(false));
-    assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
-    assertThat(modelInferrer.inferForeignKeyCardinality(ref), is(ForeignKeyCardinality.one_many));
-    assertThat(modelInferrer.isForeignKeyCoveredByIndex(ref), is(OptionalBoolean.false_value));
-    assertThat(
-        modelInferrer.isForeignKeyCoveredByUniqueIndex(ref), is(OptionalBoolean.false_value));
   }
 }

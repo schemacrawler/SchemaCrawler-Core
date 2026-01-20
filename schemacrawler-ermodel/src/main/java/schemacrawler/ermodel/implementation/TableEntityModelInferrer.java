@@ -189,7 +189,7 @@ public final class TableEntityModelInferrer {
    */
   public ForeignKeyCardinality inferForeignKeyCardinality(final TableReference fk) {
 
-    if (fk == null) {
+    if ((fk == null) || isPartial(table) || !fk.getForeignKeyTable().equals(table)) {
       return ForeignKeyCardinality.unknown;
     }
 
@@ -222,7 +222,7 @@ public final class TableEntityModelInferrer {
    */
   public OptionalBoolean isForeignKeyCoveredByIndex(final TableReference fk) {
 
-    if (fk == null) {
+    if ((fk == null) || isPartial(table) || !fk.getForeignKeyTable().equals(table)) {
       return OptionalBoolean.unknown;
     }
 
@@ -243,7 +243,7 @@ public final class TableEntityModelInferrer {
    */
   public OptionalBoolean isForeignKeyCoveredByUniqueIndex(final TableReference fk) {
 
-    if (fk == null) {
+    if ((fk == null) || isPartial(table) || !fk.getForeignKeyTable().equals(table)) {
       return OptionalBoolean.unknown;
     }
 
