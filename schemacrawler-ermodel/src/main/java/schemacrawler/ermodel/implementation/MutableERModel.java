@@ -10,6 +10,7 @@ package schemacrawler.ermodel.implementation;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +26,9 @@ import schemacrawler.schema.Table;
 
 public class MutableERModel implements ERModel {
 
+  private static final EnumSet<EntityType> VALID_ENTITY_TYPES =
+      EnumSet.of(EntityType.strong_entity, EntityType.weak_entity, EntityType.subtype);
+
   private final Map<NamedObjectKey, Table> tablesMap;
   private final Map<NamedObjectKey, Entity> entitiesMap;
   private final Map<NamedObjectKey, Relationship> relationshipsMap;
@@ -37,7 +41,10 @@ public class MutableERModel implements ERModel {
 
   @Override
   public Collection<Entity> getEntities() {
-    return Set.copyOf(entitiesMap.values());
+    return Set.copyOf(
+        entitiesMap.values().stream()
+            .filter(entity -> VALID_ENTITY_TYPES.contains(entity.getType()))
+            .toList());
   }
 
   @Override

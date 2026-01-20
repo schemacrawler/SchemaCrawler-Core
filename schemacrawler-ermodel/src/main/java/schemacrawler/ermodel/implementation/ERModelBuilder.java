@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +26,6 @@ import schemacrawler.schema.Table;
 import us.fatehi.utility.Builder;
 
 public class ERModelBuilder implements Builder<ERModel> {
-
-  private static final EnumSet<EntityType> VALID_ENTITY_TYPES =
-      EnumSet.of(EntityType.strong_entity, EntityType.weak_entity, EntityType.subtype);
 
   private final Catalog catalog;
   final MutableERModel erModel;
@@ -100,9 +96,7 @@ public class ERModelBuilder implements Builder<ERModel> {
           final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
           final EntityType entityType = modelInferrer.inferEntityType();
           newEntity.setEntityType(entityType);
-          if (VALID_ENTITY_TYPES.contains(entityType)) {
-            erModel.addEntity(newEntity);
-          }
+          erModel.addEntity(newEntity);
           return newEntity;
         });
   }

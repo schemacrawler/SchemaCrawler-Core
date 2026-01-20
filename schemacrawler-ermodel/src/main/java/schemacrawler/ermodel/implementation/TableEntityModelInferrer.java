@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.ForeignKeyCardinality;
@@ -212,6 +213,29 @@ public final class TableEntityModelInferrer {
     }
 
     return cardinality;
+  }
+
+  /**
+   * Identifies the supertype of the table, if the table is a subtype.
+   *
+   * @return Entity type
+   */
+  public Optional<Table> inferSuperType() {
+
+    if (inferEntityType() != EntityType.subtype) {
+      return Optional.empty();
+    }
+
+    for (final ForeignKey fk : importedForeignKeys) {
+
+      final Set<Column> fkParentColumns = pkColumnsMap.get(fk.key());
+      final Set<Column> parentPkColumns = parentPkColumnsMap.get(fk.key());
+      // Revisit subtype conditions to locate the supertype
+      if (parentPkColumns.equals(fkParentColumns)) {
+        return Optional.of(fk.getParent());
+      }
+    }
+    return Optional.empty();
   }
 
   /**
