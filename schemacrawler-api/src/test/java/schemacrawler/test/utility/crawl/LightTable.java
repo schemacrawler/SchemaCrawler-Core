@@ -270,7 +270,7 @@ public final class LightTable implements Table {
 
   @Override
   public boolean hasRemarks() {
-    return false;
+    return !isBlank(remarks);
   }
 
   @Override
@@ -295,7 +295,7 @@ public final class LightTable implements Table {
 
   @Override
   public <T> Optional<T> lookupAttribute(final String name) {
-    return Optional.of(getAttribute(name));
+    return Optional.ofNullable(getAttribute(name));
   }
 
   @Override
