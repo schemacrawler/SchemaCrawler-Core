@@ -92,10 +92,18 @@ public class ERModelBuilder implements Builder<ERModel> {
     return entityMap.computeIfAbsent(
         table.key(),
         key -> {
-          final MutableEntity newEntity = new MutableEntity(table);
           final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
           final EntityType entityType = modelInferrer.inferEntityType();
-          newEntity.setEntityType(entityType);
+          final MutableEntity newEntity;
+          if (entityType != EntityType.subtype) {
+            newEntity = new MutableEntity(table);
+            newEntity.setEntityType(entityType);
+          } else {
+            newEntity = new MutableEntitySubtype(table);
+            newEntity.setEntityType(entityType);
+            Table superTypeTable = modelInferrer.inferSuperType().get();
+            ((MutableEntitySubtype) newEntity).setSupertype(lookupOrCreateEntity(superTypeTable));
+          }
           erModel.addEntity(newEntity);
           return newEntity;
         });
