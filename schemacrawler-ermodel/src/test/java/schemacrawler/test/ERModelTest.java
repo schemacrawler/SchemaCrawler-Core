@@ -23,6 +23,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
+import schemacrawler.ermodel.model.EntitySubtype;
+import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.ManyToManyRelationship;
 import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
@@ -54,16 +57,34 @@ public class ERModelTest {
   }
 
   @Test
-  public void testInferEntityType(final TestContext testContext) {
+  public void testERModel(final TestContext testContext) {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
       out.println("# Entities:");
-      for (Entity entity : erModel.getEntities()) {
+      for (final Entity entity : erModel.getEntities()) {
         out.println("  - %s [%s]".formatted(entity, entity.getType()));
+        if (entity instanceof final EntitySubtype subentity) {
+          out.println("    - super-type: %s".formatted(subentity.getSupertype()));
+        }
       }
       out.println();
       out.println("# Relationships:");
-      for (Relationship relationship : erModel.getRelationships()) {
+      for (final Relationship relationship : erModel.getRelationships()) {
+        out.println("  - %s [%s]".formatted(relationship, relationship.getType()));
+        out.println("    - left: %s".formatted(relationship.getLeftEntity()));
+        out.println("    - right: %s".formatted(relationship.getRightEntity()));
+        if (relationship instanceof final ManyToManyRelationship mnRel) {
+          out.println("    - bridge: %s".formatted(mnRel.getBridgeTable()));
+        }
+      }
+      out.println();
+      out.println("# Non-entities:");
+      for (final Entity entity : erModel.getEntitiesByType(EntityType.non_entity)) {
+        out.println("  - %s [%s]".formatted(entity, entity.getType()));
+      }
+      out.println();
+      out.println("# Unknown entities:");
+      for (final Relationship relationship : erModel.getRelationships()) {
         out.println("  - %s [%s]".formatted(relationship, relationship.getType()));
         out.println("    - left: %s".formatted(relationship.getLeftEntity()));
         out.println("    - right: %s".formatted(relationship.getRightEntity()));
