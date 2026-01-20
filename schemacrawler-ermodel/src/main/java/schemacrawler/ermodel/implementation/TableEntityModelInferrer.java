@@ -53,9 +53,6 @@ public final class TableEntityModelInferrer {
    */
   public TableEntityModelInferrer(final Table table) {
     this.table = requireNonNull(table, "No table provided");
-    if (isPartial(table)) {
-      throw new IllegalArgumentException("Table cannot be partial");
-    }
 
     uniqueIndexes = new HashSet<>();
     indexes = new HashSet<>();
@@ -67,8 +64,10 @@ public final class TableEntityModelInferrer {
     pkColumnsMap = new HashMap<>();
     parentPkColumnsMap = new HashMap<>();
 
-    buildSupportingLookups();
-    buildIndexesLookup();
+    if (!isPartial(table)) {
+      buildSupportingLookups();
+      buildIndexesLookup();
+    }
   }
 
   /**
@@ -124,6 +123,9 @@ public final class TableEntityModelInferrer {
 
     // Step 1: Check for non-entity pattern: Non-entity tables do not have a primary
     // key.
+    if (isPartial(table)) {
+      return EntityType.unknown;
+    }
     if (!table.hasPrimaryKey()) {
       return EntityType.non_entity;
     }

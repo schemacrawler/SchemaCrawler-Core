@@ -10,12 +10,15 @@ package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.crawl.LightTableReference;
+import us.fatehi.utility.OptionalBoolean;
 
 public class EntityIdentifierTest {
 
@@ -227,7 +230,15 @@ public class EntityIdentifierTest {
   public void testTablePartial() {
     final SchemaReference schema = new SchemaReference("catalog", "schema");
     final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL");
+    final TablePartial table2 = new TablePartial(schema, "TABLE_PARTIAL_2");
+    final TableReference ref = new LightTableReference("REF", table, table2);
 
-    assertThrows(IllegalArgumentException.class, () -> new TableEntityModelInferrer(table));
+    TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
+    assertThat(modelInferrer.inferBridgeTable(), is(false));
+    assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
+    assertThat(modelInferrer.inferForeignKeyCardinality(ref), is(ForeignKeyCardinality.one_many));
+    assertThat(modelInferrer.isForeignKeyCoveredByIndex(ref), is(OptionalBoolean.false_value));
+    assertThat(
+        modelInferrer.isForeignKeyCoveredByUniqueIndex(ref), is(OptionalBoolean.false_value));
   }
 }
