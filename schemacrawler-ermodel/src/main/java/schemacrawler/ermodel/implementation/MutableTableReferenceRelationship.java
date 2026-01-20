@@ -16,7 +16,6 @@ import java.util.Optional;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.ermodel.model.TableReferenceRelationship;
-import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.TableReference;
@@ -27,13 +26,13 @@ final class MutableTableReferenceRelationship implements TableReferenceRelations
   @Serial private static final long serialVersionUID = 3561028568798848133L;
 
   private final TableReference tableReference;
-  private final RelationshipCardinality cardinality;
+  private RelationshipCardinality cardinality;
   private Entity leftEntity;
   private Entity rightEntity;
 
   public MutableTableReferenceRelationship(final TableReference tableReference) {
     this.tableReference = requireNonNull(tableReference, "No table reference provided");
-    cardinality = RelationshipCardinality.from(EntityModelUtility.inferCardinality(tableReference));
+    cardinality = RelationshipCardinality.unknown;
   }
 
   @Override
@@ -136,6 +135,12 @@ final class MutableTableReferenceRelationship implements TableReferenceRelations
   @Override
   public void setRemarks(final String remarks) {
     tableReference.setRemarks(remarks);
+  }
+
+  void setCardinality(final RelationshipCardinality cardinality) {
+    if (cardinality != null) {
+      this.cardinality = cardinality;
+    }
   }
 
   void setLeftEntity(final Entity leftEntity) {

@@ -9,6 +9,7 @@
 package schemacrawler.ermodel.implementation;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.Serial;
 import java.util.Collection;
@@ -21,7 +22,6 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.exceptions.ConfigurationException;
-import schemacrawler.utility.MetaDataUtility;
 
 abstract class AbstractTableBacked implements TableBacked {
 
@@ -31,7 +31,7 @@ abstract class AbstractTableBacked implements TableBacked {
 
   public AbstractTableBacked(final Table table) {
     this.table = requireNonNull(table, "No table provided");
-    if (MetaDataUtility.isPartial(table)) {
+    if (isPartial(table)) {
       throw new ConfigurationException("Table cannot be partial");
     }
   }

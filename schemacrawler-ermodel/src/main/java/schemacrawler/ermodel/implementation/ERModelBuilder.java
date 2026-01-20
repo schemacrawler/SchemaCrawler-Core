@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.NamedObjectKey;
@@ -53,11 +55,11 @@ public class ERModelBuilder implements Builder<ERModel> {
         continue;
       }
 
-      // Build entity
-      final MutableEntity entity = lookupOrCreateEntity(table);
+      // Build main entity
+      lookupOrCreateEntity(table);
 
       // Check for M..N relationship
-      TableEntityModelInferrer modelInferrer = getModelInferrer(table);
+      final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
       if (modelInferrer.inferBridgeTable()) {
         // Build M..N relationship
         final MutableManyToManyRelationship mnRel = new MutableManyToManyRelationship(table);
@@ -73,8 +75,11 @@ public class ERModelBuilder implements Builder<ERModel> {
         erModel.addRelationship(mnRel);
       } else {
         // Build table reference relationships
-        for (ForeignKey fk : table.getImportedForeignKeys()) {
-          MutableTableReferenceRelationship tableRel = new MutableTableReferenceRelationship(fk);
+        for (final ForeignKey fk : table.getImportedForeignKeys()) {
+          final MutableTableReferenceRelationship tableRel =
+              new MutableTableReferenceRelationship(fk);
+          final ForeignKeyCardinality cardinality = modelInferrer.inferForeignKeyCardinality(fk);
+          tableRel.setCardinality(RelationshipCardinality.from(cardinality));
           erModel.addRelationship(tableRel);
         }
       }
