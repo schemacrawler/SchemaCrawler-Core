@@ -36,8 +36,19 @@ final class MutableTableReferenceRelationship implements TableReferenceRelations
   }
 
   @Override
-  public int compareTo(final NamedObject o) {
-    return tableReference.compareTo(o);
+  public int compareTo(final NamedObject namedObj) {
+    if (namedObj == null) {
+      return 1;
+    }
+    return key().compareTo(namedObj.key());
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof final NamedObject namedObj) {
+      return key().equals(namedObj.key());
+    }
+    return false;
   }
 
   @Override
@@ -100,6 +111,11 @@ final class MutableTableReferenceRelationship implements TableReferenceRelations
   }
 
   @Override
+  public int hashCode() {
+    return key().hashCode();
+  }
+
+  @Override
   public boolean hasRemarks() {
     return tableReference.hasRemarks();
   }
@@ -135,6 +151,11 @@ final class MutableTableReferenceRelationship implements TableReferenceRelations
   @Override
   public void setRemarks(final String remarks) {
     tableReference.setRemarks(remarks);
+  }
+
+  @Override
+  public String toString() {
+    return tableReference.toString();
   }
 
   void setCardinality(final RelationshipCardinality cardinality) {

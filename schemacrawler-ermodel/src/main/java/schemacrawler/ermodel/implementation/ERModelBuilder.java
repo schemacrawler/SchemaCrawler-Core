@@ -58,25 +58,30 @@ public class ERModelBuilder implements Builder<ERModel> {
       final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
       if (modelInferrer.inferBridgeTable()) {
         // Build M..N relationship
-        final MutableManyToManyRelationship mnRel = new MutableManyToManyRelationship(table);
+        final MutableManyToManyRelationship rel = new MutableManyToManyRelationship(table);
         final List<ForeignKey> foreignKeys = new ArrayList<>(table.getForeignKeys());
         if (foreignKeys.size() != 2) {
           continue;
         }
-        final Table leftTable = foreignKeys.get(0).getParent();
-        mnRel.setLeftEntity(lookupOrCreateEntity(leftTable));
-        final Table rightTable = foreignKeys.get(0).getParent();
-        mnRel.setRightEntity(lookupOrCreateEntity(rightTable));
+        final Table leftTable = foreignKeys.get(0).getPrimaryKeyTable();
+        rel.setLeftEntity(lookupOrCreateEntity(leftTable));
+        final Table rightTable = foreignKeys.get(1).getPrimaryKeyTable();
+        rel.setRightEntity(lookupOrCreateEntity(rightTable));
 
-        erModel.addRelationship(mnRel);
+        erModel.addRelationship(rel);
       } else {
         // Build table reference relationships
         for (final ForeignKey fk : table.getImportedForeignKeys()) {
-          final MutableTableReferenceRelationship tableRel =
-              new MutableTableReferenceRelationship(fk);
+          final MutableTableReferenceRelationship rel = new MutableTableReferenceRelationship(fk);
           final ForeignKeyCardinality cardinality = modelInferrer.inferForeignKeyCardinality(fk);
-          tableRel.setCardinality(RelationshipCardinality.from(cardinality));
-          erModel.addRelationship(tableRel);
+          rel.setCardinality(RelationshipCardinality.from(cardinality));
+
+          final Table leftTable = fk.getForeignKeyTable();
+          rel.setLeftEntity(lookupOrCreateEntity(leftTable));
+          final Table rightTable = fk.getPrimaryKeyTable();
+          rel.setRightEntity(lookupOrCreateEntity(rightTable));
+
+          erModel.addRelationship(rel);
         }
       }
     }
@@ -101,7 +106,7 @@ public class ERModelBuilder implements Builder<ERModel> {
           } else {
             newEntity = new MutableEntitySubtype(table);
             newEntity.setEntityType(entityType);
-            Table superTypeTable = modelInferrer.inferSuperType().get();
+            final Table superTypeTable = modelInferrer.inferSuperType().get();
             ((MutableEntitySubtype) newEntity).setSupertype(lookupOrCreateEntity(superTypeTable));
           }
           erModel.addEntity(newEntity);

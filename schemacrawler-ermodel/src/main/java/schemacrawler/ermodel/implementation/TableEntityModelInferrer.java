@@ -232,7 +232,7 @@ public final class TableEntityModelInferrer {
       final Set<Column> parentPkColumns = parentPkColumnsMap.get(fk.key());
       // Revisit subtype conditions to locate the supertype
       if (parentPkColumns.equals(fkParentColumns)) {
-        return Optional.of(fk.getParent());
+        return Optional.of(fk.getPrimaryKeyTable());
       }
     }
     return Optional.empty();

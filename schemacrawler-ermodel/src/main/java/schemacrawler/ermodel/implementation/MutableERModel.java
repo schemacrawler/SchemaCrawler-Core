@@ -12,9 +12,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntitySubtype;
@@ -41,9 +41,10 @@ public class MutableERModel implements ERModel {
 
   @Override
   public Collection<Entity> getEntities() {
-    return Set.copyOf(
+    return List.copyOf(
         entitiesMap.values().stream()
             .filter(entity -> VALID_ENTITY_TYPES.contains(entity.getType()))
+            .sorted()
             .toList());
   }
 
@@ -52,15 +53,16 @@ public class MutableERModel implements ERModel {
     if (entityType == null) {
       return Collections.emptySet();
     }
-    return Set.copyOf(
+    return List.copyOf(
         entitiesMap.values().stream()
             .filter(entity -> entity.getType().equals(entityType))
+            .sorted()
             .toList());
   }
 
   @Override
   public Collection<Relationship> getRelationships() {
-    return Set.copyOf(relationshipsMap.values());
+    return List.copyOf(relationshipsMap.values().stream().sorted().toList());
   }
 
   @Override
@@ -69,9 +71,10 @@ public class MutableERModel implements ERModel {
     if (cardinality == null) {
       return Collections.emptySet();
     }
-    return Set.copyOf(
+    return List.copyOf(
         relationshipsMap.values().stream()
             .filter(relationship -> relationship.getType().equals(cardinality))
+            .sorted()
             .toList());
   }
 
@@ -80,15 +83,16 @@ public class MutableERModel implements ERModel {
     if (supertype == null) {
       return Collections.emptySet();
     }
-    return Set.copyOf(
+    return List.copyOf(
         getSubtypes().stream()
             .filter(subtype -> subtype.getSupertype().equals(supertype))
+            .sorted()
             .toList());
   }
 
   @Override
   public Collection<Table> getTables() {
-    return Set.copyOf(tablesMap.values());
+    return List.copyOf(tablesMap.values().stream().sorted().toList());
   }
 
   @Override

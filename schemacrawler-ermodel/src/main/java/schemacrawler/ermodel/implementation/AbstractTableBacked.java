@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import schemacrawler.ermodel.model.TableBacked;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 
@@ -29,11 +28,6 @@ abstract class AbstractTableBacked implements TableBacked {
 
   public AbstractTableBacked(final Table table) {
     this.table = requireNonNull(table, "No table provided");
-  }
-
-  @Override
-  public int compareTo(final NamedObject o) {
-    return table.compareTo(o);
   }
 
   @Override
@@ -111,5 +105,10 @@ abstract class AbstractTableBacked implements TableBacked {
   @Override
   public void setRemarks(final String remarks) {
     table.setRemarks(remarks);
+  }
+
+  @Override
+  public String toString() {
+    return table.toString();
   }
 }

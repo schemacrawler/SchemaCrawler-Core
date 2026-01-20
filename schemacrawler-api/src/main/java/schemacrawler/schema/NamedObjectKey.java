@@ -14,7 +14,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public final class NamedObjectKey implements Serializable {
+public final class NamedObjectKey implements Serializable, Comparable<NamedObjectKey> {
 
   @Serial private static final long serialVersionUID = -5008609072012459037L;
 
@@ -29,14 +29,21 @@ public final class NamedObjectKey implements Serializable {
   }
 
   @Override
+  public int compareTo(final NamedObjectKey other) {
+    if (other == null) {
+      return 1;
+    }
+    return Arrays.compare(key, other.key);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof NamedObjectKey)) {
+    if (!(obj instanceof final NamedObjectKey other)) {
       return false;
     }
-    final NamedObjectKey other = (NamedObjectKey) obj;
     return Arrays.equals(key, other.key);
   }
 

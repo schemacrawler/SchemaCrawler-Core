@@ -11,6 +11,7 @@ package schemacrawler.ermodel.implementation;
 import java.io.Serial;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Table;
 
 /** Conceptual entity backed by a SchemaCrawler table. */
@@ -23,12 +24,34 @@ class MutableEntity extends AbstractTableBacked implements Entity {
   public MutableEntity(final Table table) {
     super(table);
     entityType = EntityType.unknown;
-    // No checks for partial table - exceptions will be thrown while calling unsupported methods
+    // No checks for partial table - exceptions will be thrown while calling
+    // unsupported methods
+  }
+
+  @Override
+  public int compareTo(final NamedObject namedObj) {
+    if (namedObj == null) {
+      return 1;
+    }
+    return key().compareTo(namedObj.key());
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof final NamedObject namedObj) {
+      return key().equals(namedObj.key());
+    }
+    return false;
   }
 
   @Override
   public EntityType getType() {
     return entityType;
+  }
+
+  @Override
+  public int hashCode() {
+    return key().hashCode();
   }
 
   void setEntityType(final EntityType entityType) {
