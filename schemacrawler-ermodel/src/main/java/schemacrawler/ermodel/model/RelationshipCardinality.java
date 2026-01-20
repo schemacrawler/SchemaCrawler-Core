@@ -17,24 +17,112 @@ public enum RelationshipCardinality {
    * <p>Used when the relationship rules are not modeled or have not yet been determined.
    */
   unknown(""),
+
+  /**
+   * Zero-or-one related row: <code>(0..1)</code>.
+   *
+   * <p>Optional relationship. The foreign-key column may be <code>NULL</code>, meaning “no related
+   * row”, or may reference exactly one existing target row.
+   *
+   * <p>Example schema:
+   *
+   * <pre>
+   * CUSTOMER(
+   *   Id PK,
+   *   ...
+   * )
+   *
+   * ORDER(
+   *   Id PK,
+   *   CustomerId,
+   *   FK NULL REFERENCES CUSTOMER(Id)
+   * )
+   * </pre>
+   *
+   * <p>Here, an <code>ORDER</code> may or may not be linked to a <code>CUSTOMER</code> (<code>
+   * CustomerId</code> is nullable).
+   */
   zero_one("(0..1)"),
+
+  /**
+   * Zero-or-many related rows: <code>(0..many)</code>.
+   *
+   * <p>Optional one-to-many or many-to-many relationship. A given target row may be referenced by
+   * any number of source rows, including none at all.
+   *
+   * <p>Example schema:
+   *
+   * <pre>
+   * CUSTOMER(
+   *   Id PK,
+   *   ...
+   * )
+   *
+   * ORDER(
+   *   Id PK,
+   *   CustomerId,
+   *   FK NULL REFERENCES CUSTOMER(Id)
+   * )
+   * </pre>
+   *
+   * <p>A <code>CUSTOMER</code> can have zero, one, or many <code>ORDER</code> records. An <code>
+   * ORDER</code> may exist without a <code>CUSTOMER</code> if <code>CustomerId</code> is <code>NULL
+   * </code>.
+   */
   zero_many("(0..many)"),
+
+  /**
+   * Exactly one related row: <code>(1..1)</code>.
+   *
+   * <p>Mandatory single relationship from the source row's perspective: the foreign-key column must
+   * always reference exactly one existing target row, and must never be <code>NULL</code>.
+   *
+   * <p>Example schema:
+   *
+   * <pre>
+   * CUSTOMER(
+   *   Id PK,
+   *   ...
+   * )
+   *
+   * CUSTOMER_PROFILE(
+   *   Id PK,
+   *   CustomerId FK NOT NULL UNIQUE REFERENCES CUSTOMER(Id)
+   * )
+   * </pre>
+   *
+   * <p>Each <code>CUSTOMER_PROFILE</code> must be linked to exactly one <code>CUSTOMER</code>. The
+   * <code>UNIQUE</code> constraint ensures that no two profiles point to the same customer.
+   */
   one_one("(1..1)"),
+
+  /**
+   * One-or-many related rows: <code>(1..many)</code>.
+   *
+   * <p>From the “one” side, each target row must have at least one referencing row on the “many”
+   * side. From the “many” side, each source row must reference exactly one target row.
+   *
+   * <p>Example schema:
+   *
+   * <pre>
+   * DEPARTMENT(
+   *   Id PK,
+   *   ...
+   * )
+   *
+   * EMPLOYEE(
+   *   Id PK,
+   *   DepartmentId FK NOT NULL REFERENCES DEPARTMENT(Id)
+   * )
+   * </pre>
+   *
+   * <p>Each <code>EMPLOYEE</code> must belong to exactly one <code>DEPARTMENT</code> (<code>
+   * DepartmentId</code> is <code>NOT NULL</code>). However, typical databases do not enforce that
+   * every department has at least one employee — such constraints are usually implemented by
+   * application logic or triggers.
+   */
   one_many("(1..many)"),
   many_many("(many..many)");
-
-  public static RelationshipCardinality from(final ForeignKeyCardinality fkCardinality) {
-    if (fkCardinality == null) {
-      return unknown;
-    }
-    return switch (fkCardinality) {
-      case one_one -> one_one;
-      case one_many -> one_many;
-      case zero_one -> zero_one;
-      case zero_many -> zero_many;
-      default -> unknown;
-    };
-  }
 
   private final String description;
 

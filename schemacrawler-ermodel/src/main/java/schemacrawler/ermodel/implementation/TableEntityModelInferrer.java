@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import schemacrawler.ermodel.model.EntityType;
-import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
@@ -188,13 +188,13 @@ public final class TableEntityModelInferrer {
    * @param fk Foreign key
    * @return Foreign key cardinality
    */
-  public ForeignKeyCardinality inferForeignKeyCardinality(final TableReference fk) {
+  public RelationshipCardinality inferCardinality(final TableReference fk) {
 
     if (!isFkValid(fk)) {
-      return ForeignKeyCardinality.unknown;
+      return RelationshipCardinality.unknown;
     }
 
-    final ForeignKeyCardinality cardinality;
+    final RelationshipCardinality cardinality;
 
     final Set<Column> importedColumns = findOrGetImportedKeys(fk);
     final boolean isForeignKeyUnique = uniqueIndexes.contains(importedColumns);
@@ -202,14 +202,14 @@ public final class TableEntityModelInferrer {
 
     if (isForeignKeyUnique) {
       if (isForeignKeyOptional) {
-        cardinality = ForeignKeyCardinality.zero_one;
+        cardinality = RelationshipCardinality.zero_one;
       } else {
-        cardinality = ForeignKeyCardinality.one_one;
+        cardinality = RelationshipCardinality.one_one;
       }
     } else if (isForeignKeyOptional) {
-      cardinality = ForeignKeyCardinality.zero_many;
+      cardinality = RelationshipCardinality.zero_many;
     } else {
-      cardinality = ForeignKeyCardinality.one_many;
+      cardinality = RelationshipCardinality.one_many;
     }
 
     return cardinality;
@@ -244,7 +244,7 @@ public final class TableEntityModelInferrer {
    * @param fk Foreign key, can be null
    * @return Whether the foreign key columns are covered by an index
    */
-  public OptionalBoolean isForeignKeyCoveredByIndex(final TableReference fk) {
+  public OptionalBoolean coveredByIndex(final TableReference fk) {
 
     if (!isFkValid(fk)) {
       return OptionalBoolean.unknown;
@@ -265,7 +265,7 @@ public final class TableEntityModelInferrer {
    * @param fk Foreign key, can be null
    * @return Whether the foreign key columns are covered by a unique index
    */
-  public OptionalBoolean isForeignKeyCoveredByUniqueIndex(final TableReference fk) {
+  public OptionalBoolean coveredByUniqueIndex(final TableReference fk) {
 
     if (!isFkValid(fk)) {
       return OptionalBoolean.unknown;

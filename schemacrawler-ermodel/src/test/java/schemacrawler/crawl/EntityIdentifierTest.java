@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.EntityType;
-import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.crawl.LightTableReference;
@@ -122,9 +122,9 @@ public class EntityIdentifierTest {
     TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
     assertThat(modelInferrer.inferBridgeTable(), is(false));
     assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
-    assertThat(modelInferrer.inferForeignKeyCardinality(ref), is(ForeignKeyCardinality.unknown));
-    assertThat(modelInferrer.isForeignKeyCoveredByIndex(ref), is(OptionalBoolean.unknown));
-    assertThat(modelInferrer.isForeignKeyCoveredByUniqueIndex(ref), is(OptionalBoolean.unknown));
+    assertThat(modelInferrer.inferCardinality(ref), is(RelationshipCardinality.unknown));
+    assertThat(modelInferrer.coveredByIndex(ref), is(OptionalBoolean.unknown));
+    assertThat(modelInferrer.coveredByUniqueIndex(ref), is(OptionalBoolean.unknown));
   }
 
   /**
@@ -207,9 +207,9 @@ public class EntityIdentifierTest {
     TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
     assertThat(modelInferrer.inferBridgeTable(), is(false));
     assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
-    assertThat(modelInferrer.inferForeignKeyCardinality(ref), is(ForeignKeyCardinality.unknown));
-    assertThat(modelInferrer.isForeignKeyCoveredByIndex(ref), is(OptionalBoolean.unknown));
-    assertThat(modelInferrer.isForeignKeyCoveredByUniqueIndex(ref), is(OptionalBoolean.unknown));
+    assertThat(modelInferrer.inferCardinality(ref), is(RelationshipCardinality.unknown));
+    assertThat(modelInferrer.coveredByIndex(ref), is(OptionalBoolean.unknown));
+    assertThat(modelInferrer.coveredByUniqueIndex(ref), is(OptionalBoolean.unknown));
   }
 
   /**

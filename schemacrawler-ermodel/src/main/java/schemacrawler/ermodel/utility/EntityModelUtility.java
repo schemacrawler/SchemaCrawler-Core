@@ -15,7 +15,7 @@ import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityType;
-import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
@@ -48,7 +48,7 @@ public class EntityModelUtility {
     }
 
     final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
-    final OptionalBoolean coveredByIndex = tableEntityModel.isForeignKeyCoveredByIndex(fk);
+    final OptionalBoolean coveredByIndex = tableEntityModel.coveredByIndex(fk);
     return coveredByIndex;
   }
 
@@ -69,7 +69,7 @@ public class EntityModelUtility {
     }
 
     final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
-    final OptionalBoolean coveredByIndex = tableEntityModel.isForeignKeyCoveredByUniqueIndex(fk);
+    final OptionalBoolean coveredByIndex = tableEntityModel.coveredByUniqueIndex(fk);
     return coveredByIndex;
   }
 
@@ -95,18 +95,18 @@ public class EntityModelUtility {
    * @param fk Foreign key
    * @return Inferred cardinality
    */
-  public static ForeignKeyCardinality inferCardinality(final TableReference fk) {
+  public static RelationshipCardinality inferCardinality(final TableReference fk) {
     if (fk == null) {
-      return ForeignKeyCardinality.unknown;
+      return RelationshipCardinality.unknown;
     }
 
     final Table table = fk.getForeignKeyTable();
     if (table == null || isPartial(table)) {
-      return ForeignKeyCardinality.unknown;
+      return RelationshipCardinality.unknown;
     }
 
     final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
-    final ForeignKeyCardinality fkCardinality = tableEntityModel.inferForeignKeyCardinality(fk);
+    final RelationshipCardinality fkCardinality = tableEntityModel.inferCardinality(fk);
     return fkCardinality;
   }
 

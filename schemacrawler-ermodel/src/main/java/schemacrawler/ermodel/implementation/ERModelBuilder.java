@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityType;
-import schemacrawler.ermodel.model.ForeignKeyCardinality;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
@@ -73,8 +72,8 @@ public class ERModelBuilder implements Builder<ERModel> {
         // Build table reference relationships
         for (final ForeignKey fk : table.getImportedForeignKeys()) {
           final MutableTableReferenceRelationship rel = new MutableTableReferenceRelationship(fk);
-          final ForeignKeyCardinality cardinality = modelInferrer.inferForeignKeyCardinality(fk);
-          rel.setCardinality(RelationshipCardinality.from(cardinality));
+          final RelationshipCardinality cardinality = modelInferrer.inferCardinality(fk);
+          rel.setCardinality(cardinality);
 
           final Table leftTable = fk.getForeignKeyTable();
           rel.setLeftEntity(lookupOrCreateEntity(leftTable));
