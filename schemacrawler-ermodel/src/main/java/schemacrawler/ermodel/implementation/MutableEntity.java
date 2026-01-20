@@ -23,6 +23,7 @@ class MutableEntity extends AbstractTableBacked implements Entity {
   public MutableEntity(final Table table) {
     super(table);
     entityType = EntityType.unknown;
+    // No checks for partial table - exceptions will be thrown while calling unsupported methods
   }
 
   @Override
