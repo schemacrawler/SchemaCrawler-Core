@@ -29,6 +29,7 @@ import schemacrawler.ermodel.model.ManyToManyRelationship;
 import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.test.utility.WithTestDatabase;
 import us.fatehi.test.utility.TestWriter;
@@ -88,6 +89,10 @@ public class ERModelTest {
         out.println("  - %s [%s]".formatted(relationship, relationship.getType()));
         out.println("    - left: %s".formatted(relationship.getLeftEntity()));
         out.println("    - right: %s".formatted(relationship.getRightEntity()));
+      }
+      out.println("# Unmodeled tables:");
+      for (final Table table : erModel.getUnmodeledTables()) {
+        out.println("  - %s".formatted(table));
       }
     }
     assertThat(

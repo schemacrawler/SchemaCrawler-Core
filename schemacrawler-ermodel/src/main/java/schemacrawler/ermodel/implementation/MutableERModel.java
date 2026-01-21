@@ -8,6 +8,8 @@
 
 package schemacrawler.ermodel.implementation;
 
+import static java.util.function.Predicate.not;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -93,6 +95,18 @@ public class MutableERModel implements ERModel {
   @Override
   public Collection<Table> getTables() {
     return List.copyOf(tablesMap.values().stream().sorted().toList());
+  }
+
+  @Override
+  public Collection<Table> getUnmodeledTables() {
+    return tablesMap.keySet().stream()
+        // Not a valid entity
+        .filter(not(key -> VALID_ENTITY_TYPES.contains(entitiesMap.get(key).getType())))
+        // Not a bridge table
+        .filter(not(key -> relationshipsMap.containsKey(key)))
+        .map(key -> tablesMap.get(key))
+        .sorted()
+        .toList();
   }
 
   @Override

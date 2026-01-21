@@ -26,6 +26,8 @@ public interface ERModel {
 
   Collection<Table> getTables();
 
+  Collection<Table> getUnmodeledTables();
+
   Optional<Relationship> lookupByBridgeTable(Table table);
 
   Optional<Relationship> lookupByBridgeTableName(String tableName);
