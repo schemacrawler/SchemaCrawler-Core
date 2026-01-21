@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import schemacrawler.ermodel.model.EntityType;
-import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
@@ -45,26 +45,28 @@ public class EntityModelUtilityTest {
     // zero_one: Unique, Nullable
     final Table zeroOneTable = catalog.lookupTable(schema, "ZEROONECHILD").get();
     final ForeignKey zeroOneFk = zeroOneTable.getForeignKeys().iterator().next();
-    assertThat(EntityModelUtility.inferCardinality(zeroOneFk), is(ForeignKeyCardinality.zero_one));
+    assertThat(
+        EntityModelUtility.inferCardinality(zeroOneFk), is(RelationshipCardinality.zero_one));
 
     // one_one: Unique, Not Null
     final Table oneOneTable = catalog.lookupTable(schema, "ONEONECHILD").get();
     final ForeignKey oneOneFk = oneOneTable.getForeignKeys().iterator().next();
-    assertThat(EntityModelUtility.inferCardinality(oneOneFk), is(ForeignKeyCardinality.one_one));
+    assertThat(EntityModelUtility.inferCardinality(oneOneFk), is(RelationshipCardinality.one_one));
 
     // zero_many: Not Unique, Nullable
     final Table zeroManyTable = catalog.lookupTable(schema, "ZEROMANYCHILD").get();
     final ForeignKey zeroManyFk = zeroManyTable.getForeignKeys().iterator().next();
     assertThat(
-        EntityModelUtility.inferCardinality(zeroManyFk), is(ForeignKeyCardinality.zero_many));
+        EntityModelUtility.inferCardinality(zeroManyFk), is(RelationshipCardinality.zero_many));
 
     // one_many: Not Unique, Not Null
     final Table oneManyTable = catalog.lookupTable(schema, "ONEMANYCHILD").get();
     final ForeignKey oneManyFk = oneManyTable.getForeignKeys().iterator().next();
-    assertThat(EntityModelUtility.inferCardinality(oneManyFk), is(ForeignKeyCardinality.one_many));
+    assertThat(
+        EntityModelUtility.inferCardinality(oneManyFk), is(RelationshipCardinality.one_many));
 
     // unknown
-    assertThat(EntityModelUtility.inferCardinality(null), is(ForeignKeyCardinality.unknown));
+    assertThat(EntityModelUtility.inferCardinality(null), is(RelationshipCardinality.unknown));
   }
 
   @BeforeAll

@@ -9,25 +9,7 @@ package schemacrawler.ermodel.model;
 
 import static java.util.Objects.requireNonNull;
 
-/**
- * Describes the cardinality of a foreign-key relationship in terms of how many target rows may or
- * must be referenced from the source row.
- *
- * <p>The notation <code>(min..max)</code> follows common ER/UML conventions:
- *
- * <ul>
- *   <li><b>min = 0</b> → optional relationship (foreign key may be <code>NULL</code>)
- *   <li><b>min = 1</b> → mandatory relationship (foreign key must be <code>NOT NULL</code>)
- *   <li><b>max = 1</b> → at most one target row
- *   <li><b>max = many</b> → any number of target rows
- * </ul>
- *
- * <p>Note: Standard relational schemas express optional vs. mandatory relationships primarily
- * through <code>NULL</code>/<code>NOT NULL</code> constraints on the foreign-key column. The
- * minimum cardinality on the “many” side (for example, <code>1..many</code>) is usually enforced by
- * application logic rather than pure DDL.
- */
-public enum ForeignKeyCardinality {
+public enum RelationshipCardinality {
 
   /**
    * Cardinality is unknown or not specified.
@@ -139,11 +121,12 @@ public enum ForeignKeyCardinality {
    * every department has at least one employee — such constraints are usually implemented by
    * application logic or triggers.
    */
-  one_many("(1..many)");
+  one_many("(1..many)"),
+  many_many("(many..many)");
 
   private final String description;
 
-  ForeignKeyCardinality(final String description) {
+  RelationshipCardinality(final String description) {
     this.description = requireNonNull(description, "No description provided");
   }
 

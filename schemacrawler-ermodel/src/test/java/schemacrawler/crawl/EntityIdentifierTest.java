@@ -10,12 +10,15 @@ package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.ermodel.build.TableEntityModelInferrer;
+import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.crawl.LightTableReference;
+import us.fatehi.utility.OptionalBoolean;
 
 public class EntityIdentifierTest {
 
@@ -109,6 +112,21 @@ public class EntityIdentifierTest {
     assertThat(entityType, is(EntityType.subtype));
   }
 
+  @Test
+  public void testTablePartial() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+    final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL_1");
+    final TablePartial table2 = new TablePartial(schema, "TABLE_PARTIAL_2");
+    final TableReference ref = new LightTableReference("REF", table, table2);
+
+    TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
+    assertThat(modelInferrer.inferBridgeTable(), is(false));
+    assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
+    assertThat(modelInferrer.inferCardinality(ref), is(RelationshipCardinality.unknown));
+    assertThat(modelInferrer.coveredByIndex(ref), is(OptionalBoolean.unknown));
+    assertThat(modelInferrer.coveredByUniqueIndex(ref), is(OptionalBoolean.unknown));
+  }
+
   /**
    * Test for an unknown entity table (high connectivity).
    *
@@ -177,6 +195,23 @@ public class EntityIdentifierTest {
     assertThat(entityType, is(EntityType.unknown));
   }
 
+  @Test
+  public void testUnrelatedFk() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+
+    final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL");
+    final TablePartial tableUnrelated1 = new TablePartial(schema, "TABLE_UNRELATED_1");
+    final TablePartial tableUnrelated2 = new TablePartial(schema, "TABLE_UNRELATED_2");
+    final TableReference ref = new LightTableReference("REF", tableUnrelated1, tableUnrelated2);
+
+    TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
+    assertThat(modelInferrer.inferBridgeTable(), is(false));
+    assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
+    assertThat(modelInferrer.inferCardinality(ref), is(RelationshipCardinality.unknown));
+    assertThat(modelInferrer.coveredByIndex(ref), is(OptionalBoolean.unknown));
+    assertThat(modelInferrer.coveredByUniqueIndex(ref), is(OptionalBoolean.unknown));
+  }
+
   /**
    * Test for a weak entity table.
    *
@@ -221,13 +256,5 @@ public class EntityIdentifierTest {
 
     final EntityType entityType = new TableEntityModelInferrer(weakTable).inferEntityType();
     assertThat(entityType, is(EntityType.weak_entity));
-  }
-
-  @Test
-  public void testTablePartial() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL");
-
-    assertThrows(IllegalArgumentException.class, () -> new TableEntityModelInferrer(table));
   }
 }

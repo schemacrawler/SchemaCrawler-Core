@@ -15,7 +15,6 @@ import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
 import java.util.Arrays;
 import java.util.Collection;
-import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Schema;
@@ -71,9 +70,7 @@ public class ProposedWeakAssociationsTestUtility {
         out.println("table: " + table.getFullName());
         final Collection<WeakAssociation> weakAssociations = table.getWeakAssociations();
         for (final WeakAssociation weakFk : weakAssociations) {
-          out.println(
-              "  weak association (1 to %s):"
-                  .formatted(EntityModelUtility.inferCardinality(weakFk)));
+          out.println("  weak association:");
           for (final ColumnReference weakAssociationColumnReference : weakFk) {
             out.println("    column reference: %s".formatted(weakAssociationColumnReference));
           }

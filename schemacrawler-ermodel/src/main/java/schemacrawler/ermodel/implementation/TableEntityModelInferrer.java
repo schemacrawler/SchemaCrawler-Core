@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.ermodel.build;
+package schemacrawler.ermodel.implementation;
 
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
@@ -15,10 +15,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import schemacrawler.ermodel.model.EntityType;
-import schemacrawler.ermodel.model.ForeignKeyCardinality;
+import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
@@ -42,6 +42,7 @@ public final class TableEntityModelInferrer {
   private final Set<ForeignKey> importedForeignKeys;
 
   private final Set<Column> tablePkColumns;
+
   private final Map<NamedObjectKey, Set<Column>> importedColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> pkColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> parentPkColumnsMap;
@@ -53,9 +54,6 @@ public final class TableEntityModelInferrer {
    */
   public TableEntityModelInferrer(final Table table) {
     this.table = requireNonNull(table, "No table provided");
-    if (isPartial(table)) {
-      throw new IllegalArgumentException("Table cannot be partial");
-    }
 
     uniqueIndexes = new HashSet<>();
     indexes = new HashSet<>();
@@ -67,45 +65,10 @@ public final class TableEntityModelInferrer {
     pkColumnsMap = new HashMap<>();
     parentPkColumnsMap = new HashMap<>();
 
-    buildSupportingLookups();
-    buildIndexesLookup();
-  }
-
-  /**
-   * Checks if the columns of a foreign key are covered by an index on this table.
-   *
-   * @param fk Foreign key, can be null
-   * @return Whether the foreign key columns are covered by an index
-   */
-  public OptionalBoolean foreignKeyCoveredByIndex(final TableReference fk) {
-
-    if (fk == null) {
-      return OptionalBoolean.unknown;
+    if (!isPartial(table)) {
+      buildSupportingLookups();
+      buildIndexesLookup();
     }
-
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
-    for (final Set<Column> indexColumns : indexes) {
-      if (indexColumns.containsAll(importedColumns)) {
-        return OptionalBoolean.true_value;
-      }
-    }
-    return OptionalBoolean.false_value;
-  }
-
-  /**
-   * Checks if the columns of a foreign key are covered by a unique index on this table.
-   *
-   * @param fk Foreign key, can be null
-   * @return Whether the foreign key columns are covered by a unique index
-   */
-  public OptionalBoolean foreignKeyCoveredByUniqueIndex(final TableReference fk) {
-
-    if (fk == null) {
-      return OptionalBoolean.unknown;
-    }
-
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
-    return OptionalBoolean.fromBoolean(uniqueIndexes.contains(importedColumns));
   }
 
   /**
@@ -116,7 +79,7 @@ public final class TableEntityModelInferrer {
    *   <li>T has at least two foreign keys, each to a different parent table; and
    *   <li>there is a primary key or unique index whose columns are exactly those two foreign key
    *       columns; and
-   *   <li>there are no other columns in T that participate in the PK/unique index beyond those two
+   *   <li>there are no other columns in T that participate in the PK/ unique index beyond those two
    *       FKs.
    * </ul>
    *
@@ -161,6 +124,9 @@ public final class TableEntityModelInferrer {
 
     // Step 1: Check for non-entity pattern: Non-entity tables do not have a primary
     // key.
+    if (isPartial(table)) {
+      return EntityType.unknown;
+    }
     if (!table.hasPrimaryKey()) {
       return EntityType.non_entity;
     }
@@ -222,13 +188,13 @@ public final class TableEntityModelInferrer {
    * @param fk Foreign key
    * @return Foreign key cardinality
    */
-  public ForeignKeyCardinality inferForeignKeyCardinality(final TableReference fk) {
+  public RelationshipCardinality inferCardinality(final TableReference fk) {
 
-    if (fk == null) {
-      return ForeignKeyCardinality.unknown;
+    if (!isFkValid(fk)) {
+      return RelationshipCardinality.unknown;
     }
 
-    final ForeignKeyCardinality cardinality;
+    final RelationshipCardinality cardinality;
 
     final Set<Column> importedColumns = findOrGetImportedKeys(fk);
     final boolean isForeignKeyUnique = uniqueIndexes.contains(importedColumns);
@@ -236,17 +202,77 @@ public final class TableEntityModelInferrer {
 
     if (isForeignKeyUnique) {
       if (isForeignKeyOptional) {
-        cardinality = ForeignKeyCardinality.zero_one;
+        cardinality = RelationshipCardinality.zero_one;
       } else {
-        cardinality = ForeignKeyCardinality.one_one;
+        cardinality = RelationshipCardinality.one_one;
       }
     } else if (isForeignKeyOptional) {
-      cardinality = ForeignKeyCardinality.zero_many;
+      cardinality = RelationshipCardinality.zero_many;
     } else {
-      cardinality = ForeignKeyCardinality.one_many;
+      cardinality = RelationshipCardinality.one_many;
     }
 
     return cardinality;
+  }
+
+  /**
+   * Identifies the supertype of the table, if the table is a subtype.
+   *
+   * @return Entity type
+   */
+  public Optional<Table> inferSuperType() {
+
+    if (inferEntityType() != EntityType.subtype) {
+      return Optional.empty();
+    }
+
+    for (final ForeignKey fk : importedForeignKeys) {
+
+      final Set<Column> fkParentColumns = pkColumnsMap.get(fk.key());
+      final Set<Column> parentPkColumns = parentPkColumnsMap.get(fk.key());
+      // Revisit subtype conditions to locate the supertype
+      if (parentPkColumns.equals(fkParentColumns)) {
+        return Optional.of(fk.getPrimaryKeyTable());
+      }
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Checks if the columns of a foreign key are covered by an index on this table.
+   *
+   * @param fk Foreign key, can be null
+   * @return Whether the foreign key columns are covered by an index
+   */
+  public OptionalBoolean coveredByIndex(final TableReference fk) {
+
+    if (!isFkValid(fk)) {
+      return OptionalBoolean.unknown;
+    }
+
+    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    for (final Set<Column> indexColumns : indexes) {
+      if (indexColumns.containsAll(importedColumns)) {
+        return OptionalBoolean.true_value;
+      }
+    }
+    return OptionalBoolean.false_value;
+  }
+
+  /**
+   * Checks if the columns of a foreign key are covered by a unique index on this table.
+   *
+   * @param fk Foreign key, can be null
+   * @return Whether the foreign key columns are covered by a unique index
+   */
+  public OptionalBoolean coveredByUniqueIndex(final TableReference fk) {
+
+    if (!isFkValid(fk)) {
+      return OptionalBoolean.unknown;
+    }
+
+    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    return OptionalBoolean.fromBoolean(uniqueIndexes.contains(importedColumns));
   }
 
   @Override
@@ -257,14 +283,13 @@ public final class TableEntityModelInferrer {
   /** Builds a lookup of all known index column combinations for this table. */
   private void buildIndexesLookup() {
     if (table.hasPrimaryKey()) {
-      final HashSet<Column> pkColumns =
-          new HashSet<>(table.getPrimaryKey().getConstrainedColumns());
+      final Set<Column> pkColumns = Set.copyOf(table.getPrimaryKey().getConstrainedColumns());
       uniqueIndexes.add(pkColumns);
       indexes.add(pkColumns);
     }
     if (table.hasIndexes()) {
       for (final Index index : table.getIndexes()) {
-        final Set<Column> indexColumns = new HashSet<>(index.getColumns());
+        final Set<Column> indexColumns = Set.copyOf(index.getColumns());
         indexes.add(indexColumns);
         if (index.isUnique()) {
           uniqueIndexes.add(indexColumns);
@@ -287,9 +312,8 @@ public final class TableEntityModelInferrer {
 
     for (final ForeignKey fk : importedForeignKeys) {
       final Set<Column> fkParentColumns =
-          fk.getColumnReferences().stream()
-              .map(ColumnReference::getPrimaryKeyColumn)
-              .collect(Collectors.toSet());
+          Set.copyOf(
+              fk.getColumnReferences().stream().map(ColumnReference::getPrimaryKeyColumn).toList());
       pkColumnsMap.put(fk.key(), fkParentColumns);
 
       findOrGetImportedKeys(fk);
@@ -297,7 +321,7 @@ public final class TableEntityModelInferrer {
       final Table parentTable = fk.getPrimaryKeyTable();
       if (!isPartial(parentTable) && parentTable.hasPrimaryKey()) {
         final Set<Column> parentPkColumns =
-            new HashSet<>(parentTable.getPrimaryKey().getConstrainedColumns());
+            Set.copyOf(parentTable.getPrimaryKey().getConstrainedColumns());
         parentPkColumnsMap.put(fk.key(), parentPkColumns);
       } else {
         parentPkColumnsMap.put(fk.key(), Collections.emptySet());
@@ -307,17 +331,18 @@ public final class TableEntityModelInferrer {
 
   private Set<Column> findOrGetImportedKeys(final TableReference fk) {
     requireNonNull(fk, "No foreign key provided");
+    return importedColumnsMap.computeIfAbsent(
+        fk.key(),
+        key ->
+            Set.copyOf(
+                fk.getColumnReferences().stream()
+                    .map(ColumnReference::getForeignKeyColumn)
+                    .toList()));
+  }
 
-    final Set<Column> importedColumns;
-    if (importedColumnsMap.containsKey(fk.key())) {
-      importedColumns = importedColumnsMap.get(fk.key());
-    } else {
-      importedColumns =
-          fk.getColumnReferences().stream()
-              .map(ColumnReference::getForeignKeyColumn)
-              .collect(Collectors.toSet());
-      importedColumnsMap.put(fk.key(), importedColumns);
-    }
-    return importedColumns;
+  private boolean isFkValid(final TableReference fk) {
+    final boolean isNotValid =
+        fk == null || isPartial(table) || !fk.getForeignKeyTable().equals(table);
+    return !isNotValid;
   }
 }

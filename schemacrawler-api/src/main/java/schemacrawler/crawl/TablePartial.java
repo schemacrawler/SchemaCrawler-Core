@@ -127,6 +127,7 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
   }
 
   @Override
+  @Deprecated(forRemoval = true)
   public Collection<WeakAssociation> getWeakAssociations() {
     throw new NotLoadedException(this);
   }
