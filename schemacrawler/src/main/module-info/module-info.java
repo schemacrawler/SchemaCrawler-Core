@@ -33,6 +33,11 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.utility;
   // Do NOT export schemacrawler.crawl - this is an internal implementation package
 
+  // Export public API packages from schemacrawler-ermodel
+  exports schemacrawler.ermodel.model;
+  exports schemacrawler.ermodel.utility;
+  // Do NOT export schemacrawler.ermodel.implementation - this is an internal package
+
   // Export public API packages from schemacrawler-tools
   exports schemacrawler.tools.catalogloader;
   exports schemacrawler.tools.databaseconnector;
@@ -43,8 +48,6 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.tools.utility;
 
   // Export public API packages from schemacrawler-loader
-  exports schemacrawler.ermodel.model;
-  exports schemacrawler.ermodel.utility;
   exports schemacrawler.loader.utility;
 
   // ServiceLoader providers
