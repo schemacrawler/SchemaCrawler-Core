@@ -50,7 +50,7 @@ public class GettersSettersTest {
   }
 
   // Configured for expectation, so we know when a class gets added or removed.
-  private static final int EXPECTED_CLASS_COUNT = 57;
+  private static final int EXPECTED_CLASS_COUNT = 56;
 
   private static final String PACKAGE_SCHEMACRAWLER_SCHEMA = "schemacrawler.schema";
 
@@ -61,7 +61,8 @@ public class GettersSettersTest {
     "TableTypes",
     "Identifiers",
     "IdentifiersBuilder",
-    "IdentifierQuotingStrategy"
+    "IdentifierQuotingStrategy",
+    "Test"
   };
 
   @Test
