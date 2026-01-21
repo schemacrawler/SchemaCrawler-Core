@@ -1,4 +1,4 @@
-package schemacrawler.schema;
+package schemacrawler.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import schemacrawler.schema.NamedObjectKey;
 
 public class NamedObjectKeyTest {
 
