@@ -27,6 +27,11 @@
     </dependency>
     <dependency>
       <groupId>us.fatehi</groupId>
+      <artifactId>schemacrawler-ermodel</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <groupId>us.fatehi</groupId>
       <artifactId>schemacrawler-tools</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -54,6 +59,7 @@
               <dependencySourceIncludes>
                 <dependencySourceInclude>us.fatehi:schemacrawler-utility</dependencySourceInclude>
                 <dependencySourceInclude>us.fatehi:schemacrawler-api</dependencySourceInclude>
+                <dependencySourceInclude>us.fatehi:schemacrawler-ermodel</dependencySourceInclude>
                 <dependencySourceInclude>us.fatehi:schemacrawler-tools</dependencySourceInclude>
                 <dependencySourceInclude>us.fatehi:schemacrawler-loader</dependencySourceInclude>
               </dependencySourceIncludes>
@@ -87,6 +93,7 @@
                 <includes>
                   <include>us.fatehi:schemacrawler-utility</include>
                   <include>us.fatehi:schemacrawler-api</include>
+                  <include>us.fatehi:schemacrawler-ermodel</include>
                   <include>us.fatehi:schemacrawler-tools</include>
                   <include>us.fatehi:schemacrawler-loader</include>
                 </includes>
