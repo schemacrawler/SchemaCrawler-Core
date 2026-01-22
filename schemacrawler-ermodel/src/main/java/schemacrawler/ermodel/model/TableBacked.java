@@ -9,13 +9,10 @@
 package schemacrawler.ermodel.model;
 
 import java.util.Collection;
-import schemacrawler.schema.AttributedObject;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.DescribedObject;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Table;
 
-public interface TableBacked extends NamedObject, AttributedObject, DescribedObject {
+public interface TableBacked extends DatabaseObjectBacked<Table> {
 
   Collection<Column> getAttributeColumns();
 

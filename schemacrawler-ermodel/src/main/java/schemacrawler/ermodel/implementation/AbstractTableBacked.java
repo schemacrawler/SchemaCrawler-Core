@@ -8,107 +8,31 @@
 
 package schemacrawler.ermodel.implementation;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.Serial;
 import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import schemacrawler.ermodel.model.TableBacked;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 
-abstract class AbstractTableBacked implements TableBacked {
+public class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
+    implements TableBacked {
 
-  @Serial private static final long serialVersionUID = -1252099222675350939L;
-
-  private final Table table;
+  @Serial private static final long serialVersionUID = 7423406592008806690L;
 
   public AbstractTableBacked(final Table table) {
-    this.table = requireNonNull(table, "No table provided");
-  }
-
-  @Override
-  public <T> T getAttribute(final String name) {
-    return table.getAttribute(name);
-  }
-
-  @Override
-  public <T> T getAttribute(final String name, final T defaultValue) throws ClassCastException {
-    return table.getAttribute(name, defaultValue);
+    super(table);
   }
 
   @Override
   public Collection<Column> getAttributeColumns() {
-    return table.getColumns().stream()
+    return getDatabaseObject().getColumns().stream()
         .filter(column -> !column.isPartOfPrimaryKey() && !column.isPartOfForeignKey())
         .collect(Collectors.toList());
   }
 
   @Override
-  public Map<String, Object> getAttributes() {
-    return table.getAttributes();
-  }
-
-  @Override
-  public String getFullName() {
-    return table.getFullName();
-  }
-
-  @Override
-  public String getName() {
-    return table.getName();
-  }
-
-  @Override
-  public String getRemarks() {
-    return table.getRemarks();
-  }
-
-  @Override
   public Table getTable() {
-    return table;
-  }
-
-  @Override
-  public boolean hasAttribute(final String name) {
-    return table.hasAttribute(name);
-  }
-
-  @Override
-  public boolean hasRemarks() {
-    return table.hasRemarks();
-  }
-
-  @Override
-  public NamedObjectKey key() {
-    return table.key();
-  }
-
-  @Override
-  public <T> Optional<T> lookupAttribute(final String name) {
-    return table.lookupAttribute(name);
-  }
-
-  @Override
-  public void removeAttribute(final String name) {
-    table.removeAttribute(name);
-  }
-
-  @Override
-  public <T> void setAttribute(final String name, final T value) {
-    table.setAttribute(name, value);
-  }
-
-  @Override
-  public void setRemarks(final String remarks) {
-    table.setRemarks(remarks);
-  }
-
-  @Override
-  public String toString() {
-    return table.toString();
+    return getDatabaseObject();
   }
 }

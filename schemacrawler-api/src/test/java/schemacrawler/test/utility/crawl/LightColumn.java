@@ -16,8 +16,6 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import schemacrawler.schema.Column;
@@ -29,7 +27,7 @@ import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 
-final class LightColumn implements Column {
+final class LightColumn extends AbstractLightNamedObject implements Column {
 
   @Serial private static final long serialVersionUID = -1931193814458050468L;
 
@@ -90,21 +88,6 @@ final class LightColumn implements Column {
   }
 
   @Override
-  public <T> T getAttribute(final String name) {
-    return null;
-  }
-
-  @Override
-  public <T> T getAttribute(final String name, final T defaultValue) throws ClassCastException {
-    return null;
-  }
-
-  @Override
-  public Map<String, Object> getAttributes() {
-    return new HashMap<>();
-  }
-
-  @Override
   public ColumnDataType getColumnDataType() {
     return columnDataType;
   }
@@ -152,11 +135,6 @@ final class LightColumn implements Column {
   }
 
   @Override
-  public String getRemarks() {
-    return "";
-  }
-
-  @Override
   public Schema getSchema() {
     return parent.getSchema();
   }
@@ -182,18 +160,8 @@ final class LightColumn implements Column {
   }
 
   @Override
-  public boolean hasAttribute(final String name) {
-    return false;
-  }
-
-  @Override
   public int hashCode() {
     return Objects.hash(name, parent);
-  }
-
-  @Override
-  public boolean hasRemarks() {
-    return false;
   }
 
   @Override
@@ -257,23 +225,9 @@ final class LightColumn implements Column {
   }
 
   @Override
-  public <T> Optional<T> lookupAttribute(final String name) {
-    return Optional.empty();
-  }
-
-  @Override
   public <P extends Privilege<Column>> Optional<P> lookupPrivilege(final String name) {
     return Optional.empty();
   }
-
-  @Override
-  public void removeAttribute(final String name) {}
-
-  @Override
-  public <T> void setAttribute(final String name, final T value) {}
-
-  @Override
-  public void setRemarks(final String remarks) {}
 
   @Override
   public String toString() {
