@@ -11,20 +11,18 @@ package schemacrawler.test.utility.crawl;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import schemacrawler.schema.ActionOrientationType;
 import schemacrawler.schema.ConditionTimingType;
 import schemacrawler.schema.EventManipulationType;
+import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.Trigger;
-import schemacrawler.schema.Identifiers;
 
-public class LightTrigger implements Trigger {
+public class LightTrigger extends AbstractLightNamedObject implements Trigger {
 
   @Serial private static final long serialVersionUID = -2552665161195438344L;
 
@@ -65,21 +63,6 @@ public class LightTrigger implements Trigger {
   }
 
   @Override
-  public <T> T getAttribute(String name) {
-    return null;
-  }
-
-  @Override
-  public <T> T getAttribute(String name, T defaultValue) throws ClassCastException {
-    return null;
-  }
-
-  @Override
-  public Map<String, Object> getAttributes() {
-    return null;
-  }
-
-  @Override
   public ConditionTimingType getConditionTiming() {
     return null;
   }
@@ -105,11 +88,6 @@ public class LightTrigger implements Trigger {
   }
 
   @Override
-  public String getRemarks() {
-    return null;
-  }
-
-  @Override
   public Schema getSchema() {
     return schema;
   }
@@ -117,16 +95,6 @@ public class LightTrigger implements Trigger {
   @Override
   public String getShortName() {
     return name;
-  }
-
-  @Override
-  public boolean hasAttribute(String name) {
-    return false;
-  }
-
-  @Override
-  public boolean hasRemarks() {
-    return false;
   }
 
   @Override
@@ -139,23 +107,9 @@ public class LightTrigger implements Trigger {
     return null;
   }
 
-  @Override
-  public <T> Optional<T> lookupAttribute(String name) {
-    return Optional.empty();
-  }
-
-  @Override
-  public void removeAttribute(String name) {}
-
   public void setActionStatement(String actionStatement) {
     this.actionStatement = actionStatement;
   }
-
-  @Override
-  public <T> void setAttribute(String name, T value) {}
-
-  @Override
-  public void setRemarks(String remarks) {}
 
   @Override
   public void withQuoting(Identifiers identifiers) {}

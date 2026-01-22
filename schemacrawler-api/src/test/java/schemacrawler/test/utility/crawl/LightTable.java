@@ -17,9 +17,7 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -41,7 +39,7 @@ import schemacrawler.schema.Trigger;
 import schemacrawler.schema.WeakAssociation;
 import schemacrawler.schemacrawler.SchemaReference;
 
-public final class LightTable implements Table {
+public final class LightTable extends AbstractLightNamedObject implements Table {
 
   @Serial private static final long serialVersionUID = -309232480533750613L;
 
@@ -49,15 +47,12 @@ public final class LightTable implements Table {
   private final String name;
   private final List<Column> columns;
   private final List<Column> hiddenColumns;
-  private final Map<String, Object> attributes;
   private final Collection<Trigger> triggers;
   private String definition;
-  private String remarks;
 
   public LightTable(final Schema schema, final String name) {
     this.schema = requireNonNull(schema, "No schema provided");
     this.name = requireNotBlank(name, "No table name provided");
-    attributes = new HashMap<>();
     columns = new ArrayList<>();
     hiddenColumns = new ArrayList<>();
     triggers = new ArrayList<>();
@@ -117,24 +112,6 @@ public final class LightTable implements Table {
   @Override
   public Collection<PrimaryKey> getAlternateKeys() {
     return Collections.emptyList();
-  }
-
-  @Override
-  public <T> T getAttribute(final String name) {
-    return (T) attributes.get(name);
-  }
-
-  @Override
-  public <T> T getAttribute(final String name, final T defaultValue) throws ClassCastException {
-    if (hasAttribute(name)) {
-      return getAttribute(name);
-    }
-    return defaultValue;
-  }
-
-  @Override
-  public Map<String, Object> getAttributes() {
-    return attributes;
   }
 
   @Override
@@ -198,11 +175,6 @@ public final class LightTable implements Table {
   }
 
   @Override
-  public String getRemarks() {
-    return trimToEmpty(remarks);
-  }
-
-  @Override
   public Schema getSchema() {
     return schema;
   }
@@ -239,11 +211,6 @@ public final class LightTable implements Table {
   }
 
   @Override
-  public boolean hasAttribute(final String name) {
-    return attributes.containsKey(name);
-  }
-
-  @Override
   public boolean hasDefinition() {
     return false;
   }
@@ -269,11 +236,6 @@ public final class LightTable implements Table {
   }
 
   @Override
-  public boolean hasRemarks() {
-    return !isBlank(remarks);
-  }
-
-  @Override
   public boolean hasTriggers() {
     return !triggers.isEmpty();
   }
@@ -291,11 +253,6 @@ public final class LightTable implements Table {
   @Override
   public <A extends PrimaryKey> Optional<A> lookupAlternateKey(final String name) {
     return Optional.empty();
-  }
-
-  @Override
-  public <T> Optional<T> lookupAttribute(final String name) {
-    return Optional.ofNullable(getAttribute(name));
   }
 
   @Override
@@ -333,23 +290,8 @@ public final class LightTable implements Table {
     return Optional.empty();
   }
 
-  @Override
-  public void removeAttribute(final String name) {
-    attributes.remove(name);
-  }
-
-  @Override
-  public <T> void setAttribute(final String name, final T value) {
-    attributes.put(name, value);
-  }
-
   public void setDefinition(String definition) {
     this.definition = definition;
-  }
-
-  @Override
-  public void setRemarks(final String remarks) {
-    this.remarks = remarks;
   }
 
   @Override
