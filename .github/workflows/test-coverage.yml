@@ -48,24 +48,16 @@ jobs:
         name: coverage-test-results
         path: ./schemacrawler-verify/target/site/jacoco-aggregate
         retention-days: 5
-    - id: publish-coverage-codecov
-      name: Upload coverage report to Codecov
-      if: contains(github.ref, 'main')
-      continue-on-error: true
-      uses: codecov/codecov-action@v5
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        verbose: true
     - id: publish-coverage-codacy
       name: Upload coverage report to Codacy
       uses: codacy/codacy-coverage-reporter-action@v1
       if: contains(github.ref, 'main')
-      continue-on-error: true
+      # continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CODACY_ORGANIZATION_PROVIDER: gh
-        CODACY_USERNAME: schemacrawler
-        CODACY_PROJECT_NAME: SchemaCrawler
+        # CODACY_ORGANIZATION_PROVIDER: gh
+        # CODACY_USERNAME: schemacrawler
+        # CODACY_PROJECT_NAME: SchemaCrawler-Core
         CODACY_API_TOKEN: ${{ secrets.CODACY_API_TOKEN }}
       with:
         api-token: ${{ secrets.CODACY_API_TOKEN }}
