@@ -38,7 +38,9 @@ jobs:
           -Dtestcoverage \
           -Dreactor.printOrder \
           -Dmaven.javadoc.skip=false \
-          clean verify
+          -Dmaven.javadoc.failOnError=false \
+          clean verify \
+          jacoco:report-aggregate
 
 # GET TEST RESULTS
     - id: upload-coverage-test-results
@@ -52,12 +54,12 @@ jobs:
       name: Upload coverage report to Codacy
       uses: codacy/codacy-coverage-reporter-action@v1
       if: contains(github.ref, 'main')
-      # continue-on-error: true
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # CODACY_ORGANIZATION_PROVIDER: gh
-        # CODACY_USERNAME: schemacrawler
-        # CODACY_PROJECT_NAME: SchemaCrawler-Core
+        CODACY_ORGANIZATION_PROVIDER: gh
+        CODACY_USERNAME: schemacrawler
+        CODACY_PROJECT_NAME: SchemaCrawler-Core
         CODACY_API_TOKEN: ${{ secrets.CODACY_API_TOKEN }}
       with:
         api-token: ${{ secrets.CODACY_API_TOKEN }}
