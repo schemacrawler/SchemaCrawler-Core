@@ -37,19 +37,19 @@ public class TableMatchKeysTest {
     assertThat(matchkeys.toString(), is("{}"));
 
     withoutPrefix = matchkeys.get(new LightTable("table0"));
-    assertThat(withoutPrefix, containsInAnyOrder("table0"));
+    assertThat(withoutPrefix, is(nullValue()));
 
     // 3.
     matchkeys = new TableMatchKeys(tables("table1"));
     assertThat(matchkeys.toString(), is("{table1=[table1]}"));
 
     withoutPrefix = matchkeys.get(new LightTable("table0"));
-    assertThat(withoutPrefix, containsInAnyOrder("table0"));
+    assertThat(withoutPrefix, is(nullValue()));
 
     withoutPrefix = matchkeys.get(new LightTable("table1"));
     assertThat(withoutPrefix, containsInAnyOrder("table1"));
 
-    withoutPrefix = matchkeys.get(null);
+    withoutPrefix = matchkeys.get((Table) null);
     assertThat(withoutPrefix, is(nullValue()));
   }
 
@@ -61,7 +61,7 @@ public class TableMatchKeysTest {
         new TableMatchKeys(tables("vap_old_table1", "vap_old_table2", "vap_table3"));
 
     withoutPrefix = matchkeys.get(new LightTable("table0"));
-    assertThat(withoutPrefix, containsInAnyOrder("table0"));
+    assertThat(withoutPrefix, is(nullValue()));
 
     withoutPrefix = matchkeys.get(new LightTable("vap_old_table1"));
     assertThat(withoutPrefix, containsInAnyOrder("table1", "old_table1", "vap_old_table1"));

@@ -22,6 +22,8 @@ import us.fatehi.utility.Multimap;
  */
 final class ColumnMatchKeysMap {
 
+  private static final String ID_SUFFIX_REGEX = "_?id$";
+
   private final Multimap<String, Column> columnsForMatchKey;
   private final Multimap<Column, String> matchKeysForColumn;
 
@@ -59,7 +61,7 @@ final class ColumnMatchKeysMap {
   private void mapColumnNameMatches(final Table table) {
     for (final Column column : table.getColumns()) {
       final String columnName = column.getName().toLowerCase();
-      final String matchColumnName = columnName.replaceAll("_?id$", "");
+      final String matchColumnName = columnName.replaceAll(ID_SUFFIX_REGEX, "");
       if (!isBlank(matchColumnName)) {
         columnsForMatchKey.add(matchColumnName, column);
         matchKeysForColumn.add(column, matchColumnName);
