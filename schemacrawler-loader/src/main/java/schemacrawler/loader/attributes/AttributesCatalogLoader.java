@@ -34,6 +34,7 @@ import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import schemacrawler.tools.catalogloader.BaseCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
+import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.ioresource.InputResource;
 import us.fatehi.utility.ioresource.InputResourceUtility;
 import us.fatehi.utility.property.PropertyName;
@@ -76,7 +77,8 @@ public class AttributesCatalogLoader extends BaseCatalogLoader {
 
     try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadAttributes", 1); ) {
       final Catalog catalog = getCatalog();
-      final Config config = getAdditionalConfiguration();
+      final Config config =
+          Optional.ofNullable(getAdditionalConfiguration()).orElseGet(ConfigUtility::newConfig);
       final TaskDefinition.TaskRunnable taskRunnable =
           () -> {
             final String catalogAttributesFile = config.getStringValue(OPTION_ATTRIBUTES_FILE);
@@ -84,7 +86,7 @@ public class AttributesCatalogLoader extends BaseCatalogLoader {
               return;
             }
             final InputResource inputResource =
-                InputResourceUtility.createInputResource(catalogAttributesFile)
+                resolveCatalogAttributesInputResource(catalogAttributesFile)
                     .orElseThrow(
                         () ->
                             new IORuntimeException(
@@ -196,5 +198,22 @@ public class AttributesCatalogLoader extends BaseCatalogLoader {
         }
       }
     }
+  }
+
+  /**
+   * Resolves the catalog attributes resource, tolerating a leading slash for classpath resources.
+   *
+   * @param catalogAttributesFile Resource path or file location
+   * @return Resolved input resource, if available
+   */
+  private Optional<InputResource> resolveCatalogAttributesInputResource(
+      final String catalogAttributesFile) {
+    final Optional<InputResource> inputResource =
+        InputResourceUtility.createInputResource(catalogAttributesFile);
+    if (inputResource.isPresent() || !catalogAttributesFile.startsWith("/")) {
+      return inputResource;
+    }
+    final String normalized = catalogAttributesFile.substring(1);
+    return InputResourceUtility.createInputResource(normalized);
   }
 }

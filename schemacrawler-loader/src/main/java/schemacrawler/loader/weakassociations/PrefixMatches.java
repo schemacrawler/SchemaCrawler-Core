@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -91,6 +93,26 @@ public final class PrefixMatches {
         Level.FINE, new StringFormat("Key matches map: %s", new ObjectToStringFormat(keyPrefixes)));
   }
 
+  private Map<String, Integer> countPrefixKeyOccurrences(final List<String> keys) {
+    final Map<String, Integer> prefixKeyCounts = new TreeMap<>();
+    for (final String key : keys) {
+      final String[] splitKey = splitList(key, keySeparator);
+      if (splitKey == null || splitKey.length == 0) {
+        continue;
+      }
+
+      // Build cumulative prefixes token-by-token: "schema_", "schema_table_", etc.
+      final StringBuilder buffer = new StringBuilder(1024);
+      for (final String token : splitKey) {
+        buffer.append(token).append(keySeparator);
+        final String prefix = buffer.toString();
+        final int prevCount = prefixKeyCounts.getOrDefault(prefix, 0);
+        prefixKeyCounts.put(prefix, prevCount + 1);
+      }
+    }
+    return prefixKeyCounts;
+  }
+
   /**
    * Finds key prefixes. Prefixes are separated by a separator character.
    *
@@ -112,8 +134,7 @@ public final class PrefixMatches {
 
     // Sort prefixes by the number of keys using them, in descending order
     final List<Map.Entry<String, Integer>> prefixesList = new ArrayList<>(prefixesMap.entrySet());
-    Collections.sort(
-        prefixesList, (entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue()));
+    Collections.sort(prefixesList, Comparator.comparing(Entry<String, Integer>::getValue));
 
     // Reduce the number of prefixes in use by keeping the top-ranked few and any
     // prefix that is still widely shared. This balances signal (popular prefixes)
@@ -131,26 +152,6 @@ public final class PrefixMatches {
     prefixes.add("");
 
     return prefixes;
-  }
-
-  private Map<String, Integer> countPrefixKeyOccurrences(final List<String> keys) {
-    final Map<String, Integer> prefixKeyCounts = new TreeMap<>();
-    for (final String key : keys) {
-      final String[] splitKey = splitList(key, keySeparator);
-      if (splitKey == null || splitKey.length == 0) {
-        continue;
-      }
-
-      // Build cumulative prefixes token-by-token: "schema_", "schema_table_", etc.
-      final StringBuilder buffer = new StringBuilder(1024);
-      for (final String token : splitKey) {
-        buffer.append(token).append(keySeparator);
-        final String prefix = buffer.toString();
-        final int prevCount = prefixKeyCounts.getOrDefault(prefix, 0);
-        prefixKeyCounts.put(prefix, prevCount + 1);
-      }
-    }
-    return prefixKeyCounts;
   }
 
   private void mapPrefixes(final List<String> keys, final Collection<String> prefixes) {

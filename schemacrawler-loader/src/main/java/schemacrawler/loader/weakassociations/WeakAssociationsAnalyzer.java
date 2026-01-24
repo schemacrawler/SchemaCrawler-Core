@@ -80,7 +80,7 @@ public final class WeakAssociationsAnalyzer {
       for (final Column pkColumn : tableCandidateKeys) {
         final Set<String> fkColumnMatchKeys = new HashSet<>();
         // Look for all columns matching this table match key
-        if (pkColumn.isPartOfPrimaryKey()) {
+        if (pkColumn.isPartOfPrimaryKey() && tableMatchKeys.containsKey(table)) {
           fkColumnMatchKeys.addAll(tableMatchKeys.get(table));
         }
         // Look for all columns matching this column match key
