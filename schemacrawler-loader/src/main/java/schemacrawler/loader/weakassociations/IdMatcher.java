@@ -15,16 +15,18 @@ import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
 
 /**
- * Matches weak associations based on conventional naming rules for foreign keys ending with {@code
- * _id}, {@code _key}, or {@code _keyid}. The primary key column must not be named only {@code id}
- * so that purely generic primary keys do not incorrectly match every foreign key.
+ * Matches weak associations based on conventional naming rules for foreign keys.
+ *
+ * <p>A match is found if the foreign key column name ends with a conventional suffix ({@code _id},
+ * {@code _key}, or {@code _keyid}), and the primary key column is not a generic "id" column. This
+ * prevents generic primary keys from incorrectly matching every potential foreign key.
  */
 public final class IdMatcher implements Predicate<ProposedWeakAssociation> {
 
   private static final Logger LOGGER = Logger.getLogger(IdMatcher.class.getName());
 
-  private static final Pattern endsWithIdPattern = Pattern.compile(".*(?i)_?(id|key|keyid)$");
-  private static final Pattern isIdPattern = Pattern.compile("^(?i)_?(id|key|keyid)$");
+  private static final Pattern endsWithIdPattern = Pattern.compile("(?i).*_?(id|key|keyid)$");
+  private static final Pattern isIdPattern = Pattern.compile("(?i)_?(id|key|keyid)$");
 
   @Override
   public boolean test(final ProposedWeakAssociation proposedWeakAssociation) {
@@ -36,6 +38,7 @@ public final class IdMatcher implements Predicate<ProposedWeakAssociation> {
     final Column primaryKeyColumn = proposedWeakAssociation.getPrimaryKeyColumn();
 
     final boolean fkColEndsWithId = endsWithIdPattern.matcher(foreignKeyColumn.getName()).matches();
+    // PK column must have the suffix, but it must not be ONLY the suffix (generic name)
     final boolean pkColEndsWithId =
         endsWithIdPattern.matcher(primaryKeyColumn.getName()).matches()
             && !isIdPattern.matcher(primaryKeyColumn.getName()).matches();

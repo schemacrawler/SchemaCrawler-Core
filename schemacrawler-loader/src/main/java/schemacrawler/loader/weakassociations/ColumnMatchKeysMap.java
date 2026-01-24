@@ -17,8 +17,16 @@ import schemacrawler.schema.Table;
 import us.fatehi.utility.Multimap;
 
 /**
- * Maintains match keys for columns by normalizing names (lowercase) and removing a trailing {@code
- * _id} suffix. The match keys are used to group likely foreign key columns and primary key columns.
+ * Maintains a bidirectional mapping between columns and their normalized match keys.
+ *
+ * <p>Match keys are derived by:
+ * <ol>
+ *   <li>Converting the column name to lowercase.
+ *   <li>Removing a trailing {@code _id} suffix (e.g., "customer_id" becomes "customer").
+ * </ol>
+ *
+ * <p>These keys are used to group likely foreign key columns with their corresponding primary key
+ * columns based on naming conventions.
  */
 final class ColumnMatchKeysMap {
 
