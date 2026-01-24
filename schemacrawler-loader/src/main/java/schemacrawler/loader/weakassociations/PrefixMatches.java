@@ -6,11 +6,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package us.fatehi.utility;
+package schemacrawler.loader.weakassociations;
 
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.CollectionsUtility.splitList;
-import static us.fatehi.utility.Utility.commonPrefix;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.util.ArrayList;
@@ -23,16 +22,32 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import us.fatehi.utility.Inflection;
+import us.fatehi.utility.Multimap;
 import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
 
+/**
+ * Derives normalized match keys by stripping common prefixes (based on a separator) and
+ * singularizing the remaining token. These match keys are used by weak association inference to
+ * relate tables and columns that share naming patterns across schemas.
+ */
 public final class PrefixMatches {
 
   private static final Logger LOGGER = Logger.getLogger(PrefixMatches.class.getName());
 
+  private static final int MAX_TOP_PREFIXES = 5;
+  private static final double MIN_SHARED_PREFIX_RATIO = 0.5;
+
   private final String keySeparator;
   private final Multimap<String, String> keyPrefixes;
 
+  /**
+   * Creates match keys for a set of names using a token separator.
+   *
+   * @param keys Keys to analyze
+   * @param keySeparator Separator between key tokens
+   */
   public PrefixMatches(final List<String> keys, final String keySeparator) {
     this.keySeparator = requireNonNull(keySeparator, "No key separator provided");
     keyPrefixes = new Multimap<>();
@@ -40,6 +55,12 @@ public final class PrefixMatches {
     analyze(keys);
   }
 
+  /**
+   * Returns normalized match keys for the supplied key.
+   *
+   * @param key Key to look up
+   * @return Normalized match keys
+   */
   public List<String> get(final String key) {
     if (keyPrefixes.containsKey(key)) {
       return keyPrefixes.get(key);
@@ -47,6 +68,11 @@ public final class PrefixMatches {
     return Arrays.asList(key);
   }
 
+  /**
+   * Returns a string representation of the match key map.
+   *
+   * @return Match key map as a string
+   */
   @Override
   public String toString() {
     return keyPrefixes.toString();
@@ -73,41 +99,14 @@ public final class PrefixMatches {
    */
   private Collection<String> findPrefixes(final List<String> keys) {
     final SortedMap<String, Integer> prefixesMap = new TreeMap<>();
-    for (int i = 0; i < keys.size(); i++) {
-      for (int j = i + 1; j < keys.size(); j++) {
-        final String key1 = keys.get(i);
-        final String key2 = keys.get(j);
-        final String commonPrefix = commonPrefix(key1, key2);
-        if (isBlank(commonPrefix)) {
-          continue;
-        }
-
-        final List<String> splitCommonPrefixes = new ArrayList<>();
-        final String[] splitPrefix = splitList(commonPrefix, keySeparator);
-        if (splitPrefix != null && splitPrefix.length > 0) {
-          for (int k = 0; k < splitPrefix.length; k++) {
-            final StringBuilder buffer = new StringBuilder(1024);
-            for (int l = 0; l < k; l++) {
-              buffer.append(splitPrefix[l]).append(keySeparator);
-            }
-            if (buffer.length() > 0) {
-              splitCommonPrefixes.add(buffer.toString());
-            }
-          }
-        }
-        if (commonPrefix.endsWith(keySeparator)) {
-          splitCommonPrefixes.add(commonPrefix);
-        }
-
-        for (final String splitCommonPrefix : splitCommonPrefixes) {
-          final int prevCount;
-          if (prefixesMap.containsKey(splitCommonPrefix)) {
-            prevCount = prefixesMap.get(splitCommonPrefix);
-          } else {
-            prevCount = 0;
-          }
-          prefixesMap.put(splitCommonPrefix, prevCount + 1);
-        }
+    // Count how many keys share each token-boundary prefix in a single pass
+    final Map<String, Integer> prefixKeyCounts = countPrefixKeyOccurrences(keys);
+    // Convert counts to pair counts to preserve the previous ranking semantics
+    for (final Map.Entry<String, Integer> entry : prefixKeyCounts.entrySet()) {
+      final int keyCount = entry.getValue();
+      if (keyCount > 1) {
+        final int pairCount = keyCount * (keyCount - 1) / 2;
+        prefixesMap.put(entry.getKey(), pairCount);
       }
     }
 
@@ -116,11 +115,15 @@ public final class PrefixMatches {
     Collections.sort(
         prefixesList, (entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue()));
 
-    // Reduce the number of prefixes in use
+    // Reduce the number of prefixes in use by keeping the top-ranked few and any
+    // prefix that is still widely shared. This balances signal (popular prefixes)
+    // with keeping the list small enough to avoid noisy matches.
     final List<String> prefixes = new ArrayList<>();
     for (int i = 0; i < prefixesList.size(); i++) {
-      final boolean add = i < 5 || prefixesList.get(i).getValue() > prefixesMap.size() * 0.5;
-      if (add) {
+      final boolean isTopPrefix = i < MAX_TOP_PREFIXES;
+      final boolean isWidelyUsed =
+          prefixesList.get(i).getValue() > prefixesMap.size() * MIN_SHARED_PREFIX_RATIO;
+      if (isTopPrefix || isWidelyUsed) {
         prefixes.add(prefixesList.get(i).getKey());
       }
     }
@@ -128,6 +131,26 @@ public final class PrefixMatches {
     prefixes.add("");
 
     return prefixes;
+  }
+
+  private Map<String, Integer> countPrefixKeyOccurrences(final List<String> keys) {
+    final Map<String, Integer> prefixKeyCounts = new TreeMap<>();
+    for (final String key : keys) {
+      final String[] splitKey = splitList(key, keySeparator);
+      if (splitKey == null || splitKey.length == 0) {
+        continue;
+      }
+
+      // Build cumulative prefixes token-by-token: "schema_", "schema_table_", etc.
+      final StringBuilder buffer = new StringBuilder(1024);
+      for (final String token : splitKey) {
+        buffer.append(token).append(keySeparator);
+        final String prefix = buffer.toString();
+        final int prevCount = prefixKeyCounts.getOrDefault(prefix, 0);
+        prefixKeyCounts.put(prefix, prevCount + 1);
+      }
+    }
+    return prefixKeyCounts;
   }
 
   private void mapPrefixes(final List<String> keys, final Collection<String> prefixes) {

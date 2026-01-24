@@ -9,11 +9,19 @@
 package schemacrawler.loader.weakassociations;
 
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 
+/**
+ * Matches weak associations for extension tables that share a normalized primary key name with the
+ * referenced table. This rule is optionally enabled via the {@code infer-extension-tables} option
+ * and requires the foreign key column to be unique in the extension table.
+ */
 public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssociation> {
 
+  private static final Logger LOGGER = Logger.getLogger(ExtensionTableMatcher.class.getName());
   private final boolean inferExtensionTables;
 
   public ExtensionTableMatcher(final boolean inferExtensionTables) {
@@ -40,7 +48,14 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
       final boolean fkIsUnique =
           foreignKeyColumn.isPartOfPrimaryKey() || foreignKeyColumn.isPartOfUniqueIndex();
       final boolean pkTableSortsFirst = pkTable.compareTo(fkTable) < 0;
-      return fkIsUnique && pkTableSortsFirst;
+      final boolean matches = fkIsUnique && pkTableSortsFirst;
+      if (matches && LOGGER.isLoggable(Level.FINER)) {
+        LOGGER.log(
+            Level.FINER,
+            "Weak association rule matched: ExtensionTableMatcher for proposed association {0}",
+            proposedWeakAssociation);
+      }
+      return matches;
     }
     return false;
   }

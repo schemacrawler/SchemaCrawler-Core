@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 
 /**
  * Implementation of Rails' <a href=
- * 'http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/String/Inflections.html'>
- * Inflections</a> to handle singularization and pluralization of 'Rails strings'. Copied from <a
+ * 'https://api.rubyonrails.org/classes/ActiveSupport/Inflector/Inflections.html'> Inflections</a>
+ * to handle singularization and pluralization of 'Rails strings'. Copied from <a
  * href='http://code.google.com/p/rogueweb/'>rogueweb</a>'s port of Rails to Java.
  *
  * @author Anthony Eden

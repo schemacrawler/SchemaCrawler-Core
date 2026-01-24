@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 import schemacrawler.schema.Table;
-import us.fatehi.utility.PrefixMatches;
 
 final class TableMatchKeys {
 

@@ -20,6 +20,16 @@ import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 
+/**
+ * Provides candidate key columns used for weak association inference.
+ *
+ * <p>Rules:
+ *
+ * <ul>
+ *   <li>Single-column primary keys are included.
+ *   <li>Single-column unique indexes are included.
+ * </ul>
+ */
 final class TableCandidateKeys implements Iterable<Column> {
 
   private final Table table;

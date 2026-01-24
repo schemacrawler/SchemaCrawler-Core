@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package us.fatehi.utility.test;
+package schemacrawler.test;
 
 import static java.util.Objects.requireNonNull;
 import static org.hamcrest.CoreMatchers.is;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.PrefixMatches;
+import schemacrawler.loader.weakassociations.PrefixMatches;
 
 public class PrefixMatchesTest {
 

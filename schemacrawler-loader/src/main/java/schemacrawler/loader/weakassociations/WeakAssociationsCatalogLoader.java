@@ -29,6 +29,10 @@ import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 import us.fatehi.utility.string.StringFormat;
 
+/**
+ * Catalog loader that infers weak associations by applying a composite rule (ID-based matching and
+ * optional extension-table matching) across all tables and adds the results to the catalog.
+ */
 public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
 
   private static final Logger LOGGER =
