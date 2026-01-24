@@ -23,12 +23,14 @@ final class ImmutableColumnReference implements ColumnReference {
   private final Column foreignKeyColumn;
   private final Column primaryKeyColumn;
   private final int keySequence;
+  private final boolean isSelfReferencing;
 
   protected ImmutableColumnReference(
       final int keySequence, final Column foreignKeyColumn, final Column primaryKeyColumn) {
     this.keySequence = keySequence;
     this.foreignKeyColumn = requireNonNull(foreignKeyColumn, "No foreign key column provided");
     this.primaryKeyColumn = requireNonNull(primaryKeyColumn, "No primary key column provided");
+    isSelfReferencing = foreignKeyColumn.equals(primaryKeyColumn);
   }
 
   /**
@@ -67,7 +69,7 @@ final class ImmutableColumnReference implements ColumnReference {
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || !(obj instanceof ImmutableColumnReference)) {
+    if (obj == null || !(obj instanceof ImmutableColumnReference)) {
       return false;
     }
     final ColumnReference other = (ColumnReference) obj;
@@ -96,6 +98,11 @@ final class ImmutableColumnReference implements ColumnReference {
   @Override
   public int hashCode() {
     return Objects.hash(foreignKeyColumn, primaryKeyColumn);
+  }
+
+  @Override
+  public boolean isSelfReferencing() {
+    return isSelfReferencing;
   }
 
   @Override

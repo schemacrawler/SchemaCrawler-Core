@@ -108,6 +108,9 @@ public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
         weakAssociationsAnalyzer.analyzeTables();
 
     for (final ProposedWeakAssociation proposedWeakAssociation : proposedWeakAssociations) {
+      if (proposedWeakAssociation.isSelfReferencing()) {
+        continue;
+      }
       LOGGER.log(
           Level.INFO, new StringFormat("Adding weak association <%s> ", proposedWeakAssociation));
 

@@ -33,10 +33,12 @@ public final class ProposedWeakAssociation implements ColumnReference {
 
   private final Column primaryKeyColumn;
   private final Column foreignKeyColumn;
+  private final boolean isSelfReferencing;
 
   ProposedWeakAssociation(final Column foreignKeyColumn, final Column primaryKeyColumn) {
     this.primaryKeyColumn = requireNonNull(primaryKeyColumn, "No primary key column provided");
     this.foreignKeyColumn = requireNonNull(foreignKeyColumn, "No foreign key column provided");
+    isSelfReferencing = foreignKeyColumn.equals(primaryKeyColumn);
   }
 
   @Override
@@ -57,6 +59,11 @@ public final class ProposedWeakAssociation implements ColumnReference {
   @Override
   public Column getPrimaryKeyColumn() {
     return primaryKeyColumn;
+  }
+
+  @Override
+  public boolean isSelfReferencing() {
+    return isSelfReferencing;
   }
 
   /**
