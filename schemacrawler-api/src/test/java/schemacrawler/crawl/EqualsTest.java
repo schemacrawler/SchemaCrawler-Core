@@ -31,7 +31,7 @@ public class EqualsTest {
   @Test
   public void columnReference() {
     EqualsVerifier.forClass(ImmutableColumnReference.class)
-        .withIgnoredFields("keySequence")
+        .withIgnoredFields("keySequence", "isSelfReferencing")
         .verify();
   }
 
