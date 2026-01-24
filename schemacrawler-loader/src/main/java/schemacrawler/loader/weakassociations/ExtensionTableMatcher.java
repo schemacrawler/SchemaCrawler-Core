@@ -21,15 +21,9 @@ import schemacrawler.schema.Table;
 import us.fatehi.utility.string.StringFormat;
 
 /**
- * Matches weak associations for extension tables.
- *
- * <p>An extension table relationship (1-to-1 or 1-to-0..1) is inferred when:
- * <ul>
- *   <li>The {@code infer-extension-tables} option is enabled.
- *   <li>The foreign key column shares a normalized name with the referenced table's primary key.
- *   <li>The foreign key column is unique (part of its own primary key or a unique index).
- *   <li>The referenced table is considered a top-ranked candidate for the match key.
- * </ul>
+ * Matches weak associations for extension tables that share a normalized primary key name with the
+ * referenced table. This rule is optionally enabled via the {@code infer-extension-tables} option
+ * and requires the foreign key column to be unique in the extension table.
  */
 public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssociation> {
 
@@ -58,9 +52,10 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
     final Column foreignKeyColumn = proposedWeakAssociation.getForeignKeyColumn();
     final Column primaryKeyColumn = proposedWeakAssociation.getPrimaryKeyColumn();
 
-    final String pkColumnName = foreignKeyColumn.getName().replaceAll("[^\\p{L}\\d]", "").toLowerCase();
+    final String pkColumnName =
+        primaryKeyColumn.getName().replaceAll("[^\\p{L}\\{d}]", "").toLowerCase();
     final String fkColumnName =
-        foreignKeyColumn.getName().replaceAll("[^\\p{L}\\d]", "").toLowerCase();
+        foreignKeyColumn.getName().replaceAll("[^\\p{L}\\{d}]", "").toLowerCase();
     if (pkColumnName.equals(fkColumnName)) {
       final Table pkTable = primaryKeyColumn.getParent();
       final boolean fkIsUnique =

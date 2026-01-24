@@ -21,12 +21,13 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 
 /**
- * Provides candidate key columns for a table.
+ * Provides candidate key columns used for weak association inference.
  *
- * <p>To ensure high-confidence weak associations, only single-column keys are considered:
+ * <p>Rules:
+ *
  * <ul>
- *   <li>Single-column primary keys.
- *   <li>Single-column unique indexes.
+ *   <li>Single-column primary keys are included.
+ *   <li>Single-column unique indexes are included.
  * </ul>
  */
 final class TableCandidateKeys implements Iterable<Column> {
@@ -50,25 +51,25 @@ final class TableCandidateKeys implements Iterable<Column> {
     return "%s: %s".formatted(table, tableKeys);
   }
 
-  private void addColumnFromIndex(final Index index) {
+  private void addColumnFromIndex(final Table table, final Index index) {
     final IndexColumn indexColumn = index.getColumns().get(0);
-    table.lookupColumn(indexColumn.getName()).ifPresent(tableKeys::add);
+    table.lookupColumn(indexColumn.getName()).ifPresent(column -> tableKeys.add(column));
   }
 
-  private void addColumnFromPrimaryKey(final PrimaryKey primaryKey) {
+  private void addColumnFromPrimaryKey(final Table table, final PrimaryKey primaryKey) {
     final TableConstraintColumn tableConstraintColumn = primaryKey.getConstrainedColumns().get(0);
-    table.lookupColumn(tableConstraintColumn.getName()).ifPresent(tableKeys::add);
+    table.lookupColumn(tableConstraintColumn.getName()).ifPresent(column -> tableKeys.add(column));
   }
 
   private void listTableKeys(final Table table) {
     final PrimaryKey primaryKey = table.getPrimaryKey();
     if (primaryKey != null && primaryKey.getConstrainedColumns().size() == 1) {
-      addColumnFromPrimaryKey(primaryKey);
+      addColumnFromPrimaryKey(table, primaryKey);
     }
 
     for (final Index index : table.getIndexes()) {
       if (index != null && index.isUnique() && index.getColumns().size() == 1) {
-        addColumnFromIndex(index);
+        addColumnFromIndex(table, index);
       }
     }
   }

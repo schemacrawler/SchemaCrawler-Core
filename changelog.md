@@ -2,11 +2,6 @@
 
 SchemaCrawler Core release notes.
 
-<a name="v17.5.1"></a>
-## Release 17.5.1 - 2026-01-25
-- Rework inferring weak associations to reduce number of matches
-
-
 <a name="v17.5.0"></a>
 ## Release 17.5.0 - 2026-01-19
 - Re-organize database connector options into a builder to avoid too many arguments

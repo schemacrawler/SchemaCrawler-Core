@@ -30,18 +30,9 @@ import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
 
 /**
- * Derives normalized match keys by stripping common prefixes.
- *
- * <p>The analysis process:
- * <ol>
- *   <li>Identifies common prefixes shared across names, using a separator (e.g., {@code _}).
- *   <li>Ranks prefixes based on how many names share them (signal strength).
- *   <li>Filters to keep only the top-ranked or widely-used prefixes to minimize noise.
- *   <li>Derives match keys by stripping valid prefixes and singularizing the remaining token.
- * </ol>
- *
- * <p>These match keys facilitate relating tables and columns that share naming patterns across
- * different schemas or modules.
+ * Derives normalized match keys by stripping common prefixes (based on a separator) and
+ * singularizing the remaining token. These match keys are used by weak association inference to
+ * relate tables and columns that share naming patterns across schemas.
  */
 public final class PrefixMatches {
 
@@ -70,7 +61,7 @@ public final class PrefixMatches {
    * Returns normalized match keys for the supplied key.
    *
    * @param key Key to look up
-   * @return Normalized match keys. If no match keys are found, returns the key itself.
+   * @return Normalized match keys
    */
   public List<String> get(final String key) {
     if (keyPrefixes.containsKey(key)) {
@@ -90,7 +81,7 @@ public final class PrefixMatches {
   }
 
   private void analyze(final List<String> keys) {
-    if (keys == null || keys.isEmpty()) {
+    if (keys.isEmpty()) {
       return;
     }
 
@@ -104,7 +95,6 @@ public final class PrefixMatches {
 
   private Map<String, Integer> countPrefixKeyOccurrences(final List<String> keys) {
     final Map<String, Integer> prefixKeyCounts = new TreeMap<>();
-    final StringBuilder buffer = new StringBuilder(1024);
     for (final String key : keys) {
       final String[] splitKey = splitList(key, keySeparator);
       if (splitKey == null || splitKey.length == 0) {
@@ -112,7 +102,7 @@ public final class PrefixMatches {
       }
 
       // Build cumulative prefixes token-by-token: "schema_", "schema_table_", etc.
-      buffer.setLength(0);
+      final StringBuilder buffer = new StringBuilder(1024);
       for (final String token : splitKey) {
         buffer.append(token).append(keySeparator);
         final String prefix = buffer.toString();

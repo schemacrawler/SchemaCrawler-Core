@@ -26,21 +26,13 @@ import us.fatehi.utility.string.StringFormat;
 /**
  * Analyzes tables to infer weak associations using naming heuristics.
  *
- * <p>The analysis follows two main paths:
- * <ol>
- *   <li><b>Table-based matching:</b> Relates a foreign key column to a primary key column if the
- *       column name matches the referenced table's name (or a normalized version of it).
- *   <li><b>Column-based matching:</b> Relates columns that share the same normalized name across
- *       different tables (e.g., both named {@code customer_id}).
- * </ol>
+ * <p>Flow:
  *
- * <p>Inference steps:
  * <ol>
- *   <li>Identify candidate key columns (primary keys or single-column unique indexes).
- *   <li>Generate match keys by normalizing names and stripping common suffixes like {@code _id}.
- *   <li>Cross-reference candidate foreign key columns with primary key columns using these keys.
- *   <li>Validate proposed pairs and apply additional rules (e.g., {@link IdMatcher}, {@link
- *       ExtensionTableMatcher}).
+ *   <li>Collect candidate key columns (primary key or single-column unique index).
+ *   <li>Generate match keys by normalizing column names and stripping {@code _id} suffixes.
+ *   <li>Find candidate foreign key columns that share match keys with primary key columns.
+ *   <li>Validate proposed pairs and apply configured match rules.
  * </ol>
  */
 public final class WeakAssociationsAnalyzer {
@@ -68,12 +60,12 @@ public final class WeakAssociationsAnalyzer {
       return Collections.emptySet();
     }
 
-    findWeakAssociations();
+    findWeakAssociations(tables);
 
     return weakAssociations;
   }
 
-  private void findWeakAssociations() {
+  private void findWeakAssociations(final List<Table> tables) {
     LOGGER.log(Level.INFO, "Finding weak associations");
     final ColumnMatchKeysMap columnMatchKeysMap = new ColumnMatchKeysMap(tables);
     final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
@@ -82,14 +74,11 @@ public final class WeakAssociationsAnalyzer {
       LOGGER.log(Level.FINER, new StringFormat("Column match keys <%s>", columnMatchKeysMap));
       LOGGER.log(Level.FINER, new StringFormat("Table match keys <%s>", tableMatchKeys));
     }
-
-    final Set<String> fkColumnMatchKeys = new HashSet<>();
-    final Set<Column> fkColumns = new HashSet<>();
     for (final Table table : tables) {
       final TableCandidateKeys tableCandidateKeys = new TableCandidateKeys(table);
       LOGGER.log(Level.FINER, new StringFormat("Table candidate keys <%s>", tableCandidateKeys));
       for (final Column pkColumn : tableCandidateKeys) {
-        fkColumnMatchKeys.clear();
+        final Set<String> fkColumnMatchKeys = new HashSet<>();
         // Look for all columns matching this table match key
         if (pkColumn.isPartOfPrimaryKey() && tableMatchKeys.containsKey(table)) {
           fkColumnMatchKeys.addAll(tableMatchKeys.get(table));
@@ -99,7 +88,7 @@ public final class WeakAssociationsAnalyzer {
           fkColumnMatchKeys.addAll(columnMatchKeysMap.get(pkColumn));
         }
 
-        fkColumns.clear();
+        final Set<Column> fkColumns = new HashSet<>();
         for (final String fkColumnMatchKey : fkColumnMatchKeys) {
           if (columnMatchKeysMap.containsKey(fkColumnMatchKey)) {
             fkColumns.addAll(columnMatchKeysMap.get(fkColumnMatchKey));

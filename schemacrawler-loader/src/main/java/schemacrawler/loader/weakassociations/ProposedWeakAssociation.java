@@ -20,12 +20,11 @@ import schemacrawler.schema.ColumnReference;
  * Proposed weak association between a foreign-key-like column and a primary key column.
  *
  * <p>Validation rejects:
+ *
  * <ul>
  *   <li>Self-references to the same column.
- *   <li>Pairs where both columns are partial (missing metadata) or either column has an unknown
- *       data type.
- *   <li>Pairs with non-matching standard data types (e.g., matching an {@code INTEGER} foreign key
- *       to a {@code VARCHAR} primary key is rejected).
+ *   <li>Pairs where both columns are partial or either column has unknown data type.
+ *   <li>Pairs with non-matching standard data types.
  * </ul>
  */
 public final class ProposedWeakAssociation implements ColumnReference {
@@ -44,14 +43,7 @@ public final class ProposedWeakAssociation implements ColumnReference {
 
   @Override
   public int compareTo(final ColumnReference o) {
-    if (o == null) {
-      return 1;
-    }
-    int result = foreignKeyColumn.compareTo(o.getForeignKeyColumn());
-    if (result == 0) {
-      result = primaryKeyColumn.compareTo(o.getPrimaryKeyColumn());
-    }
-    return result;
+    throw new UnsupportedOperationException();
   }
 
   @Override

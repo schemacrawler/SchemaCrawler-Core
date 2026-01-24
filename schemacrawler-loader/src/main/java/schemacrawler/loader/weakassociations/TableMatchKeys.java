@@ -18,14 +18,6 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.Multimap;
 
-/**
- * Manages match keys for tables.
- *
- * <p>Tables are ranked by their incoming reference count. When multiple tables share a match key,
- * only the most-referenced table (the "top-ranked candidate") is considered a valid target for a
- * weak association. This heuristic helps resolve ambiguity when multiple tables have similar
- * names.
- */
 final class TableMatchKeys {
 
   private static PrefixMatches analyzeTables(final List<Table> tables) {
@@ -44,8 +36,8 @@ final class TableMatchKeys {
 
     matchKeysForTable = new Multimap<>();
     tablesForMatchKey = new Multimap<>();
-
     final Map<Table, Integer> incomingReferenceCounts = new HashMap<>();
+
     for (final Table table : tables) {
       for (final ForeignKey foreignKey : table.getForeignKeys()) {
         final Table pkTable = foreignKey.getPrimaryKeyTable();
@@ -59,23 +51,25 @@ final class TableMatchKeys {
     final Map<String, Integer> maxCountsForKey = new HashMap<>();
     for (final Table table : tables) {
       final List<String> tableMatchKeys = prefixMatches.get(table.getName());
-      if (tableMatchKeys != null) {
-        final int tableCount = incomingReferenceCounts.getOrDefault(table, 0);
-        for (final String matchKey : tableMatchKeys) {
-          maxCountsForKey.merge(matchKey, tableCount, Math::max);
-        }
+      if (tableMatchKeys == null) {
+        continue;
+      }
+      final int tableCount = incomingReferenceCounts.getOrDefault(table, 0);
+      for (final String matchKey : tableMatchKeys) {
+        maxCountsForKey.merge(matchKey, tableCount, Math::max);
       }
     }
 
     for (final Table table : tables) {
       final List<String> tableMatchKeys = prefixMatches.get(table.getName());
-      if (tableMatchKeys != null) {
-        final int tableCount = incomingReferenceCounts.getOrDefault(table, 0);
-        for (final String matchKey : tableMatchKeys) {
-          if (tableCount == maxCountsForKey.getOrDefault(matchKey, 0)) {
-            matchKeysForTable.add(table, matchKey);
-            tablesForMatchKey.add(matchKey, table);
-          }
+      if (tableMatchKeys == null) {
+        continue;
+      }
+      final int tableCount = incomingReferenceCounts.getOrDefault(table, 0);
+      for (final String matchKey : tableMatchKeys) {
+        if (tableCount == maxCountsForKey.getOrDefault(matchKey, 0)) {
+          matchKeysForTable.add(table, matchKey);
+          tablesForMatchKey.add(matchKey, table);
         }
       }
     }
