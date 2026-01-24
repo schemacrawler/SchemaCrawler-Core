@@ -9,13 +9,22 @@
 package schemacrawler.loader.weakassociations;
 
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
 
+/**
+ * Matches weak associations based on conventional naming rules for foreign keys ending with {@code
+ * _id}, {@code _key}, or {@code _keyid}. The primary key column must not be named only {@code id}
+ * so that purely generic primary keys do not incorrectly match every foreign key.
+ */
 public final class IdMatcher implements Predicate<ProposedWeakAssociation> {
 
-  private static final Pattern endsWithIdPattern = Pattern.compile(".*(?i)_?id$");
-  private static final Pattern isIdPattern = Pattern.compile("^(?i)_?id$");
+  private static final Logger LOGGER = Logger.getLogger(IdMatcher.class.getName());
+
+  private static final Pattern endsWithIdPattern = Pattern.compile(".*(?i)_?(id|key|keyid)$");
+  private static final Pattern isIdPattern = Pattern.compile("^(?i)_?(id|key|keyid)$");
 
   @Override
   public boolean test(final ProposedWeakAssociation proposedWeakAssociation) {
@@ -31,6 +40,13 @@ public final class IdMatcher implements Predicate<ProposedWeakAssociation> {
         endsWithIdPattern.matcher(primaryKeyColumn.getName()).matches()
             && !isIdPattern.matcher(primaryKeyColumn.getName()).matches();
 
-    return fkColEndsWithId && !pkColEndsWithId;
+    final boolean matches = fkColEndsWithId && !pkColEndsWithId;
+    if (matches && LOGGER.isLoggable(Level.FINER)) {
+      LOGGER.log(
+          Level.FINER,
+          "Weak association rule matched: IdMatcher for proposed association {0}",
+          proposedWeakAssociation);
+    }
+    return matches;
   }
 }

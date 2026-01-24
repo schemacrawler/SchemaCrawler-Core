@@ -23,6 +23,18 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.string.StringFormat;
 
+/**
+ * Analyzes tables to infer weak associations using naming heuristics.
+ *
+ * <p>Flow:
+ *
+ * <ol>
+ *   <li>Collect candidate key columns (primary key or single-column unique index).
+ *   <li>Generate match keys by normalizing column names and stripping {@code _id} suffixes.
+ *   <li>Find candidate foreign key columns that share match keys with primary key columns.
+ *   <li>Validate proposed pairs and apply configured match rules.
+ * </ol>
+ */
 public final class WeakAssociationsAnalyzer {
 
   private static final Logger LOGGER = Logger.getLogger(WeakAssociationsAnalyzer.class.getName());

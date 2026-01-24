@@ -16,6 +16,10 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.Multimap;
 
+/**
+ * Maintains match keys for columns by normalizing names (lowercase) and removing a trailing {@code
+ * _id} suffix. The match keys are used to group likely foreign key columns and primary key columns.
+ */
 final class ColumnMatchKeysMap {
 
   private final Multimap<String, Column> columnsForMatchKey;
