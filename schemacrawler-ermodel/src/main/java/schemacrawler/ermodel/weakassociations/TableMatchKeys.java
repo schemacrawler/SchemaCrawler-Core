@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.weakassociations;
+package schemacrawler.ermodel.weakassociations;
 
 import static java.util.Objects.requireNonNull;
 
@@ -35,11 +35,12 @@ final class TableMatchKeys {
     return new PrefixMatches(tableNames, "_");
   }
 
+  private final List<Table> tables;
   private final Multimap<Table, String> matchKeysForTable;
   private final Multimap<String, Table> tablesForMatchKey;
 
   TableMatchKeys(final List<Table> tables) {
-    requireNonNull(tables, "No tables provided");
+    this.tables = requireNonNull(tables, "No tables provided");
 
     matchKeysForTable = new Multimap<>();
     tablesForMatchKey = new Multimap<>();
@@ -96,6 +97,10 @@ final class TableMatchKeys {
 
   public List<String> get(final Table table) {
     return matchKeysForTable.get(table);
+  }
+
+  public List<Table> getTables() {
+    return tables;
   }
 
   @Override

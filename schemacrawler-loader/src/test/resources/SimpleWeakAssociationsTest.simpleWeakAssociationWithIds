@@ -1,21 +1,41 @@
 table: PUBLIC.PUBLIC.BOOK
   weak association:
     column reference: PUBLIC.PUBLIC.BOOK2.BOOKID --> PUBLIC.PUBLIC.BOOK.ID
+                      (fk is part of pk)
+  weak association:
+    column reference: PUBLIC.PUBLIC.BOOK3.BOOK --> PUBLIC.PUBLIC.BOOK.ID
+                      (fk is part of pk)
   weak association:
     column reference: PUBLIC.PUBLIC.READER1.BOOKID --> PUBLIC.PUBLIC.BOOK.ID
+  weak association:
+    column reference: PUBLIC.PUBLIC.READER2.BOOK --> PUBLIC.PUBLIC.BOOK.ID
 table: PUBLIC.PUBLIC.BOOK2
   weak association:
     column reference: PUBLIC.PUBLIC.BOOK2.BOOKID --> PUBLIC.PUBLIC.BOOK.ID
+                      (fk is part of pk)
   weak association:
-    column reference: PUBLIC.PUBLIC.BOOK2.BOOKID --> PUBLIC.PUBLIC.BOOK3.BOOK
+    column reference: PUBLIC.PUBLIC.BOOK3.BOOK --> PUBLIC.PUBLIC.BOOK2.BOOKID
+                      (fk is part of pk)
+  weak association:
+    column reference: PUBLIC.PUBLIC.READER1.BOOKID --> PUBLIC.PUBLIC.BOOK2.BOOKID
+                      (fk is NOT part of pk)
+  weak association:
+    column reference: PUBLIC.PUBLIC.READER2.BOOK --> PUBLIC.PUBLIC.BOOK2.BOOKID
 table: PUBLIC.PUBLIC.BOOK3
   weak association:
-    column reference: PUBLIC.PUBLIC.BOOK2.BOOKID --> PUBLIC.PUBLIC.BOOK3.BOOK
+    column reference: PUBLIC.PUBLIC.BOOK3.BOOK --> PUBLIC.PUBLIC.BOOK.ID
+                      (fk is part of pk)
   weak association:
-    column reference: PUBLIC.PUBLIC.READER1.BOOKID --> PUBLIC.PUBLIC.BOOK3.BOOK
+    column reference: PUBLIC.PUBLIC.BOOK3.BOOK --> PUBLIC.PUBLIC.BOOK2.BOOKID
+                      (fk is part of pk)
 table: PUBLIC.PUBLIC.READER1
   weak association:
     column reference: PUBLIC.PUBLIC.READER1.BOOKID --> PUBLIC.PUBLIC.BOOK.ID
   weak association:
-    column reference: PUBLIC.PUBLIC.READER1.BOOKID --> PUBLIC.PUBLIC.BOOK3.BOOK
+    column reference: PUBLIC.PUBLIC.READER1.BOOKID --> PUBLIC.PUBLIC.BOOK2.BOOKID
+                      (fk is NOT part of pk)
 table: PUBLIC.PUBLIC.READER2
+  weak association:
+    column reference: PUBLIC.PUBLIC.READER2.BOOK --> PUBLIC.PUBLIC.BOOK.ID
+  weak association:
+    column reference: PUBLIC.PUBLIC.READER2.BOOK --> PUBLIC.PUBLIC.BOOK2.BOOKID

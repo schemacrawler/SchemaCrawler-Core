@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.weakassociations;
+package schemacrawler.ermodel.weakassociations;
 
 import static java.util.Objects.requireNonNull;
 import static org.hamcrest.CoreMatchers.is;
@@ -58,19 +58,19 @@ public class TableMatchKeysTest {
     List<String> withoutPrefix;
 
     final TableMatchKeys matchkeys =
-        new TableMatchKeys(tables("vap_old_table1", "vap_old_table2", "vap_table3"));
+        new TableMatchKeys(tables("xyz_old_table1", "xyz_old_table2", "xyz_table3"));
 
     withoutPrefix = matchkeys.get(new LightTable("table0"));
     assertThat(withoutPrefix, is(nullValue()));
 
-    withoutPrefix = matchkeys.get(new LightTable("vap_old_table1"));
-    assertThat(withoutPrefix, containsInAnyOrder("table1", "old_table1", "vap_old_table1"));
+    withoutPrefix = matchkeys.get(new LightTable("xyz_old_table1"));
+    assertThat(withoutPrefix, containsInAnyOrder("table1", "old_table1", "xyz_old_table1"));
 
-    withoutPrefix = matchkeys.get(new LightTable("vap_old_table2"));
-    assertThat(withoutPrefix, containsInAnyOrder("table2", "old_table2", "vap_old_table2"));
+    withoutPrefix = matchkeys.get(new LightTable("xyz_old_table2"));
+    assertThat(withoutPrefix, containsInAnyOrder("table2", "old_table2", "xyz_old_table2"));
 
-    withoutPrefix = matchkeys.get(new LightTable("vap_table3"));
-    assertThat(withoutPrefix, containsInAnyOrder("table3", "vap_table3"));
+    withoutPrefix = matchkeys.get(new LightTable("xyz_table3"));
+    assertThat(withoutPrefix, containsInAnyOrder("table3", "xyz_table3"));
   }
 
   private List<Table> tables(final String... tableNames) {

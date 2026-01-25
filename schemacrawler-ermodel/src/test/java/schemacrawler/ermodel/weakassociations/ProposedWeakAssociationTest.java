@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.weakassociations;
+package schemacrawler.ermodel.weakassociations;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,21 +25,20 @@ public class ProposedWeakAssociationTest {
     final Column col1 = table1.addColumn("Id");
     final Column col2 = table1.addColumn("ColA");
 
-    assertThrows(NullPointerException.class, () -> new ProposedWeakAssociation(null, col2));
-    assertThrows(NullPointerException.class, () -> new ProposedWeakAssociation(col1, null));
-    assertThrows(NullPointerException.class, () -> new ProposedWeakAssociation(null, null));
+    assertThrows(NullPointerException.class, () -> new WeakAssociationColumnReference(null, col2));
+    assertThrows(NullPointerException.class, () -> new WeakAssociationColumnReference(col1, null));
+    assertThrows(NullPointerException.class, () -> new WeakAssociationColumnReference(null, null));
 
-    final ProposedWeakAssociation proposedWeakAssociation = new ProposedWeakAssociation(col1, col2);
-    assertThrows(
-        UnsupportedOperationException.class, () -> proposedWeakAssociation.compareTo(null));
-    assertThrows(
-        UnsupportedOperationException.class, () -> proposedWeakAssociation.getKeySequence());
+    final WeakAssociationColumnReference proposedWeakAssociation =
+        new WeakAssociationColumnReference(col1, col2);
+    assertThat(proposedWeakAssociation.compareTo(null), is(-1));
+    assertThat(proposedWeakAssociation.getKeySequence(), is(1));
 
     assertThat(proposedWeakAssociation.getPrimaryKeyColumn(), is(col2));
     assertThat(proposedWeakAssociation.getForeignKeyColumn(), is(col1));
     assertThat(proposedWeakAssociation.toString(), is("Table1.Id ~~> Table1.ColA"));
     assertThat(proposedWeakAssociation.isValid(), is(true));
 
-    assertThat(new ProposedWeakAssociation(col1, col1).isValid(), is(false));
+    assertThat(new WeakAssociationColumnReference(col1, col1).isValid(), is(false));
   }
 }

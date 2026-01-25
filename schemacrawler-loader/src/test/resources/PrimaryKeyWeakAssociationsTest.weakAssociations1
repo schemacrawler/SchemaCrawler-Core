@@ -1,5 +1,17 @@
 table: PUBLIC.PUBLIC.TABLE1_PK
+  weak association:
+    column reference: PUBLIC.PUBLIC.TABLE4_UNIQUE.ENTITY_ID --> PUBLIC.PUBLIC.TABLE1_PK.ENTITY_ID
+                      (fk is NOT part of pk)
 table: PUBLIC.PUBLIC.TABLE2_PK
+  weak association:
+    column reference: PUBLIC.PUBLIC.TABLE4_UNIQUE.ENTITY_ID --> PUBLIC.PUBLIC.TABLE2_PK.ENTITY_ID
+                      (fk is NOT part of pk)
 table: PUBLIC.PUBLIC.TABLE3_FK
 table: PUBLIC.PUBLIC.TABLE4_UNIQUE
+  weak association:
+    column reference: PUBLIC.PUBLIC.TABLE4_UNIQUE.ENTITY_ID --> PUBLIC.PUBLIC.TABLE1_PK.ENTITY_ID
+                      (fk is NOT part of pk)
+  weak association:
+    column reference: PUBLIC.PUBLIC.TABLE4_UNIQUE.ENTITY_ID --> PUBLIC.PUBLIC.TABLE2_PK.ENTITY_ID
+                      (fk is NOT part of pk)
 table: PUBLIC.PUBLIC.TABLE5_FK

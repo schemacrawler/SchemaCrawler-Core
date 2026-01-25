@@ -1,4 +1,4 @@
-package schemacrawler.loader.weakassociations;
+package schemacrawler.ermodel.weakassociations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -71,13 +71,14 @@ public class ExtensionTableMatcherTest {
             fkTableSchema2,
             refSchema2);
 
-    final ExtensionTableMatcher matcher = new ExtensionTableMatcher(true, tables);
+    final ExtensionTableMatcher matcher = new ExtensionTableMatcher(new TableMatchKeys(tables));
 
-    assertThat(matcher.test(new ProposedWeakAssociation(fkColumn, pkColumnTop1)), is(true));
-    assertThat(matcher.test(new ProposedWeakAssociation(fkColumn, pkColumnTop2)), is(true));
-    assertThat(matcher.test(new ProposedWeakAssociation(fkColumn, pkColumnLow)), is(true));
+    assertThat(matcher.test(new WeakAssociationColumnReference(fkColumn, pkColumnTop1)), is(true));
+    assertThat(matcher.test(new WeakAssociationColumnReference(fkColumn, pkColumnTop2)), is(true));
+    assertThat(matcher.test(new WeakAssociationColumnReference(fkColumn, pkColumnLow)), is(true));
     assertThat(
-        matcher.test(new ProposedWeakAssociation(fkColumnSchema2, pkColumnSchema2)), is(true));
+        matcher.test(new WeakAssociationColumnReference(fkColumnSchema2, pkColumnSchema2)),
+        is(true));
   }
 
   private Column mockColumn(

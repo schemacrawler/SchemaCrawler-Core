@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.weakassociations;
+package schemacrawler.ermodel.weakassociations;
 
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.CollectionsUtility.splitList;
@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,11 +39,11 @@ import us.fatehi.utility.string.StringFormat;
  * link more pairs of tables/columns, thereby highlighting strong naming patterns while filtering
  * out coincidental or infrequent prefixes.
  */
-public final class PrefixMatches {
+final class PrefixMatches {
 
   private static final Logger LOGGER = Logger.getLogger(PrefixMatches.class.getName());
 
-  private static final int MAX_TOP_PREFIXES = 5;
+  private static final int MAX_TOP_PREFIXES = 12;
   private static final double MIN_SHARED_PREFIX_RATIO = 0.5;
 
   private final String keySeparator;
@@ -56,7 +55,7 @@ public final class PrefixMatches {
    * @param keys Keys to analyze
    * @param keySeparator Separator between key tokens
    */
-  public PrefixMatches(final List<String> keys, final String keySeparator) {
+  PrefixMatches(final List<String> keys, final String keySeparator) {
     this.keySeparator = requireNonNull(keySeparator, "No key separator provided");
     keyPrefixes = new Multimap<>();
 
@@ -103,7 +102,7 @@ public final class PrefixMatches {
     final Map<String, Integer> prefixKeyCounts = new TreeMap<>();
     for (final String key : keys) {
       final String[] splitKey = splitList(key, keySeparator);
-      if (splitKey == null || splitKey.length == 0) {
+      if (splitKey == null || splitKey.length <= 1) {
         continue;
       }
 
@@ -126,20 +125,12 @@ public final class PrefixMatches {
    * @return Key name prefixes
    */
   private Collection<String> findPrefixes(final List<String> keys) {
-    final SortedMap<String, Integer> prefixesMap = new TreeMap<>();
     // Count how many keys share each token-boundary prefix in a single pass
     final Map<String, Integer> prefixKeyCounts = countPrefixKeyOccurrences(keys);
-    // Convert counts to pair counts to preserve the previous ranking semantics
-    for (final Map.Entry<String, Integer> entry : prefixKeyCounts.entrySet()) {
-      final int keyCount = entry.getValue();
-      if (keyCount > 1) {
-        final int pairCount = keyCount * (keyCount - 1) / 2;
-        prefixesMap.put(entry.getKey(), pairCount);
-      }
-    }
 
     // Sort prefixes by the number of keys using them, in descending order
-    final List<Map.Entry<String, Integer>> prefixesList = new ArrayList<>(prefixesMap.entrySet());
+    final List<Map.Entry<String, Integer>> prefixesList =
+        new ArrayList<>(prefixKeyCounts.entrySet());
     Collections.sort(prefixesList, Comparator.comparing(Entry<String, Integer>::getValue));
 
     // Reduce the number of prefixes in use by keeping the top-ranked few and any
@@ -149,7 +140,7 @@ public final class PrefixMatches {
     for (int i = 0; i < prefixesList.size(); i++) {
       final boolean isTopPrefix = i < MAX_TOP_PREFIXES;
       final boolean isWidelyUsed =
-          prefixesList.get(i).getValue() > prefixesMap.size() * MIN_SHARED_PREFIX_RATIO;
+          prefixesList.get(i).getValue() > prefixKeyCounts.size() * MIN_SHARED_PREFIX_RATIO;
       if (isTopPrefix || isWidelyUsed) {
         prefixes.add(prefixesList.get(i).getKey());
       }

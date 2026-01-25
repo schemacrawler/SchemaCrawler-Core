@@ -8,17 +8,16 @@
 
 package schemacrawler.loader.weakassociations;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.WeakAssociationBuilder;
 import schemacrawler.crawl.WeakAssociationBuilder.WeakAssociationColumn;
+import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzer;
+import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzerBuilder;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.Table;
+import schemacrawler.schema.ColumnReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.catalogloader.BaseCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
@@ -102,24 +101,21 @@ public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
 
   private void findWeakAssociations(final boolean inferExtensionTables) {
 
-    final Predicate<ProposedWeakAssociation> weakAssociationRule =
-        new IdMatcher().or(new ExtensionTableMatcher(inferExtensionTables));
     final Catalog catalog = getCatalog();
-    final List<Table> allTables = new ArrayList<>(catalog.getTables());
-    final WeakAssociationsAnalyzer weakAssociationsAnalyzer =
-        new WeakAssociationsAnalyzer(allTables, weakAssociationRule);
-    final Collection<ProposedWeakAssociation> proposedWeakAssociations =
-        weakAssociationsAnalyzer.analyzeTables();
+    final WeakAssociationsAnalyzerBuilder analyzerBuilder =
+        WeakAssociationsAnalyzerBuilder.builder(catalog.getTables()).withIdMatcher();
+    if (inferExtensionTables) {
+      analyzerBuilder.withExtensionTableMatcher();
+    }
 
-    for (final ProposedWeakAssociation proposedWeakAssociation : proposedWeakAssociations) {
-      if (proposedWeakAssociation.isSelfReferencing()) {
-        continue;
-      }
-      LOGGER.log(
-          Level.INFO, new StringFormat("Adding weak association <%s> ", proposedWeakAssociation));
+    final WeakAssociationsAnalyzer weakAssociationsAnalyzer = analyzerBuilder.build();
+    final Collection<ColumnReference> weakAssociations = weakAssociationsAnalyzer.analyzeTables();
 
-      final Column fkColumn = proposedWeakAssociation.getForeignKeyColumn();
-      final Column pkColumn = proposedWeakAssociation.getPrimaryKeyColumn();
+    for (final ColumnReference weakAssociation : weakAssociations) {
+      LOGGER.log(Level.INFO, new StringFormat("Adding weak association <%s> ", weakAssociation));
+
+      final Column fkColumn = weakAssociation.getForeignKeyColumn();
+      final Column pkColumn = weakAssociation.getPrimaryKeyColumn();
 
       final WeakAssociationBuilder builder = WeakAssociationBuilder.builder(catalog);
       builder.addColumnReference(

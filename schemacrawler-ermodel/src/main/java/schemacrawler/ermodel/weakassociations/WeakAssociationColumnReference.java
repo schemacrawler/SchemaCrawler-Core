@@ -6,18 +6,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.weakassociations;
+package schemacrawler.ermodel.weakassociations;
 
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.Serial;
+import java.util.Objects;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 
 /**
- * Proposed weak association between a foreign-key-like column and a primary key column.
+ * Weak association between a foreign-key-like column and a primary key column.
  *
  * <p>Validation rejects:
  *
@@ -27,43 +28,88 @@ import schemacrawler.schema.ColumnReference;
  *   <li>Pairs with non-matching standard data types.
  * </ul>
  */
-public final class ProposedWeakAssociation implements ColumnReference {
+public final class WeakAssociationColumnReference implements ColumnReference {
 
   @Serial private static final long serialVersionUID = 2986663326992262188L;
 
-  private final Column primaryKeyColumn;
   private final Column foreignKeyColumn;
-  private final boolean isSelfReferencing;
+  private final Column primaryKeyColumn;
 
-  ProposedWeakAssociation(final Column foreignKeyColumn, final Column primaryKeyColumn) {
-    this.primaryKeyColumn = requireNonNull(primaryKeyColumn, "No primary key column provided");
+  public WeakAssociationColumnReference(
+      final Column foreignKeyColumn, final Column primaryKeyColumn) {
     this.foreignKeyColumn = requireNonNull(foreignKeyColumn, "No foreign key column provided");
-    isSelfReferencing = foreignKeyColumn.equals(primaryKeyColumn);
+    this.primaryKeyColumn = requireNonNull(primaryKeyColumn, "No primary key column provided");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>NOTE: compareTo is not compatible with equals. equals compares the full name of a database
+   * object, but compareTo uses more fields to define a "natural" sorting order.
+   */
+  @Override
+  public int compareTo(final ColumnReference columnRef) {
+
+    if (columnRef == null) {
+      return -1;
+    }
+
+    int compare = 0;
+
+    final ColumnReference other = columnRef;
+    if (compare == 0) {
+      compare = getKeySequence() - other.getKeySequence();
+    }
+    if (compare == 0) {
+      compare =
+          foreignKeyColumn.getFullName().compareTo(columnRef.getForeignKeyColumn().getFullName());
+    }
+    if (compare == 0) {
+      compare =
+          primaryKeyColumn.getFullName().compareTo(columnRef.getPrimaryKeyColumn().getFullName());
+    }
+    return compare;
   }
 
   @Override
-  public int compareTo(final ColumnReference o) {
-    throw new UnsupportedOperationException();
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || !(obj instanceof ColumnReference)) {
+      return false;
+    }
+    final ColumnReference other = (ColumnReference) obj;
+    return Objects.equals(primaryKeyColumn, other.getPrimaryKeyColumn())
+        && Objects.equals(foreignKeyColumn, other.getForeignKeyColumn());
   }
 
+  /** {@inheritDoc} */
   @Override
   public Column getForeignKeyColumn() {
     return foreignKeyColumn;
   }
 
+  /** {@inheritDoc} */
   @Override
   public int getKeySequence() {
-    throw new UnsupportedOperationException();
+    return 1;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Column getPrimaryKeyColumn() {
     return primaryKeyColumn;
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(foreignKeyColumn, primaryKeyColumn);
+  }
+
+  @Override
   public boolean isSelfReferencing() {
-    return isSelfReferencing;
+    return false;
   }
 
   /**
@@ -74,7 +120,7 @@ public final class ProposedWeakAssociation implements ColumnReference {
    */
   public boolean isValid() {
 
-    if (primaryKeyColumn.equals(foreignKeyColumn)) {
+    if (primaryKeyColumn.equals(foreignKeyColumn) || foreignKeyColumn.isPartOfForeignKey()) {
       return false;
     }
 
