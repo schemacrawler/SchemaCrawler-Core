@@ -8,4 +8,5 @@
 
 package schemacrawler.schema;
 
+@Deprecated(forRemoval = true)
 public interface WeakAssociation extends TableReference {}
