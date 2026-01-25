@@ -9,20 +9,22 @@
 package schemacrawler.loader.weakassociations;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.Multimap;
 
 /**
- * Maintains match keys for columns by normalizing names (lowercase) and removing a trailing {@code
- * _id} suffix. The match keys are used to group likely foreign key columns and primary key columns.
+ * Maintains match keys for columns by normalizing names (lowercase) and removing a trailing id
+ * suffix. The match keys are used to group likely foreign key columns and primary key columns.
  */
 final class ColumnMatchKeysMap {
 
-  private static final String ID_SUFFIX_REGEX = "_?id$";
+  private static final Pattern ID_PATTERN = Pattern.compile("_?(id|key|keyid)$", CASE_INSENSITIVE);
 
   private final Multimap<String, Column> columnsForMatchKey;
   private final Multimap<Column, String> matchKeysForColumn;
@@ -61,7 +63,7 @@ final class ColumnMatchKeysMap {
   private void mapColumnNameMatches(final Table table) {
     for (final Column column : table.getColumns()) {
       final String columnName = column.getName().toLowerCase();
-      final String matchColumnName = columnName.replaceAll(ID_SUFFIX_REGEX, "");
+      final String matchColumnName = ID_PATTERN.matcher(columnName).replaceAll("");
       if (!isBlank(matchColumnName)) {
         columnsForMatchKey.add(matchColumnName, column);
         matchKeysForColumn.add(column, matchColumnName);
