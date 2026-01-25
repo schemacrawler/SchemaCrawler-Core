@@ -45,7 +45,11 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
   public ExtensionTableMatcher(final boolean inferExtensionTables, final Collection<Table> tables) {
     this.inferExtensionTables = inferExtensionTables;
     requireNonNull(tables, "No tables provided");
-    matchKeys = new TableMatchKeys(List.copyOf(tables));
+    if (inferExtensionTables) {
+      matchKeys = new TableMatchKeys(List.copyOf(tables));
+    } else {
+      matchKeys = null;
+    }
   }
 
   @Override
