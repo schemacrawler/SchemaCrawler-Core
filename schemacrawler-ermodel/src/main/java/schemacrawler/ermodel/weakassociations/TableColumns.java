@@ -11,11 +11,8 @@ package schemacrawler.ermodel.weakassociations;
 import static java.util.Objects.requireNonNull;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.NamedObjectKey;
@@ -37,14 +34,11 @@ final class TableColumns {
 
   private final Table table;
   private final Set<Column> candidateKeys;
-  private final Set<Column> importedForeignKeys;
 
   TableColumns(final Table table) {
     this.table = requireNonNull(table, "No table provided");
 
     candidateKeys = new HashSet<>();
-    importedForeignKeys = new HashSet<>();
-
     buildLookups();
   }
 
@@ -54,18 +48,6 @@ final class TableColumns {
 
   public Table getTable() {
     return table;
-  }
-
-  public boolean hasImportedForeignKey(final Column fkColumn) {
-    if (fkColumn == null) {
-      return false;
-    }
-    for (final Column importedForeignKeyColumn : importedForeignKeys) {
-      if (importedForeignKeyColumn.key().equals(fkColumn.key())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public NamedObjectKey key() {
@@ -88,14 +70,6 @@ final class TableColumns {
       if (index != null && index.isUnique() && index.getColumns().size() == 1) {
         final IndexColumn indexColumn = index.getColumns().get(0);
         candidateKeys.add(indexColumn);
-      }
-    }
-
-    for (final ForeignKey foreignKey : table.getImportedForeignKeys()) {
-      final List<ColumnReference> columnReferences = foreignKey.getColumnReferences();
-      if (columnReferences.size() == 1) {
-        final Column fkColumn = columnReferences.get(0).getForeignKeyColumn();
-        importedForeignKeys.add(fkColumn);
       }
     }
   }

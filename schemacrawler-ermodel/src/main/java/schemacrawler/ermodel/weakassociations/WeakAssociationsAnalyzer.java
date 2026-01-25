@@ -87,12 +87,10 @@ public final class WeakAssociationsAnalyzer {
         }
 
         for (final Column fkColumn : fkColumns) {
-          final TableColumns fkTableColumns = new TableColumns(fkColumn.getParent());
           final WeakAssociationColumnReference proposedWeakAssociation =
               new WeakAssociationColumnReference(fkColumn, pkColumn);
           if (proposedWeakAssociation.isValid()
-              && weakAssociationRule.test(proposedWeakAssociation)
-              && !fkTableColumns.hasImportedForeignKey(fkColumn)) {
+              && weakAssociationRule.test(proposedWeakAssociation)) {
             LOGGER.log(
                 Level.FINE,
                 new StringFormat("Found weak association <%s>", proposedWeakAssociation));

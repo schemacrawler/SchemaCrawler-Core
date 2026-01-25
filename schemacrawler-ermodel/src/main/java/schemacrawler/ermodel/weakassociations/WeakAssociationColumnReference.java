@@ -120,7 +120,7 @@ public final class WeakAssociationColumnReference implements ColumnReference {
    */
   public boolean isValid() {
 
-    if (primaryKeyColumn.equals(foreignKeyColumn)) {
+    if (primaryKeyColumn.equals(foreignKeyColumn) || foreignKeyColumn.isPartOfForeignKey()) {
       return false;
     }
 

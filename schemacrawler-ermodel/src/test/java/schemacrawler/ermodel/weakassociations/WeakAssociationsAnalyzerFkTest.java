@@ -24,12 +24,12 @@ public class WeakAssociationsAnalyzerFkTest {
   public void weakAssociationNotAddedIfFkExists() {
     // Table A (orders) with primary key "id"
     final Table tableA = mockTable("orders");
-    final Column pkColumn = mockColumn(tableA, "id", true);
+    final Column pkColumn = mockColumn(tableA, "id", true, false);
     mockPrimaryKey(tableA, pkColumn);
 
     // Table B (order_items) with column "order_id"
     final Table tableB = mockTable("order_items");
-    final Column fkColumn = mockColumn(tableB, "order_id", false);
+    final Column fkColumn = mockColumn(tableB, "order_id", false, true);
     when(tableB.getColumns()).thenReturn(List.of(fkColumn));
 
     // Existing ForeignKey on Table B (order_id)
@@ -58,12 +58,12 @@ public class WeakAssociationsAnalyzerFkTest {
   public void weakAssociationAddedIfFkDoesNotExist() {
     // Table A (orders) with primary key "id"
     final Table tableA = mockTable("orders");
-    final Column pkColumn = mockColumn(tableA, "id", true);
+    final Column pkColumn = mockColumn(tableA, "id", true, false);
     mockPrimaryKey(tableA, pkColumn);
 
     // Table B (order_items) with column "order_id"
     final Table tableB = mockTable("order_items");
-    final Column fkColumn = mockColumn(tableB, "order_id", false);
+    final Column fkColumn = mockColumn(tableB, "order_id", false, false);
     when(tableB.getColumns()).thenReturn(List.of(fkColumn));
 
     // Analyzer setup
@@ -98,13 +98,8 @@ public class WeakAssociationsAnalyzerFkTest {
     when(table.getPrimaryKey()).thenReturn(primaryKey);
   }
 
-  private Column mockColumn(final Table parent, final String name, final boolean isPk) {
-    final Column column = mockColumn(parent, name, "INTEGER", isPk);
-    return column;
-  }
-
   private Column mockColumn(
-      final Table parent, final String name, final String typeName, final boolean isPk) {
+      final Table parent, final String name, final boolean isPk, final boolean isFk) {
     final String parentName = parent.getName();
     final Column column;
     if (isPk) {
@@ -112,13 +107,15 @@ public class WeakAssociationsAnalyzerFkTest {
     } else {
       column = mock(Column.class, name);
     }
+    when(column.isPartOfPrimaryKey()).thenReturn(isPk);
+    when(column.isPartOfForeignKey()).thenReturn(isFk);
     when(column.getParent()).thenReturn(parent);
     when(column.getName()).thenReturn(name);
     when(column.getFullName()).thenReturn(parentName + "." + name);
     when(column.isColumnDataTypeKnown()).thenReturn(true);
     when(column.isPartOfPrimaryKey()).thenReturn(isPk);
     final ColumnDataType dataType = mock(ColumnDataType.class);
-    when(dataType.getStandardTypeName()).thenReturn(typeName);
+    when(dataType.getStandardTypeName()).thenReturn("INTEGER");
     when(column.getColumnDataType()).thenReturn(dataType);
 
     // Simulate NamedObjectKey
