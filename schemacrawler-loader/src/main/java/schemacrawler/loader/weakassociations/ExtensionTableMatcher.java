@@ -33,7 +33,7 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
 
   private static final Logger LOGGER = Logger.getLogger(ExtensionTableMatcher.class.getName());
 
-  private static final Pattern NORMALIZATION_PATTERN = Pattern.compile("[^\\p{L}\\d]");
+  private static final Pattern NOT_ALPHANUMERIC_PATTERN = Pattern.compile("[^\\p{L}\\d]");
 
   private final boolean inferExtensionTables;
   private final TableMatchKeys matchKeys;
@@ -59,9 +59,9 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
     final Column primaryKeyColumn = proposedWeakAssociation.getPrimaryKeyColumn();
 
     final String pkColumnName =
-        NORMALIZATION_PATTERN.matcher(primaryKeyColumn.getName()).replaceAll("").toLowerCase();
+        NOT_ALPHANUMERIC_PATTERN.matcher(primaryKeyColumn.getName()).replaceAll("").toLowerCase();
     final String fkColumnName =
-        NORMALIZATION_PATTERN.matcher(foreignKeyColumn.getName()).replaceAll("").toLowerCase();
+        NOT_ALPHANUMERIC_PATTERN.matcher(foreignKeyColumn.getName()).replaceAll("").toLowerCase();
     if (pkColumnName.equals(fkColumnName)) {
       final Table pkTable = primaryKeyColumn.getParent();
       final boolean fkIsUnique =
