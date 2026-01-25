@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.test;
+package schemacrawler.ermodel.weakassociations;
 
 import static java.util.Objects.requireNonNull;
 import static org.hamcrest.CoreMatchers.is;
@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import schemacrawler.loader.weakassociations.PrefixMatches;
 
 public class PrefixMatchesTest {
 

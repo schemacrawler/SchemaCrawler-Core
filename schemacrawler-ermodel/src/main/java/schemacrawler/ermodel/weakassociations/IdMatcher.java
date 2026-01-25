@@ -6,9 +6,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.weakassociations;
+package schemacrawler.ermodel.weakassociations;
 
-import static schemacrawler.loader.weakassociations.WeakAssociationsAnalyzer.ID_PATTERN;
+import static schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzer.ID_PATTERN;
 
 import java.util.function.Predicate;
 import java.util.logging.Level;

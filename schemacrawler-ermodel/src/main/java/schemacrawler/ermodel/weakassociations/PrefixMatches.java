@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.weakassociations;
+package schemacrawler.ermodel.weakassociations;
 
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.CollectionsUtility.splitList;
@@ -40,7 +40,7 @@ import us.fatehi.utility.string.StringFormat;
  * link more pairs of tables/columns, thereby highlighting strong naming patterns while filtering
  * out coincidental or infrequent prefixes.
  */
-public final class PrefixMatches {
+final class PrefixMatches {
 
   private static final Logger LOGGER = Logger.getLogger(PrefixMatches.class.getName());
 
@@ -56,7 +56,7 @@ public final class PrefixMatches {
    * @param keys Keys to analyze
    * @param keySeparator Separator between key tokens
    */
-  public PrefixMatches(final List<String> keys, final String keySeparator) {
+  PrefixMatches(final List<String> keys, final String keySeparator) {
     this.keySeparator = requireNonNull(keySeparator, "No key separator provided");
     keyPrefixes = new Multimap<>();
 
