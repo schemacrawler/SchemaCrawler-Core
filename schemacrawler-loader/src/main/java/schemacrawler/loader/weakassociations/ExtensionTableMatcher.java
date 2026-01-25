@@ -16,18 +16,24 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.string.StringFormat;
 
 /**
  * Matches weak associations for extension tables that share a normalized primary key name with the
- * referenced table. This rule is optionally enabled via the {@code infer-extension-tables} option
- * and requires the foreign key column to be unique in the extension table.
+ * referenced table. Extension tables are tables where the foreign key column is also a primary key
+ * or part of a unique index, representing a 1-to-1 or 1-to-0..1 relationship.
+ *
+ * <p>This rule is optionally enabled via the {@code infer-extension-tables} option and requires the
+ * foreign key column to be unique in the extension table.
  */
 public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssociation> {
 
   private static final Logger LOGGER = Logger.getLogger(ExtensionTableMatcher.class.getName());
+
+  private static final Pattern NORMALIZATION_PATTERN = Pattern.compile("[^\\p{L}\\d]");
 
   private final boolean inferExtensionTables;
   private final TableMatchKeys matchKeys;
@@ -53,9 +59,9 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
     final Column primaryKeyColumn = proposedWeakAssociation.getPrimaryKeyColumn();
 
     final String pkColumnName =
-        primaryKeyColumn.getName().replaceAll("[^\\p{L}\\{d}]", "").toLowerCase();
+        NORMALIZATION_PATTERN.matcher(primaryKeyColumn.getName()).replaceAll("").toLowerCase();
     final String fkColumnName =
-        foreignKeyColumn.getName().replaceAll("[^\\p{L}\\{d}]", "").toLowerCase();
+        NORMALIZATION_PATTERN.matcher(foreignKeyColumn.getName()).replaceAll("").toLowerCase();
     if (pkColumnName.equals(fkColumnName)) {
       final Table pkTable = primaryKeyColumn.getParent();
       final boolean fkIsUnique =
