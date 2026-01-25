@@ -20,6 +20,16 @@ import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 
+/**
+ * Provides candidate key columns used for weak association inference.
+ *
+ * <p>To ensure high-confidence weak associations, this only considers single-column keys:
+ *
+ * <ul>
+ *   <li>Single-column primary keys are included.
+ *   <li>Single-column unique indexes are included.
+ * </ul>
+ */
 final class TableCandidateKeys implements Iterable<Column> {
 
   private final Table table;
@@ -41,25 +51,25 @@ final class TableCandidateKeys implements Iterable<Column> {
     return "%s: %s".formatted(table, tableKeys);
   }
 
-  private void addColumnFromIndex(final Table table, final Index index) {
+  private void addColumnFromIndex(final Index index) {
     final IndexColumn indexColumn = index.getColumns().get(0);
-    table.lookupColumn(indexColumn.getName()).ifPresent(column -> tableKeys.add(column));
+    tableKeys.add(indexColumn);
   }
 
-  private void addColumnFromPrimaryKey(final Table table, final PrimaryKey primaryKey) {
+  private void addColumnFromPrimaryKey(final PrimaryKey primaryKey) {
     final TableConstraintColumn tableConstraintColumn = primaryKey.getConstrainedColumns().get(0);
-    table.lookupColumn(tableConstraintColumn.getName()).ifPresent(column -> tableKeys.add(column));
+    tableKeys.add(tableConstraintColumn);
   }
 
   private void listTableKeys(final Table table) {
     final PrimaryKey primaryKey = table.getPrimaryKey();
     if (primaryKey != null && primaryKey.getConstrainedColumns().size() == 1) {
-      addColumnFromPrimaryKey(table, primaryKey);
+      addColumnFromPrimaryKey(primaryKey);
     }
 
     for (final Index index : table.getIndexes()) {
       if (index != null && index.isUnique() && index.getColumns().size() == 1) {
-        addColumnFromIndex(table, index);
+        addColumnFromIndex(index);
       }
     }
   }

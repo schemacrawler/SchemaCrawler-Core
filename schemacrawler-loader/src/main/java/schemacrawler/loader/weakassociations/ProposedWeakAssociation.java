@@ -16,16 +16,29 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 
+/**
+ * Proposed weak association between a foreign-key-like column and a primary key column.
+ *
+ * <p>Validation rejects:
+ *
+ * <ul>
+ *   <li>Self-references to the same column.
+ *   <li>Pairs where both columns are partial or either column has unknown data type.
+ *   <li>Pairs with non-matching standard data types.
+ * </ul>
+ */
 public final class ProposedWeakAssociation implements ColumnReference {
 
   @Serial private static final long serialVersionUID = 2986663326992262188L;
 
   private final Column primaryKeyColumn;
   private final Column foreignKeyColumn;
+  private final boolean isSelfReferencing;
 
   ProposedWeakAssociation(final Column foreignKeyColumn, final Column primaryKeyColumn) {
     this.primaryKeyColumn = requireNonNull(primaryKeyColumn, "No primary key column provided");
     this.foreignKeyColumn = requireNonNull(foreignKeyColumn, "No foreign key column provided");
+    isSelfReferencing = foreignKeyColumn.equals(primaryKeyColumn);
   }
 
   @Override
@@ -48,6 +61,17 @@ public final class ProposedWeakAssociation implements ColumnReference {
     return primaryKeyColumn;
   }
 
+  @Override
+  public boolean isSelfReferencing() {
+    return isSelfReferencing;
+  }
+
+  /**
+   * Validates a proposed association based on identity, partiality, and standard data type
+   * compatibility.
+   *
+   * @return true if the association should be considered for matching rules
+   */
   public boolean isValid() {
 
     if (primaryKeyColumn.equals(foreignKeyColumn)) {

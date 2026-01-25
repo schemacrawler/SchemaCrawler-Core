@@ -33,4 +33,11 @@ public interface ColumnReference extends Serializable, Comparable<ColumnReferenc
    * @return Primary key column
    */
   Column getPrimaryKeyColumn();
+
+  /**
+   * If the column references itself.
+   *
+   * @return True if the column is self-referencing.
+   */
+  boolean isSelfReferencing();
 }

@@ -29,6 +29,14 @@ import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 import us.fatehi.utility.string.StringFormat;
 
+/**
+ * Catalog loader that infers weak associations by applying a composite rule (ID-based matching and
+ * optional extension-table matching) across all tables and adds the results to the catalog.
+ *
+ * <p>This is a {@link PluginCommand} that provides options to enable weak association discovery.
+ * Enabling these options can have a significant performance impact on schema loading, as it
+ * involves analyzing naming patterns across all tables.
+ */
 public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
 
   private static final Logger LOGGER =
@@ -104,6 +112,9 @@ public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
         weakAssociationsAnalyzer.analyzeTables();
 
     for (final ProposedWeakAssociation proposedWeakAssociation : proposedWeakAssociations) {
+      if (proposedWeakAssociation.isSelfReferencing()) {
+        continue;
+      }
       LOGGER.log(
           Level.INFO, new StringFormat("Adding weak association <%s> ", proposedWeakAssociation));
 

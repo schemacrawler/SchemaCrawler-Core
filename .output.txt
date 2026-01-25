@@ -1,0 +1,1149 @@
+[INFO] Scanning for projects...
+[INFO] Inspecting build with total of 9 modules
+[INFO] Installing Central Publishing features
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO]
+[INFO] SchemaCrawler [Parent]                                             [pom]
+[INFO] SchemaCrawler - JDBC Drivers Distribution                          [pom]
+[INFO] SchemaCrawler Test Database                                        [jar]
+[INFO] SchemaCrawler Test Utility                                         [jar]
+[INFO] SchemaCrawler Utility                                              [jar]
+[INFO] SchemaCrawler API                                                  [jar]
+[INFO] SchemaCrawler ER Model                                             [jar]
+[INFO] SchemaCrawler Tools                                                [jar]
+[INFO] SchemaCrawler Catalog Loaders                                      [jar]
+Downloading from central: https://repo.maven.apache.org/maven2/org/jacoco/maven-metadata.xml
+Downloaded from central: https://repo.maven.apache.org/maven2/org/jacoco/maven-metadata.xml (237 B at 635 B/s)
+[INFO]
+[INFO] -------------------< us.fatehi:schemacrawler-parent >-------------------
+[INFO] Building SchemaCrawler [Parent] 17.5.0                             [1/9]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-3) @ schemacrawler-parent ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireMavenVersion passed
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-dependencies) @ schemacrawler-parent ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO]
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ schemacrawler-parent ---
+[INFO] argLine set to -javaagent:C:\\Users\\sualeh\\Code\\.m2\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=C:\\Users\\sualeh\\Code\\_SchemaCrawler\\SchemaCrawler-Core\\schemacrawler-parent\\target\\jacoco.exec
+[INFO]
+[INFO] --- jacoco:0.8.14:report (default-cli) @ schemacrawler-parent ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO]
+[INFO] ----------------< us.fatehi:schemacrawler-jdbc-drivers >----------------
+[INFO] Building SchemaCrawler - JDBC Drivers Distribution 17.5.0          [2/9]
+[INFO]   from C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-jdbc-drivers\pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-3) @ schemacrawler-jdbc-drivers ---
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-dependencies) @ schemacrawler-jdbc-drivers ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO]
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ schemacrawler-jdbc-drivers ---
+[INFO] argLine set to -javaagent:C:\\Users\\sualeh\\Code\\.m2\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=C:\\Users\\sualeh\\Code\\_SchemaCrawler\\SchemaCrawler-Core\\schemacrawler-jdbc-drivers\\target\\jacoco.exec
+[INFO]
+[INFO] --- jacoco:0.8.14:report (default-cli) @ schemacrawler-jdbc-drivers ---
+[INFO] Skipping JaCoCo execution due to missing execution data file.
+[INFO]
+[INFO] -------------------< us.fatehi:schemacrawler-testdb >-------------------
+[INFO] Building SchemaCrawler Test Database 17.5.0                        [3/9]
+[INFO]   from C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-testdb\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-3) @ schemacrawler-testdb ---
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-dependencies) @ schemacrawler-testdb ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO]
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ schemacrawler-testdb ---
+[INFO] argLine set to -javaagent:C:\\Users\\sualeh\\Code\\.m2\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=C:\\Users\\sualeh\\Code\\_SchemaCrawler\\SchemaCrawler-Core\\schemacrawler-testdb\\target\\jacoco.exec
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ schemacrawler-testdb ---
+[INFO] Copying 133 resources from src\main\resources to target\classes
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ schemacrawler-testdb ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ schemacrawler-testdb ---
+[INFO] skip non existing resourceDirectory C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-testdb\src\test\resources
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ schemacrawler-testdb ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- surefire:3.5.4:test (default-test) @ schemacrawler-testdb ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Logging configuration class "us.fatehi.utility.LoggingConfig" failed
+java.lang.ClassNotFoundException: us.fatehi.utility.LoggingConfig
+[INFO] Running schemacrawler.integration.test.DatabaseScriptsTest
+C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-testdb\target\test-classes\..\..\src\main\resources
+C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-testdb\target\test-classes\..\..\src\main\resources
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.156 s -- in schemacrawler.integration.test.DatabaseScriptsTest
+[INFO] Running schemacrawler.integration.test.TestSchemaCreatorTest
+Jan 24, 2026 5:56:18 PM schemacrawler.testdb.TestDatabase stopServer
+INFO: SHUTDOWN database
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.827 s -- in schemacrawler.integration.test.TestSchemaCreatorTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO]
+[INFO] --- jacoco:0.8.14:report (default-cli) @ schemacrawler-testdb ---
+[INFO] Loading execution data file C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-testdb\target\jacoco.exec
+[INFO] Analyzed bundle 'SchemaCrawler Test Database' with 4 classes
+[INFO]
+[INFO] ----------------< us.fatehi:schemacrawler-test-utility >----------------
+[INFO] Building SchemaCrawler Test Utility 17.5.0                         [4/9]
+[INFO]   from C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-test-utility\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-3) @ schemacrawler-test-utility ---
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-dependencies) @ schemacrawler-test-utility ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO]
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ schemacrawler-test-utility ---
+[INFO] argLine set to -javaagent:C:\\Users\\sualeh\\Code\\.m2\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=C:\\Users\\sualeh\\Code\\_SchemaCrawler\\SchemaCrawler-Core\\schemacrawler-test-utility\\target\\jacoco.exec
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ schemacrawler-test-utility ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ schemacrawler-test-utility ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ schemacrawler-test-utility ---
+[INFO] Copying 8 resources from src\test\resources to target\test-classes
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ schemacrawler-test-utility ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- surefire:3.5.4:test (default-test) @ schemacrawler-test-utility ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Logging configuration class "us.fatehi.utility.LoggingConfig" failed
+java.lang.ClassNotFoundException: us.fatehi.utility.LoggingConfig
+[INFO] Running schemacrawler.test.utility.test.FileHasContentTest
+was (expected followed by actual)
+goodbye, world
+hello, world
+>> Actual output in:
+schemacrawler-test-utility/target/unit_tests_results_output/_file_has_content/outputNotMatching
+Expected: contents of <_file_has_content/outputNotMatching>
+     but: was (expected followed by actual)
+goodbye, world
+hello, world
+>> Actual output in:
+schemacrawler-test-utility/target/unit_tests_results_output/_file_has_content/outputNotMatching
+output file is not created
+Expected: contents of <_file_has_content/missingOutputFile>
+     but: output file is not created
+output file is not empty
+Expected: no output
+     but: output file is not empty
+reference file is not available
+>> Actual output in:
+schemacrawler-test-utility/target/unit_tests_results_output/_file_has_content/missingReferenceResource
+Expected: contents of <_file_has_content/missingReferenceResource>
+     but: reference file is not available
+>> Actual output in:
+schemacrawler-test-utility/target/unit_tests_results_output/_file_has_content/missingReferenceResource
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.260 s -- in schemacrawler.test.utility.test.FileHasContentTest
+[INFO] Running schemacrawler.test.utility.test.GettersSettersTest
+Jan 24, 2026 5:56:22 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Logging subsystem initialized to [com.openpojo.log.impl.SLF4JLogger]
+Jan 24, 2026 5:56:22 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Jacoco detected, auto-configuring OpenPojo to ignore its structures.
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to get value for environment variable: [sun.boot.class.path]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\Microsoft\jdk-21.0.8.9-hotspot\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\Microsoft\jdk-21.0.8.9-hotspot\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Windows\Sun\Java\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Windows\Sun\Java\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Windows\system32
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Windows\system32]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Windows
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Windows]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\Microsoft\jdk-21.0.8.9-hotspot\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\Microsoft\jdk-21.0.8.9-hotspot\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\jdk/bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\jdk/bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\jdk/bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\jdk/bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Windows\system32
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Windows\system32]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Windows
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Windows]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Windows\System32\Wbem
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Windows\System32\Wbem]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Windows\System32\WindowsPowerShell\v1.0\
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Windows\System32\WindowsPowerShell\v1.0\]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Windows\System32\OpenSSH\
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Windows\System32\OpenSSH\]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files (x86)\Gpg4win\..\GnuPG\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files (x86)\Gpg4win\..\GnuPG\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\GitHub CLI\
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\GitHub CLI\]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\suale\AppData\Local\Microsoft\WindowsApps
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\suale\AppData\Local\Microsoft\WindowsApps]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\suale\AppData\Local\Programs\Microsoft VS Code\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\suale\AppData\Local\Programs\Microsoft VS Code\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\suale\Code\jvms
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\suale\Code\jvms]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\Amazon\AWSCLIV2\
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\Amazon\AWSCLIV2\]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\Graphviz\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\Graphviz\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\dotnet\
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\dotnet\]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: c:\Users\sualeh\AppData\Local\Programs\cursor\resources\app\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [c:\Users\sualeh\AppData\Local\Programs\cursor\resources\app\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\Go\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\Go\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\scoop\apps\maven\current\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\scoop\apps\maven\current\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\scoop\shims
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\scoop\shims]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\AppData\Local\Microsoft\WindowsApps
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\AppData\Local\Microsoft\WindowsApps]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\AppData\Local\Programs\Microsoft VS Code\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\AppData\Local\Programs\Microsoft VS Code\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\.dotnet\tools
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\.dotnet\tools]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: c:\users\sualeh\.local\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [c:\users\sualeh\.local\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\JetBrains\In
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\JetBrains\In]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\PowerShell\7\
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\PowerShell\7\]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\Git\cmd
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\Git\cmd]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\Docker\Docker\resources\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\Docker\Docker\resources\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\KeePassXC\
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\KeePassXC\]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\nodejs\
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\nodejs\]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\TortoiseGit\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\TortoiseGit\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\scoop\apps\maven\current\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\scoop\apps\maven\current\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\scoop\apps\photosrenamer\current\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\scoop\apps\photosrenamer\current\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\scoop\shims
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\scoop\shims]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\AppData\Local\Microsoft\WindowsApps
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\AppData\Local\Microsoft\WindowsApps]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\AppData\Local\Programs\Microsoft VS Code\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\AppData\Local\Programs\Microsoft VS Code\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\.dotnet\tools
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\.dotnet\tools]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: c:\users\sualeh\.local\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [c:\users\sualeh\.local\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Program Files\JetBrains\IntelliJ IDEA 2025.3\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Program Files\JetBrains\IntelliJ IDEA 2025.3\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\AppData\Local\Microsoft\WinGet\Packages\Task.Task_Microsoft.Winget.Source_8wekyb3d8bbwe
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\AppData\Local\Microsoft\WinGet\Packages\Task.Task_Microsoft.Winget.Source_8wekyb3d8bbwe]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\go\bin
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\go\bin]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\AppData\Local\PowerToys\DSCModules\
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\AppData\Local\PowerToys\DSCModules\]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\AppData\Roaming\npm
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\AppData\Roaming\npm]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: .
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [.]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-test-utility\target\test-classes
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-test-utility\target\test-classes]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-test-utility\target\classes
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-test-utility\target\classes]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\junit\jupiter\junit-jupiter\6.0.2\junit-jupiter-6.0.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\junit\jupiter\junit-jupiter-api\6.0.2\junit-jupiter-api-6.0.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\junit\platform\junit-platform-commons\6.0.2\junit-platform-commons-6.0.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\junit\jupiter\junit-jupiter-params\6.0.2\junit-jupiter-params-6.0.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\junit\jupiter\junit-jupiter-engine\6.0.2\junit-jupiter-engine-6.0.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\junit\platform\junit-platform-engine\6.0.2\junit-platform-engine-6.0.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\hamcrest\hamcrest\3.0\hamcrest-3.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\mockito\mockito-junit-jupiter\5.21.0\mockito-junit-jupiter-5.21.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\mockito\mockito-core\5.21.0\mockito-core-5.21.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\net\bytebuddy\byte-buddy-agent\1.17.7\byte-buddy-agent-1.17.7.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\apache\commons\commons-lang3\3.20.0\commons-lang3-3.20.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\commons-io\commons-io\2.21.0\commons-io-2.21.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\apache\commons\commons-beanutils2\2.0.0-M2\commons-beanutils2-2.0.0-M2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\commons-logging\commons-logging\1.3.5\commons-logging-1.3.5.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\apache\commons\commons-collections4\4.5.0\commons-collections4-4.5.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\zaxxer\HikariCP\7.0.2\HikariCP-7.0.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\slf4j\slf4j-api\2.0.17\slf4j-api-2.0.17.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-junit-jupiter\2.0.3\testcontainers-junit-jupiter-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers\2.0.3\testcontainers-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\apache\commons\commons-compress\1.28.0\commons-compress-1.28.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\commons-codec\commons-codec\1.19.0\commons-codec-1.19.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\docker-java\docker-java-api\3.7.0\docker-java-api-3.7.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\docker-java\docker-java-transport-zerodep\3.7.0\docker-java-transport-zerodep-3.7.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\docker-java\docker-java-transport\3.7.0\docker-java-transport-3.7.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\net\java\dev\jna\jna\5.18.1\jna-5.18.1.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-oracle-free\2.0.3\testcontainers-oracle-free-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-jdbc\2.0.3\testcontainers-jdbc-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-mssqlserver\2.0.3\testcontainers-mssqlserver-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-mysql\2.0.3\testcontainers-mysql-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-mariadb\2.0.3\testcontainers-mariadb-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-db2\2.0.3\testcontainers-db2-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-postgresql\2.0.3\testcontainers-postgresql-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-cassandra\2.0.3\testcontainers-cassandra-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-database-commons\2.0.3\testcontainers-database-commons-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\datastax\cassandra\cassandra-driver-core\3.10.0\cassandra-driver-core-3.10.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\io\netty\netty-handler\4.0.56.Final\netty-handler-4.0.56.Final.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\io\netty\netty-buffer\4.0.56.Final\netty-buffer-4.0.56.Final.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\io\netty\netty-common\4.0.56.Final\netty-common-4.0.56.Final.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\io\netty\netty-transport\4.0.56.Final\netty-transport-4.0.56.Final.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\io\netty\netty-codec\4.0.56.Final\netty-codec-4.0.56.Final.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\google\guava\guava\19.0\guava-19.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\io\dropwizard\metrics\metrics-core\3.2.2\metrics-core-3.2.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\jnr\jnr-ffi\2.1.7\jnr-ffi-2.1.7.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\jnr\jffi\1.2.16\jffi-1.2.16.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\jnr\jffi\1.2.16\jffi-1.2.16-native.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\ow2\asm\asm\5.0.3\asm-5.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\ow2\asm\asm-commons\5.0.3\asm-commons-5.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\ow2\asm\asm-analysis\5.0.3\asm-analysis-5.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\ow2\asm\asm-tree\5.0.3\asm-tree-5.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\ow2\asm\asm-util\5.0.3\asm-util-5.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\jnr\jnr-x86asm\1.0.2\jnr-x86asm-1.0.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\jnr\jnr-posix\3.0.44\jnr-posix-3.0.44.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\jnr\jnr-constants\0.9.9\jnr-constants-0.9.9.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\fasterxml\jackson\core\jackson-databind\2.7.9.3\jackson-databind-2.7.9.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\fasterxml\jackson\core\jackson-core\2.7.9\jackson-core-2.7.9.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\testcontainers\testcontainers-trino\2.0.3\testcontainers-trino-2.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\openpojo\openpojo\0.9.1\openpojo-0.9.1.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-testdb\target\classes
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to load entries from: [C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-testdb\target\classes]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\postgresql\postgresql\42.7.9\postgresql-42.7.9.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\checkerframework\checker-qual\3.52.0\checker-qual-3.52.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\mysql\mysql-connector-j\9.5.0\mysql-connector-j-9.5.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\microsoft\sqlserver\mssql-jdbc\13.2.1.jre11\mssql-jdbc-13.2.1.jre11.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\oracle\database\jdbc\debug\ojdbc8_g\21.20.0.0\ojdbc8_g-21.20.0.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\ibm\db2\jcc\12.1.3.0\jcc-12.1.3.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\h2database\h2\2.4.240\h2-2.4.240.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\xerial\sqlite-jdbc\3.51.1.0\sqlite-jdbc-3.51.1.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\ibm\informix\jdbc\4.50.13\jdbc-4.50.13.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\mongodb\bson\3.8.0\bson-3.8.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\net\snowflake\snowflake-jdbc\3.28.0\snowflake-jdbc-3.28.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\amazon\redshift\redshift-jdbc42\2.2.2\redshift-jdbc42-2.2.2.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\firebirdsql\jdbc\jaybird\6.0.3\jaybird-6.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\duckdb\duckdb_jdbc\1.4.3.0\duckdb_jdbc-1.4.3.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\mariadb\jdbc\mariadb-java-client\3.5.7\mariadb-java-client-3.5.7.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\info\picocli\picocli\4.7.7\picocli-4.7.7.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\jspecify\jspecify\1.0.0\jspecify-1.0.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\tools\jackson\core\jackson-core\3.0.3\jackson-core-3.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\tools\jackson\core\jackson-databind\3.0.3\jackson-databind-3.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\fasterxml\jackson\core\jackson-annotations\2.20\jackson-annotations-2.20.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\tools\jackson\dataformat\jackson-dataformat-yaml\3.0.3\jackson-dataformat-yaml-3.0.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\snakeyaml\snakeyaml-engine\2.10\snakeyaml-engine-2.10.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\hsqldb\hsqldb\2.7.4\hsqldb-2.7.4.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\npathai\hamcrest-optional\2.0.0\hamcrest-optional-2.0.0.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\nl\jqno\equalsverifier\equalsverifier\4.3\equalsverifier-4.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\objenesis\objenesis\3.4\objenesis-3.4.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\net\bytebuddy\byte-buddy\1.18.3\byte-buddy-1.18.3.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\github\stefanbirkner\system-lambda\1.2.1\system-lambda-1.2.1.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\org\slf4j\slf4j-jdk14\2.0.17\slf4j-jdk14-2.0.17.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\tngtech\archunit\archunit-junit5\1.4.1\archunit-junit5-1.4.1.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\tngtech\archunit\archunit-junit5-api\1.4.1\archunit-junit5-api-1.4.1.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\tngtech\archunit\archunit\1.4.1\archunit-1.4.1.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\tngtech\archunit\archunit-junit5-engine\1.4.1\archunit-junit5-engine-1.4.1.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Loading classes from: C:\Users\sualeh\Code\.m2\com\tngtech\archunit\archunit-junit5-engine-api\1.4.1\archunit-junit5-engine-api-1.4.1.jar
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Failed to get value for environment variable: [java.ext.dirs]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: Getter=[getInternalSubset] in class=[us.fatehi.test.utility.DOCTYPEChanger] rejected due non-equal return types [class java.lang.String != boolean]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger info
+INFO: Dynamically setting affirmation implementation = [com.openpojo.validation.affirm.JavaAssertionAffirmation [@517a2b0: ]]
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: No ParametrizableRandomGenerator implementation found for parameterized type [PojoFieldImpl [field=private java.lang.Enum us.fatehi.test.utility.TestObject.primitiveEnum, fieldGetter=PojoMethodImpl [method=getPrimitiveEnum args=[] return=class java.lang.Enum], fieldSetter=PojoMethodImpl [method=setPrimitiveEnum args=[class java.lang.Enum] return=void]]] creating non-parameterized instance
+Jan 24, 2026 5:56:23 PM com.openpojo.log.impl.SLF4JLogger warn
+WARNING: No ParametrizableRandomGenerator implementation found for parameterized type [PojoFieldImpl [field=private java.lang.Enum us.fatehi.test.utility.TestObject.primitiveEnum, fieldGetter=PojoMethodImpl [method=getPrimitiveEnum args=[] return=class java.lang.Enum], fieldSetter=PojoMethodImpl [method=setPrimitiveEnum args=[class java.lang.Enum] return=void]]] creating non-parameterized instance
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.416 s -- in schemacrawler.test.utility.test.GettersSettersTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO]
+[INFO] --- jacoco:0.8.14:report (default-cli) @ schemacrawler-test-utility ---
+[INFO] Loading execution data file C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-test-utility\target\jacoco.exec
+[INFO] Analyzed bundle 'SchemaCrawler Test Utility' with 47 classes
+[INFO]
+[INFO] ------------------< us.fatehi:schemacrawler-utility >-------------------
+[INFO] Building SchemaCrawler Utility 17.5.0                              [5/9]
+[INFO]   from C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-utility\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-3) @ schemacrawler-utility ---
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-dependencies) @ schemacrawler-utility ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO]
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ schemacrawler-utility ---
+[INFO] argLine set to -javaagent:C:\\Users\\sualeh\\Code\\.m2\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=C:\\Users\\sualeh\\Code\\_SchemaCrawler\\SchemaCrawler-Core\\schemacrawler-utility\\target\\jacoco.exec
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ schemacrawler-utility ---
+[INFO] skip non existing resourceDirectory C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-utility\src\main\resources
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ schemacrawler-utility ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ schemacrawler-utility ---
+[INFO] Copying 6 resources from src\test\resources to target\test-classes
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ schemacrawler-utility ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- surefire:3.5.4:test (default-test) @ schemacrawler-utility ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running us.fatehi.test.AbstractPropertyTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\sualeh\Code\.m2\net\bytebuddy\byte-buddy-agent\1.17.7\byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.130 s -- in us.fatehi.test.AbstractPropertyTest
+[INFO] Running us.fatehi.test.BaseProductVersionTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.089 s -- in us.fatehi.test.BaseProductVersionTest
+[INFO] Running us.fatehi.test.ConnectionInfoBuilderTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.945 s -- in us.fatehi.test.ConnectionInfoBuilderTest
+[INFO] Running us.fatehi.test.SqlScriptTest
+unexpected token: SOME
+SOME BAD SQL
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.090 s -- in us.fatehi.test.SqlScriptTest
+[INFO] Running us.fatehi.test.SystemExitExceptionTest
+Exit code 1: message
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in us.fatehi.test.SystemExitExceptionTest
+[INFO] Running us.fatehi.utility.datasource.DatabaseConnectionSourceBuilderTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.033 s -- in us.fatehi.utility.datasource.DatabaseConnectionSourceBuilderTest
+[INFO] Running us.fatehi.utility.datasource.DataSourceConnectionSourceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.493 s -- in us.fatehi.utility.datasource.DataSourceConnectionSourceTest
+[INFO] Running us.fatehi.utility.datasource.MultiUseUserCredentialsTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in us.fatehi.utility.datasource.MultiUseUserCredentialsTest
+[INFO] Running us.fatehi.utility.datasource.SimpleDatabaseConnectionSourceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.074 s -- in us.fatehi.utility.datasource.SimpleDatabaseConnectionSourceTest
+[INFO] Running us.fatehi.utility.datasource.TestDatabaseConnectionSourceTest
+[WARNING] Tests run: 2, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 0.033 s -- in us.fatehi.utility.datasource.TestDatabaseConnectionSourceTest
+[INFO] Running us.fatehi.utility.ioresource.NonCloseableWriterTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in us.fatehi.utility.ioresource.NonCloseableWriterTest
+[INFO] Running us.fatehi.utility.scheduler.TaskDefinitionTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in us.fatehi.utility.scheduler.TaskDefinitionTest
+[INFO] Running us.fatehi.utility.scheduler.TaskRunnerTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in us.fatehi.utility.scheduler.TaskRunnerTest
+[INFO] Running us.fatehi.utility.scheduler.TimedTaskResultTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in us.fatehi.utility.scheduler.TimedTaskResultTest
+[INFO] Running us.fatehi.utility.test.CollectionsUtilityTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in us.fatehi.utility.test.CollectionsUtilityTest
+[INFO] Running us.fatehi.utility.test.ColorTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.067 s -- in us.fatehi.utility.test.ColorTest
+[INFO] Running us.fatehi.utility.test.DatabaseConnectionSourcesTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.069 s -- in us.fatehi.utility.test.DatabaseConnectionSourcesTest
+[INFO] Running us.fatehi.utility.test.DatabaseUtilityTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.183 s -- in us.fatehi.utility.test.DatabaseUtilityTest
+[INFO] Running us.fatehi.utility.test.graph.DirectedGraphBoundaryTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in us.fatehi.utility.test.graph.DirectedGraphBoundaryTest
+[INFO] Running us.fatehi.utility.test.graph.DirectedGraphTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.063 s -- in us.fatehi.utility.test.graph.DirectedGraphTest
+[INFO] Running us.fatehi.utility.test.graph.TreeNodeTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in us.fatehi.utility.test.graph.TreeNodeTest
+[INFO] Running us.fatehi.utility.test.html.AnchorTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.160 s -- in us.fatehi.utility.test.html.AnchorTest
+[INFO] Running us.fatehi.utility.test.html.CaptionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in us.fatehi.utility.test.html.CaptionTest
+[INFO] Running us.fatehi.utility.test.html.SpanTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in us.fatehi.utility.test.html.SpanTest
+[INFO] Running us.fatehi.utility.test.html.TableCellTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in us.fatehi.utility.test.html.TableCellTest
+[INFO] Running us.fatehi.utility.test.html.TableRowTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in us.fatehi.utility.test.html.TableRowTest
+[INFO] Running us.fatehi.utility.test.html.TagTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in us.fatehi.utility.test.html.TagTest
+[INFO] Running us.fatehi.utility.test.ioresource.ClasspathInputResourceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in us.fatehi.utility.test.ioresource.ClasspathInputResourceTest
+[INFO] Running us.fatehi.utility.test.ioresource.ConsoleOutputResourceTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in us.fatehi.utility.test.ioresource.ConsoleOutputResourceTest
+[INFO] Running us.fatehi.utility.test.ioresource.FileInputResourceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in us.fatehi.utility.test.ioresource.FileInputResourceTest
+[INFO] Running us.fatehi.utility.test.ioresource.FileOutputResourceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in us.fatehi.utility.test.ioresource.FileOutputResourceTest
+[INFO] Running us.fatehi.utility.test.ioresource.InputResourceUtilityTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in us.fatehi.utility.test.ioresource.InputResourceUtilityTest
+[INFO] Running us.fatehi.utility.test.ioresource.WriterOutputResourceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in us.fatehi.utility.test.ioresource.WriterOutputResourceTest
+[INFO] Running us.fatehi.utility.test.IOUtilityTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.068 s -- in us.fatehi.utility.test.IOUtilityTest
+[INFO] Running us.fatehi.utility.test.MultimapTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in us.fatehi.utility.test.MultimapTest
+[INFO] Running us.fatehi.utility.test.OptionalBooleanTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in us.fatehi.utility.test.OptionalBooleanTest
+[INFO] Running us.fatehi.utility.test.PooledConnectionTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.180 s -- in us.fatehi.utility.test.PooledConnectionTest
+[INFO] Running us.fatehi.utility.test.ProcessExecutorTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 s -- in us.fatehi.utility.test.ProcessExecutorTest
+[INFO] Running us.fatehi.utility.test.PropertyNameTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in us.fatehi.utility.test.PropertyNameTest
+[INFO] Running us.fatehi.utility.test.PropertyTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.033 s -- in us.fatehi.utility.test.PropertyTest
+[INFO] Running us.fatehi.utility.test.RegularExpressionColorMapTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in us.fatehi.utility.test.RegularExpressionColorMapTest
+[INFO] Running us.fatehi.utility.test.string.FileContentsTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in us.fatehi.utility.test.string.FileContentsTest
+[INFO] Running us.fatehi.utility.test.string.ObjectToStringFormatTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in us.fatehi.utility.test.string.ObjectToStringFormatTest
+[INFO] Running us.fatehi.utility.test.string.ObjectToStringFunctionsTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.467 s -- in us.fatehi.utility.test.string.ObjectToStringFunctionsTest
+[INFO] Running us.fatehi.utility.test.string.ObjectToStringTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in us.fatehi.utility.test.string.ObjectToStringTest
+[INFO] Running us.fatehi.utility.test.string.StringFormatTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in us.fatehi.utility.test.string.StringFormatTest
+[INFO] Running us.fatehi.utility.test.SystemPropertiesTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in us.fatehi.utility.test.SystemPropertiesTest
+[INFO] Running us.fatehi.utility.test.TemplatingTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in us.fatehi.utility.test.TemplatingTest
+[INFO] Running us.fatehi.utility.test.UtilityLoggerLogFatalStackTraceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in us.fatehi.utility.test.UtilityLoggerLogFatalStackTraceTest
+[INFO] Running us.fatehi.utility.test.UtilityLoggerLogSafeArgumentsTest
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in us.fatehi.utility.test.UtilityLoggerLogSafeArgumentsTest
+[INFO] Running us.fatehi.utility.test.UtilityLoggerLogSystemInformationTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in us.fatehi.utility.test.UtilityLoggerLogSystemInformationTest
+[INFO] Running us.fatehi.utility.test.UtilityTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in us.fatehi.utility.test.UtilityTest
+[INFO]
+[INFO] Results:
+[INFO]
+[WARNING] Tests run: 222, Failures: 0, Errors: 0, Skipped: 1
+[INFO]
+[INFO]
+[INFO] --- jacoco:0.8.14:report (default-cli) @ schemacrawler-utility ---
+[INFO] Loading execution data file C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-utility\target\jacoco.exec
+[INFO] Analyzed bundle 'SchemaCrawler Utility' with 85 classes
+[INFO]
+[INFO] --------------------< us.fatehi:schemacrawler-api >---------------------
+[INFO] Building SchemaCrawler API 17.5.0                                  [6/9]
+[INFO]   from C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-api\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-3) @ schemacrawler-api ---
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-dependencies) @ schemacrawler-api ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO]
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ schemacrawler-api ---
+[INFO] argLine set to -javaagent:C:\\Users\\sualeh\\Code\\.m2\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=C:\\Users\\sualeh\\Code\\_SchemaCrawler\\SchemaCrawler-Core\\schemacrawler-api\\target\\jacoco.exec
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ schemacrawler-api ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ schemacrawler-api ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ schemacrawler-api ---
+[INFO] Copying 69 resources from src\test\resources to target\test-classes
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ schemacrawler-api ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- surefire:3.5.4:test (default-test) @ schemacrawler-api ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running schemacrawler.crawl.CompareToTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.088 s -- in schemacrawler.crawl.CompareToTest
+[INFO] Running schemacrawler.crawl.CoverageTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.008 s -- in schemacrawler.crawl.CoverageTest
+[INFO] Running schemacrawler.crawl.DatabaseInfoRetrieverTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\sualeh\Code\.m2\net\bytebuddy\byte-buddy-agent\1.17.7\byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.955 s -- in schemacrawler.crawl.DatabaseInfoRetrieverTest
+[INFO] Running schemacrawler.crawl.DataTypeRetrieverTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.672 s -- in schemacrawler.crawl.DataTypeRetrieverTest
+[INFO] Running schemacrawler.crawl.EqualsTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.003 s -- in schemacrawler.crawl.EqualsTest
+[INFO] Running schemacrawler.crawl.ForeignKeyRetrieverTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.599 s -- in schemacrawler.crawl.ForeignKeyRetrieverTest
+[INFO] Running schemacrawler.crawl.FunctionParameterRetrieverTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.343 s -- in schemacrawler.crawl.FunctionParameterRetrieverTest
+[INFO] Running schemacrawler.crawl.GettersSettersTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.384 s -- in schemacrawler.crawl.GettersSettersTest
+[INFO] Running schemacrawler.crawl.IndexRetrieverTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.746 s -- in schemacrawler.crawl.IndexRetrieverTest
+[INFO] Running schemacrawler.crawl.JdbcDriverInfoRetrieverTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.932 s -- in schemacrawler.crawl.JdbcDriverInfoRetrieverTest
+[INFO] Running schemacrawler.crawl.LookupTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.126 s -- in schemacrawler.crawl.LookupTest
+[INFO] Running schemacrawler.crawl.MetadataResultSetTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.471 s -- in schemacrawler.crawl.MetadataResultSetTest
+[INFO] Running schemacrawler.crawl.MutableDatabaseObjectsTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in schemacrawler.crawl.MutableDatabaseObjectsTest
+[INFO] Running schemacrawler.crawl.NamedObjectTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in schemacrawler.crawl.NamedObjectTest
+[INFO] Running schemacrawler.crawl.PartialsTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 s -- in schemacrawler.crawl.PartialsTest
+[INFO] Running schemacrawler.crawl.PrimaryKeyRetrieverTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.965 s -- in schemacrawler.crawl.PrimaryKeyRetrieverTest
+[INFO] Running schemacrawler.crawl.ProcedureParameterRetrieverTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.082 s -- in schemacrawler.crawl.ProcedureParameterRetrieverTest
+[INFO] Running schemacrawler.crawl.RoutineExtRetrieverTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.975 s -- in schemacrawler.crawl.RoutineExtRetrieverTest
+[INFO] Running schemacrawler.crawl.RoutineRetrieverFunctionsTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.007 s -- in schemacrawler.crawl.RoutineRetrieverFunctionsTest
+[INFO] Running schemacrawler.crawl.RoutineRetrieverProceduresTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.072 s -- in schemacrawler.crawl.RoutineRetrieverProceduresTest
+[INFO] Running schemacrawler.crawl.SchemaCrawlerCoverageTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.695 s -- in schemacrawler.crawl.SchemaCrawlerCoverageTest
+[INFO] Running schemacrawler.crawl.SchemaCrawlerDeepTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.151 s -- in schemacrawler.crawl.SchemaCrawlerDeepTest
+[INFO] Running schemacrawler.crawl.SchemaReferenceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in schemacrawler.crawl.SchemaReferenceTest
+[INFO] Running schemacrawler.crawl.SchemaRetrieverTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.340 s -- in schemacrawler.crawl.SchemaRetrieverTest
+[INFO] Running schemacrawler.crawl.ServerInfoPropertyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in schemacrawler.crawl.ServerInfoPropertyTest
+[INFO] Running schemacrawler.crawl.TableColumnRetrieverTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.750 s -- in schemacrawler.crawl.TableColumnRetrieverTest
+[INFO] Running schemacrawler.crawl.TableConstraintRetrieverTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.331 s -- in schemacrawler.crawl.TableConstraintRetrieverTest
+[INFO] Running schemacrawler.crawl.TableExtRetrieverTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.974 s -- in schemacrawler.crawl.TableExtRetrieverTest
+[INFO] Running schemacrawler.crawl.TablePrivilegeRetrieverTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.820 s -- in schemacrawler.crawl.TablePrivilegeRetrieverTest
+[INFO] Running schemacrawler.crawl.TableRetrieverTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.804 s -- in schemacrawler.crawl.TableRetrieverTest
+[INFO] Running schemacrawler.filter.TableGrepFilterTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.043 s -- in schemacrawler.filter.TableGrepFilterTest
+[INFO] Running schemacrawler.test.DatabaseServerTypeTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.114 s -- in schemacrawler.test.DatabaseServerTypeTest
+[INFO] Running schemacrawler.test.ExcludeTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.912 s -- in schemacrawler.test.ExcludeTest
+[INFO] Running schemacrawler.test.FileContentsTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in schemacrawler.test.FileContentsTest
+[INFO] Running schemacrawler.test.ForeignKeyNamesTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.933 s -- in schemacrawler.test.ForeignKeyNamesTest
+[INFO] Running schemacrawler.test.GrepOptionsBuilderTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.041 s -- in schemacrawler.test.GrepOptionsBuilderTest
+[INFO] Running schemacrawler.test.HeavyDatabaseExtensionTest
+[WARNING] Tests run: 5, Failures: 0, Errors: 0, Skipped: 5, Time elapsed: 0.003 s -- in schemacrawler.test.HeavyDatabaseExtensionTest
+[INFO] Running schemacrawler.test.IdentifiersTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in schemacrawler.test.IdentifiersTest
+[INFO] Running schemacrawler.test.InformationSchemaViewsBuilderTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.034 s -- in schemacrawler.test.InformationSchemaViewsBuilderTest
+[INFO] Running schemacrawler.test.JavaSqlTypeTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.277 s -- in schemacrawler.test.JavaSqlTypeTest
+[INFO] Running schemacrawler.test.LimitOptionsBuilderTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.028 s -- in schemacrawler.test.LimitOptionsBuilderTest
+[INFO] Running schemacrawler.test.ListExclusionRuleTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in schemacrawler.test.ListExclusionRuleTest
+[INFO] Running schemacrawler.test.LoadOptionsBuilderTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in schemacrawler.test.LoadOptionsBuilderTest
+[INFO] Running schemacrawler.test.MetadataUtilityTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.949 s -- in schemacrawler.test.MetadataUtilityTest
+[INFO] Running schemacrawler.test.NamedObjectKeyTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.026 s -- in schemacrawler.test.NamedObjectKeyTest
+[INFO] Running schemacrawler.test.NamedObjectSortTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.099 s -- in schemacrawler.test.NamedObjectSortTest
+[INFO] Running schemacrawler.test.QueryUtilityTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.364 s -- in schemacrawler.test.QueryUtilityTest
+[INFO] Running schemacrawler.test.RegularExpressionRuleTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s -- in schemacrawler.test.RegularExpressionRuleTest
+[INFO] Running schemacrawler.test.ResultColumnsTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.692 s -- in schemacrawler.test.ResultColumnsTest
+[INFO] Running schemacrawler.test.SchemaCrawlerGrepTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.552 s -- in schemacrawler.test.SchemaCrawlerGrepTest
+[INFO] Running schemacrawler.test.SchemaCrawlerReferenceTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.264 s -- in schemacrawler.test.SchemaCrawlerReferenceTest
+[INFO] Running schemacrawler.test.SchemaCrawlerTest
+[INFO] Tests run: 24, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.843 s -- in schemacrawler.test.SchemaCrawlerTest
+[INFO] Running schemacrawler.test.SchemaInfoLevelBuilderTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.779 s -- in schemacrawler.test.SchemaInfoLevelBuilderTest
+[INFO] Running schemacrawler.test.SchemaRetrievalOptionsBuilderTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.068 s -- in schemacrawler.test.SchemaRetrievalOptionsBuilderTest
+[INFO] Running schemacrawler.test.SerializationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.134 s -- in schemacrawler.test.SerializationTest
+[INFO] Running schemacrawler.test.SortingTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.355 s -- in schemacrawler.test.SortingTest
+[INFO] Running schemacrawler.test.TableNamePatternTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.580 s -- in schemacrawler.test.TableNamePatternTest
+[INFO] Running schemacrawler.test.TableTypesTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.215 s -- in schemacrawler.test.TableTypesTest
+[INFO] Running schemacrawler.test.TableTypeTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in schemacrawler.test.TableTypeTest
+[INFO] Running schemacrawler.test.TypeMapTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in schemacrawler.test.TypeMapTest
+[INFO] Running schemacrawler.test.VersionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in schemacrawler.test.VersionTest
+[INFO]
+[INFO] Results:
+[INFO]
+[WARNING] Tests run: 297, Failures: 0, Errors: 0, Skipped: 5
+[INFO]
+[INFO]
+[INFO] --- jacoco:0.8.14:report (default-cli) @ schemacrawler-api ---
+[INFO] Loading execution data file C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-api\target\jacoco.exec
+[INFO] Analyzed bundle 'SchemaCrawler API' with 191 classes
+[INFO]
+[INFO] ------------------< us.fatehi:schemacrawler-ermodel >-------------------
+[INFO] Building SchemaCrawler ER Model 17.5.0                             [7/9]
+[INFO]   from C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-ermodel\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-3) @ schemacrawler-ermodel ---
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-dependencies) @ schemacrawler-ermodel ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO]
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ schemacrawler-ermodel ---
+[INFO] argLine set to -javaagent:C:\\Users\\sualeh\\Code\\.m2\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=C:\\Users\\sualeh\\Code\\_SchemaCrawler\\SchemaCrawler-Core\\schemacrawler-ermodel\\target\\jacoco.exec
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ schemacrawler-ermodel ---
+[INFO] skip non existing resourceDirectory C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-ermodel\src\main\resources
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ schemacrawler-ermodel ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ schemacrawler-ermodel ---
+[INFO] Copying 2 resources from src\test\resources to target\test-classes
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ schemacrawler-ermodel ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- surefire:3.5.4:test (default-test) @ schemacrawler-ermodel ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running schemacrawler.crawl.EntityIdentifierTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.139 s -- in schemacrawler.crawl.EntityIdentifierTest
+[INFO] Running schemacrawler.crawl.TableEntityModelInferrerTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in schemacrawler.crawl.TableEntityModelInferrerTest
+[INFO] Running schemacrawler.ermodel.implementation.ERModelImplementationTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in schemacrawler.ermodel.implementation.ERModelImplementationTest
+[INFO] Running schemacrawler.ermodel.implementation.MutableERModelTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.046 s -- in schemacrawler.ermodel.implementation.MutableERModelTest
+[INFO] Running schemacrawler.test.EntityModelUtilityTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.774 s -- in schemacrawler.test.EntityModelUtilityTest
+[INFO] Running schemacrawler.test.ERModelTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.839 s -- in schemacrawler.test.ERModelTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO]
+[INFO] --- jacoco:0.8.14:report (default-cli) @ schemacrawler-ermodel ---
+[INFO] Loading execution data file C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-ermodel\target\jacoco.exec
+[INFO] Analyzed bundle 'SchemaCrawler ER Model' with 13 classes
+[INFO]
+[INFO] -------------------< us.fatehi:schemacrawler-tools >--------------------
+[INFO] Building SchemaCrawler Tools 17.5.0                                [8/9]
+[INFO]   from C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-tools\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-3) @ schemacrawler-tools ---
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-dependencies) @ schemacrawler-tools ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO]
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ schemacrawler-tools ---
+[INFO] argLine set to -javaagent:C:\\Users\\sualeh\\Code\\.m2\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=C:\\Users\\sualeh\\Code\\_SchemaCrawler\\SchemaCrawler-Core\\schemacrawler-tools\\target\\jacoco.exec
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ schemacrawler-tools ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ schemacrawler-tools ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ schemacrawler-tools ---
+[INFO] Copying 6 resources from src\test\resources to target\test-classes
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ schemacrawler-tools ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- surefire:3.5.4:test (default-test) @ schemacrawler-tools ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running schemacrawler.test.AvailableRegistryPluginsTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.534 s -- in schemacrawler.test.AvailableRegistryPluginsTest
+[INFO] Running schemacrawler.test.CatalogEntityModelUtilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.683 s -- in schemacrawler.test.CatalogEntityModelUtilityTest
+[INFO] Running schemacrawler.test.CatalogLoaderRegistryTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.068 s -- in schemacrawler.test.CatalogLoaderRegistryTest
+[INFO] Running schemacrawler.test.CommandProviderSortTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s -- in schemacrawler.test.CommandProviderSortTest
+[INFO] Running schemacrawler.test.CommandRegistryTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.026 s -- in schemacrawler.test.CommandRegistryTest
+[INFO] Running schemacrawler.test.ConfigTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.045 s -- in schemacrawler.test.ConfigTest
+[INFO] Running schemacrawler.test.DatabaseConnectionOptionsTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in schemacrawler.test.DatabaseConnectionOptionsTest
+[INFO] Running schemacrawler.test.DatabaseConnectionSourceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.709 s -- in schemacrawler.test.DatabaseConnectionSourceTest
+[INFO] Running schemacrawler.test.DatabaseConnectorRegistryTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.040 s -- in schemacrawler.test.DatabaseConnectorRegistryTest
+[INFO] Running schemacrawler.test.JDBCDriverRegistryTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.097 s -- in schemacrawler.test.JDBCDriverRegistryTest
+[INFO] Running schemacrawler.test.SchemaCrawlerExecutableTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\sualeh\Code\.m2\net\bytebuddy\byte-buddy-agent\1.17.7\byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.366 s -- in schemacrawler.test.SchemaCrawlerExecutableTest
+[INFO] Running schemacrawler.test.SchemaCrawlerUtilityTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.644 s -- in schemacrawler.test.SchemaCrawlerUtilityTest
+[INFO] Running schemacrawler.tools.catalogloader.SchemaCrawlerCatalogLoaderTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s -- in schemacrawler.tools.catalogloader.SchemaCrawlerCatalogLoaderTest
+[INFO] Running schemacrawler.tools.databaseconnector.DatabaseConnectorTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.109 s -- in schemacrawler.tools.databaseconnector.DatabaseConnectorTest
+[INFO] Running schemacrawler.tools.executable.commandline.PluginCommandPojoTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.032 s -- in schemacrawler.tools.executable.commandline.PluginCommandPojoTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 75, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO]
+[INFO] --- jacoco:0.8.14:report (default-cli) @ schemacrawler-tools ---
+[INFO] Loading execution data file C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-tools\target\jacoco.exec
+[INFO] Analyzed bundle 'SchemaCrawler Tools' with 33 classes
+[INFO]
+[INFO] -------------------< us.fatehi:schemacrawler-loader >-------------------
+[INFO] Building SchemaCrawler Catalog Loaders 17.5.0                      [9/9]
+[INFO]   from C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-loader\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-maven-3) @ schemacrawler-loader ---
+[INFO]
+[INFO] --- enforcer:3.6.2:enforce (enforce-dependencies) @ schemacrawler-loader ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO]
+[INFO] --- jacoco:0.8.14:prepare-agent (prepare-agent) @ schemacrawler-loader ---
+[INFO] argLine set to -javaagent:C:\\Users\\sualeh\\Code\\.m2\\org\\jacoco\\org.jacoco.agent\\0.8.14\\org.jacoco.agent-0.8.14-runtime.jar=destfile=C:\\Users\\sualeh\\Code\\_SchemaCrawler\\SchemaCrawler-Core\\schemacrawler-loader\\target\\jacoco.exec
+[INFO]
+[INFO] --- resources:3.4.0:resources (default-resources) @ schemacrawler-loader ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ schemacrawler-loader ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ schemacrawler-loader ---
+[INFO] Copying 32 resources from src\test\resources to target\test-classes
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ schemacrawler-loader ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 17 source files with javac [debug release 17] to target\test-classes
+[WARNING] /C:/Users/sualeh/Code/_SchemaCrawler/SchemaCrawler-Core/schemacrawler-loader/src/test/java/schemacrawler/test/utility/ProposedWeakAssociationsTestUtility.java:[71,67] getWeakAssociations() in schemacrawler.schema.Table has been deprecated and marked for removal
+[WARNING] /C:/Users/sualeh/Code/_SchemaCrawler/SchemaCrawler-Core/schemacrawler-loader/src/test/java/schemacrawler/test/WeakAssociationsAnalyzerTest.java:[81,70] getWeakAssociations() in schemacrawler.schema.Table has been deprecated and marked for removal
+[WARNING] /C:/Users/sualeh/Code/_SchemaCrawler/SchemaCrawler-Core/schemacrawler-loader/src/test/java/schemacrawler/test/WeakAssociationsAnalyzerTest.java:[84,70] getWeakAssociations() in schemacrawler.schema.Table has been deprecated and marked for removal
+[WARNING] /C:/Users/sualeh/Code/_SchemaCrawler/SchemaCrawler-Core/schemacrawler-loader/src/test/java/schemacrawler/test/WeakAssociationsAttributesTest.java:[97,69] getWeakAssociations() in schemacrawler.schema.Table has been deprecated and marked for removal
+[WARNING] /C:/Users/sualeh/Code/_SchemaCrawler/SchemaCrawler-Core/schemacrawler-loader/src/test/java/schemacrawler/test/WeakAssociationsTest.java:[90,61] getWeakAssociations() in schemacrawler.schema.Table has been deprecated and marked for removal
+[INFO]
+[INFO] --- surefire:3.5.4:test (default-test) @ schemacrawler-loader ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running schemacrawler.loader.counts.TableRowCountsUtilityTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.113 s -- in schemacrawler.loader.counts.TableRowCountsUtilityTest
+[INFO] Running schemacrawler.loader.weakassociations.ColumnMatchKeysMapTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.035 s -- in schemacrawler.loader.weakassociations.ColumnMatchKeysMapTest
+[INFO] Running schemacrawler.loader.weakassociations.ExtensionTableMatcherTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\sualeh\Code\.m2\net\bytebuddy\byte-buddy-agent\1.17.7\byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.258 s -- in schemacrawler.loader.weakassociations.ExtensionTableMatcherTest
+[INFO] Running schemacrawler.loader.weakassociations.PrimaryKeyWeakAssociationsTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.290 s -- in schemacrawler.loader.weakassociations.PrimaryKeyWeakAssociationsTest
+[INFO] Running schemacrawler.loader.weakassociations.ProposedWeakAssociationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in schemacrawler.loader.weakassociations.ProposedWeakAssociationTest
+[INFO] Running schemacrawler.loader.weakassociations.SimpleWeakAssociationsTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.580 s -- in schemacrawler.loader.weakassociations.SimpleWeakAssociationsTest
+[INFO] Running schemacrawler.loader.weakassociations.TableMatchKeysTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in schemacrawler.loader.weakassociations.TableMatchKeysTest
+[INFO] Running schemacrawler.test.AlternateKeysAttributesTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.262 s -- in schemacrawler.test.AlternateKeysAttributesTest
+[INFO] Running schemacrawler.test.AttributesCatalogLoaderTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.653 s -- in schemacrawler.test.AttributesCatalogLoaderTest
+[INFO] Running schemacrawler.test.AttributesModelTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.182 s -- in schemacrawler.test.AttributesModelTest
+[INFO] Running schemacrawler.test.LoaderPluginCommandTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in schemacrawler.test.LoaderPluginCommandTest
+[INFO] Running schemacrawler.test.PrefixMatchesTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in schemacrawler.test.PrefixMatchesTest
+[INFO] Running schemacrawler.test.TableRowCountsTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.010 s -- in schemacrawler.test.TableRowCountsTest
+[INFO] Running schemacrawler.test.WeakAssociationsAnalyzerTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.287 s -- in schemacrawler.test.WeakAssociationsAnalyzerTest
+[INFO] Running schemacrawler.test.WeakAssociationsAttributesTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.889 s -- in schemacrawler.test.WeakAssociationsAttributesTest
+[INFO] Running schemacrawler.test.WeakAssociationsTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.735 s -- in schemacrawler.test.WeakAssociationsTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 33, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO]
+[INFO] --- jacoco:0.8.14:report (default-cli) @ schemacrawler-loader ---
+[INFO] Loading execution data file C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacrawler-loader\target\jacoco.exec
+[INFO] Analyzed bundle 'SchemaCrawler Catalog Loaders' with 21 classes
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for SchemaCrawler [Parent] 17.5.0:
+[INFO]
+[INFO] SchemaCrawler [Parent] ............................. SUCCESS [  0.518 s]
+[INFO] SchemaCrawler - JDBC Drivers Distribution .......... SUCCESS [  0.100 s]
+[INFO] SchemaCrawler Test Database ........................ SUCCESS [  8.302 s]
+[INFO] SchemaCrawler Test Utility ......................... SUCCESS [  2.873 s]
+[INFO] SchemaCrawler Utility .............................. SUCCESS [  9.221 s]
+[INFO] SchemaCrawler API .................................. SUCCESS [01:42 min]
+[INFO] SchemaCrawler ER Model ............................. SUCCESS [ 13.736 s]
+[INFO] SchemaCrawler Tools ................................ SUCCESS [ 28.651 s]
+[INFO] SchemaCrawler Catalog Loaders ...................... SUCCESS [ 40.647 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  03:28 min
+[INFO] Finished at: 2026-01-24T17:59:38-05:00
+[INFO] ------------------------------------------------------------------------

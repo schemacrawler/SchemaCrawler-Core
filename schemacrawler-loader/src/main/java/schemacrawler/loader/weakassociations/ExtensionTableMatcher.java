@@ -8,22 +8,50 @@
 
 package schemacrawler.loader.weakassociations;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
+import us.fatehi.utility.string.StringFormat;
 
+/**
+ * Matches weak associations for extension tables that share a normalized primary key name with the
+ * referenced table. Extension tables are tables where the foreign key column is also a primary key
+ * or part of a unique index, representing a 1-to-1 or 1-to-0..1 relationship.
+ *
+ * <p>This rule is optionally enabled via the {@code infer-extension-tables} option and requires the
+ * foreign key column to be unique in the extension table.
+ */
 public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssociation> {
 
+  private static final Logger LOGGER = Logger.getLogger(ExtensionTableMatcher.class.getName());
+
+  private static final Pattern NOT_ALPHANUMERIC_PATTERN = Pattern.compile("[^\\p{L}\\d]");
+
   private final boolean inferExtensionTables;
+  private final TableMatchKeys matchKeys;
 
   public ExtensionTableMatcher(final boolean inferExtensionTables) {
+    this(inferExtensionTables, Collections.emptyList());
+  }
+
+  public ExtensionTableMatcher(final boolean inferExtensionTables, final Collection<Table> tables) {
     this.inferExtensionTables = inferExtensionTables;
+    requireNonNull(tables, "No tables provided");
+    matchKeys = new TableMatchKeys(List.copyOf(tables));
   }
 
   @Override
   public boolean test(final ProposedWeakAssociation proposedWeakAssociation) {
 
-    if (!inferExtensionTables || (proposedWeakAssociation == null)) {
+    if (!inferExtensionTables || proposedWeakAssociation == null) {
       return false;
     }
 
@@ -31,16 +59,21 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
     final Column primaryKeyColumn = proposedWeakAssociation.getPrimaryKeyColumn();
 
     final String pkColumnName =
-        primaryKeyColumn.getName().replaceAll("[^\\p{L}\\{d}]", "").toLowerCase();
+        NOT_ALPHANUMERIC_PATTERN.matcher(primaryKeyColumn.getName()).replaceAll("").toLowerCase();
     final String fkColumnName =
-        foreignKeyColumn.getName().replaceAll("[^\\p{L}\\{d}]", "").toLowerCase();
+        NOT_ALPHANUMERIC_PATTERN.matcher(foreignKeyColumn.getName()).replaceAll("").toLowerCase();
     if (pkColumnName.equals(fkColumnName)) {
       final Table pkTable = primaryKeyColumn.getParent();
-      final Table fkTable = foreignKeyColumn.getParent();
       final boolean fkIsUnique =
           foreignKeyColumn.isPartOfPrimaryKey() || foreignKeyColumn.isPartOfUniqueIndex();
-      final boolean pkTableSortsFirst = pkTable.compareTo(fkTable) < 0;
-      return fkIsUnique && pkTableSortsFirst;
+      final boolean matches = fkIsUnique && matchKeys.isTopRankedCandidate(pkTable);
+      if (!matches) {
+        return false;
+      }
+      LOGGER.log(
+          Level.FINE,
+          new StringFormat("ExtensionTableMatcher proposed <%s>", proposedWeakAssociation));
+      return matches;
     }
     return false;
   }

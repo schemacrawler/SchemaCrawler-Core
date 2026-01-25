@@ -9,6 +9,7 @@
 package schemacrawler.loader.weakassociations;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,13 +20,28 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.string.StringFormat;
 
+/**
+ * Analyzes tables to infer weak associations using naming heuristics.
+ *
+ * <p>Flow:
+ *
+ * <ol>
+ *   <li>Collect candidate key columns (primary key or single-column unique index).
+ *   <li>Generate match keys by normalizing column names and stripping {@code _id} suffixes.
+ *   <li>Find candidate foreign key columns that share match keys with primary key columns.
+ *   <li>Validate proposed pairs and apply configured match rules.
+ * </ol>
+ */
 public final class WeakAssociationsAnalyzer {
 
   private static final Logger LOGGER = Logger.getLogger(WeakAssociationsAnalyzer.class.getName());
+
+  static final Pattern ID_PATTERN = Pattern.compile("_?(id|key|keyid)$", CASE_INSENSITIVE);
 
   private final List<Table> tables;
   private final Predicate<ProposedWeakAssociation> weakAssociationRule;
@@ -55,7 +71,7 @@ public final class WeakAssociationsAnalyzer {
 
   private void findWeakAssociations(final List<Table> tables) {
     LOGGER.log(Level.INFO, "Finding weak associations");
-    final ColumnMatchKeysMap columnMatchKeysMap = new ColumnMatchKeysMap(tables);
+    final ColumnMatchKeys columnMatchKeysMap = new ColumnMatchKeys(tables);
     final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
 
     if (LOGGER.isLoggable(Level.FINER)) {
@@ -68,7 +84,7 @@ public final class WeakAssociationsAnalyzer {
       for (final Column pkColumn : tableCandidateKeys) {
         final Set<String> fkColumnMatchKeys = new HashSet<>();
         // Look for all columns matching this table match key
-        if (pkColumn.isPartOfPrimaryKey()) {
+        if (pkColumn.isPartOfPrimaryKey() && tableMatchKeys.containsKey(table)) {
           fkColumnMatchKeys.addAll(tableMatchKeys.get(table));
         }
         // Look for all columns matching this column match key
