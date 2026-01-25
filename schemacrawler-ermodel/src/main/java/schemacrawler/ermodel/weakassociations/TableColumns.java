@@ -56,6 +56,18 @@ final class TableColumns {
     return table;
   }
 
+  public boolean hasImportedForeignKey(final Column fkColumn) {
+    if (fkColumn == null) {
+      return false;
+    }
+    for (final Column importedForeignKeyColumn : importedForeignKeys) {
+      if (importedForeignKeyColumn.key().equals(fkColumn.key())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public NamedObjectKey key() {
     return table.key();
   }

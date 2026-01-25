@@ -42,27 +42,22 @@ public final class WeakAssociationsAnalyzer {
 
   private final TableMatchKeys tableMatchKeys;
   private final Predicate<ColumnReference> weakAssociationRule;
-  private final Collection<ColumnReference> weakAssociations;
 
   public WeakAssociationsAnalyzer(
       final TableMatchKeys matchKeys, final Predicate<ColumnReference> weakAssociationRule) {
     tableMatchKeys = requireNonNull(matchKeys, "No table match keys provided");
-
     this.weakAssociationRule = requireNonNull(weakAssociationRule, "No rules provided");
-
-    weakAssociations = new ArrayList<>();
   }
 
   public Collection<ColumnReference> analyzeTables() {
     if (tableMatchKeys.getTables().size() < 2) {
       return Collections.emptySet();
     }
-    findWeakAssociations();
-    return weakAssociations;
-  }
 
-  private void findWeakAssociations() {
     LOGGER.log(Level.INFO, "Finding weak associations");
+
+    final List<ColumnReference> weakAssociations = new ArrayList<>();
+
     final List<Table> tables = tableMatchKeys.getTables();
     final ColumnMatchKeys columnMatchKeys = new ColumnMatchKeys(tables);
 
@@ -92,10 +87,12 @@ public final class WeakAssociationsAnalyzer {
         }
 
         for (final Column fkColumn : fkColumns) {
+          final TableColumns fkTableColumns = new TableColumns(fkColumn.getParent());
           final WeakAssociationColumnReference proposedWeakAssociation =
               new WeakAssociationColumnReference(fkColumn, pkColumn);
           if (proposedWeakAssociation.isValid()
-              && weakAssociationRule.test(proposedWeakAssociation)) {
+              && weakAssociationRule.test(proposedWeakAssociation)
+              && !fkTableColumns.hasImportedForeignKey(fkColumn)) {
             LOGGER.log(
                 Level.FINE,
                 new StringFormat("Found weak association <%s>", proposedWeakAssociation));
@@ -104,5 +101,8 @@ public final class WeakAssociationsAnalyzer {
         }
       }
     }
+
+    Collections.sort(weakAssociations);
+    return weakAssociations;
   }
 }
