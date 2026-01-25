@@ -9,11 +9,11 @@
 package schemacrawler.ermodel.weakassociations;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.ermodel.weakassociations.WeakAssociationsUtility.normalizeColumnName;
 
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Table;
@@ -31,8 +31,6 @@ final class ExtensionTableMatcher implements Predicate<ColumnReference> {
 
   private static final Logger LOGGER = Logger.getLogger(ExtensionTableMatcher.class.getName());
 
-  private static final Pattern NOT_ALPHANUMERIC_PATTERN = Pattern.compile("[^\\p{L}\\d]");
-
   private final TableMatchKeys tableMatchKeys;
 
   public ExtensionTableMatcher(final TableMatchKeys tableMatchKeys) {
@@ -46,24 +44,21 @@ final class ExtensionTableMatcher implements Predicate<ColumnReference> {
       return false;
     }
 
-    final Column foreignKeyColumn = proposedWeakAssociation.getForeignKeyColumn();
-    final Column primaryKeyColumn = proposedWeakAssociation.getPrimaryKeyColumn();
+    final Column fkColumn = proposedWeakAssociation.getForeignKeyColumn();
+    final Column pkColumn = proposedWeakAssociation.getPrimaryKeyColumn();
 
-    final String pkColumnName =
-        NOT_ALPHANUMERIC_PATTERN.matcher(primaryKeyColumn.getName()).replaceAll("").toLowerCase();
-    final String fkColumnName =
-        NOT_ALPHANUMERIC_PATTERN.matcher(foreignKeyColumn.getName()).replaceAll("").toLowerCase();
+    final String pkColumnName = normalizeColumnName(pkColumn);
+    final String fkColumnName = normalizeColumnName(fkColumn);
+
     if (pkColumnName.equals(fkColumnName)) {
-      final Table pkTable = primaryKeyColumn.getParent();
-      final boolean fkIsUnique =
-          foreignKeyColumn.isPartOfPrimaryKey() || foreignKeyColumn.isPartOfUniqueIndex();
+      final Table pkTable = pkColumn.getParent();
+      final boolean fkIsUnique = fkColumn.isPartOfPrimaryKey() || fkColumn.isPartOfUniqueIndex();
       final boolean matches = fkIsUnique && tableMatchKeys.isTopRankedCandidate(pkTable);
-      if (!matches) {
-        return false;
+      if (matches) {
+        LOGGER.log(
+            Level.FINE,
+            new StringFormat("ExtensionTableMatcher proposed <%s>", proposedWeakAssociation));
       }
-      LOGGER.log(
-          Level.FINE,
-          new StringFormat("ExtensionTableMatcher proposed <%s>", proposedWeakAssociation));
       return matches;
     }
     return false;

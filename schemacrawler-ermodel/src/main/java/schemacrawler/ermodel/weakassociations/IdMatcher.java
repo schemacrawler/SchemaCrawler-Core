@@ -8,7 +8,8 @@
 
 package schemacrawler.ermodel.weakassociations;
 
-import static schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzer.ID_PATTERN;
+import static schemacrawler.ermodel.weakassociations.WeakAssociationsUtility.normalizeColumnName;
+import static schemacrawler.ermodel.weakassociations.WeakAssociationsUtility.removeId;
 
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -18,12 +19,28 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 
 /**
- * Matches weak associations based on conventional naming rules for foreign keys ending with an id
- * suffix.
+ * Matches weak associations using naming conventions where a foreign key column identifies its
+ * parent table by name and an {@code id} suffix.
  *
- * <p>To prevent "God-table" false positives, this rule excludes generic primary keys named only
- * {@code id}, {@code key}, or {@code keyid}. Such generic names are common in many tables and would
- * otherwise incorrectly match every foreign key that ends with the same suffix.
+ * <p>This matcher implements several heuristics to ensure high-confidence matches in real-world
+ * schemas:
+ *
+ * <ul>
+ *   <li><b>Suffix Matching:</b> Recognizes common foreign key suffixes such as {@code _id}, {@code
+ *       _key}, and {@code _keyid} (case-insensitive).
+ *   <li><b>Generic ID Protection:</b> To prevent "God-tables" (generic tables like {@code UUIDs} or
+ *       {@code Metadata} with a single {@code ID} column) from matching every foreign key in the
+ *       database, this rule excludes primary keys named simply {@code id}, {@code key}, or {@code
+ *       keyid} unless the foreign key name specifically includes the parent table's name.
+ *   <li><b>Sub-entity Filtering:</b> Prevents misidentifying primary key columns in extension or
+ *       sub-entity tables as weak associations to a parent. If a column is part of its own table's
+ *       primary key and shares the exact name of a potential parent's primary key, it is excluded
+ *       to avoid circular or incorrect 1-to-1 mappings that are better handled by specific
+ *       extension table rules.
+ * </ul>
+ *
+ * <p>The matching logic operates on normalized names, stripping non-alphanumeric characters to
+ * handle various snake_case, camelCase, or space-separated naming styles consistently.
  */
 final class IdMatcher implements Predicate<ColumnReference> {
 
@@ -35,16 +52,30 @@ final class IdMatcher implements Predicate<ColumnReference> {
       return false;
     }
 
-    final Column foreignKeyColumn = proposedWeakAssociation.getForeignKeyColumn();
-    final Column primaryKeyColumn = proposedWeakAssociation.getPrimaryKeyColumn();
+    final Column fkColumn = proposedWeakAssociation.getForeignKeyColumn();
+    final Column pkColumn = proposedWeakAssociation.getPrimaryKeyColumn();
 
-    final boolean fkColEndsWithId = ID_PATTERN.matcher(foreignKeyColumn.getName()).find();
-    final Matcher pkMatcher = ID_PATTERN.matcher(primaryKeyColumn.getName());
-    // Check that the primary key column has a prefix, so that it is not equal to something like
-    // simply "ID"
-    final boolean pkColEndsWithId = pkMatcher.find() && pkMatcher.start() > 0;
+    final String pkColumnName = normalizeColumnName(pkColumn);
+    final String fkColumnName = normalizeColumnName(fkColumn);
 
-    final boolean matches = fkColEndsWithId && !pkColEndsWithId;
+    final String fkBaseName = removeId(fkColumn);
+    final String pkBaseName = removeId(pkColumn);
+
+    final boolean fkIsPartOfPk = fkColumn.isPartOfPrimaryKey();
+
+    final Matcher pkMatcher1 = WeakAssociationsUtility.ID_PATTERN.matcher(pkColumnName);
+    final boolean pkColNameHasId = pkMatcher1.find();
+    // Check that the primary key column has a prefix, so that it is not equal to
+    // something like simply "ID"
+    final boolean pkColNameIsJustId = pkColNameHasId && pkMatcher1.start() == 0;
+
+    final boolean isPossiblySubentity =
+        pkColNameHasId && fkColumnName.equalsIgnoreCase(pkColumnName) && fkIsPartOfPk;
+
+    final boolean matches =
+        pkColNameHasId
+            && (fkBaseName.equals(pkBaseName) || pkColNameIsJustId)
+            && !isPossiblySubentity;
     if (matches && LOGGER.isLoggable(Level.FINER)) {
       LOGGER.log(
           Level.FINER,

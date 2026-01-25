@@ -9,7 +9,6 @@
 package schemacrawler.ermodel.weakassociations;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +19,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Table;
@@ -41,8 +39,6 @@ import us.fatehi.utility.string.StringFormat;
 public final class WeakAssociationsAnalyzer {
 
   private static final Logger LOGGER = Logger.getLogger(WeakAssociationsAnalyzer.class.getName());
-
-  static final Pattern ID_PATTERN = Pattern.compile("_?(id|key|keyid)$", CASE_INSENSITIVE);
 
   private final TableMatchKeys tableMatchKeys;
   private final Predicate<ColumnReference> weakAssociationRule;

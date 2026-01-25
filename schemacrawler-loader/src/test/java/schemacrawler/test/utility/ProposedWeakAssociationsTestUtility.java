@@ -16,6 +16,7 @@ import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 import java.util.Arrays;
 import java.util.Collection;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -73,6 +74,13 @@ public class ProposedWeakAssociationsTestUtility {
           out.println("  weak association:");
           for (final ColumnReference weakAssociationColumnReference : weakFk) {
             out.println("    column reference: %s".formatted(weakAssociationColumnReference));
+            final Column fkColumn = weakAssociationColumnReference.getForeignKeyColumn();
+            final Column pkColumn = weakAssociationColumnReference.getPrimaryKeyColumn();
+            if (fkColumn.isPartOfPrimaryKey()) {
+              out.println("                      (fk is part of pk)");
+            } else if (fkColumn.getName().equalsIgnoreCase(pkColumn.getName())) {
+              out.println("                      (fk is NOT part of pk)");
+            }
           }
         }
       }
