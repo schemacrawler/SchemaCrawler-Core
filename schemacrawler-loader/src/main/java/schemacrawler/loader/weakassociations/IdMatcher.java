@@ -16,8 +16,11 @@ import schemacrawler.schema.Column;
 
 /**
  * Matches weak associations based on conventional naming rules for foreign keys ending with {@code
- * _id}, {@code _key}, or {@code _keyid}. The primary key column must not be named only {@code id}
- * so that purely generic primary keys do not incorrectly match every foreign key.
+ * _id}, {@code _key}, or {@code _keyid}.
+ *
+ * <p>To prevent "God-table" false positives, this rule excludes generic primary keys named only
+ * {@code id}, {@code key}, or {@code keyid}. Such generic names are common in many tables and would
+ * otherwise incorrectly match every foreign key that ends with the same suffix.
  */
 public final class IdMatcher implements Predicate<ProposedWeakAssociation> {
 

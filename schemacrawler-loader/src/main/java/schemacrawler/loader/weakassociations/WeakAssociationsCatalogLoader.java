@@ -32,6 +32,10 @@ import us.fatehi.utility.string.StringFormat;
 /**
  * Catalog loader that infers weak associations by applying a composite rule (ID-based matching and
  * optional extension-table matching) across all tables and adds the results to the catalog.
+ *
+ * <p>This is a {@link PluginCommand} that provides options to enable weak association discovery.
+ * Enabling these options can have a significant performance impact on schema loading, as it
+ * involves analyzing naming patterns across all tables.
  */
 public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
 

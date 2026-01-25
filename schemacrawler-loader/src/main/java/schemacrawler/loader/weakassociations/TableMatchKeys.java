@@ -18,6 +18,13 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.Multimap;
 
+/**
+ * Maintains a mapping between tables and their derived match keys.
+ *
+ * <p>A ranking system is used where tables with more incoming references are preferred as "targets"
+ * for a match key. If multiple tables share a match key, only those with the highest incoming
+ * reference count for that specific key are retained as valid candidates.
+ */
 final class TableMatchKeys {
 
   private static PrefixMatches analyzeTables(final List<Table> tables) {

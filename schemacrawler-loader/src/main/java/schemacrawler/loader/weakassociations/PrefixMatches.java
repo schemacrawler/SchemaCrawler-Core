@@ -33,6 +33,12 @@ import us.fatehi.utility.string.StringFormat;
  * Derives normalized match keys by stripping common prefixes (based on a separator) and
  * singularizing the remaining token. These match keys are used by weak association inference to
  * relate tables and columns that share naming patterns across schemas.
+ *
+ * <p>The "signal-to-noise" balancing logic in {@code findPrefixes} ensures that only meaningful and
+ * widely shared prefixes are considered. It ranks prefixes using a pair-count formula (n * (n - 1)
+ * / 2), where n is the number of occurrences. This formula effectively prioritizes prefixes that
+ * link more pairs of tables/columns, thereby highlighting strong naming patterns while filtering
+ * out coincidental or infrequent prefixes.
  */
 public final class PrefixMatches {
 
