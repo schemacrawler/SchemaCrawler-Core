@@ -8,13 +8,12 @@
 
 package schemacrawler.loader.weakassociations;
 
-import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static schemacrawler.loader.weakassociations.WeakAssociationsAnalyzer.ID_PATTERN;
 
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
 
 /**
@@ -28,8 +27,6 @@ import schemacrawler.schema.Column;
 public final class IdMatcher implements Predicate<ProposedWeakAssociation> {
 
   private static final Logger LOGGER = Logger.getLogger(IdMatcher.class.getName());
-
-  private static final Pattern ID_PATTERN = Pattern.compile("_?(id|key|keyid)$", CASE_INSENSITIVE);
 
   @Override
   public boolean test(final ProposedWeakAssociation proposedWeakAssociation) {

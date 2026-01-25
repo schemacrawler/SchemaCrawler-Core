@@ -34,8 +34,8 @@ public class ColumnMatchKeysMapTest {
     final LightTable table5 = new LightTable("Table5");
     table5.addColumn("NonEntity");
 
-    final ColumnMatchKeysMap columnMatchKeysMap =
-        new ColumnMatchKeysMap(List.of(table1, table2, table3, table4, table5));
+    final ColumnMatchKeys columnMatchKeysMap =
+        new ColumnMatchKeys(List.of(table1, table2, table3, table4, table5));
 
     assertThat(
         columnMatchKeysMap.toString(),
@@ -70,8 +70,8 @@ public class ColumnMatchKeysMapTest {
     final LightTable table4 = new LightTable("Table4");
     table4.addColumn("_ID");
 
-    final ColumnMatchKeysMap columnMatchKeysMap =
-        new ColumnMatchKeysMap(List.of(table1, table2, table3, table4));
+    final ColumnMatchKeys columnMatchKeysMap =
+        new ColumnMatchKeys(List.of(table1, table2, table3, table4));
 
     assertThat(columnMatchKeysMap.toString(), is("{}"));
 
