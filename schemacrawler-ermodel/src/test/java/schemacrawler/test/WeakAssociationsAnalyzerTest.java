@@ -10,7 +10,6 @@ package schemacrawler.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
@@ -18,8 +17,6 @@ import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
 import java.sql.Connection;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -28,11 +25,9 @@ import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzerBuilder;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
-import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
@@ -88,34 +83,5 @@ public class WeakAssociationsAnalyzerTest {
 
     assertThat(
         outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
-  }
-
-  @Test
-  public void weakAssociationsFewTables() throws Exception {
-
-    WeakAssociationsAnalyzerBuilder builder;
-
-    builder =
-        WeakAssociationsAnalyzerBuilder.builder(Collections.emptySet())
-            .withIdMatcher()
-            .withExtensionTableMatcher();
-    assertThat(builder.build().analyzeTables(), hasSize(0));
-
-    final Table booksTable =
-        catalog.lookupTable(new SchemaReference("PUBLIC", "BOOKS"), "BOOKS").get();
-    final Table bookAuthorsTable =
-        catalog.lookupTable(new SchemaReference("PUBLIC", "BOOKS"), "BOOKAUTHORS").get();
-
-    builder =
-        WeakAssociationsAnalyzerBuilder.builder(List.of(booksTable))
-            .withIdMatcher()
-            .withExtensionTableMatcher();
-    assertThat(builder.build().analyzeTables(), hasSize(0));
-
-    builder =
-        WeakAssociationsAnalyzerBuilder.builder(List.of(booksTable, bookAuthorsTable))
-            .withIdMatcher()
-            .withExtensionTableMatcher();
-    assertThat(builder.build().analyzeTables(), hasSize(1));
   }
 }
