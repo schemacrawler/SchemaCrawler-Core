@@ -71,9 +71,9 @@ public final class WeakAssociationsAnalyzer {
       LOGGER.log(Level.FINER, new StringFormat("Table match keys <%s>", tableMatchKeys));
     }
     for (final Table table : tables) {
-      final TableCandidateKeys tableCandidateKeys = new TableCandidateKeys(table);
-      LOGGER.log(Level.FINER, new StringFormat("Table candidate keys <%s>", tableCandidateKeys));
-      for (final Column pkColumn : tableCandidateKeys) {
+      final TableColumns tableColumns = new TableColumns(table);
+      LOGGER.log(Level.FINER, new StringFormat("Table candidate keys <%s>", tableColumns));
+      for (final Column pkColumn : tableColumns.getCandidateKeys()) {
         final Set<String> fkColumnMatchKeys = new HashSet<>();
         // Look for all columns matching this table match key
         if (pkColumn.isPartOfPrimaryKey() && tableMatchKeys.containsKey(table)) {
