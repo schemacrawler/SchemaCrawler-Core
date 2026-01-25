@@ -8,6 +8,8 @@
 
 package schemacrawler.loader.weakassociations;
 
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,8 +28,10 @@ public final class IdMatcher implements Predicate<ProposedWeakAssociation> {
 
   private static final Logger LOGGER = Logger.getLogger(IdMatcher.class.getName());
 
-  private static final Pattern endsWithIdPattern = Pattern.compile(".*(?i)_?(id|key|keyid)$");
-  private static final Pattern isIdPattern = Pattern.compile("^(?i)_?(id|key|keyid)$");
+  private static final Pattern ID_SUFFIX_PATTERN =
+      Pattern.compile(".*_?(id|key|keyid)$", CASE_INSENSITIVE);
+  private static final Pattern IS_ID_PATTERN =
+      Pattern.compile("^_?(id|key|keyid)$", CASE_INSENSITIVE);
 
   @Override
   public boolean test(final ProposedWeakAssociation proposedWeakAssociation) {
@@ -38,10 +42,10 @@ public final class IdMatcher implements Predicate<ProposedWeakAssociation> {
     final Column foreignKeyColumn = proposedWeakAssociation.getForeignKeyColumn();
     final Column primaryKeyColumn = proposedWeakAssociation.getPrimaryKeyColumn();
 
-    final boolean fkColEndsWithId = endsWithIdPattern.matcher(foreignKeyColumn.getName()).matches();
+    final boolean fkColEndsWithId = ID_SUFFIX_PATTERN.matcher(foreignKeyColumn.getName()).matches();
     final boolean pkColEndsWithId =
-        endsWithIdPattern.matcher(primaryKeyColumn.getName()).matches()
-            && !isIdPattern.matcher(primaryKeyColumn.getName()).matches();
+        ID_SUFFIX_PATTERN.matcher(primaryKeyColumn.getName()).matches()
+            && !IS_ID_PATTERN.matcher(primaryKeyColumn.getName()).matches();
 
     final boolean matches = fkColEndsWithId && !pkColEndsWithId;
     if (matches && LOGGER.isLoggable(Level.FINER)) {
