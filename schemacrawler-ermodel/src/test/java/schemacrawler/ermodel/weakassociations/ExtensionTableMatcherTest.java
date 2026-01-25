@@ -71,7 +71,7 @@ public class ExtensionTableMatcherTest {
             fkTableSchema2,
             refSchema2);
 
-    final ExtensionTableMatcher matcher = new ExtensionTableMatcher(true, tables);
+    final ExtensionTableMatcher matcher = new ExtensionTableMatcher(new TableMatchKeys(tables));
 
     assertThat(matcher.test(new WeakAssociationColumnReference(fkColumn, pkColumnTop1)), is(true));
     assertThat(matcher.test(new WeakAssociationColumnReference(fkColumn, pkColumnTop2)), is(true));

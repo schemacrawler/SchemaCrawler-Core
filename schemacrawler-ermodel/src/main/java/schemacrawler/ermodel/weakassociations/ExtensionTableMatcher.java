@@ -10,14 +10,12 @@ package schemacrawler.ermodel.weakassociations;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import schemacrawler.schema.Column;
+import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.string.StringFormat;
 
@@ -29,33 +27,22 @@ import us.fatehi.utility.string.StringFormat;
  * <p>This rule is optionally enabled via the {@code infer-extension-tables} option and requires the
  * foreign key column to be unique in the extension table.
  */
-public final class ExtensionTableMatcher implements Predicate<WeakAssociationColumnReference> {
+final class ExtensionTableMatcher implements Predicate<ColumnReference> {
 
   private static final Logger LOGGER = Logger.getLogger(ExtensionTableMatcher.class.getName());
 
   private static final Pattern NOT_ALPHANUMERIC_PATTERN = Pattern.compile("[^\\p{L}\\d]");
 
-  private final boolean inferExtensionTables;
-  private final TableMatchKeys matchKeys;
+  private final TableMatchKeys tableMatchKeys;
 
-  public ExtensionTableMatcher(final boolean inferExtensionTables) {
-    this(inferExtensionTables, Collections.emptyList());
-  }
-
-  public ExtensionTableMatcher(final boolean inferExtensionTables, final Collection<Table> tables) {
-    this.inferExtensionTables = inferExtensionTables;
-    requireNonNull(tables, "No tables provided");
-    if (inferExtensionTables) {
-      matchKeys = new TableMatchKeys(List.copyOf(tables));
-    } else {
-      matchKeys = null;
-    }
+  public ExtensionTableMatcher(final TableMatchKeys tableMatchKeys) {
+    this.tableMatchKeys = requireNonNull(tableMatchKeys, "No table match keys provided");
   }
 
   @Override
-  public boolean test(final WeakAssociationColumnReference proposedWeakAssociation) {
+  public boolean test(final ColumnReference proposedWeakAssociation) {
 
-    if (!inferExtensionTables || proposedWeakAssociation == null) {
+    if (proposedWeakAssociation == null) {
       return false;
     }
 
@@ -70,7 +57,7 @@ public final class ExtensionTableMatcher implements Predicate<WeakAssociationCol
       final Table pkTable = primaryKeyColumn.getParent();
       final boolean fkIsUnique =
           foreignKeyColumn.isPartOfPrimaryKey() || foreignKeyColumn.isPartOfUniqueIndex();
-      final boolean matches = fkIsUnique && matchKeys.isTopRankedCandidate(pkTable);
+      final boolean matches = fkIsUnique && tableMatchKeys.isTopRankedCandidate(pkTable);
       if (!matches) {
         return false;
       }

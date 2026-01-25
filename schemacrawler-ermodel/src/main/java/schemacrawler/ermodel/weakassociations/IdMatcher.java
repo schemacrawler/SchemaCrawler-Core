@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import schemacrawler.schema.Column;
+import schemacrawler.schema.ColumnReference;
 
 /**
  * Matches weak associations based on conventional naming rules for foreign keys ending with an id
@@ -24,12 +25,12 @@ import schemacrawler.schema.Column;
  * {@code id}, {@code key}, or {@code keyid}. Such generic names are common in many tables and would
  * otherwise incorrectly match every foreign key that ends with the same suffix.
  */
-public final class IdMatcher implements Predicate<WeakAssociationColumnReference> {
+final class IdMatcher implements Predicate<ColumnReference> {
 
   private static final Logger LOGGER = Logger.getLogger(IdMatcher.class.getName());
 
   @Override
-  public boolean test(final WeakAssociationColumnReference proposedWeakAssociation) {
+  public boolean test(final ColumnReference proposedWeakAssociation) {
     if (proposedWeakAssociation == null) {
       return false;
     }
