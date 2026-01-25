@@ -24,12 +24,12 @@ import schemacrawler.schema.Column;
  * {@code id}, {@code key}, or {@code keyid}. Such generic names are common in many tables and would
  * otherwise incorrectly match every foreign key that ends with the same suffix.
  */
-public final class IdMatcher implements Predicate<ProposedWeakAssociation> {
+public final class IdMatcher implements Predicate<WeakAssociationColumnReference> {
 
   private static final Logger LOGGER = Logger.getLogger(IdMatcher.class.getName());
 
   @Override
-  public boolean test(final ProposedWeakAssociation proposedWeakAssociation) {
+  public boolean test(final WeakAssociationColumnReference proposedWeakAssociation) {
     if (proposedWeakAssociation == null) {
       return false;
     }

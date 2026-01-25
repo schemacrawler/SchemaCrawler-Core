@@ -22,6 +22,7 @@ public enum TableConstraintType {
   check("CHECK"),
   // user-supplied metadata
   alternate_key("ALTERNATE KEY"),
+  @Deprecated(forRemoval = true)
   weak_association("WEAK ASSOCIATION");
 
   private static final Logger LOGGER = Logger.getLogger(TableConstraintType.class.getName());

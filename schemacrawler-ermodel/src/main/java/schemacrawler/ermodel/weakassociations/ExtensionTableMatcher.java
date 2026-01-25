@@ -29,7 +29,7 @@ import us.fatehi.utility.string.StringFormat;
  * <p>This rule is optionally enabled via the {@code infer-extension-tables} option and requires the
  * foreign key column to be unique in the extension table.
  */
-public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssociation> {
+public final class ExtensionTableMatcher implements Predicate<WeakAssociationColumnReference> {
 
   private static final Logger LOGGER = Logger.getLogger(ExtensionTableMatcher.class.getName());
 
@@ -53,7 +53,7 @@ public final class ExtensionTableMatcher implements Predicate<ProposedWeakAssoci
   }
 
   @Override
-  public boolean test(final ProposedWeakAssociation proposedWeakAssociation) {
+  public boolean test(final WeakAssociationColumnReference proposedWeakAssociation) {
 
     if (!inferExtensionTables || proposedWeakAssociation == null) {
       return false;

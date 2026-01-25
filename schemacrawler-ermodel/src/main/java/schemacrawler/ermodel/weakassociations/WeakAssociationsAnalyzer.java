@@ -44,12 +44,12 @@ public final class WeakAssociationsAnalyzer {
   static final Pattern ID_PATTERN = Pattern.compile("_?(id|key|keyid)$", CASE_INSENSITIVE);
 
   private final List<Table> tables;
-  private final Predicate<ProposedWeakAssociation> weakAssociationRule;
-  private final Collection<ProposedWeakAssociation> weakAssociations;
+  private final Predicate<WeakAssociationColumnReference> weakAssociationRule;
+  private final Collection<WeakAssociationColumnReference> weakAssociations;
 
   public WeakAssociationsAnalyzer(
       final Collection<Table> tables,
-      final Predicate<ProposedWeakAssociation> weakAssociationRule) {
+      final Predicate<WeakAssociationColumnReference> weakAssociationRule) {
     requireNonNull(tables, "No tables provided");
     this.tables = new ArrayList<>(tables);
     Collections.sort(this.tables);
@@ -59,7 +59,7 @@ public final class WeakAssociationsAnalyzer {
     weakAssociations = new ArrayList<>();
   }
 
-  public Collection<ProposedWeakAssociation> analyzeTables() {
+  public Collection<WeakAssociationColumnReference> analyzeTables() {
     if (tables.size() < 2) {
       return Collections.emptySet();
     }
@@ -100,8 +100,8 @@ public final class WeakAssociationsAnalyzer {
         }
 
         for (final Column fkColumn : fkColumns) {
-          final ProposedWeakAssociation proposedWeakAssociation =
-              new ProposedWeakAssociation(fkColumn, pkColumn);
+          final WeakAssociationColumnReference proposedWeakAssociation =
+              new WeakAssociationColumnReference(fkColumn, pkColumn);
           if (proposedWeakAssociation.isValid()
               && weakAssociationRule.test(proposedWeakAssociation)) {
             LOGGER.log(

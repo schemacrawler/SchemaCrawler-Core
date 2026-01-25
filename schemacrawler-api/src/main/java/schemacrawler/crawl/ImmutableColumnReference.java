@@ -37,8 +37,7 @@ final class ImmutableColumnReference implements ColumnReference {
    * {@inheritDoc}
    *
    * <p>NOTE: compareTo is not compatible with equals. equals compares the full name of a database
-   * object, but compareTo uses more fields to define a "natural" sorting order. compareTo may
-   * return incorrect results until the object is fully built by SchemaCrawler.
+   * object, but compareTo uses more fields to define a "natural" sorting order.
    */
   @Override
   public int compareTo(final ColumnReference columnRef) {
@@ -69,7 +68,7 @@ final class ImmutableColumnReference implements ColumnReference {
     if (this == obj) {
       return true;
     }
-    if (obj == null || !(obj instanceof ImmutableColumnReference)) {
+    if (obj == null || !(obj instanceof ColumnReference)) {
       return false;
     }
     final ColumnReference other = (ColumnReference) obj;

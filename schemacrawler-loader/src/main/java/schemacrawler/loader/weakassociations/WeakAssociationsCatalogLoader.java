@@ -18,7 +18,7 @@ import schemacrawler.crawl.WeakAssociationBuilder;
 import schemacrawler.crawl.WeakAssociationBuilder.WeakAssociationColumn;
 import schemacrawler.ermodel.weakassociations.ExtensionTableMatcher;
 import schemacrawler.ermodel.weakassociations.IdMatcher;
-import schemacrawler.ermodel.weakassociations.ProposedWeakAssociation;
+import schemacrawler.ermodel.weakassociations.WeakAssociationColumnReference;
 import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzer;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
@@ -106,24 +106,20 @@ public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
 
   private void findWeakAssociations(final boolean inferExtensionTables) {
 
-    final Predicate<ProposedWeakAssociation> weakAssociationRule =
+    final Predicate<WeakAssociationColumnReference> weakAssociationRule =
         new IdMatcher().or(new ExtensionTableMatcher(inferExtensionTables));
     final Catalog catalog = getCatalog();
     final List<Table> allTables = new ArrayList<>(catalog.getTables());
     final WeakAssociationsAnalyzer weakAssociationsAnalyzer =
         new WeakAssociationsAnalyzer(allTables, weakAssociationRule);
-    final Collection<ProposedWeakAssociation> proposedWeakAssociations =
+    final Collection<WeakAssociationColumnReference> weakAssociations =
         weakAssociationsAnalyzer.analyzeTables();
 
-    for (final ProposedWeakAssociation proposedWeakAssociation : proposedWeakAssociations) {
-      if (proposedWeakAssociation.isSelfReferencing()) {
-        continue;
-      }
-      LOGGER.log(
-          Level.INFO, new StringFormat("Adding weak association <%s> ", proposedWeakAssociation));
+    for (final WeakAssociationColumnReference weakAssociation : weakAssociations) {
+      LOGGER.log(Level.INFO, new StringFormat("Adding weak association <%s> ", weakAssociation));
 
-      final Column fkColumn = proposedWeakAssociation.getForeignKeyColumn();
-      final Column pkColumn = proposedWeakAssociation.getPrimaryKeyColumn();
+      final Column fkColumn = weakAssociation.getForeignKeyColumn();
+      final Column pkColumn = weakAssociation.getPrimaryKeyColumn();
 
       final WeakAssociationBuilder builder = WeakAssociationBuilder.builder(catalog);
       builder.addColumnReference(
