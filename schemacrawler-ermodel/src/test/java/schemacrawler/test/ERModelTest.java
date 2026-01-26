@@ -79,6 +79,13 @@ public class ERModelTest {
         }
       }
       out.println();
+      out.println("# Weak relationships:");
+      for (final Relationship relationship : erModel.getWeakRelationships()) {
+        out.println("  - %s [%s]".formatted(relationship, relationship.getType()));
+        out.println("    - left: %s".formatted(relationship.getLeftEntity()));
+        out.println("    - right: %s".formatted(relationship.getRightEntity()));
+      }
+      out.println();
       out.println("# Non-entities:");
       for (final Entity entity : erModel.getEntitiesByType(EntityType.non_entity)) {
         out.println("  - %s [%s]".formatted(entity, entity.getType()));

@@ -15,6 +15,7 @@ import schemacrawler.crawl.WeakAssociationBuilder;
 import schemacrawler.crawl.WeakAssociationBuilder.WeakAssociationColumn;
 import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzer;
 import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.weakassociations.WeakColumnReference;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
@@ -109,7 +110,8 @@ public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
     }
 
     final WeakAssociationsAnalyzer weakAssociationsAnalyzer = analyzerBuilder.build();
-    final Collection<ColumnReference> weakAssociations = weakAssociationsAnalyzer.analyzeTables();
+    final Collection<WeakColumnReference> weakAssociations =
+        weakAssociationsAnalyzer.analyzeTables();
 
     for (final ColumnReference weakAssociation : weakAssociations) {
       LOGGER.log(Level.INFO, new StringFormat("Adding weak association <%s> ", weakAssociation));

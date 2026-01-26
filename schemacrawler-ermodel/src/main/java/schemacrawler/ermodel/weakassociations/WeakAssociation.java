@@ -46,14 +46,14 @@ public final class WeakAssociation implements TableReference {
 
   private final Table fkTable;
   private final Table pkTable;
-  private final WeakAssociationColumnReference columnReference;
+  private final WeakColumnReference columnReference;
   private final TableConstraintColumn tableConstraintColumn;
   private final boolean isSelfReferencing;
   private final boolean isOptional;
 
   private final Map<String, Object> attributeMap;
 
-  public WeakAssociation(final WeakAssociationColumnReference columnReference) {
+  public WeakAssociation(final WeakColumnReference columnReference) {
     this.columnReference = requireNonNull(columnReference, "No column reference provided");
     final Column fkColumn = columnReference.getForeignKeyColumn();
 

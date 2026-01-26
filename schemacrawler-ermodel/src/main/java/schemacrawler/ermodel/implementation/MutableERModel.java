@@ -34,11 +34,13 @@ public class MutableERModel implements ERModel {
   private final Map<NamedObjectKey, Table> tablesMap;
   private final Map<NamedObjectKey, Entity> entitiesMap;
   private final Map<NamedObjectKey, Relationship> relationshipsMap;
+  private final Map<NamedObjectKey, Relationship> weakRelationshipsMap;
 
   public MutableERModel() {
     tablesMap = new HashMap<>();
     entitiesMap = new HashMap<>();
     relationshipsMap = new HashMap<>();
+    weakRelationshipsMap = new HashMap<>();
   }
 
   @Override
@@ -110,6 +112,11 @@ public class MutableERModel implements ERModel {
   }
 
   @Override
+  public Collection<Relationship> getWeakRelationships() {
+    return List.copyOf(weakRelationshipsMap.values().stream().sorted().toList());
+  }
+
+  @Override
   public Optional<Relationship> lookupByBridgeTable(final Table table) {
     if (table == null) {
       return Optional.empty();
@@ -158,6 +165,12 @@ public class MutableERModel implements ERModel {
   void addTable(final Table table) {
     if (table != null) {
       tablesMap.put(table.key(), table);
+    }
+  }
+
+  void addWeakRelationship(final Relationship relationship) {
+    if (relationship != null) {
+      weakRelationshipsMap.put(relationship.key(), relationship);
     }
   }
 

@@ -32,8 +32,7 @@ public class WeakAssociationTest {
     when(pkColumn.getFullName()).thenReturn("PK_COL");
     when(pkColumn.getParent()).thenReturn(pkTable);
 
-    final WeakAssociationColumnReference columnRef =
-        new WeakAssociationColumnReference(fkColumn, pkColumn);
+    final WeakColumnReference columnRef = new WeakColumnReference(fkColumn, pkColumn);
     final WeakAssociation weakAssociation = new WeakAssociation(columnRef);
 
     assertThat(weakAssociation.getName(), startsWith("SCHCRWLR_"));
