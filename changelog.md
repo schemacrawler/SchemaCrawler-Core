@@ -2,8 +2,8 @@
 
 SchemaCrawler Core release notes.
 
-<a name="v17.5.1"></a>
-## Release 17.5.1 - 2026-01-25
+<a name="v17.6.0"></a>
+## Release 17.6.0 - 2026-01-25
 - Reduce number of weak association matches
 - Add weak associations to `ERModel`
 
