@@ -73,12 +73,10 @@ public class ExtensionTableMatcherTest {
 
     final ExtensionTableMatcher matcher = new ExtensionTableMatcher(new TableMatchKeys(tables));
 
-    assertThat(matcher.test(new WeakAssociationColumnReference(fkColumn, pkColumnTop1)), is(true));
-    assertThat(matcher.test(new WeakAssociationColumnReference(fkColumn, pkColumnTop2)), is(true));
-    assertThat(matcher.test(new WeakAssociationColumnReference(fkColumn, pkColumnLow)), is(true));
-    assertThat(
-        matcher.test(new WeakAssociationColumnReference(fkColumnSchema2, pkColumnSchema2)),
-        is(true));
+    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumnTop1)), is(true));
+    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumnTop2)), is(true));
+    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumnLow)), is(true));
+    assertThat(matcher.test(new WeakColumnReference(fkColumnSchema2, pkColumnSchema2)), is(true));
   }
 
   private Column mockColumn(

@@ -12,16 +12,22 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.ermodel.weakassociations.WeakAssociation;
+import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzer;
+import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.weakassociations.WeakColumnReference;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 import us.fatehi.utility.Builder;
 
 public class ERModelBuilder implements Builder<ERModel> {
@@ -30,6 +36,7 @@ public class ERModelBuilder implements Builder<ERModel> {
   final MutableERModel erModel;
   final Map<NamedObjectKey, TableEntityModelInferrer> inferrerMap;
   final Map<NamedObjectKey, MutableEntity> entityMap;
+  final WeakAssociationsAnalyzer weakAssociationsAnalyzer;
 
   public ERModelBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
@@ -39,6 +46,12 @@ public class ERModelBuilder implements Builder<ERModel> {
     entityMap = new HashMap<>();
 
     erModel = new MutableERModel();
+
+    weakAssociationsAnalyzer =
+        WeakAssociationsAnalyzerBuilder.builder(catalog.getTables())
+            .withIdMatcher()
+            .withExtensionTableMatcher()
+            .build();
   }
 
   @Override
@@ -71,21 +84,36 @@ public class ERModelBuilder implements Builder<ERModel> {
       } else {
         // Build table reference relationships
         for (final ForeignKey fk : table.getImportedForeignKeys()) {
-          final MutableTableReferenceRelationship rel = new MutableTableReferenceRelationship(fk);
-          final RelationshipCardinality cardinality = modelInferrer.inferCardinality(fk);
-          rel.setCardinality(cardinality);
-
-          final Table leftTable = fk.getForeignKeyTable();
-          rel.setLeftEntity(lookupOrCreateEntity(leftTable));
-          final Table rightTable = fk.getPrimaryKeyTable();
-          rel.setRightEntity(lookupOrCreateEntity(rightTable));
-
+          final MutableTableReferenceRelationship rel = createRelationship(fk);
           erModel.addRelationship(rel);
         }
       }
     }
 
+    final Collection<WeakColumnReference> weakReferences = weakAssociationsAnalyzer.analyzeTables();
+    for (final WeakColumnReference weakReference : weakReferences) {
+      final WeakAssociation weakAssociation = new WeakAssociation(weakReference);
+      final MutableTableReferenceRelationship rel = createRelationship(weakAssociation);
+      erModel.addWeakRelationship(rel);
+    }
+
     return erModel;
+  }
+
+  private MutableTableReferenceRelationship createRelationship(
+      final TableReference tableReference) {
+    final TableEntityModelInferrer modelInferrer =
+        getModelInferrer(tableReference.getForeignKeyTable());
+    final MutableTableReferenceRelationship rel =
+        new MutableTableReferenceRelationship(tableReference);
+    final RelationshipCardinality cardinality = modelInferrer.inferCardinality(tableReference);
+    rel.setCardinality(cardinality);
+
+    final Table leftTable = tableReference.getForeignKeyTable();
+    rel.setLeftEntity(lookupOrCreateEntity(leftTable));
+    final Table rightTable = tableReference.getPrimaryKeyTable();
+    rel.setRightEntity(lookupOrCreateEntity(rightTable));
+    return rel;
   }
 
   private TableEntityModelInferrer getModelInferrer(final Table table) {

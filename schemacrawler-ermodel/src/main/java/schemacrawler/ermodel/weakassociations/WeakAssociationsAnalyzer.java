@@ -49,14 +49,14 @@ public final class WeakAssociationsAnalyzer {
     this.weakAssociationRule = requireNonNull(weakAssociationRule, "No rules provided");
   }
 
-  public Collection<ColumnReference> analyzeTables() {
+  public Collection<WeakColumnReference> analyzeTables() {
     if (tableMatchKeys.getTables().size() < 2) {
       return Collections.emptySet();
     }
 
     LOGGER.log(Level.INFO, "Finding weak associations");
 
-    final List<ColumnReference> weakAssociations = new ArrayList<>();
+    final List<WeakColumnReference> weakAssociations = new ArrayList<>();
 
     final List<Table> tables = tableMatchKeys.getTables();
     final ColumnMatchKeys columnMatchKeys = new ColumnMatchKeys(tables);
@@ -90,8 +90,8 @@ public final class WeakAssociationsAnalyzer {
           if (fkColumn.isPartOfForeignKey()) {
             continue;
           }
-          final WeakAssociationColumnReference proposedWeakAssociation =
-              new WeakAssociationColumnReference(fkColumn, pkColumn);
+          final WeakColumnReference proposedWeakAssociation =
+              new WeakColumnReference(fkColumn, pkColumn);
           if (proposedWeakAssociation.isValid()
               && weakAssociationRule.test(proposedWeakAssociation)) {
             LOGGER.log(

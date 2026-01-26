@@ -68,6 +68,13 @@ public interface ERModel {
   Collection<Table> getUnmodeledTables();
 
   /**
+   * Gets weak relationships inferred from the catalog.
+   *
+   * @return All weak relationships
+   */
+  Collection<Relationship> getWeakRelationships();
+
+  /**
    * Look up a relationship by its bridge table.
    *
    * @param table Bridge table

@@ -47,7 +47,7 @@ public class WeakAssociationsAnalyzerFkTest {
         new WeakAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<ColumnReference> weakAssociations = analyzer.analyzeTables();
+    final Collection<WeakColumnReference> weakAssociations = analyzer.analyzeTables();
 
     // Verify
     assertThat(
@@ -73,7 +73,7 @@ public class WeakAssociationsAnalyzerFkTest {
         new WeakAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<ColumnReference> weakAssociations = analyzer.analyzeTables();
+    final Collection<WeakColumnReference> weakAssociations = analyzer.analyzeTables();
 
     // Verify
     assertThat("Should have one weak association", weakAssociations, hasSize(1));
