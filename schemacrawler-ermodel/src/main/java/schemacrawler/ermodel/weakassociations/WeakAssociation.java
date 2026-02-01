@@ -14,7 +14,6 @@ import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.io.Serial;
-import java.lang.reflect.Proxy;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +66,7 @@ public final class WeakAssociation implements TableReference {
                 columnReference.getPrimaryKeyColumn().getFullName().hashCode());
     schema = fkTable.getSchema();
 
-    tableConstraintColumn = createConstrainedColumn(fkColumn);
+    tableConstraintColumn = TableConstraintColumnWrapper.createConstrainedColumn(fkColumn, this);
     isSelfReferencing = getParent().equals(pkTable);
     isOptional = !isPartial(fkColumn) && fkColumn.isNullable();
 
@@ -306,23 +305,5 @@ public final class WeakAssociation implements TableReference {
       return;
     }
     key = schema.key().with(name);
-  }
-
-  private TableConstraintColumn createConstrainedColumn(final Column fkColumn) {
-    final TableConstraintColumn tableConstraintColumn =
-        (TableConstraintColumn)
-            Proxy.newProxyInstance(
-                TableConstraintColumn.class.getClassLoader(),
-                new Class<?>[] {TableConstraintColumn.class},
-                (proxy, method, args) -> {
-                  if ("getTableConstraint".equals(method.getName())) {
-                    return this;
-                  }
-                  if ("getTableConstraintOrdinalPosition".equals(method.getName())) {
-                    return 1;
-                  }
-                  return method.invoke(fkColumn, args);
-                });
-    return tableConstraintColumn;
   }
 }
