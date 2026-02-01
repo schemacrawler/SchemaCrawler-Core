@@ -8,12 +8,13 @@
 
 package schemacrawler.ermodel.model;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Optional;
 import schemacrawler.schema.Table;
 
 /** Entity-relationship model. */
-public interface ERModel {
+public interface ERModel extends Serializable {
 
   /**
    * Gets all modeled entities.

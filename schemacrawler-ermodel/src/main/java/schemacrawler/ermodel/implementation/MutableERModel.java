@@ -10,6 +10,7 @@ package schemacrawler.ermodel.implementation;
 
 import static java.util.function.Predicate.not;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -27,6 +28,8 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 
 public class MutableERModel implements ERModel {
+
+  @Serial private static final long serialVersionUID = -1912075263587495283L;
 
   private static final EnumSet<EntityType> VALID_ENTITY_TYPES =
       EnumSet.of(EntityType.strong_entity, EntityType.weak_entity, EntityType.subtype);

@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
+import static schemacrawler.test.utility.DatabaseTestUtility.validateSchema;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
@@ -53,6 +54,7 @@ public class ERModelTest {
     } catch (final Exception e) {
       fail("Catalog not loaded", e);
     }
+    validateSchema(catalog);
 
     erModel = EntityModelUtility.buildERModel(catalog);
   }
