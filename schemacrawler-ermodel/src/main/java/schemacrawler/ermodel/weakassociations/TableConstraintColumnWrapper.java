@@ -5,11 +5,13 @@ import static java.util.Objects.requireNonNull;
 import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintColumn;
+import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
@@ -30,13 +32,22 @@ final class TableConstraintColumnWrapper {
     @Override
     public Object invoke(final Object proxy, final Method method, final Object[] args)
         throws Throwable {
-      if ("getTableConstraint".equals(method.getName())) {
-        return tableConstraint;
+
+      try {
+        return switch (method.getName()) {
+          case "getTableConstraint" -> tableConstraint;
+          case "getTableConstraintOrdinalPosition" -> 1;
+          default -> method.invoke(fkColumn, args);
+        };
+      } catch (final IllegalAccessException
+          | IllegalArgumentException
+          | InvocationTargetException e) {
+        final Throwable cause = e.getCause();
+        if (cause instanceof final Exception exception) {
+          throw exception;
+        }
+        throw new ExecutionRuntimeException("Could not invoke " + method, e);
       }
-      if ("getTableConstraintOrdinalPosition".equals(method.getName())) {
-        return 1;
-      }
-      return method.invoke(fkColumn, args);
     }
   }
 
