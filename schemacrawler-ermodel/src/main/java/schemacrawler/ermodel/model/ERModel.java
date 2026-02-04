@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Optional;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 
 /** Entity-relationship model. */
 public interface ERModel extends Serializable {
@@ -90,6 +91,22 @@ public interface ERModel extends Serializable {
    * @return Relationship, if found
    */
   Optional<Relationship> lookupByBridgeTableName(String tableName);
+
+  /**
+   * Look up a relationship by a table reference.
+   *
+   * @param tableRef Table reference.
+   * @return Relationship, if found
+   */
+  Optional<Relationship> lookupByTableReference(TableReference tableRef);
+
+  /**
+   * Look up a relationship by its table reference name.
+   *
+   * @param tableRefName table reference name
+   * @return Relationship, if found
+   */
+  Optional<Relationship> lookupByTableReferenceName(String tableRefName);
 
   /**
    * Look up an entity by its name.

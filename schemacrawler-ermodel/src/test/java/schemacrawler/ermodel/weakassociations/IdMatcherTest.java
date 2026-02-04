@@ -13,54 +13,6 @@ import schemacrawler.test.utility.crawl.LightTable;
 public class IdMatcherTest {
 
   @Test
-  public void valid_order_item_order_id_to_orders_order_id() {
-    final Table fkTable = new LightTable("order_item");
-    final Table pkTable = new LightTable("orders");
-
-    final Column fkColumn = mockColumn(fkTable, "order_id", false);
-    final Column pkColumn = mockColumn(pkTable, "order_id", true);
-
-    final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
-  }
-
-  @Test
-  public void valid_order_item_order_id_to_orders_id() {
-    final Table fkTable = new LightTable("order_item");
-    final Table pkTable = new LightTable("orders");
-
-    final Column fkColumn = mockColumn(fkTable, "order_id", false);
-    final Column pkColumn = mockColumn(pkTable, "id", true);
-
-    final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
-  }
-
-  @Test
-  public void valid_order_item_order_to_orders_order_id() {
-    final Table fkTable = new LightTable("order_item");
-    final Table pkTable = new LightTable("orders");
-
-    final Column fkColumn = mockColumn(fkTable, "order", false);
-    final Column pkColumn = mockColumn(pkTable, "order_id", true);
-
-    final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
-  }
-
-  @Test
-  public void valid_order_item_order_to_orders_id() {
-    final Table fkTable = new LightTable("order_item");
-    final Table pkTable = new LightTable("orders");
-
-    final Column fkColumn = mockColumn(fkTable, "order", false);
-    final Column pkColumn = mockColumn(pkTable, "id", true);
-
-    final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
-  }
-
-  @Test
   public void invalid_order_item_id_to_orders_id() {
     final Table fkTable = new LightTable("order_item");
     final Table pkTable = new LightTable("orders");
@@ -97,6 +49,54 @@ public class IdMatcherTest {
 
     final IdMatcher matcher = new IdMatcher();
     assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(false));
+  }
+
+  @Test
+  public void valid_order_item_order_id_to_orders_id() {
+    final Table fkTable = new LightTable("order_item");
+    final Table pkTable = new LightTable("orders");
+
+    final Column fkColumn = mockColumn(fkTable, "order_id", false);
+    final Column pkColumn = mockColumn(pkTable, "id", true);
+
+    final IdMatcher matcher = new IdMatcher();
+    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
+  }
+
+  @Test
+  public void valid_order_item_order_id_to_orders_order_id() {
+    final Table fkTable = new LightTable("order_item");
+    final Table pkTable = new LightTable("orders");
+
+    final Column fkColumn = mockColumn(fkTable, "order_id", false);
+    final Column pkColumn = mockColumn(pkTable, "order_id", true);
+
+    final IdMatcher matcher = new IdMatcher();
+    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
+  }
+
+  @Test
+  public void valid_order_item_order_to_orders_id() {
+    final Table fkTable = new LightTable("order_item");
+    final Table pkTable = new LightTable("orders");
+
+    final Column fkColumn = mockColumn(fkTable, "order", false);
+    final Column pkColumn = mockColumn(pkTable, "id", true);
+
+    final IdMatcher matcher = new IdMatcher();
+    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
+  }
+
+  @Test
+  public void valid_order_item_order_to_orders_order_id() {
+    final Table fkTable = new LightTable("order_item");
+    final Table pkTable = new LightTable("orders");
+
+    final Column fkColumn = mockColumn(fkTable, "order", false);
+    final Column pkColumn = mockColumn(pkTable, "order_id", true);
+
+    final IdMatcher matcher = new IdMatcher();
+    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
   }
 
   private Column mockColumn(final Table parent, final String name, final boolean partOfPrimaryKey) {

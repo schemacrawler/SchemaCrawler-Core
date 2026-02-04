@@ -21,6 +21,31 @@ import schemacrawler.schema.TableConstraintColumn;
 public class WeakAssociationsAnalyzerFkTest {
 
   @Test
+  public void weakAssociationAddedIfFkDoesNotExist() {
+    // Table A (orders) with primary key "id"
+    final Table tableA = mockTable("orders");
+    final Column pkColumn = mockColumn(tableA, "id", true, false);
+    mockPrimaryKey(tableA, pkColumn);
+
+    // Table B (order_items) with column "order_id"
+    final Table tableB = mockTable("order_items");
+    final Column fkColumn = mockColumn(tableB, "order_id", false, false);
+    when(tableB.getColumns()).thenReturn(List.of(fkColumn));
+
+    // Analyzer setup
+    final List<Table> tables = List.of(tableA, tableB);
+    final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
+    final WeakAssociationsAnalyzer analyzer =
+        new WeakAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
+
+    // Execute
+    final Collection<WeakColumnReference> weakAssociations = analyzer.analyzeTables();
+
+    // Verify
+    assertThat("Should have one weak association", weakAssociations, hasSize(1));
+  }
+
+  @Test
   public void weakAssociationNotAddedIfFkExists() {
     // Table A (orders) with primary key "id"
     final Table tableA = mockTable("orders");
@@ -54,50 +79,6 @@ public class WeakAssociationsAnalyzerFkTest {
         "Should not have weak associations because a real FK exists", weakAssociations, empty());
   }
 
-  @Test
-  public void weakAssociationAddedIfFkDoesNotExist() {
-    // Table A (orders) with primary key "id"
-    final Table tableA = mockTable("orders");
-    final Column pkColumn = mockColumn(tableA, "id", true, false);
-    mockPrimaryKey(tableA, pkColumn);
-
-    // Table B (order_items) with column "order_id"
-    final Table tableB = mockTable("order_items");
-    final Column fkColumn = mockColumn(tableB, "order_id", false, false);
-    when(tableB.getColumns()).thenReturn(List.of(fkColumn));
-
-    // Analyzer setup
-    final List<Table> tables = List.of(tableA, tableB);
-    final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
-    final WeakAssociationsAnalyzer analyzer =
-        new WeakAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
-
-    // Execute
-    final Collection<WeakColumnReference> weakAssociations = analyzer.analyzeTables();
-
-    // Verify
-    assertThat("Should have one weak association", weakAssociations, hasSize(1));
-  }
-
-  private Table mockTable(final String name) {
-    final Table table = mock(Table.class, name);
-    when(table.getName()).thenReturn(name);
-    when(table.getFullName()).thenReturn(name);
-    when(table.key()).thenReturn(new NamedObjectKey(name));
-    when(table.getForeignKeys()).thenReturn(List.of());
-    when(table.getImportedForeignKeys()).thenReturn(List.of());
-    when(table.getExportedForeignKeys()).thenReturn(List.of());
-    when(table.getIndexes()).thenReturn(List.of());
-    when(table.getColumns()).thenReturn(List.of());
-    return table;
-  }
-
-  private void mockPrimaryKey(final Table table, final Column pkColumn) {
-    final PrimaryKey primaryKey = mock(PrimaryKey.class, "PK_" + table.getName());
-    when(primaryKey.getConstrainedColumns()).thenReturn(List.of((TableConstraintColumn) pkColumn));
-    when(table.getPrimaryKey()).thenReturn(primaryKey);
-  }
-
   private Column mockColumn(
       final Table parent, final String name, final boolean isPk, final boolean isFk) {
     final String parentName = parent.getName();
@@ -123,5 +104,24 @@ public class WeakAssociationsAnalyzerFkTest {
     when(column.key()).thenReturn(key);
 
     return column;
+  }
+
+  private void mockPrimaryKey(final Table table, final Column pkColumn) {
+    final PrimaryKey primaryKey = mock(PrimaryKey.class, "PK_" + table.getName());
+    when(primaryKey.getConstrainedColumns()).thenReturn(List.of((TableConstraintColumn) pkColumn));
+    when(table.getPrimaryKey()).thenReturn(primaryKey);
+  }
+
+  private Table mockTable(final String name) {
+    final Table table = mock(Table.class, name);
+    when(table.getName()).thenReturn(name);
+    when(table.getFullName()).thenReturn(name);
+    when(table.key()).thenReturn(new NamedObjectKey(name));
+    when(table.getForeignKeys()).thenReturn(List.of());
+    when(table.getImportedForeignKeys()).thenReturn(List.of());
+    when(table.getExportedForeignKeys()).thenReturn(List.of());
+    when(table.getIndexes()).thenReturn(List.of());
+    when(table.getColumns()).thenReturn(List.of());
+    return table;
   }
 }

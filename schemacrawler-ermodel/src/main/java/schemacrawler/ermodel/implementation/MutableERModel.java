@@ -26,6 +26,7 @@ import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 
 public class MutableERModel implements ERModel {
 
@@ -106,7 +107,11 @@ public class MutableERModel implements ERModel {
   public Collection<Table> getUnmodeledTables() {
     return tablesMap.keySet().stream()
         // Not a valid entity
-        .filter(not(key -> VALID_ENTITY_TYPES.contains(entitiesMap.get(key).getType())))
+        .filter(
+            key -> {
+              final Entity entity = entitiesMap.get(key);
+              return entity == null || !VALID_ENTITY_TYPES.contains(entity.getType());
+            })
         // Not a bridge table
         .filter(not(key -> relationshipsMap.containsKey(key)))
         .map(key -> tablesMap.get(key))
@@ -134,6 +139,24 @@ public class MutableERModel implements ERModel {
   public Optional<Relationship> lookupByBridgeTableName(final String tableName) {
     return relationshipsMap.values().stream()
         .filter(relationship -> relationship.getFullName().equals(tableName))
+        .findFirst();
+  }
+
+  @Override
+  public Optional<Relationship> lookupByTableReference(final TableReference tableRef) {
+    if (tableRef == null) {
+      return Optional.empty();
+    }
+    return Optional.ofNullable(relationshipsMap.get(tableRef.key()));
+  }
+
+  @Override
+  public Optional<Relationship> lookupByTableReferenceName(final String tableRefName) {
+    if (tableRefName == null) {
+      return Optional.empty();
+    }
+    return relationshipsMap.values().stream()
+        .filter(relationship -> relationship.getFullName().equals(tableRefName))
         .findFirst();
   }
 
