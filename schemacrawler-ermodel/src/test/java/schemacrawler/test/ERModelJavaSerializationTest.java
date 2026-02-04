@@ -42,6 +42,19 @@ public class ERModelJavaSerializationTest {
   private Catalog catalog;
   private ERModel erModel;
 
+  @Test
+  public void erModelSerializationWithJava(final DatabaseConnectionSource dataSource)
+      throws Exception {
+
+    final Path testOutputFile = IOUtility.createTempFilePath("sc_ermodel_serialization", "ser");
+    SerializedERModelUtility.saveERModel(
+        erModel, Files.newOutputStream(testOutputFile, WRITE, CREATE, TRUNCATE_EXISTING));
+    assertThat("ERModel was not serialized", isFileReadable(testOutputFile), is(true));
+    assertThat(fileHeaderOf(testOutputFile), is("ACED"));
+
+    SerializedERModelUtility.readERModel(newInputStream(testOutputFile, READ));
+  }
+
   @BeforeEach
   public void loadCatalog(final Connection connection) {
     final SchemaCrawlerOptions schemaCrawlerOptions =
@@ -54,21 +67,5 @@ public class ERModelJavaSerializationTest {
     validateSchema(catalog);
 
     erModel = EntityModelUtility.buildERModel(catalog);
-  }
-
-  @Test
-  public void erModelSerializationWithJava(final DatabaseConnectionSource dataSource)
-      throws Exception {
-
-    final Path testOutputFile = IOUtility.createTempFilePath("sc_ermodel_serialization", "ser");
-    SerializedERModelUtility.saveERModel(
-        erModel, Files.newOutputStream(testOutputFile, WRITE, CREATE, TRUNCATE_EXISTING));
-    assertThat("ERModel was not serialized", isFileReadable(testOutputFile), is(true));
-    assertThat(fileHeaderOf(testOutputFile), is("ACED"));
-
-    // Deserialize generated JSON file, and assert load
-    final ERModel erModelDeserialized =
-        SerializedERModelUtility.readERModel(newInputStream(testOutputFile, READ));
-    // TODO: Validate ER model
   }
 }

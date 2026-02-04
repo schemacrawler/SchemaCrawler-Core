@@ -72,6 +72,43 @@ public final class TableEntityModelInferrer {
   }
 
   /**
+   * Checks if the columns of a foreign key are covered by an index on this table.
+   *
+   * @param fk Foreign key, can be null
+   * @return Whether the foreign key columns are covered by an index
+   */
+  public OptionalBoolean coveredByIndex(final TableReference fk) {
+
+    if (!isFkValid(fk)) {
+      return OptionalBoolean.unknown;
+    }
+
+    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    for (final Set<Column> indexColumns : indexes) {
+      if (indexColumns.containsAll(importedColumns)) {
+        return OptionalBoolean.true_value;
+      }
+    }
+    return OptionalBoolean.false_value;
+  }
+
+  /**
+   * Checks if the columns of a foreign key are covered by a unique index on this table.
+   *
+   * @param fk Foreign key, can be null
+   * @return Whether the foreign key columns are covered by a unique index
+   */
+  public OptionalBoolean coveredByUniqueIndex(final TableReference fk) {
+
+    if (!isFkValid(fk)) {
+      return OptionalBoolean.unknown;
+    }
+
+    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    return OptionalBoolean.fromBoolean(uniqueIndexes.contains(importedColumns));
+  }
+
+  /**
    * Identifies if a table is a bridge table. A table T is treated as a bridge for an M..N
    * relationship between two tables if:
    *
@@ -112,6 +149,39 @@ public final class TableEntityModelInferrer {
     }
 
     return false;
+  }
+
+  /**
+   * Identifies the cardinality of a foreign key.
+   *
+   * @param fk Foreign key
+   * @return Foreign key cardinality
+   */
+  public RelationshipCardinality inferCardinality(final TableReference fk) {
+
+    if (!isFkValid(fk)) {
+      return RelationshipCardinality.unknown;
+    }
+
+    final RelationshipCardinality cardinality;
+
+    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    final boolean isForeignKeyUnique = uniqueIndexes.contains(importedColumns);
+    final boolean isForeignKeyOptional = fk.isOptional();
+
+    if (isForeignKeyUnique) {
+      if (isForeignKeyOptional) {
+        cardinality = RelationshipCardinality.zero_one;
+      } else {
+        cardinality = RelationshipCardinality.one_one;
+      }
+    } else if (isForeignKeyOptional) {
+      cardinality = RelationshipCardinality.zero_many;
+    } else {
+      cardinality = RelationshipCardinality.one_many;
+    }
+
+    return cardinality;
   }
 
   /**
@@ -183,39 +253,6 @@ public final class TableEntityModelInferrer {
   }
 
   /**
-   * Identifies the cardinality of a foreign key.
-   *
-   * @param fk Foreign key
-   * @return Foreign key cardinality
-   */
-  public RelationshipCardinality inferCardinality(final TableReference fk) {
-
-    if (!isFkValid(fk)) {
-      return RelationshipCardinality.unknown;
-    }
-
-    final RelationshipCardinality cardinality;
-
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
-    final boolean isForeignKeyUnique = uniqueIndexes.contains(importedColumns);
-    final boolean isForeignKeyOptional = fk.isOptional();
-
-    if (isForeignKeyUnique) {
-      if (isForeignKeyOptional) {
-        cardinality = RelationshipCardinality.zero_one;
-      } else {
-        cardinality = RelationshipCardinality.one_one;
-      }
-    } else if (isForeignKeyOptional) {
-      cardinality = RelationshipCardinality.zero_many;
-    } else {
-      cardinality = RelationshipCardinality.one_many;
-    }
-
-    return cardinality;
-  }
-
-  /**
    * Identifies the supertype of the table, if the table is a subtype.
    *
    * @return Entity type
@@ -236,43 +273,6 @@ public final class TableEntityModelInferrer {
       }
     }
     return Optional.empty();
-  }
-
-  /**
-   * Checks if the columns of a foreign key are covered by an index on this table.
-   *
-   * @param fk Foreign key, can be null
-   * @return Whether the foreign key columns are covered by an index
-   */
-  public OptionalBoolean coveredByIndex(final TableReference fk) {
-
-    if (!isFkValid(fk)) {
-      return OptionalBoolean.unknown;
-    }
-
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
-    for (final Set<Column> indexColumns : indexes) {
-      if (indexColumns.containsAll(importedColumns)) {
-        return OptionalBoolean.true_value;
-      }
-    }
-    return OptionalBoolean.false_value;
-  }
-
-  /**
-   * Checks if the columns of a foreign key are covered by a unique index on this table.
-   *
-   * @param fk Foreign key, can be null
-   * @return Whether the foreign key columns are covered by a unique index
-   */
-  public OptionalBoolean coveredByUniqueIndex(final TableReference fk) {
-
-    if (!isFkValid(fk)) {
-      return OptionalBoolean.unknown;
-    }
-
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
-    return OptionalBoolean.fromBoolean(uniqueIndexes.contains(importedColumns));
   }
 
   @Override

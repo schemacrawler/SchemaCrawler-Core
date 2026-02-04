@@ -75,10 +75,9 @@ public final class WeakColumnReference implements ColumnReference {
     if (this == obj) {
       return true;
     }
-    if (obj == null || !(obj instanceof ColumnReference)) {
+    if (obj == null || !(obj instanceof final ColumnReference other)) {
       return false;
     }
-    final ColumnReference other = (ColumnReference) obj;
     return Objects.equals(primaryKeyColumn, other.getPrimaryKeyColumn())
         && Objects.equals(foreignKeyColumn, other.getForeignKeyColumn());
   }

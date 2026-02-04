@@ -119,7 +119,7 @@ public class EntityIdentifierTest {
     final TablePartial table2 = new TablePartial(schema, "TABLE_PARTIAL_2");
     final TableReference ref = new LightTableReference("REF", table, table2);
 
-    TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
+    final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
     assertThat(modelInferrer.inferBridgeTable(), is(false));
     assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
     assertThat(modelInferrer.inferCardinality(ref), is(RelationshipCardinality.unknown));
@@ -204,7 +204,7 @@ public class EntityIdentifierTest {
     final TablePartial tableUnrelated2 = new TablePartial(schema, "TABLE_UNRELATED_2");
     final TableReference ref = new LightTableReference("REF", tableUnrelated1, tableUnrelated2);
 
-    TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
+    final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
     assertThat(modelInferrer.inferBridgeTable(), is(false));
     assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
     assertThat(modelInferrer.inferCardinality(ref), is(RelationshipCardinality.unknown));

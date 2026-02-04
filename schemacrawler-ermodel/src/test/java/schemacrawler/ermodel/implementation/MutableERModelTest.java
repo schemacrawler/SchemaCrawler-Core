@@ -16,36 +16,6 @@ import schemacrawler.test.utility.crawl.LightTableReference;
 public class MutableERModelTest {
 
   @Test
-  public void testMutableERModel() {
-    final MutableERModel model = new MutableERModel();
-
-    final LightTable table1 = new LightTable("TABLE1");
-    final MutableEntity entity1 = new MutableEntity(table1);
-    entity1.setEntityType(EntityType.strong_entity);
-
-    final LightTable table2 = new LightTable("TABLE2");
-    final MutableEntity entity2 = new MutableEntity(table2);
-    entity2.setEntityType(EntityType.weak_entity);
-
-    model.addTable(table1);
-    model.addEntity(entity1);
-    model.addTable(table2);
-    model.addEntity(entity2);
-
-    assertThat(model.getTables(), containsInAnyOrder(table1, table2));
-    assertThat(model.getEntities(), containsInAnyOrder(entity1, entity2));
-
-    assertThat(model.getEntitiesByType(EntityType.strong_entity), containsInAnyOrder(entity1));
-    assertThat(model.getEntitiesByType(EntityType.weak_entity), containsInAnyOrder(entity2));
-    assertThat(model.getEntitiesByType(EntityType.unknown), is(empty()));
-
-    assertThat(model.lookupEntity("TABLE1").isPresent(), is(true));
-    assertThat(model.lookupEntity("TABLE1").get(), is(entity1));
-    assertThat(model.lookupEntity(table2).isPresent(), is(true));
-    assertThat(model.lookupEntity(table2).get(), is(entity2));
-  }
-
-  @Test
   public void testMutableEntity() {
     final LightTable table = new LightTable("TABLE");
     final MutableEntity entity = new MutableEntity(table);
@@ -86,6 +56,36 @@ public class MutableERModelTest {
   }
 
   @Test
+  public void testMutableERModel() {
+    final MutableERModel model = new MutableERModel();
+
+    final LightTable table1 = new LightTable("TABLE1");
+    final MutableEntity entity1 = new MutableEntity(table1);
+    entity1.setEntityType(EntityType.strong_entity);
+
+    final LightTable table2 = new LightTable("TABLE2");
+    final MutableEntity entity2 = new MutableEntity(table2);
+    entity2.setEntityType(EntityType.weak_entity);
+
+    model.addTable(table1);
+    model.addEntity(entity1);
+    model.addTable(table2);
+    model.addEntity(entity2);
+
+    assertThat(model.getTables(), containsInAnyOrder(table1, table2));
+    assertThat(model.getEntities(), containsInAnyOrder(entity1, entity2));
+
+    assertThat(model.getEntitiesByType(EntityType.strong_entity), containsInAnyOrder(entity1));
+    assertThat(model.getEntitiesByType(EntityType.weak_entity), containsInAnyOrder(entity2));
+    assertThat(model.getEntitiesByType(EntityType.unknown), is(empty()));
+
+    assertThat(model.lookupEntity("TABLE1").isPresent(), is(true));
+    assertThat(model.lookupEntity("TABLE1").get(), is(entity1));
+    assertThat(model.lookupEntity(table2).isPresent(), is(true));
+    assertThat(model.lookupEntity(table2).get(), is(entity2));
+  }
+
+  @Test
   public void testMutableManyToManyRelationship() {
     final LightTable bridgeTable = new LightTable("BRIDGE");
     final MutableManyToManyRelationship rel = new MutableManyToManyRelationship(bridgeTable);
@@ -110,6 +110,27 @@ public class MutableERModelTest {
         model.getRelationshipsByType(RelationshipCardinality.many_many), containsInAnyOrder(rel));
     assertThat(model.lookupByBridgeTable(bridgeTable).get(), is(rel));
     assertThat(model.lookupByBridgeTableName("BRIDGE").get(), is(rel));
+  }
+
+  @Test
+  public void testTableReferenceLookups() {
+    final MutableERModel model = new MutableERModel();
+
+    final LightTable pkTable = new LightTable("PK_TABLE");
+    final LightTable fkTable = new LightTable("FK_TABLE");
+    final LightTableReference tableRef = new LightTableReference("FK_PK", fkTable, pkTable);
+    final MutableTableReferenceRelationship rel = new MutableTableReferenceRelationship(tableRef);
+
+    model.addRelationship(rel);
+
+    assertThat(model.lookupByTableReference(tableRef).isPresent(), is(true));
+    assertThat(model.lookupByTableReference(tableRef).get(), is(rel));
+    assertThat(model.lookupByTableReferenceName("FK_PK").isPresent(), is(true));
+    assertThat(model.lookupByTableReferenceName("FK_PK").get(), is(rel));
+
+    assertThat(model.lookupByTableReference(null).isPresent(), is(false));
+    assertThat(model.lookupByTableReferenceName(null).isPresent(), is(false));
+    assertThat(model.lookupByTableReferenceName("NONEXISTENT").isPresent(), is(false));
   }
 
   @Test
@@ -138,5 +159,26 @@ public class MutableERModelTest {
     final MutableEntity otherEntity = new MutableEntity(otherTable);
     assertThrows(ExecutionRuntimeException.class, () -> rel.setLeftEntity(otherEntity));
     assertThrows(ExecutionRuntimeException.class, () -> rel.setRightEntity(otherEntity));
+  }
+
+  @Test
+  public void testUnmodeledTables() {
+    final MutableERModel model = new MutableERModel();
+
+    final LightTable modeledTable = new LightTable("MODELED");
+    final MutableEntity entity = new MutableEntity(modeledTable);
+    entity.setEntityType(EntityType.strong_entity);
+    model.addTable(modeledTable);
+    model.addEntity(entity);
+
+    final LightTable unmodeledTable = new LightTable("UNMODELED");
+    model.addTable(unmodeledTable);
+
+    final LightTable bridgeTable = new LightTable("BRIDGE");
+    final MutableManyToManyRelationship rel = new MutableManyToManyRelationship(bridgeTable);
+    model.addTable(bridgeTable);
+    model.addRelationship(rel);
+
+    assertThat(model.getUnmodeledTables(), containsInAnyOrder(unmodeledTable));
   }
 }
