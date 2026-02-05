@@ -15,23 +15,22 @@ import java.util.List;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableConstraintType;
 import schemacrawler.schema.TableReference;
 
-public final class LightTableReference extends AbstractLightNamedObject implements TableReference {
+public final class LightTableReference extends AbstractLightDatabaseObject
+    implements TableReference {
 
   @Serial private static final long serialVersionUID = -5359990477303202179L;
 
-  private final String name;
   private final Table fkTable;
   private final Table pkTable;
 
   public LightTableReference(final String name, final Table fkTable, final Table pkTable) {
-    this.name = name;
+    super(fkTable.getSchema(), name);
     this.fkTable = fkTable;
     this.pkTable = pkTable;
   }
@@ -62,16 +61,6 @@ public final class LightTableReference extends AbstractLightNamedObject implemen
   }
 
   @Override
-  public String getFullName() {
-    return name;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
   public Table getParent() {
     return fkTable;
   }
@@ -88,7 +77,7 @@ public final class LightTableReference extends AbstractLightNamedObject implemen
 
   @Override
   public String getShortName() {
-    return name;
+    return getName();
   }
 
   @Override
@@ -129,11 +118,6 @@ public final class LightTableReference extends AbstractLightNamedObject implemen
   @Override
   public Iterator<ColumnReference> iterator() {
     return getColumnReferences().iterator();
-  }
-
-  @Override
-  public NamedObjectKey key() {
-    return new NamedObjectKey(name);
   }
 
   @Override

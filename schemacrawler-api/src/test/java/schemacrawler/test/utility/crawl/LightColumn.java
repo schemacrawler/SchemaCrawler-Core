@@ -11,12 +11,10 @@ package schemacrawler.test.utility.crawl;
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.test.utility.crawl.LightColumnDataTypeFactory.columnDataType;
 import static schemacrawler.test.utility.crawl.LightColumnDataTypeFactory.enumColumnDataType;
-import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Optional;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -27,7 +25,7 @@ import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 
-final class LightColumn extends AbstractLightNamedObject implements Column {
+final class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Serial private static final long serialVersionUID = -1931193814458050468L;
 
@@ -52,7 +50,6 @@ final class LightColumn extends AbstractLightNamedObject implements Column {
   }
 
   private final Table parent;
-  private final String name;
   private final ColumnDataType columnDataType;
   private final boolean isHidden;
   private final boolean isGenerated;
@@ -63,8 +60,8 @@ final class LightColumn extends AbstractLightNamedObject implements Column {
       final ColumnDataType columnDataType,
       final boolean isHidden,
       final boolean isGenerated) {
-    this.parent = requireNonNull(parent);
-    this.name = requireNotBlank(name, "No name provided");
+    super(parent.getSchema(), name);
+    this.parent = parent;
     this.columnDataType = requireNonNull(columnDataType, "No column data type provided");
     this.isHidden = isHidden;
     this.isGenerated = isGenerated;
@@ -73,18 +70,6 @@ final class LightColumn extends AbstractLightNamedObject implements Column {
   @Override
   public int compareTo(final NamedObject o) {
     return 0;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if ((obj == null) || (getClass() != obj.getClass())) {
-      return false;
-    }
-    final LightColumn other = (LightColumn) obj;
-    return Objects.equals(name, other.name) && Objects.equals(parent, other.parent);
   }
 
   @Override
@@ -105,13 +90,8 @@ final class LightColumn extends AbstractLightNamedObject implements Column {
   @Override
   public String getFullName() {
     final StringBuffer buffer = new StringBuffer();
-    buffer.append(parent.getFullName()).append(".").append(name);
+    buffer.append(parent.getFullName()).append(".").append(getName());
     return buffer.toString();
-  }
-
-  @Override
-  public String getName() {
-    return name;
   }
 
   @Override
@@ -141,7 +121,7 @@ final class LightColumn extends AbstractLightNamedObject implements Column {
 
   @Override
   public String getShortName() {
-    return name;
+    return getName();
   }
 
   @Override
@@ -157,11 +137,6 @@ final class LightColumn extends AbstractLightNamedObject implements Column {
   @Override
   public String getWidth() {
     return "";
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(name, parent);
   }
 
   @Override
@@ -221,7 +196,7 @@ final class LightColumn extends AbstractLightNamedObject implements Column {
 
   @Override
   public NamedObjectKey key() {
-    return parent.key().with(name);
+    return parent.key().with(getName());
   }
 
   @Override

@@ -8,9 +8,6 @@
 
 package schemacrawler.test.utility.crawl;
 
-import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.isBlank;
-import static us.fatehi.utility.Utility.requireNotBlank;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.io.Serial;
@@ -18,16 +15,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.ForeignKey;
-import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
-import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
@@ -39,20 +32,17 @@ import schemacrawler.schema.Trigger;
 import schemacrawler.schema.WeakAssociation;
 import schemacrawler.schemacrawler.SchemaReference;
 
-public final class LightTable extends AbstractLightNamedObject implements Table {
+public final class LightTable extends AbstractLightDatabaseObject implements Table {
 
   @Serial private static final long serialVersionUID = -309232480533750613L;
 
-  private final Schema schema;
-  private final String name;
   private final List<Column> columns;
   private final List<Column> hiddenColumns;
   private final Collection<Trigger> triggers;
   private String definition;
 
   public LightTable(final Schema schema, final String name) {
-    this.schema = requireNonNull(schema, "No schema provided");
-    this.name = requireNotBlank(name, "No table name provided");
+    super(schema, name);
     columns = new ArrayList<>();
     hiddenColumns = new ArrayList<>();
     triggers = new ArrayList<>();
@@ -93,23 +83,6 @@ public final class LightTable extends AbstractLightNamedObject implements Table 
   }
 
   @Override
-  public int compareTo(final NamedObject o) {
-    return name.compareTo(o.getName());
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if ((obj == null) || (getClass() != obj.getClass())) {
-      return false;
-    }
-    final LightTable other = (LightTable) obj;
-    return Objects.equals(name, other.name) && Objects.equals(schema, other.schema);
-  }
-
-  @Override
   public Collection<PrimaryKey> getAlternateKeys() {
     return Collections.emptyList();
   }
@@ -135,11 +108,6 @@ public final class LightTable extends AbstractLightNamedObject implements Table 
   }
 
   @Override
-  public String getFullName() {
-    return getName();
-  }
-
-  @Override
   public Collection<Column> getHiddenColumns() {
     return Set.copyOf(hiddenColumns);
   }
@@ -155,11 +123,6 @@ public final class LightTable extends AbstractLightNamedObject implements Table 
   }
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
   public PrimaryKey getPrimaryKey() {
     return null;
   }
@@ -172,11 +135,6 @@ public final class LightTable extends AbstractLightNamedObject implements Table 
   @Override
   public Collection<Table> getRelatedTables(final TableRelationshipType tableRelationshipType) {
     return Collections.emptyList();
-  }
-
-  @Override
-  public Schema getSchema() {
-    return schema;
   }
 
   @Override
@@ -221,11 +179,6 @@ public final class LightTable extends AbstractLightNamedObject implements Table 
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(name, schema);
-  }
-
-  @Override
   public boolean hasIndexes() {
     return false;
   }
@@ -243,11 +196,6 @@ public final class LightTable extends AbstractLightNamedObject implements Table 
   @Override
   public boolean isSelfReferencing() {
     return false;
-  }
-
-  @Override
-  public NamedObjectKey key() {
-    return new NamedObjectKey(null, null, name);
   }
 
   @Override
@@ -292,20 +240,5 @@ public final class LightTable extends AbstractLightNamedObject implements Table 
 
   public void setDefinition(String definition) {
     this.definition = definition;
-  }
-
-  @Override
-  public String toString() {
-    final StringBuffer buffer = new StringBuffer();
-    if (!isBlank(schema.getFullName())) {
-      buffer.append(schema).append(".");
-    }
-    buffer.append(name);
-    return buffer.toString();
-  }
-
-  @Override
-  public void withQuoting(final Identifiers identifiers) {
-    // No-op
   }
 }

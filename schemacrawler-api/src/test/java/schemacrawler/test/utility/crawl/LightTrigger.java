@@ -8,8 +8,6 @@
 
 package schemacrawler.test.utility.crawl;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.Serial;
 import java.util.Set;
 import schemacrawler.schema.ActionOrientationType;
@@ -18,23 +16,19 @@ import schemacrawler.schema.EventManipulationType;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.Trigger;
 
-public class LightTrigger extends AbstractLightNamedObject implements Trigger {
+public class LightTrigger extends AbstractLightDatabaseObject implements Trigger {
 
   @Serial private static final long serialVersionUID = -2552665161195438344L;
 
-  private final Schema schema;
-  private final String name;
   private final Table table;
   private String actionStatement;
 
   public LightTrigger(final Table table, final String name) {
-    this.table = requireNonNull(table, "No table provided");
-    schema = table.getSchema();
-    this.name = name;
+    super(table.getSchema(), name);
+    this.table = table;
   }
 
   @Override
@@ -73,28 +67,13 @@ public class LightTrigger extends AbstractLightNamedObject implements Trigger {
   }
 
   @Override
-  public String getFullName() {
-    return name;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
   public Table getParent() {
     return table;
   }
 
   @Override
-  public Schema getSchema() {
-    return schema;
-  }
-
-  @Override
   public String getShortName() {
-    return name;
+    return getName();
   }
 
   @Override

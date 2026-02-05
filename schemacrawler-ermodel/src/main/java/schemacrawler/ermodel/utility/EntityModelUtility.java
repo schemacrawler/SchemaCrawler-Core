@@ -14,9 +14,11 @@ import static schemacrawler.utility.MetaDataUtility.isPartial;
 import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.model.EntityAttributeType;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.OptionalBoolean;
@@ -108,6 +110,59 @@ public class EntityModelUtility {
     final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final RelationshipCardinality fkCardinality = tableEntityModel.inferCardinality(fk);
     return fkCardinality;
+  }
+
+  public static EntityAttributeType inferEntityAttributeType(final ColumnDataType columnDataType) {
+    if (columnDataType == null) {
+      return EntityAttributeType.unknown;
+    }
+
+    final EntityAttributeType attributeType =
+        switch (columnDataType.getJavaSqlType().getVendorTypeNumber()) {
+          case java.sql.Types.ARRAY,
+              java.sql.Types.DISTINCT,
+              java.sql.Types.JAVA_OBJECT,
+              java.sql.Types.OTHER,
+              java.sql.Types.STRUCT,
+              java.sql.Types.ROWID,
+              java.sql.Types.REF,
+              java.sql.Types.REF_CURSOR,
+              java.sql.Types.DATALINK,
+              java.sql.Types.SQLXML ->
+              EntityAttributeType.other;
+          case java.sql.Types.BINARY,
+              java.sql.Types.LONGVARBINARY,
+              java.sql.Types.VARBINARY,
+              java.sql.Types.BLOB ->
+              EntityAttributeType.binary;
+          case java.sql.Types.BIT, java.sql.Types.BOOLEAN -> EntityAttributeType.bool;
+          case java.sql.Types.CHAR,
+              java.sql.Types.LONGNVARCHAR,
+              java.sql.Types.LONGVARCHAR,
+              java.sql.Types.NCHAR,
+              java.sql.Types.NVARCHAR,
+              java.sql.Types.VARCHAR,
+              java.sql.Types.CLOB,
+              java.sql.Types.NCLOB ->
+              EntityAttributeType.string;
+          case java.sql.Types.BIGINT,
+              java.sql.Types.INTEGER,
+              java.sql.Types.SMALLINT,
+              java.sql.Types.TINYINT ->
+              EntityAttributeType.integer;
+          case java.sql.Types.DECIMAL,
+              java.sql.Types.DOUBLE,
+              java.sql.Types.FLOAT,
+              java.sql.Types.NUMERIC,
+              java.sql.Types.REAL ->
+              EntityAttributeType.decimal;
+          case java.sql.Types.DATE -> EntityAttributeType.date;
+          case java.sql.Types.TIME, java.sql.Types.TIME_WITH_TIMEZONE -> EntityAttributeType.time;
+          case java.sql.Types.TIMESTAMP, java.sql.Types.TIMESTAMP_WITH_TIMEZONE ->
+              EntityAttributeType.timestamp;
+          default -> EntityAttributeType.unknown;
+        };
+    return attributeType;
   }
 
   /**
