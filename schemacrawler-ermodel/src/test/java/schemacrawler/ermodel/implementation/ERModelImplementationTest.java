@@ -54,7 +54,7 @@ public class ERModelImplementationTest {
     // Other methods
     assertThat(tableBacked.getTable(), is((Table) table));
     assertThat(tableBacked.toString(), containsString("TEST_TABLE"));
-    assertThat(tableBacked.getAttributeColumns(), notNullValue());
+    assertThat(tableBacked.getEntityAttributes(), notNullValue());
   }
 
   @Test
