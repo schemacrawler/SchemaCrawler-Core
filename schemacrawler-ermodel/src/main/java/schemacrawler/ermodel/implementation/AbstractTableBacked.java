@@ -10,6 +10,7 @@ package schemacrawler.ermodel.implementation;
 
 import java.io.Serial;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import schemacrawler.ermodel.model.EntityAttribute;
 import schemacrawler.ermodel.model.TableBacked;
@@ -20,16 +21,21 @@ public class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
 
   @Serial private static final long serialVersionUID = 7423406592008806690L;
 
+  private Collection<EntityAttribute> entityAttributes;
+
   public AbstractTableBacked(final Table table) {
     super(table);
+
+    entityAttributes =
+        getDatabaseObject().getColumns().stream()
+            .filter(column -> !column.isPartOfPrimaryKey() && !column.isPartOfForeignKey())
+            .map(column -> new MutableEntityAttribute(this, column))
+            .collect(Collectors.toList());
   }
 
   @Override
   public Collection<EntityAttribute> getEntityAttributes() {
-    return getDatabaseObject().getColumns().stream()
-        .filter(column -> !column.isPartOfPrimaryKey() && !column.isPartOfForeignKey())
-        .map(MutableEntityAttribute::new)
-        .collect(Collectors.toList());
+    return List.copyOf(entityAttributes);
   }
 
   @Override

@@ -10,11 +10,14 @@ package schemacrawler.ermodel.model;
 
 import java.util.List;
 import schemacrawler.schema.Column;
+import schemacrawler.schema.ContainedObject;
 import schemacrawler.schema.TypedObject;
 
 /** Conceptual entity backed by a SchemaCrawler column. */
 public interface EntityAttribute
-    extends DatabaseObjectBacked<Column>, TypedObject<EntityAttributeType> {
+    extends DatabaseObjectBacked<Column>,
+        ContainedObject<TableBacked>,
+        TypedObject<EntityAttributeType> {
 
   default Column getColumn() {
     return getDatabaseObject();
