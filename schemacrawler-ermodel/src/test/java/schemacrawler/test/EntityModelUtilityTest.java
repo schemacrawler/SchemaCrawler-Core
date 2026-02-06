@@ -15,10 +15,13 @@ import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
 
 import java.sql.Connection;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import schemacrawler.ermodel.model.EntityAttributeType;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.ermodel.utility.EntityModelUtility;
@@ -28,6 +31,7 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.test.utility.WithTestDatabase;
+import schemacrawler.test.utility.crawl.LightColumnDataTypeFactory;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.utility.OptionalBoolean;
 
@@ -132,5 +136,40 @@ public class EntityModelUtilityTest {
     assertThat(EntityModelUtility.inferEntityType(parentTable), is(EntityType.strong_entity));
 
     assertThat(EntityModelUtility.inferEntityType(null), is(EntityType.unknown));
+  }
+
+  @Test
+  public void inferEntityAttributeType() {
+    Map<String, EntityAttributeType> attributeTypes =
+        Map.of(
+            "INTEGER",
+            EntityAttributeType.integer,
+            "decimal",
+            EntityAttributeType.decimal,
+            "OTHER",
+            EntityAttributeType.other,
+            "LONGVARBINARY",
+            EntityAttributeType.binary,
+            "BOOLEAN",
+            EntityAttributeType.bool,
+            "LONGNVARCHAR",
+            EntityAttributeType.string,
+            "DATE",
+            EntityAttributeType.date,
+            "TIME_WITH_TIMEZONE",
+            EntityAttributeType.time,
+            "TIMESTAMP",
+            EntityAttributeType.timestamp,
+            "NO_DATA_TYPE",
+            EntityAttributeType.unknown);
+    for (Entry<String, EntityAttributeType> attributeTypeCase : attributeTypes.entrySet()) {
+      assertThat(
+          "Wrong attribute type for <%s>".formatted(attributeTypeCase.getKey()),
+          EntityModelUtility.inferEntityAttributeType(
+              LightColumnDataTypeFactory.columnDataType(attributeTypeCase.getKey())),
+          is(attributeTypeCase.getValue()));
+    }
+
+    assertThat(EntityModelUtility.inferEntityAttributeType(null), is(EntityAttributeType.unknown));
   }
 }

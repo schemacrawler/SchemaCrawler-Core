@@ -11,6 +11,8 @@ package schemacrawler.test.utility.crawl;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.sql.SQLFeatureNotSupportedException;
@@ -23,8 +25,9 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public class LightColumnDataTypeFactory {
 
-  private static final class ColumnDataTypeInvocationHandler implements InvocationHandler {
-
+  private static final class ColumnDataTypeInvocationHandler
+      implements InvocationHandler, Serializable {
+    @Serial private static final long serialVersionUID = 1L;
     private final String name;
     private final boolean isEnumerated;
     private final List<String> enumValues;

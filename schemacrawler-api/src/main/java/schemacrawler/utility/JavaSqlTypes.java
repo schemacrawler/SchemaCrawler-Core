@@ -50,7 +50,7 @@ public final class JavaSqlTypes implements Iterable<JavaSqlType> {
     }
 
     for (final JavaSqlType javaSqlType : javaSqlTypeMap.values()) {
-      if (typeName.equals(javaSqlType.getName())) {
+      if (typeName.equalsIgnoreCase(javaSqlType.getName())) {
         sqlDataType = javaSqlType;
         break;
       }
@@ -75,8 +75,7 @@ public final class JavaSqlTypes implements Iterable<JavaSqlType> {
   public JavaSqlType valueOf(final int key) {
     if (javaSqlTypeMap.containsKey(key)) {
       return javaSqlTypeMap.get(key);
-    } else {
-      return JavaSqlType.UNKNOWN;
     }
+    return JavaSqlType.UNKNOWN;
   }
 }

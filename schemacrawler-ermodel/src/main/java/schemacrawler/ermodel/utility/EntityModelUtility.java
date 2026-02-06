@@ -8,6 +8,44 @@
 
 package schemacrawler.ermodel.utility;
 
+import static java.sql.Types.ARRAY;
+import static java.sql.Types.BIGINT;
+import static java.sql.Types.BINARY;
+import static java.sql.Types.BIT;
+import static java.sql.Types.BLOB;
+import static java.sql.Types.BOOLEAN;
+import static java.sql.Types.CHAR;
+import static java.sql.Types.CLOB;
+import static java.sql.Types.DATALINK;
+import static java.sql.Types.DATE;
+import static java.sql.Types.DECIMAL;
+import static java.sql.Types.DISTINCT;
+import static java.sql.Types.DOUBLE;
+import static java.sql.Types.FLOAT;
+import static java.sql.Types.INTEGER;
+import static java.sql.Types.JAVA_OBJECT;
+import static java.sql.Types.LONGNVARCHAR;
+import static java.sql.Types.LONGVARBINARY;
+import static java.sql.Types.LONGVARCHAR;
+import static java.sql.Types.NCHAR;
+import static java.sql.Types.NCLOB;
+import static java.sql.Types.NUMERIC;
+import static java.sql.Types.NVARCHAR;
+import static java.sql.Types.OTHER;
+import static java.sql.Types.REAL;
+import static java.sql.Types.REF;
+import static java.sql.Types.REF_CURSOR;
+import static java.sql.Types.ROWID;
+import static java.sql.Types.SMALLINT;
+import static java.sql.Types.SQLXML;
+import static java.sql.Types.STRUCT;
+import static java.sql.Types.TIME;
+import static java.sql.Types.TIMESTAMP;
+import static java.sql.Types.TIMESTAMP_WITH_TIMEZONE;
+import static java.sql.Types.TIME_WITH_TIMEZONE;
+import static java.sql.Types.TINYINT;
+import static java.sql.Types.VARBINARY;
+import static java.sql.Types.VARCHAR;
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
@@ -119,47 +157,26 @@ public class EntityModelUtility {
 
     final EntityAttributeType attributeType =
         switch (columnDataType.getJavaSqlType().getVendorTypeNumber()) {
-          case java.sql.Types.ARRAY,
-              java.sql.Types.DISTINCT,
-              java.sql.Types.JAVA_OBJECT,
-              java.sql.Types.OTHER,
-              java.sql.Types.STRUCT,
-              java.sql.Types.ROWID,
-              java.sql.Types.REF,
-              java.sql.Types.REF_CURSOR,
-              java.sql.Types.DATALINK,
-              java.sql.Types.SQLXML ->
+          case ARRAY,
+              DISTINCT,
+              JAVA_OBJECT,
+              OTHER,
+              STRUCT,
+              ROWID,
+              REF,
+              REF_CURSOR,
+              DATALINK,
+              SQLXML ->
               EntityAttributeType.other;
-          case java.sql.Types.BINARY,
-              java.sql.Types.LONGVARBINARY,
-              java.sql.Types.VARBINARY,
-              java.sql.Types.BLOB ->
-              EntityAttributeType.binary;
-          case java.sql.Types.BIT, java.sql.Types.BOOLEAN -> EntityAttributeType.bool;
-          case java.sql.Types.CHAR,
-              java.sql.Types.LONGNVARCHAR,
-              java.sql.Types.LONGVARCHAR,
-              java.sql.Types.NCHAR,
-              java.sql.Types.NVARCHAR,
-              java.sql.Types.VARCHAR,
-              java.sql.Types.CLOB,
-              java.sql.Types.NCLOB ->
+          case BINARY, LONGVARBINARY, VARBINARY, BLOB -> EntityAttributeType.binary;
+          case BIT, BOOLEAN -> EntityAttributeType.bool;
+          case CHAR, LONGNVARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, VARCHAR, CLOB, NCLOB ->
               EntityAttributeType.string;
-          case java.sql.Types.BIGINT,
-              java.sql.Types.INTEGER,
-              java.sql.Types.SMALLINT,
-              java.sql.Types.TINYINT ->
-              EntityAttributeType.integer;
-          case java.sql.Types.DECIMAL,
-              java.sql.Types.DOUBLE,
-              java.sql.Types.FLOAT,
-              java.sql.Types.NUMERIC,
-              java.sql.Types.REAL ->
-              EntityAttributeType.decimal;
-          case java.sql.Types.DATE -> EntityAttributeType.date;
-          case java.sql.Types.TIME, java.sql.Types.TIME_WITH_TIMEZONE -> EntityAttributeType.time;
-          case java.sql.Types.TIMESTAMP, java.sql.Types.TIMESTAMP_WITH_TIMEZONE ->
-              EntityAttributeType.timestamp;
+          case BIGINT, INTEGER, SMALLINT, TINYINT -> EntityAttributeType.integer;
+          case DECIMAL, DOUBLE, FLOAT, NUMERIC, REAL -> EntityAttributeType.decimal;
+          case DATE -> EntityAttributeType.date;
+          case TIME, TIME_WITH_TIMEZONE -> EntityAttributeType.time;
+          case TIMESTAMP, TIMESTAMP_WITH_TIMEZONE -> EntityAttributeType.timestamp;
           default -> EntityAttributeType.unknown;
         };
     return attributeType;
