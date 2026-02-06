@@ -155,6 +155,10 @@ public class EntityModelUtility {
       return EntityAttributeType.unknown;
     }
 
+    if (columnDataType.isEnumerated()) {
+      return EntityAttributeType.enumerated;
+    }
+
     final EntityAttributeType attributeType =
         switch (columnDataType.getJavaSqlType().getVendorTypeNumber()) {
           case ARRAY,

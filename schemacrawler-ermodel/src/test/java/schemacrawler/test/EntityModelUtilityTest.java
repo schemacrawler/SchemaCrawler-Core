@@ -11,6 +11,8 @@ package schemacrawler.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
 
@@ -26,6 +28,7 @@ import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -171,5 +174,11 @@ public class EntityModelUtilityTest {
     }
 
     assertThat(EntityModelUtility.inferEntityAttributeType(null), is(EntityAttributeType.unknown));
+
+    final ColumnDataType enumeratedDataType = mock(ColumnDataType.class);
+    when(enumeratedDataType.isEnumerated()).thenReturn(true);
+    assertThat(
+        EntityModelUtility.inferEntityAttributeType(enumeratedDataType),
+        is(EntityAttributeType.enumerated));
   }
 }
