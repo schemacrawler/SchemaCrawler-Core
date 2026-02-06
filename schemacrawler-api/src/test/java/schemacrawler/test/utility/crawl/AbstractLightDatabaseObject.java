@@ -8,6 +8,10 @@
 
 package schemacrawler.test.utility.crawl;
 
+import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.isBlank;
+import static us.fatehi.utility.Utility.requireNotBlank;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
@@ -15,12 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import static java.util.Objects.requireNonNull;
-
-import static us.fatehi.utility.Utility.isBlank;
-import static us.fatehi.utility.Utility.requireNotBlank;
-
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
@@ -43,9 +41,7 @@ abstract class AbstractLightDatabaseObject implements DatabaseObject, Serializab
 
   @Override
   public int compareTo(final NamedObject o) {
-    return Comparator.comparing(NamedObject::getName)
-        .thenComparing(obj -> getSchema().compareTo(((DatabaseObject) obj).getSchema()))
-        .compare(this, o);
+    return Comparator.comparing(NamedObject::key).compare(this, o);
   }
 
   @Override
@@ -53,9 +49,8 @@ abstract class AbstractLightDatabaseObject implements DatabaseObject, Serializab
     if (this == obj) {
       return true;
     }
-    if (obj instanceof final AbstractLightDatabaseObject other) {
-      return Objects.equals(getName(), other.getName())
-          && Objects.equals(getSchema(), other.getSchema());
+    if (obj instanceof final NamedObject other) {
+      return Objects.equals(key(), other.key());
     }
     return false;
   }
@@ -84,8 +79,8 @@ abstract class AbstractLightDatabaseObject implements DatabaseObject, Serializab
     final StringBuffer buffer = new StringBuffer();
     buffer.append(schema.getFullName());
     if (!buffer.isEmpty()) {
-		buffer.append(".");
-	}
+      buffer.append(".");
+    }
     buffer.append(getName());
     return buffer.toString();
   }
@@ -112,7 +107,7 @@ abstract class AbstractLightDatabaseObject implements DatabaseObject, Serializab
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, schema);
+    return key().hashCode();
   }
 
   @Override
