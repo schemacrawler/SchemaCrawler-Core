@@ -163,7 +163,7 @@ public class SqlScript implements Runnable {
       }
     }
     // Check if the last line is not delimited
-    if (sql.length() > 0) {
+    if (!sql.isEmpty()) {
       list.add(sql.toString());
     }
 

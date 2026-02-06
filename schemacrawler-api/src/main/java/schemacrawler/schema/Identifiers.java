@@ -265,7 +265,7 @@ public final class Identifiers implements Options, Serializable {
     final String name = databaseObject.getName();
     quoteFullName(buffer, schema);
     if (!isBlank(name)) {
-      if (buffer.length() > 0) {
+      if (!buffer.isEmpty()) {
         buffer.append('.');
       }
       quoteName(buffer, name);
@@ -277,7 +277,7 @@ public final class Identifiers implements Options, Serializable {
     requireNonNull(buffer, "No buffer provided");
     quoteFullName(buffer, parent);
     if (!isBlank(name)) {
-      if (buffer.length() > 0) {
+      if (!buffer.isEmpty()) {
         buffer.append('.');
       }
       quoteName(buffer, name);

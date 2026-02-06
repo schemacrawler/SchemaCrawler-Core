@@ -38,7 +38,7 @@ class DriverManagerLogWriter extends Writer {
       return;
     }
 
-    if (buffer.length() > 0) {
+    if (!buffer.isEmpty()) {
       LOGGER.log(LOG_LEVEL, buffer.toString());
       buffer.setLength(0);
     }
