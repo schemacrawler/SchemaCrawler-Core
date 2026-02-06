@@ -21,18 +21,20 @@ public interface EntityAttribute
   }
 
   /**
+   * Gets the default data value for the column.
+   *
+   * @return Default data value for the column
+   */
+  String getDefaultValue();
+
+  /**
    * Get list of enum values if the data type is enumerated.
    *
    * @return List of enum values
    */
   List<String> getEnumValues();
 
-  /**
-   * Gets the default data value for the column.
-   *
-   * @return Default data value for the column
-   */
-  String getDefaultValue();
+  boolean hasDefaultValue();
 
   /**
    * Whether the attribute is optional.

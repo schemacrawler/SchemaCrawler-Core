@@ -1,0 +1,7 @@
+# Non-entities:
+- PUBLIC.BOOKS.AUTHORSLIST [non_entity]
+- PUBLIC.BOOKS.BOOKAUTHORS [non_entity]
+- PUBLIC.FOR_LINT."Global Counts" [non_entity]
+- PUBLIC.FOR_LINT.PUBLICATIONWRITERS [non_entity]
+- PUBLIC."PUBLISHER SALES".SALES [non_entity]
+- PUBLIC."PUBLISHER SALES".SALESDATA [non_entity]

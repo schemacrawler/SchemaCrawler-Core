@@ -1,0 +1,14 @@
+# Entities:
+- PUBLIC.BOOKS.AUTHORS [strong_entity]
+- PUBLIC.BOOKS.BOOKS [strong_entity]
+- PUBLIC.BOOKS.COUPONS [strong_entity]
+- PUBLIC.BOOKS.CUSTOMERDATA [weak_entity]
+- PUBLIC.BOOKS.CUSTOMERS [strong_entity]
+- PUBLIC.BOOKS."Celebrities" [strong_entity]
+- PUBLIC.BOOKS."Celebrity Updates" [subtype]
+  - super-type: PUBLIC.BOOKS."Celebrities"
+- PUBLIC.BOOKS.PUBLISHERS [strong_entity]
+- PUBLIC.BOOKS.ΒΙΒΛΊΑ [strong_entity]
+- PUBLIC.FOR_LINT.PUBLICATIONS [strong_entity]
+- PUBLIC.FOR_LINT.WRITERS [strong_entity]
+- PUBLIC."PUBLISHER SALES".REGIONS [strong_entity]

@@ -24,6 +24,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
+import schemacrawler.ermodel.model.EntityAttribute;
 import schemacrawler.ermodel.model.EntitySubtype;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.ManyToManyRelationship;
@@ -45,6 +46,44 @@ public class ERModelTest {
   private Catalog catalog;
   private ERModel erModel;
 
+  @Test
+  public void attributes(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Entity attributes:");
+      for (final Entity entity : erModel.getEntities()) {
+        out.println("- %s".formatted(entity));
+        for (EntityAttribute entityAttribute : entity.getEntityAttributes()) {
+          out.println(
+              "  - %s [%s]".formatted(entityAttribute.getName(), entityAttribute.getType()));
+          out.println("    - optional: %b".formatted(entityAttribute.isOptional()));
+          out.println("    - default: %s".formatted(entityAttribute.getDefaultValue()));
+          out.println("    - enum: %s".formatted(entityAttribute.getEnumValues()));
+        }
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
+  @Test
+  public void entities(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Entities:");
+      for (final Entity entity : erModel.getEntities()) {
+        out.println("- %s [%s]".formatted(entity, entity.getType()));
+        if (entity instanceof final EntitySubtype subentity) {
+          out.println("  - super-type: %s".formatted(subentity.getSupertype()));
+        }
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
   @BeforeAll
   public void loadCatalog(final Connection connection) {
     final SchemaCrawlerOptions schemaCrawlerOptions =
@@ -60,51 +99,81 @@ public class ERModelTest {
   }
 
   @Test
-  public void testERModel(final TestContext testContext) {
+  public void nonEntities(final TestContext testContext) {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
-      out.println("# Entities:");
-      for (final Entity entity : erModel.getEntities()) {
-        out.println("  - %s [%s]".formatted(entity, entity.getType()));
-        if (entity instanceof final EntitySubtype subentity) {
-          out.println("    - super-type: %s".formatted(subentity.getSupertype()));
-        }
-      }
-      out.println();
-      out.println("# Relationships:");
-      for (final Relationship relationship : erModel.getRelationships()) {
-        out.println("  - %s [%s]".formatted(relationship, relationship.getType()));
-        out.println("    - left: %s".formatted(relationship.getLeftEntity()));
-        out.println("    - right: %s".formatted(relationship.getRightEntity()));
-        if (relationship instanceof final ManyToManyRelationship mnRel) {
-          out.println("    - bridge: %s".formatted(mnRel.getBridgeTable()));
-        }
-      }
-      out.println();
-      out.println("# Weak relationships:");
-      for (final Relationship relationship : erModel.getWeakRelationships()) {
-        out.println("  - %s [%s]".formatted(relationship, relationship.getType()));
-        out.println("    - left: %s".formatted(relationship.getLeftEntity()));
-        out.println("    - right: %s".formatted(relationship.getRightEntity()));
-      }
-      out.println();
       out.println("# Non-entities:");
       for (final Entity entity : erModel.getEntitiesByType(EntityType.non_entity)) {
-        out.println("  - %s [%s]".formatted(entity, entity.getType()));
-      }
-      out.println();
-      out.println("# Unknown entities:");
-      for (final Relationship relationship : erModel.getRelationships()) {
-        out.println("  - %s [%s]".formatted(relationship, relationship.getType()));
-        out.println("    - left: %s".formatted(relationship.getLeftEntity()));
-        out.println("    - right: %s".formatted(relationship.getRightEntity()));
-      }
-      out.println("# Unmodeled tables:");
-      for (final Table table : erModel.getUnmodeledTables()) {
-        out.println("  - %s".formatted(table));
+        out.println("- %s [%s]".formatted(entity, entity.getType()));
       }
     }
     assertThat(
-        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
+  @Test
+  public void relationships(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Relationships:");
+      for (final Relationship relationship : erModel.getRelationships()) {
+        out.println("- %s [%s]".formatted(relationship, relationship.getType()));
+        out.println("  - left: %s".formatted(relationship.getLeftEntity()));
+        out.println("  - right: %s".formatted(relationship.getRightEntity()));
+        if (relationship instanceof final ManyToManyRelationship mnRel) {
+          out.println("  - bridge: %s".formatted(mnRel.getBridgeTable()));
+        }
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
+  @Test
+  public void unknownEntities(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Unknown entities:");
+      for (final Relationship relationship : erModel.getRelationships()) {
+        out.println("- %s [%s]".formatted(relationship, relationship.getType()));
+        out.println("  - left: %s".formatted(relationship.getLeftEntity()));
+        out.println("  - right: %s".formatted(relationship.getRightEntity()));
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
+  @Test
+  public void unmodeled(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Unmodeled tables:");
+      for (final Table table : erModel.getUnmodeledTables()) {
+        out.println("- %s".formatted(table));
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
+  @Test
+  public void weakRelationships(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Weak relationships:");
+      for (final Relationship relationship : erModel.getWeakRelationships()) {
+        out.println("- %s [%s]".formatted(relationship, relationship.getType()));
+        out.println("  - left: %s".formatted(relationship.getLeftEntity()));
+        out.println("  - right: %s".formatted(relationship.getRightEntity()));
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
   }
 }

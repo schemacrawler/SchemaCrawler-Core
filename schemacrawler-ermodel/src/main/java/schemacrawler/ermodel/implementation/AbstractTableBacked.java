@@ -11,8 +11,8 @@ package schemacrawler.ermodel.implementation;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import schemacrawler.ermodel.model.EntityAttribute;
 import schemacrawler.ermodel.model.TableBacked;
-import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 
 public class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
@@ -25,9 +25,10 @@ public class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
   }
 
   @Override
-  public Collection<Column> getAttributeColumns() {
+  public Collection<EntityAttribute> getEntityAttributes() {
     return getDatabaseObject().getColumns().stream()
         .filter(column -> !column.isPartOfPrimaryKey() && !column.isPartOfForeignKey())
+        .map(MutableEntityAttribute::new)
         .collect(Collectors.toList());
   }
 

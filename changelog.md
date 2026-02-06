@@ -6,6 +6,7 @@ SchemaCrawler Core release notes.
 ## Release 17.6.0 - 2026-02-08
 - Make `ERModel` serializable
 - Add `ERModel` lookups for table references
+- Add entity attributes
 
 
 <a name="v17.6.0"></a>
