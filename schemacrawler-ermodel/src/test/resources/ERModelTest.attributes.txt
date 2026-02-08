@@ -1,209 +1,209 @@
 # Entity attributes:
 - PUBLIC.BOOKS.AUTHORS
   - FIRSTNAME [string]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - LASTNAME [string]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - ADDRESS1 [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - ADDRESS2 [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - CITY [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - STATE [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - POSTALCODE [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - COUNTRY [string]
-    - optional: true
+    - required: false
     - default: 'USA'
     - enum: []
 - PUBLIC.BOOKS.BOOKS
   - TITLE [string]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - DESCRIPTION [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - PUBLISHERID [integer]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - PUBLICATIONDATE [date]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - PRICE [decimal]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC.BOOKS.COUPONS
   - DATA [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - COUPONS [other]
-    - optional: true
+    - required: false
     - default: ARRAY[]
     - enum: []
   - BOOKS [other]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC.BOOKS.CUSTOMERDATA
   - DATA [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC.BOOKS.CUSTOMERS
   - FIRSTNAME [other]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - LASTNAME [other]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - AGE [other]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC.BOOKS."Celebrities"
   - NAME [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC.BOOKS."Celebrity Updates"
   - UPDATE [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC.BOOKS.PUBLISHERS
   - PUBLISHER [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC.BOOKS.ΒΙΒΛΊΑ
   - ΤΊΤΛΟΣ [string]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - ΠΕΡΙΓΡΑΦΉ [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC.FOR_LINT.PUBLICATIONS
   - TITLE [string]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - DESCRIPTION [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - PUBLICATIONDATE [date]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - PRICE [decimal]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - UPDATE [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - PRESS_RELEASE [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC.FOR_LINT.WRITERS
   - FIRSTNAME [string]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - LASTNAME [string]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - ADDRESS1 [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - ADDRESS2 [string]
-    - optional: false
+    - required: true
     - default: NULL
     - enum: []
   - CITY [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - STATE [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - POSTALCODE [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - COUNTRY [string]
-    - optional: true
+    - required: false
     - default: NULL
     - enum: []
   - PHONE1 [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - PHONE2 [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - EMAIL1 [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - EMAIL2 [integer]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - FAX [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - FAX3 [integer]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - HOMEEMAIL11 [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
   - HOMEEMAIL12 [string]
-    - optional: true
+    - required: false
     - default: null
     - enum: []
 - PUBLIC."PUBLISHER SALES".REGIONS
   - CITY [string]
-    - optional: false
+    - required: true
     - default: null
     - enum: []
   - STATE [string]
-    - optional: false
+    - required: true
     - default: null
     - enum: []

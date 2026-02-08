@@ -40,9 +40,9 @@ public interface EntityAttribute
   boolean hasDefaultValue();
 
   /**
-   * Whether the attribute is optional.
+   * Whether the attribute is required.
    *
-   * @return Whether the attribute is optional
+   * @return Whether the attribute is required
    */
-  boolean isOptional();
+  boolean isRequired();
 }

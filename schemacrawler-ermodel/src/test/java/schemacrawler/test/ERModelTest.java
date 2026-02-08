@@ -56,7 +56,7 @@ public class ERModelTest {
         for (EntityAttribute entityAttribute : entity.getEntityAttributes()) {
           out.println(
               "  - %s [%s]".formatted(entityAttribute.getName(), entityAttribute.getType()));
-          out.println("    - optional: %b".formatted(entityAttribute.isOptional()));
+          out.println("    - required: %b".formatted(entityAttribute.isRequired()));
           out.println("    - default: %s".formatted(entityAttribute.getDefaultValue()));
           out.println("    - enum: %s".formatted(entityAttribute.getEnumValues()));
         }
