@@ -19,8 +19,8 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaRetrievalOptionsDefault;
+import static schemacrawler.test.utility.crawl.LightCatalogUtility.lightCatalog;
 import static us.fatehi.utility.IOUtility.createTempFilePath;
 
 import java.nio.file.Path;
@@ -144,7 +144,7 @@ public class SchemaCrawlerExecutableTest {
     // Catalog
     assertThat(executable.getCatalog(), is(nullValue()));
 
-    final Catalog catalog = mock(Catalog.class);
+    final Catalog catalog = lightCatalog();
     executable.setCatalog(catalog);
     assertThat(executable.getCatalog(), is(sameInstance(catalog)));
 
@@ -157,7 +157,7 @@ public class SchemaCrawlerExecutableTest {
   public void executable_with_settings(final DatabaseConnectionSource dataSource) throws Exception {
 
     final Path testOutputFile = createTempFilePath("sc", "data");
-    final Catalog mockCatalog = mock(Catalog.class);
+    final Catalog mockCatalog = lightCatalog();
     final SchemaRetrievalOptions mockSchemaRetrievalOptions =
         SchemaRetrievalOptionsBuilder.newSchemaRetrievalOptions();
     final Config config = ConfigUtility.newConfig();
