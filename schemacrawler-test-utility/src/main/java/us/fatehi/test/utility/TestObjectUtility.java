@@ -181,6 +181,8 @@ public class TestObjectUtility {
           final String methodName = method.getName();
 
           return switch (methodName) {
+            case "equals" -> proxy == args[0];
+            case "hashCode" -> System.identityHashCode(proxy);
             default -> returnEmpty(method);
           };
         };
