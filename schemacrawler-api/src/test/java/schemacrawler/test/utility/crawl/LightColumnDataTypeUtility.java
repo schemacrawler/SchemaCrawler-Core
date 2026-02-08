@@ -9,13 +9,13 @@
 package schemacrawler.test.utility.crawl;
 
 import static java.lang.reflect.Proxy.newProxyInstance;
+import static us.fatehi.test.utility.TestObjectUtility.returnEmpty;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.Collections;
 import java.util.List;
 import schemacrawler.schema.ColumnDataType;
@@ -23,7 +23,7 @@ import schemacrawler.utility.JavaSqlTypes;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
-public class LightColumnDataTypeFactory {
+public class LightColumnDataTypeUtility {
 
   private static final class ColumnDataTypeInvocationHandler
       implements InvocationHandler, Serializable {
@@ -51,8 +51,10 @@ public class LightColumnDataTypeFactory {
         case "getJavaSqlType" -> new JavaSqlTypes().getFromJavaSqlTypeName(name);
         case "isEnumerated" -> isEnumerated;
         case "getEnumValues" -> enumValues;
+        case "equals" -> proxy == args[0];
+        case "hashCode" -> System.identityHashCode(proxy);
         case "toString" -> toString();
-        default -> throw new SQLFeatureNotSupportedException(methodName);
+        default -> returnEmpty(method);
       };
     }
 
@@ -81,7 +83,7 @@ public class LightColumnDataTypeFactory {
             new ColumnDataTypeInvocationHandler("VARCHAR", List.of("VALUE1", "VALUE2")));
   }
 
-  private LightColumnDataTypeFactory() {
+  private LightColumnDataTypeUtility() {
     // Prevent instantiation
   }
 }

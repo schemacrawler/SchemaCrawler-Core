@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
+import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -40,7 +41,6 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
-import us.fatehi.test.utility.TestObjectUtility;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.test.utility.extensions.TestContext;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
@@ -200,7 +200,7 @@ public class DatabaseInfoRetrieverTest {
       throws Exception {
 
     // Create a retriever connection with a mocked connection source to simulate errors
-    final Connection mockConnection = TestObjectUtility.mockConnection();
+    final Connection mockConnection = mockConnection();
     final DatabaseMetaData mockMetaData = mockConnection.getMetaData();
     when(mockMetaData.isReadOnly()).thenThrow(SQLException.class);
     when(mockMetaData.getSchemas()).thenThrow(AbstractMethodError.class);

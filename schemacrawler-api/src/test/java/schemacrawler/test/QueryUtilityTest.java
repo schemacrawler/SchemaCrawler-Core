@@ -14,10 +14,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.columnDataType;
 import static schemacrawler.utility.MetaDataUtility.inclusionRuleString;
+import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
+import static us.fatehi.test.utility.TestObjectUtility.mockStatement;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
@@ -37,7 +38,6 @@ import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schemacrawler.Query;
 import schemacrawler.schemacrawler.QueryUtility;
 import schemacrawler.test.utility.WithTestDatabase;
-import us.fatehi.test.utility.TestObjectUtility;
 import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.test.utility.extensions.TestContext;
@@ -49,11 +49,10 @@ public class QueryUtilityTest {
   @Test
   public void executeAgainstColumnDataType() throws Exception {
 
-    final Connection mockConnection = TestObjectUtility.mockConnection();
-    final Statement mockStatement = TestObjectUtility.mockStatement();
+    final Connection mockConnection = mockConnection();
+    final Statement mockStatement = mockStatement();
     lenient().when(mockConnection.createStatement()).thenReturn(mockStatement);
-    final ColumnDataType mockColumnDataType = mock(ColumnDataType.class);
-    when(mockColumnDataType.getName()).thenReturn("mock-column-data-type-name");
+    final ColumnDataType testColumnDataType = columnDataType("INTEGER");
 
     final Query query =
         new Query(
@@ -62,15 +61,13 @@ public class QueryUtilityTest {
 
     final Statement statement = mockConnection.createStatement();
     final ResultSet results =
-        QueryUtility.executeAgainstColumnDataType(query, statement, mockColumnDataType);
+        QueryUtility.executeAgainstColumnDataType(query, statement, testColumnDataType);
 
     final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockStatement).execute(captor.capture());
     final String expandedSQL = captor.getValue();
 
-    assertThat(
-        expandedSQL,
-        is("SELECT * FROM SOME_TABLE WHERE SOME_COLUMN_HAS = 'mock-column-data-type-name')"));
+    assertThat(expandedSQL, is("SELECT * FROM SOME_TABLE WHERE SOME_COLUMN_HAS = 'INTEGER')"));
   }
 
   @Test

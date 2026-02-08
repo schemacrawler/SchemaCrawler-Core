@@ -20,6 +20,7 @@ import static schemacrawler.schema.ParameterModeType.result;
 import static schemacrawler.schema.ParameterModeType.returnValue;
 import static schemacrawler.schema.ParameterModeType.unknown;
 import static schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy.functionParametersRetrievalStrategy;
+import static us.fatehi.test.utility.TestObjectUtility.mockResultSet;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -35,7 +36,6 @@ import schemacrawler.schemacrawler.MetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.DisableLogging;
-import us.fatehi.test.utility.TestObjectUtility;
 
 @DisableLogging
 public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTest {
@@ -207,6 +207,6 @@ public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTe
     };
 
     final String resultSetDescription = "Function parameters for <%s>".formatted(routineName);
-    return TestObjectUtility.mockResultSet(resultSetDescription, columnNames, data);
+    return mockResultSet(resultSetDescription, columnNames, data);
   }
 }

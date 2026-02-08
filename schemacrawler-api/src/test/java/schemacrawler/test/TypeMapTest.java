@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
@@ -21,6 +20,7 @@ import java.util.Map;
 import org.apache.commons.collections4.keyvalue.UnmodifiableMapEntry;
 import org.junit.jupiter.api.Test;
 import schemacrawler.utility.TypeMap;
+import us.fatehi.test.utility.TestObjectUtility;
 
 public class TypeMapTest {
 
@@ -42,7 +42,7 @@ public class TypeMapTest {
     map.put("string", String.class);
     map.put("object", Object.class);
 
-    final Connection connection = mock(Connection.class);
+    final Connection connection = TestObjectUtility.mockConnection();
 
     final TypeMap typeMap1 = new TypeMap(connection);
     assertThat(typeMap1.size(), is(39));

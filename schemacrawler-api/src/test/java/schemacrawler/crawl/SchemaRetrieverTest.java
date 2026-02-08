@@ -12,9 +12,9 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static us.fatehi.test.utility.TestObjectUtility.mockDatabaseMetaData;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -51,7 +51,7 @@ public class SchemaRetrieverTest {
     // Mock database metadata, so we can check if it is being used over the INFORMATION_SCHEMA
     final Connection spyConnection = connection;
     // final Connection spyConnection = spy(connection.unwrap(Connection.class));
-    final DatabaseMetaData databaseMetaData = mock(DatabaseMetaData.class);
+    final DatabaseMetaData databaseMetaData = mockDatabaseMetaData();
 
     final ConnectionInfoBuilder connectionInfoBuilder = ConnectionInfoBuilder.builder(connection);
     final MutableDatabaseInfo databaseInfo =

@@ -11,9 +11,9 @@ package us.fatehi.test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -69,7 +69,7 @@ public class ConnectionInfoBuilderTest {
     // See issue #931
     when(dbMetaData2.getUserName()).thenThrow(new SQLException("Cannot get user name"));
 
-    final Connection connection2 = mock();
+    final Connection connection2 = mockConnection();
     when(connection2.getMetaData()).thenReturn(dbMetaData2);
 
     final ConnectionInfoBuilder connectionInfoBuilder = ConnectionInfoBuilder.builder(connection2);

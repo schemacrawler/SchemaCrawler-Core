@@ -9,8 +9,8 @@
 package schemacrawler.test.utility.crawl;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.test.utility.crawl.LightColumnDataTypeFactory.columnDataType;
-import static schemacrawler.test.utility.crawl.LightColumnDataTypeFactory.enumColumnDataType;
+import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.columnDataType;
+import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.enumColumnDataType;
 
 import java.io.Serial;
 import java.util.Collection;
@@ -25,7 +25,7 @@ import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 
-final class LightColumn extends AbstractLightDatabaseObject implements Column {
+public final class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Serial private static final long serialVersionUID = -1931193814458050468L;
 

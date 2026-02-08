@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -24,7 +25,6 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.utility.JavaSqlTypes;
 import schemacrawler.utility.TypeMap;
-import us.fatehi.test.utility.TestObjectUtility;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
 
 /** An abstract base class for parameter retriever tests to reduce code duplication. */
@@ -40,7 +40,7 @@ public abstract class AbstractParameterRetrieverTest {
   public void setUpBase() throws SQLException {
     System.setProperty("org.mockito.debug", "true");
 
-    connection = TestObjectUtility.mockConnection();
+    connection = mockConnection();
 
     retrieverConnection = mock(RetrieverConnection.class);
     when(retrieverConnection.getConnection(anyString())).thenReturn(connection);

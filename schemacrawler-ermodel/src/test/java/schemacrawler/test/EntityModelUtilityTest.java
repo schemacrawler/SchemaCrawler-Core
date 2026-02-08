@@ -11,10 +11,9 @@ package schemacrawler.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
+import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.enumColumnDataType;
 
 import java.sql.Connection;
 import java.util.Map;
@@ -34,7 +33,7 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.test.utility.crawl.LightColumnDataTypeFactory;
+import schemacrawler.test.utility.crawl.LightColumnDataTypeUtility;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.utility.OptionalBoolean;
 
@@ -169,14 +168,13 @@ public class EntityModelUtilityTest {
       assertThat(
           "Wrong attribute type for <%s>".formatted(attributeTypeCase.getKey()),
           EntityModelUtility.inferEntityAttributeType(
-              LightColumnDataTypeFactory.columnDataType(attributeTypeCase.getKey())),
+              LightColumnDataTypeUtility.columnDataType(attributeTypeCase.getKey())),
           is(attributeTypeCase.getValue()));
     }
 
     assertThat(EntityModelUtility.inferEntityAttributeType(null), is(EntityAttributeType.unknown));
 
-    final ColumnDataType enumeratedDataType = mock(ColumnDataType.class);
-    when(enumeratedDataType.isEnumerated()).thenReturn(true);
+    final ColumnDataType enumeratedDataType = enumColumnDataType();
     assertThat(
         EntityModelUtility.inferEntityAttributeType(enumeratedDataType),
         is(EntityAttributeType.enumerated));

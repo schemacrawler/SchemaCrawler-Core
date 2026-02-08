@@ -15,7 +15,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasKey;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -34,13 +33,14 @@ import schemacrawler.schemacrawler.MetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
+import us.fatehi.test.utility.TestObjectUtility;
 import us.fatehi.utility.datasource.DatabaseServerType;
 
 public class SchemaRetrievalOptionsBuilderTest {
 
   @Test
   public void connectionInitializer() {
-    final Connection connection = mock(Connection.class);
+    final Connection connection = TestObjectUtility.mockConnection();
 
     final SchemaRetrievalOptionsBuilder builder = SchemaRetrievalOptionsBuilder.builder();
 
@@ -68,12 +68,12 @@ public class SchemaRetrievalOptionsBuilderTest {
   @Test
   public void dbMetaData() throws SQLException {
 
-    final DatabaseMetaData dbMetaData = mock(DatabaseMetaData.class);
+    final DatabaseMetaData dbMetaData = TestObjectUtility.mockDatabaseMetaData();
     when(dbMetaData.supportsCatalogsInTableDefinitions()).thenReturn(false);
     when(dbMetaData.supportsSchemasInTableDefinitions()).thenReturn(true);
     when(dbMetaData.getIdentifierQuoteString()).thenReturn("@");
 
-    final Connection connection = mock(Connection.class);
+    final Connection connection = TestObjectUtility.mockConnection();
     when(connection.getMetaData()).thenReturn(dbMetaData);
 
     SchemaRetrievalOptionsBuilder builder;
@@ -109,7 +109,7 @@ public class SchemaRetrievalOptionsBuilderTest {
     assertThat(schemaRetrievalOptions.isSupportsSchemas(), is(true));
     assertThat(schemaRetrievalOptions.getTypeMap(), is(aMapWithSize(39)));
 
-    final Connection connection = mock(Connection.class);
+    final Connection connection = TestObjectUtility.mockConnection();
     when(connection.getMetaData()).thenThrow(SQLException.class);
 
     builder = SchemaRetrievalOptionsBuilder.builder();
@@ -124,12 +124,12 @@ public class SchemaRetrievalOptionsBuilderTest {
   @Test
   public void dbMetaData_overrides() throws SQLException {
 
-    final DatabaseMetaData dbMetaData = mock(DatabaseMetaData.class);
+    final DatabaseMetaData dbMetaData = TestObjectUtility.mockDatabaseMetaData();
     when(dbMetaData.supportsCatalogsInTableDefinitions()).thenReturn(false);
     when(dbMetaData.supportsSchemasInTableDefinitions()).thenReturn(true);
     when(dbMetaData.getIdentifierQuoteString()).thenReturn("#");
 
-    final Connection connection = mock(Connection.class);
+    final Connection connection = TestObjectUtility.mockConnection();
     when(connection.getMetaData()).thenReturn(dbMetaData);
 
     SchemaRetrievalOptionsBuilder builder;
@@ -341,11 +341,11 @@ public class SchemaRetrievalOptionsBuilderTest {
 
   @Test
   public void override_catalog_schema() throws SQLException {
-    final DatabaseMetaData dbMetaData = mock(DatabaseMetaData.class);
+    final DatabaseMetaData dbMetaData = TestObjectUtility.mockDatabaseMetaData();
     when(dbMetaData.supportsCatalogsInTableDefinitions()).thenReturn(false);
     when(dbMetaData.supportsSchemasInTableDefinitions()).thenReturn(true);
 
-    final Connection connection = mock(Connection.class);
+    final Connection connection = TestObjectUtility.mockConnection();
     when(connection.getMetaData()).thenReturn(dbMetaData);
 
     final SchemaRetrievalOptionsBuilder builder = SchemaRetrievalOptionsBuilder.builder();

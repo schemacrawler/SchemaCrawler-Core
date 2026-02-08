@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
+import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 
 import java.sql.Connection;
 import java.util.function.BiConsumer;
@@ -98,7 +98,7 @@ public class InformationSchemaViewsBuilderTest {
   @Test
   public void withFunction() {
 
-    final Connection connection = mock(Connection.class);
+    final Connection connection = mockConnection();
     final InformationSchemaViewsBuilder builder = InformationSchemaViewsBuilder.builder();
     final BiConsumer<InformationSchemaViewsBuilder, Connection> function =
         (bldr, conn) -> {
