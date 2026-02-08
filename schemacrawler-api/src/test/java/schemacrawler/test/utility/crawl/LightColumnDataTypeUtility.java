@@ -9,13 +9,13 @@
 package schemacrawler.test.utility.crawl;
 
 import static java.lang.reflect.Proxy.newProxyInstance;
+import static us.fatehi.test.utility.TestObjectUtility.returnEmpty;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.Collections;
 import java.util.List;
 import schemacrawler.schema.ColumnDataType;
@@ -54,7 +54,7 @@ public class LightColumnDataTypeUtility {
         case "equals" -> proxy == args[0];
         case "hashCode" -> System.identityHashCode(proxy);
         case "toString" -> toString();
-        default -> throw new SQLFeatureNotSupportedException(methodName);
+        default -> returnEmpty(method);
       };
     }
 
@@ -75,12 +75,12 @@ public class LightColumnDataTypeUtility {
             new ColumnDataTypeInvocationHandler(name));
   }
 
-  public static ColumnDataType enumColumnDataType(final List<String> enumValues) {
+  public static ColumnDataType enumColumnDataType() {
     return (ColumnDataType)
         newProxyInstance(
             ColumnDataType.class.getClassLoader(),
             new Class[] {ColumnDataType.class},
-            new ColumnDataTypeInvocationHandler("VARCHAR", enumValues));
+            new ColumnDataTypeInvocationHandler("VARCHAR", List.of("VALUE1", "VALUE2")));
   }
 
   private LightColumnDataTypeUtility() {

@@ -15,7 +15,6 @@ import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.enumCo
 import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -37,11 +36,7 @@ public final class LightColumn extends AbstractLightDatabaseObject implements Co
 
   public static LightColumn newEnumeratedColumn(final Table parent, final String name) {
     return new LightColumn(
-        parent,
-        name,
-        enumColumnDataType(List.of("VALUE1", "VALUE2")), /* isHidden */
-        false, /* isGenerated */
-        false);
+        parent, name, enumColumnDataType(), /* isHidden */ false, /* isGenerated */ false);
   }
 
   public static LightColumn newGeneratedColumn(final Table parent, final String name) {

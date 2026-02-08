@@ -5,12 +5,12 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.columnDataType;
 
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.NamedObjectKey;
@@ -95,9 +95,7 @@ public class WeakAssociationsAnalyzerFkTest {
     when(column.getFullName()).thenReturn(parentName + "." + name);
     when(column.isColumnDataTypeKnown()).thenReturn(true);
     when(column.isPartOfPrimaryKey()).thenReturn(isPk);
-    final ColumnDataType dataType = mock(ColumnDataType.class);
-    when(dataType.getStandardTypeName()).thenReturn("INTEGER");
-    when(column.getColumnDataType()).thenReturn(dataType);
+    when(column.getColumnDataType()).thenReturn(columnDataType("INTEGER"));
 
     // Simulate NamedObjectKey
     final NamedObjectKey key = new NamedObjectKey(null, null, parentName).with(name);
