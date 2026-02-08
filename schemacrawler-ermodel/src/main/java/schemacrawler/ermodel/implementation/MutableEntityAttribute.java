@@ -56,7 +56,7 @@ class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
   }
 
   @Override
-  public boolean isOptional() {
-    return getDatabaseObject().isNullable();
+  public boolean isRequired() {
+    return !getDatabaseObject().isNullable();
   }
 }
