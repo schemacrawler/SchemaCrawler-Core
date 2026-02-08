@@ -130,8 +130,7 @@ public enum RelationshipCardinality {
     this.description = requireNonNull(description, "No description provided");
   }
 
-  @Override
-  public String toString() {
+  public String description() {
     return description;
   }
 }

@@ -118,28 +118,12 @@ public class ERModelTest {
     try (final TestWriter out = testout) {
       out.println("# Relationships:");
       for (final Relationship relationship : erModel.getRelationships()) {
-        out.println("- %s [%s]".formatted(relationship, relationship.getType()));
+        out.println("- %s [%s]".formatted(relationship, relationship.getType().description()));
         out.println("  - left: %s".formatted(relationship.getLeftEntity()));
         out.println("  - right: %s".formatted(relationship.getRightEntity()));
         if (relationship instanceof final ManyToManyRelationship mnRel) {
           out.println("  - bridge: %s".formatted(mnRel.getBridgeTable()));
         }
-      }
-    }
-    assertThat(
-        outputOf(testout),
-        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
-  }
-
-  @Test
-  public void unknownEntities(final TestContext testContext) {
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
-      out.println("# Unknown entities:");
-      for (final Relationship relationship : erModel.getRelationships()) {
-        out.println("- %s [%s]".formatted(relationship, relationship.getType()));
-        out.println("  - left: %s".formatted(relationship.getLeftEntity()));
-        out.println("  - right: %s".formatted(relationship.getRightEntity()));
       }
     }
     assertThat(
@@ -167,7 +151,7 @@ public class ERModelTest {
     try (final TestWriter out = testout) {
       out.println("# Weak relationships:");
       for (final Relationship relationship : erModel.getWeakRelationships()) {
-        out.println("- %s [%s]".formatted(relationship, relationship.getType()));
+        out.println("- %s [%s]".formatted(relationship, relationship.getType().description()));
         out.println("  - left: %s".formatted(relationship.getLeftEntity()));
         out.println("  - right: %s".formatted(relationship.getRightEntity()));
       }
