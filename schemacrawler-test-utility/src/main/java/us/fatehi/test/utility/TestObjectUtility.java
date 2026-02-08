@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.nio.file.AccessMode;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -25,9 +26,12 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import tools.jackson.databind.ObjectMapper;
 
@@ -40,7 +44,7 @@ public class TestObjectUtility {
     private final String[] columnNames;
     private int rowIndex;
     private boolean wasNull;
-    private ResultSetMetaData rsmd;
+    private final ResultSetMetaData rsmd;
 
     private ResultSetInvocationHandler(
         final String resultSetDescription, final Object[][] data, final String[] columnNames)
@@ -72,7 +76,7 @@ public class TestObjectUtility {
           return rowIndex < data.length;
         case "getColumnName":
         case "getColumnLabel":
-          if (args[0] instanceof Integer index) {
+          if (args[0] instanceof final Integer index) {
             return columnNames[index];
           }
           return "columnName";
@@ -88,10 +92,10 @@ public class TestObjectUtility {
         case "getShort":
           wasNull = false;
           int index = -1;
-          if (args[0] instanceof Integer integer) {
+          if (args[0] instanceof final Integer integer) {
             index = integer - 1;
           }
-          if (args[0] instanceof String columnName) {
+          if (args[0] instanceof final String columnName) {
             index = Arrays.asList(columnNames).indexOf(columnName);
           }
           Object columnData;
@@ -170,6 +174,22 @@ public class TestObjectUtility {
     return testObject;
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T extends Object> T makeTestObject(final Class<T> clazz) {
+    final InvocationHandler handler =
+        (proxy, method, args) -> {
+          final String methodName = method.getName();
+
+          return switch (methodName) {
+            default -> returnEmpty(method);
+          };
+        };
+
+    return (T)
+        Proxy.newProxyInstance(
+            TestObjectUtility.class.getClassLoader(), new Class<?>[] {clazz}, handler);
+  }
+
   public static Map<String, Object> makeTestObjectMap() {
 
     final TestObject testObject = makeTestObject();
@@ -243,6 +263,25 @@ public class TestObjectUtility {
     } catch (final SQLException e) {
       return mock(Statement.class);
     }
+  }
+
+  public static Object returnEmpty(final Method method) {
+    if (method == null) {
+      return null;
+    }
+
+    final Class<?> returnType = method.getReturnType();
+
+    if (returnType == Void.TYPE) {
+      return null;
+    }
+    if (Optional.class.isAssignableFrom(returnType)) {
+      return Optional.empty();
+    }
+    if (Collection.class.isAssignableFrom(returnType)) {
+      return Collections.emptyList();
+    }
+    throw new UnsupportedOperationException(method.toString());
   }
 
   private TestObjectUtility() {

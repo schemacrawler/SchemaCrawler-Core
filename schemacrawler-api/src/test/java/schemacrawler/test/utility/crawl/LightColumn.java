@@ -9,12 +9,13 @@
 package schemacrawler.test.utility.crawl;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.test.utility.crawl.LightColumnDataTypeFactory.columnDataType;
-import static schemacrawler.test.utility.crawl.LightColumnDataTypeFactory.enumColumnDataType;
+import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.columnDataType;
+import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.enumColumnDataType;
 
 import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -25,7 +26,7 @@ import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 
-final class LightColumn extends AbstractLightDatabaseObject implements Column {
+public final class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Serial private static final long serialVersionUID = -1931193814458050468L;
 
@@ -36,7 +37,11 @@ final class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   public static LightColumn newEnumeratedColumn(final Table parent, final String name) {
     return new LightColumn(
-        parent, name, enumColumnDataType(), /* isHidden */ false, /* isGenerated */ false);
+        parent,
+        name,
+        enumColumnDataType(List.of("VALUE1", "VALUE2")), /* isHidden */
+        false, /* isGenerated */
+        false);
   }
 
   public static LightColumn newGeneratedColumn(final Table parent, final String name) {

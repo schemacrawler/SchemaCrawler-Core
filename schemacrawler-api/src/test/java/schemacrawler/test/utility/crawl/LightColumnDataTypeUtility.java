@@ -23,7 +23,7 @@ import schemacrawler.utility.JavaSqlTypes;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
-public class LightColumnDataTypeFactory {
+public class LightColumnDataTypeUtility {
 
   private static final class ColumnDataTypeInvocationHandler
       implements InvocationHandler, Serializable {
@@ -73,15 +73,15 @@ public class LightColumnDataTypeFactory {
             new ColumnDataTypeInvocationHandler(name));
   }
 
-  public static ColumnDataType enumColumnDataType() {
+  public static ColumnDataType enumColumnDataType(final List<String> enumValues) {
     return (ColumnDataType)
         newProxyInstance(
             ColumnDataType.class.getClassLoader(),
             new Class[] {ColumnDataType.class},
-            new ColumnDataTypeInvocationHandler("VARCHAR", List.of("VALUE1", "VALUE2")));
+            new ColumnDataTypeInvocationHandler("VARCHAR", enumValues));
   }
 
-  private LightColumnDataTypeFactory() {
+  private LightColumnDataTypeUtility() {
     // Prevent instantiation
   }
 }

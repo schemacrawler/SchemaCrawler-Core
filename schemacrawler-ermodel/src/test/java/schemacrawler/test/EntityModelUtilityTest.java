@@ -34,7 +34,7 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.test.utility.crawl.LightColumnDataTypeFactory;
+import schemacrawler.test.utility.crawl.LightColumnDataTypeUtility;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.utility.OptionalBoolean;
 
@@ -169,7 +169,7 @@ public class EntityModelUtilityTest {
       assertThat(
           "Wrong attribute type for <%s>".formatted(attributeTypeCase.getKey()),
           EntityModelUtility.inferEntityAttributeType(
-              LightColumnDataTypeFactory.columnDataType(attributeTypeCase.getKey())),
+              LightColumnDataTypeUtility.columnDataType(attributeTypeCase.getKey())),
           is(attributeTypeCase.getValue()));
     }
 

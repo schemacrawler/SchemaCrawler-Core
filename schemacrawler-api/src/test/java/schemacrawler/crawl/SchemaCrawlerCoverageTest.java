@@ -23,6 +23,7 @@ import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaRetrievalOptionsDefault;
 import static us.fatehi.test.utility.ObjectPropertyTestUtility.checkBooleanProperties;
 import static us.fatehi.test.utility.ObjectPropertyTestUtility.checkIntegerProperties;
+import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -57,7 +58,6 @@ import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
-import us.fatehi.test.utility.TestObjectUtility;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.utility.datasource.ConnectionDatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
@@ -223,7 +223,7 @@ public class SchemaCrawlerCoverageTest {
     final SchemaCrawlerOptions schemaCrawlerOptions =
         SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
-    final Connection connection = TestObjectUtility.mockConnection();
+    final Connection connection = mockConnection();
 
     final DatabaseConnectionSource dataSource = new ConnectionDatabaseConnectionSource(connection);
 
