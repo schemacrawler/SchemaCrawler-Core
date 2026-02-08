@@ -51,6 +51,8 @@ public class LightColumnDataTypeUtility {
         case "getJavaSqlType" -> new JavaSqlTypes().getFromJavaSqlTypeName(name);
         case "isEnumerated" -> isEnumerated;
         case "getEnumValues" -> enumValues;
+        case "equals" -> proxy == args[0];
+        case "hashCode" -> System.identityHashCode(proxy);
         case "toString" -> toString();
         default -> throw new SQLFeatureNotSupportedException(methodName);
       };
