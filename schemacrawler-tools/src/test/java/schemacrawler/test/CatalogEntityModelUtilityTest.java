@@ -52,7 +52,9 @@ public class CatalogEntityModelUtilityTest {
         for (final Table table : catalog.getTables(schema)) {
           for (final ForeignKey fk : table.getForeignKeys()) {
             out.println(fk);
-            out.println("  - cardinality=%s".formatted(EntityModelUtility.inferCardinality(fk)));
+            out.println(
+                "  - cardinality=%s"
+                    .formatted(EntityModelUtility.inferCardinality(fk).description()));
             out.println("  - covered by index=%s".formatted(EntityModelUtility.coveredByIndex(fk)));
             out.println(
                 "  - covered by unique index=%s"
