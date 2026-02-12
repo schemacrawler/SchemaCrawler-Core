@@ -1,4 +1,4 @@
-package schemacrawler.ermodel.weakassociations;
+package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
 

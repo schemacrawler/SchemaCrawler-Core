@@ -6,10 +6,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.ermodel.weakassociations;
+package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.ermodel.weakassociations.WeakAssociationsUtility.normalizeColumnName;
+import static schemacrawler.ermodel.associations.WeakAssociationsUtility.normalizeColumnName;
 
 import java.util.function.Predicate;
 import java.util.logging.Level;
