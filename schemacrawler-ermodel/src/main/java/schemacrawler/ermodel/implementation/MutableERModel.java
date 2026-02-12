@@ -130,34 +130,11 @@ public class MutableERModel implements ERModel {
       return Optional.empty();
     }
     final NamedObjectKey key = table.key();
-    return relationshipsMap.values().stream()
-        .filter(relationship -> relationship.key().equals(key))
-        .findFirst();
-  }
-
-  @Override
-  public Optional<Relationship> lookupByBridgeTableName(final String tableName) {
-    return relationshipsMap.values().stream()
-        .filter(relationship -> relationship.getFullName().equals(tableName))
-        .findFirst();
-  }
-
-  @Override
-  public Optional<Relationship> lookupByTableReference(final TableReference tableRef) {
-    if (tableRef == null) {
-      return Optional.empty();
+    // Look up bridge table
+    if (relationshipsMap.containsKey(key)) {
+      return Optional.of(relationshipsMap.get(key));
     }
-    return Optional.ofNullable(relationshipsMap.get(tableRef.key()));
-  }
-
-  @Override
-  public Optional<Relationship> lookupByTableReferenceName(final String tableRefName) {
-    if (tableRefName == null) {
-      return Optional.empty();
-    }
-    return relationshipsMap.values().stream()
-        .filter(relationship -> relationship.getFullName().equals(tableRefName))
-        .findFirst();
+    return Optional.empty();
   }
 
   @Override
@@ -174,6 +151,31 @@ public class MutableERModel implements ERModel {
     }
     final NamedObjectKey key = table.key();
     return Optional.ofNullable(entitiesMap.get(key));
+  }
+
+  @Override
+  public Optional<Relationship> lookupRelationship(final String relationshipName) {
+    if (relationshipName == null) {
+      return Optional.empty();
+    }
+    return relationshipsMap.values().stream()
+        .filter(relationship -> relationship.getFullName().equals(relationshipName))
+        .findFirst();
+  }
+
+  @Override
+  public Optional<Relationship> lookupRelationship(final TableReference tableRef) {
+    if (tableRef == null) {
+      return Optional.empty();
+    }
+    final NamedObjectKey key = tableRef.key();
+    if (relationshipsMap.containsKey(key)) {
+      return Optional.of(relationshipsMap.get(key));
+    }
+    if (weakRelationshipsMap.containsKey(key)) {
+      return Optional.of(weakRelationshipsMap.get(key));
+    }
+    return Optional.empty();
   }
 
   void addEntity(final Entity entity) {

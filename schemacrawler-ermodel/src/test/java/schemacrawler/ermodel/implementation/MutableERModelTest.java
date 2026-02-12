@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.test.utility.crawl.LightTable;
 import schemacrawler.test.utility.crawl.LightTableReference;
@@ -109,7 +110,6 @@ public class MutableERModelTest {
     assertThat(
         model.getRelationshipsByType(RelationshipCardinality.many_many), containsInAnyOrder(rel));
     assertThat(model.lookupByBridgeTable(bridgeTable).get(), is(rel));
-    assertThat(model.lookupByBridgeTableName("BRIDGE").get(), is(rel));
   }
 
   @Test
@@ -123,14 +123,14 @@ public class MutableERModelTest {
 
     model.addRelationship(rel);
 
-    assertThat(model.lookupByTableReference(tableRef).isPresent(), is(true));
-    assertThat(model.lookupByTableReference(tableRef).get(), is(rel));
-    assertThat(model.lookupByTableReferenceName("FK_PK").isPresent(), is(true));
-    assertThat(model.lookupByTableReferenceName("FK_PK").get(), is(rel));
+    assertThat(model.lookupRelationship(tableRef).isPresent(), is(true));
+    assertThat(model.lookupRelationship(tableRef).get(), is(rel));
+    assertThat(model.lookupRelationship("FK_PK").isPresent(), is(true));
+    assertThat(model.lookupRelationship("FK_PK").get(), is(rel));
 
-    assertThat(model.lookupByTableReference(null).isPresent(), is(false));
-    assertThat(model.lookupByTableReferenceName(null).isPresent(), is(false));
-    assertThat(model.lookupByTableReferenceName("NONEXISTENT").isPresent(), is(false));
+    assertThat(model.lookupRelationship((String) null).isPresent(), is(false));
+    assertThat(model.lookupRelationship((TableReference) null).isPresent(), is(false));
+    assertThat(model.lookupRelationship("NONEXISTENT").isPresent(), is(false));
   }
 
   @Test
