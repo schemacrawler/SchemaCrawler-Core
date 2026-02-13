@@ -90,12 +90,12 @@ public class ERModelBuilder implements Builder<ERModel> {
       }
     }
 
-    final Collection<ImplicitColumnReference> weakReferences =
+    final Collection<ImplicitColumnReference> implicitReferences =
         implicitAssociationsAnalyzer.analyzeTables();
-    for (final ImplicitColumnReference weakReference : weakReferences) {
-      final ImplicitAssociation implicitAssociation = new ImplicitAssociation(weakReference);
+    for (final ImplicitColumnReference implicitReference : implicitReferences) {
+      final ImplicitAssociation implicitAssociation = new ImplicitAssociation(implicitReference);
       final MutableTableReferenceRelationship rel = createRelationship(implicitAssociation);
-      erModel.addWeakRelationship(rel);
+      erModel.addImplicitRelationship(rel);
     }
 
     return erModel;

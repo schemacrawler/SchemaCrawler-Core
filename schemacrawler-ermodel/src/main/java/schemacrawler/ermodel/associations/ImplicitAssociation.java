@@ -31,7 +31,7 @@ import schemacrawler.schema.TableConstraintType;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.CollectionsUtility;
 
-/** Represents a weak association between two tables. */
+/** Represents a implicit association between two tables. */
 public final class ImplicitAssociation implements TableReference {
 
   @Serial private static final long serialVersionUID = -246830743604473724L;

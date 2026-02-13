@@ -30,7 +30,7 @@ import us.fatehi.utility.string.StringFormat;
 
 /**
  * Derives normalized match keys by stripping common prefixes (based on a separator) and
- * singularizing the remaining token. These match keys are used by weak association inference to
+ * singularizing the remaining token. These match keys are used by implicit association inference to
  * relate tables and columns that share naming patterns across schemas.
  *
  * <p>The "signal-to-noise" balancing logic in {@code findPrefixes} ensures that only meaningful and

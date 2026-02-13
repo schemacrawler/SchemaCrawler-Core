@@ -16,7 +16,7 @@ import schemacrawler.schema.TableConstraintType;
 public class ImplicitAssociationTest {
 
   @Test
-  public void testWeakAssociation() {
+  public void testImplicitAssociation() {
     final Table fkTable = mock(Table.class);
     when(fkTable.getName()).thenReturn("FK_TABLE");
     final Table pkTable = mock(Table.class);

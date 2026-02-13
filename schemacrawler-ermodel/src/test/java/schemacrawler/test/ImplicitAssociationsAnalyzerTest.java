@@ -71,14 +71,14 @@ public class ImplicitAssociationsAnalyzerTest {
               .withExtensionTableMatcher();
 
       final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer = builder.build();
-      final Collection<ImplicitColumnReference> proposedWeakAssociations =
+      final Collection<ImplicitColumnReference> proposedAssociations =
           implicitAssociationsAnalyzer.analyzeTables();
       assertThat(
-          "Proposed weak association count does not match",
-          proposedWeakAssociations.size(),
+          "Proposed implicit association count does not match",
+          proposedAssociations.size(),
           greaterThan(0));
-      for (final ColumnReference proposedWeakAssociation : proposedWeakAssociations) {
-        out.println("implicit association: %s".formatted(proposedWeakAssociation));
+      for (final ColumnReference proposedAssociation : proposedAssociations) {
+        out.println("implicit association: %s".formatted(proposedAssociation));
       }
     }
 

@@ -18,7 +18,7 @@ import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 
 /**
- * Weak association between a foreign-key-like column and a primary key column.
+ * Implicit association between a foreign-key-like column and a primary key column.
  *
  * <p>Validation rejects:
  *

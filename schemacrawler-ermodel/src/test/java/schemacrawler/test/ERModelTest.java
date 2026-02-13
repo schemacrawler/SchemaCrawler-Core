@@ -146,11 +146,11 @@ public class ERModelTest {
   }
 
   @Test
-  public void weakRelationships(final TestContext testContext) {
+  public void implicitRelationships(final TestContext testContext) {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
-      out.println("# Weak relationships:");
-      for (final Relationship relationship : erModel.getWeakRelationships()) {
+      out.println("# Implicit relationships:");
+      for (final Relationship relationship : erModel.getImplicitRelationships()) {
         out.println("- %s [%s]".formatted(relationship, relationship.getType().description()));
         out.println("  - left: %s".formatted(relationship.getLeftEntity()));
         out.println("  - right: %s".formatted(relationship.getRightEntity()));

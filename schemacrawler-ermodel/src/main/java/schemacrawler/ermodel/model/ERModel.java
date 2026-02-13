@@ -33,6 +33,13 @@ public interface ERModel extends Serializable {
   Collection<Entity> getEntitiesByType(EntityType entityType);
 
   /**
+   * Gets implicit relationships inferred from the catalog.
+   *
+   * @return All implicit relationships
+   */
+  Collection<Relationship> getImplicitRelationships();
+
+  /**
    * Gets all modeled relationships.
    *
    * @return All modeled relationships
@@ -70,13 +77,6 @@ public interface ERModel extends Serializable {
   Collection<Table> getUnmodeledTables();
 
   /**
-   * Gets weak relationships inferred from the catalog.
-   *
-   * @return All weak relationships
-   */
-  Collection<Relationship> getWeakRelationships();
-
-  /**
    * Look up a relationship by its bridge table.
    *
    * @param table Bridge table
@@ -102,7 +102,7 @@ public interface ERModel extends Serializable {
 
   /**
    * Look up a relationship by its full name. This may be the same as the full name of a bridge
-   * table, a foreign key, or a weak relationship.
+   * table, a foreign key, or an implicit relationship.
    *
    * @param relationshipName Full relationship name
    * @return Relationship, if found

@@ -38,13 +38,13 @@ public class MutableERModel implements ERModel {
   private final Map<NamedObjectKey, Table> tablesMap;
   private final Map<NamedObjectKey, Entity> entitiesMap;
   private final Map<NamedObjectKey, Relationship> relationshipsMap;
-  private final Map<NamedObjectKey, Relationship> weakRelationshipsMap;
+  private final Map<NamedObjectKey, Relationship> implicitRelationshipsMap;
 
   public MutableERModel() {
     tablesMap = new HashMap<>();
     entitiesMap = new HashMap<>();
     relationshipsMap = new HashMap<>();
-    weakRelationshipsMap = new HashMap<>();
+    implicitRelationshipsMap = new HashMap<>();
   }
 
   @Override
@@ -66,6 +66,11 @@ public class MutableERModel implements ERModel {
             .filter(entity -> entity.getType().equals(entityType))
             .sorted()
             .toList());
+  }
+
+  @Override
+  public Collection<Relationship> getImplicitRelationships() {
+    return List.copyOf(implicitRelationshipsMap.values().stream().sorted().toList());
   }
 
   @Override
@@ -120,11 +125,6 @@ public class MutableERModel implements ERModel {
   }
 
   @Override
-  public Collection<Relationship> getWeakRelationships() {
-    return List.copyOf(weakRelationshipsMap.values().stream().sorted().toList());
-  }
-
-  @Override
   public Optional<Relationship> lookupByBridgeTable(final Table table) {
     if (table == null) {
       return Optional.empty();
@@ -172,8 +172,8 @@ public class MutableERModel implements ERModel {
     if (relationshipsMap.containsKey(key)) {
       return Optional.of(relationshipsMap.get(key));
     }
-    if (weakRelationshipsMap.containsKey(key)) {
-      return Optional.of(weakRelationshipsMap.get(key));
+    if (implicitRelationshipsMap.containsKey(key)) {
+      return Optional.of(implicitRelationshipsMap.get(key));
     }
     return Optional.empty();
   }
@@ -181,6 +181,12 @@ public class MutableERModel implements ERModel {
   void addEntity(final Entity entity) {
     if (entity != null) {
       entitiesMap.put(entity.key(), entity);
+    }
+  }
+
+  void addImplicitRelationship(final Relationship relationship) {
+    if (relationship != null) {
+      implicitRelationshipsMap.put(relationship.key(), relationship);
     }
   }
 
@@ -193,12 +199,6 @@ public class MutableERModel implements ERModel {
   void addTable(final Table table) {
     if (table != null) {
       tablesMap.put(table.key(), table);
-    }
-  }
-
-  void addWeakRelationship(final Relationship relationship) {
-    if (relationship != null) {
-      weakRelationshipsMap.put(relationship.key(), relationship);
     }
   }
 

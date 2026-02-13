@@ -21,7 +21,7 @@ import schemacrawler.schema.TableConstraintColumn;
 public class ImplicitAssociationsAnalyzerFkTest {
 
   @Test
-  public void weakAssociationAddedIfFkDoesNotExist() {
+  public void implicitAssociationAddedIfFkDoesNotExist() {
     // Table A (orders) with primary key "id"
     final Table tableA = mockTable("orders");
     final Column pkColumn = mockColumn(tableA, "id", true, false);
@@ -39,14 +39,14 @@ public class ImplicitAssociationsAnalyzerFkTest {
         new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<ImplicitColumnReference> weakAssociations = analyzer.analyzeTables();
+    final Collection<ImplicitColumnReference> implicitAssociations = analyzer.analyzeTables();
 
     // Verify
-    assertThat("Should have one weak association", weakAssociations, hasSize(1));
+    assertThat("Should have one implicit association", implicitAssociations, hasSize(1));
   }
 
   @Test
-  public void weakAssociationNotAddedIfFkExists() {
+  public void implicitAssociationNotAddedIfFkExists() {
     // Table A (orders) with primary key "id"
     final Table tableA = mockTable("orders");
     final Column pkColumn = mockColumn(tableA, "id", true, false);
@@ -72,11 +72,13 @@ public class ImplicitAssociationsAnalyzerFkTest {
         new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<ImplicitColumnReference> weakAssociations = analyzer.analyzeTables();
+    final Collection<ImplicitColumnReference> implicitAssociations = analyzer.analyzeTables();
 
     // Verify
     assertThat(
-        "Should not have weak associations because a real FK exists", weakAssociations, empty());
+        "Should not have implicit associations because a real FK exists",
+        implicitAssociations,
+        empty());
   }
 
   private Column mockColumn(

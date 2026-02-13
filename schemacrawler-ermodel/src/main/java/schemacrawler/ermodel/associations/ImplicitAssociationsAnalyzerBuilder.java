@@ -29,25 +29,26 @@ public class ImplicitAssociationsAnalyzerBuilder implements Builder<ImplicitAsso
   }
 
   private final TableMatchKeys tableMatchKeys;
-  private Predicate<ColumnReference> weakAssociationsRule;
+  private Predicate<ColumnReference> implicitAssociationsRule;
 
   private ImplicitAssociationsAnalyzerBuilder(final List<Table> allTables) {
     tableMatchKeys = new TableMatchKeys(allTables);
-    weakAssociationsRule = colRef -> false;
+    implicitAssociationsRule = colRef -> false;
   }
 
   @Override
   public ImplicitAssociationsAnalyzer build() {
-    return new ImplicitAssociationsAnalyzer(tableMatchKeys, weakAssociationsRule);
+    return new ImplicitAssociationsAnalyzer(tableMatchKeys, implicitAssociationsRule);
   }
 
   public ImplicitAssociationsAnalyzerBuilder withExtensionTableMatcher() {
-    weakAssociationsRule = weakAssociationsRule.or(new ExtensionTableMatcher(tableMatchKeys));
+    implicitAssociationsRule =
+        implicitAssociationsRule.or(new ExtensionTableMatcher(tableMatchKeys));
     return this;
   }
 
   public ImplicitAssociationsAnalyzerBuilder withIdMatcher() {
-    weakAssociationsRule = weakAssociationsRule.or(new IdMatcher());
+    implicitAssociationsRule = implicitAssociationsRule.or(new IdMatcher());
     return this;
   }
 }

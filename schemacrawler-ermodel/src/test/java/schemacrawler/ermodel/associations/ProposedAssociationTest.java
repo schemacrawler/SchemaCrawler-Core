@@ -19,7 +19,7 @@ import schemacrawler.test.utility.crawl.LightTable;
 public class ProposedAssociationTest {
 
   @Test
-  public void proposedWeakAssociation() {
+  public void proposedImplicitAssociation() {
 
     final LightTable table1 = new LightTable("Table1");
     final Column col1 = table1.addColumn("Id");
@@ -29,14 +29,14 @@ public class ProposedAssociationTest {
     assertThrows(NullPointerException.class, () -> new ImplicitColumnReference(col1, null));
     assertThrows(NullPointerException.class, () -> new ImplicitColumnReference(null, null));
 
-    final ImplicitColumnReference proposedWeakAssociation = new ImplicitColumnReference(col1, col2);
-    assertThat(proposedWeakAssociation.compareTo(null), is(-1));
-    assertThat(proposedWeakAssociation.getKeySequence(), is(1));
+    final ImplicitColumnReference proposedAssociation = new ImplicitColumnReference(col1, col2);
+    assertThat(proposedAssociation.compareTo(null), is(-1));
+    assertThat(proposedAssociation.getKeySequence(), is(1));
 
-    assertThat(proposedWeakAssociation.getPrimaryKeyColumn(), is(col2));
-    assertThat(proposedWeakAssociation.getForeignKeyColumn(), is(col1));
-    assertThat(proposedWeakAssociation.toString(), is("Table1.Id ~~> Table1.ColA"));
-    assertThat(proposedWeakAssociation.isValid(), is(true));
+    assertThat(proposedAssociation.getPrimaryKeyColumn(), is(col2));
+    assertThat(proposedAssociation.getForeignKeyColumn(), is(col1));
+    assertThat(proposedAssociation.toString(), is("Table1.Id ~~> Table1.ColA"));
+    assertThat(proposedAssociation.isValid(), is(true));
 
     assertThat(new ImplicitColumnReference(col1, col1).isValid(), is(false));
   }

@@ -19,7 +19,7 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 
 /**
- * Matches weak associations using naming conventions where a foreign key column identifies its
+ * Matches implicit associations using naming conventions where a foreign key column identifies its
  * parent table by name and an {@code id} suffix.
  *
  * <p>This matcher implements several heuristics to ensure high-confidence matches in real-world
@@ -33,9 +33,9 @@ import schemacrawler.schema.ColumnReference;
  *       database, this rule excludes primary keys named simply {@code id}, {@code key}, or {@code
  *       keyid} unless the foreign key name specifically includes the parent table's name.
  *   <li><b>Sub-entity Filtering:</b> Prevents misidentifying primary key columns in extension or
- *       sub-entity tables as weak associations to a parent. If a column is part of its own table's
- *       primary key and shares the exact name of a potential parent's primary key, it is excluded
- *       to avoid circular or incorrect 1-to-1 mappings that are better handled by specific
+ *       sub-entity tables as implicit associations to a parent. If a column is part of its own
+ *       table's primary key and shares the exact name of a potential parent's primary key, it is
+ *       excluded to avoid circular or incorrect 1-to-1 mappings that are better handled by specific
  *       extension table rules.
  * </ul>
  *
@@ -47,13 +47,13 @@ final class IdMatcher implements Predicate<ColumnReference> {
   private static final Logger LOGGER = Logger.getLogger(IdMatcher.class.getName());
 
   @Override
-  public boolean test(final ColumnReference proposedWeakAssociation) {
-    if (proposedWeakAssociation == null) {
+  public boolean test(final ColumnReference proposedAssociation) {
+    if (proposedAssociation == null) {
       return false;
     }
 
-    final Column fkColumn = proposedWeakAssociation.getForeignKeyColumn();
-    final Column pkColumn = proposedWeakAssociation.getPrimaryKeyColumn();
+    final Column fkColumn = proposedAssociation.getForeignKeyColumn();
+    final Column pkColumn = proposedAssociation.getPrimaryKeyColumn();
 
     final String pkColumnName = normalizeColumnName(pkColumn);
     final String fkColumnName = normalizeColumnName(fkColumn);
@@ -79,8 +79,8 @@ final class IdMatcher implements Predicate<ColumnReference> {
     if (matches && LOGGER.isLoggable(Level.FINER)) {
       LOGGER.log(
           Level.FINER,
-          "Weak association rule matched: IdMatcher for proposed association {0}",
-          proposedWeakAssociation);
+          "Implicit association rule matched: IdMatcher for proposed association {0}",
+          proposedAssociation);
     }
     return matches;
   }
