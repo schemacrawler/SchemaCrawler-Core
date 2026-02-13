@@ -21,7 +21,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn(pkTable, "id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(false));
+    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(false));
   }
 
   @Test
@@ -33,7 +33,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn(pkTable, "order", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(false));
+    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(false));
   }
 
   @Test
@@ -48,7 +48,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn(pkTable, "order_id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(false));
+    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(false));
   }
 
   @Test
@@ -60,7 +60,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn(pkTable, "id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
+    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(true));
   }
 
   @Test
@@ -72,7 +72,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn(pkTable, "order_id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
+    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(true));
   }
 
   @Test
@@ -84,7 +84,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn(pkTable, "id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
+    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(true));
   }
 
   @Test
@@ -96,7 +96,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn(pkTable, "order_id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new WeakColumnReference(fkColumn, pkColumn)), is(true));
+    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(true));
   }
 
   private Column mockColumn(final Table parent, final String name, final boolean partOfPrimaryKey) {

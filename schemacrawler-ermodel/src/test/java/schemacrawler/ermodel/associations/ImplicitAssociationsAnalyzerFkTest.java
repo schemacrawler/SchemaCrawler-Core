@@ -18,7 +18,7 @@ import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 
-public class WeakAssociationsAnalyzerFkTest {
+public class ImplicitAssociationsAnalyzerFkTest {
 
   @Test
   public void weakAssociationAddedIfFkDoesNotExist() {
@@ -35,11 +35,11 @@ public class WeakAssociationsAnalyzerFkTest {
     // Analyzer setup
     final List<Table> tables = List.of(tableA, tableB);
     final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
-    final WeakAssociationsAnalyzer analyzer =
-        new WeakAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
+    final ImplicitAssociationsAnalyzer analyzer =
+        new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<WeakColumnReference> weakAssociations = analyzer.analyzeTables();
+    final Collection<ImplicitColumnReference> weakAssociations = analyzer.analyzeTables();
 
     // Verify
     assertThat("Should have one weak association", weakAssociations, hasSize(1));
@@ -68,11 +68,11 @@ public class WeakAssociationsAnalyzerFkTest {
     // Analyzer setup
     final List<Table> tables = List.of(tableA, tableB);
     final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
-    final WeakAssociationsAnalyzer analyzer =
-        new WeakAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
+    final ImplicitAssociationsAnalyzer analyzer =
+        new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<WeakColumnReference> weakAssociations = analyzer.analyzeTables();
+    final Collection<ImplicitColumnReference> weakAssociations = analyzer.analyzeTables();
 
     // Verify
     assertThat(

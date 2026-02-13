@@ -9,7 +9,7 @@
 package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.ermodel.associations.WeakAssociationsUtility.ID_PATTERN;
+import static schemacrawler.ermodel.associations.ImplicitAssociationsUtility.ID_PATTERN;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.util.List;

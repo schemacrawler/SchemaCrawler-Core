@@ -16,10 +16,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import schemacrawler.ermodel.associations.WeakAssociation;
-import schemacrawler.ermodel.associations.WeakAssociationsAnalyzer;
-import schemacrawler.ermodel.associations.WeakAssociationsAnalyzerBuilder;
-import schemacrawler.ermodel.associations.WeakColumnReference;
+import schemacrawler.ermodel.associations.ImplicitAssociation;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
@@ -36,7 +36,7 @@ public class ERModelBuilder implements Builder<ERModel> {
   final MutableERModel erModel;
   final Map<NamedObjectKey, TableEntityModelInferrer> inferrerMap;
   final Map<NamedObjectKey, MutableEntity> entityMap;
-  final WeakAssociationsAnalyzer weakAssociationsAnalyzer;
+  final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer;
 
   public ERModelBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
@@ -47,8 +47,8 @@ public class ERModelBuilder implements Builder<ERModel> {
 
     erModel = new MutableERModel();
 
-    weakAssociationsAnalyzer =
-        WeakAssociationsAnalyzerBuilder.builder(catalog.getTables())
+    implicitAssociationsAnalyzer =
+        ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
             .withIdMatcher()
             .withExtensionTableMatcher()
             .build();
@@ -90,10 +90,11 @@ public class ERModelBuilder implements Builder<ERModel> {
       }
     }
 
-    final Collection<WeakColumnReference> weakReferences = weakAssociationsAnalyzer.analyzeTables();
-    for (final WeakColumnReference weakReference : weakReferences) {
-      final WeakAssociation weakAssociation = new WeakAssociation(weakReference);
-      final MutableTableReferenceRelationship rel = createRelationship(weakAssociation);
+    final Collection<ImplicitColumnReference> weakReferences =
+        implicitAssociationsAnalyzer.analyzeTables();
+    for (final ImplicitColumnReference weakReference : weakReferences) {
+      final ImplicitAssociation implicitAssociation = new ImplicitAssociation(weakReference);
+      final MutableTableReferenceRelationship rel = createRelationship(implicitAssociation);
       erModel.addWeakRelationship(rel);
     }
 

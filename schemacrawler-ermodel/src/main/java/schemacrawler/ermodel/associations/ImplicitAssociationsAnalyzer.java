@@ -36,27 +36,28 @@ import us.fatehi.utility.string.StringFormat;
  *   <li>Validate proposed pairs and apply configured match rules.
  * </ol>
  */
-public final class WeakAssociationsAnalyzer {
+public final class ImplicitAssociationsAnalyzer {
 
-  private static final Logger LOGGER = Logger.getLogger(WeakAssociationsAnalyzer.class.getName());
+  private static final Logger LOGGER =
+      Logger.getLogger(ImplicitAssociationsAnalyzer.class.getName());
 
   private final TableMatchKeys tableMatchKeys;
   private final Predicate<ColumnReference> weakAssociationRule;
 
-  public WeakAssociationsAnalyzer(
+  public ImplicitAssociationsAnalyzer(
       final TableMatchKeys matchKeys, final Predicate<ColumnReference> weakAssociationRule) {
     tableMatchKeys = requireNonNull(matchKeys, "No table match keys provided");
     this.weakAssociationRule = requireNonNull(weakAssociationRule, "No rules provided");
   }
 
-  public Collection<WeakColumnReference> analyzeTables() {
+  public Collection<ImplicitColumnReference> analyzeTables() {
     if (tableMatchKeys.getTables().size() < 2) {
       return Collections.emptySet();
     }
 
     LOGGER.log(Level.INFO, "Finding weak associations");
 
-    final List<WeakColumnReference> weakAssociations = new ArrayList<>();
+    final List<ImplicitColumnReference> weakAssociations = new ArrayList<>();
 
     final List<Table> tables = tableMatchKeys.getTables();
     final ColumnMatchKeys columnMatchKeys = new ColumnMatchKeys(tables);
@@ -90,8 +91,8 @@ public final class WeakAssociationsAnalyzer {
           if (fkColumn.isPartOfForeignKey()) {
             continue;
           }
-          final WeakColumnReference proposedWeakAssociation =
-              new WeakColumnReference(fkColumn, pkColumn);
+          final ImplicitColumnReference proposedWeakAssociation =
+              new ImplicitColumnReference(fkColumn, pkColumn);
           if (proposedWeakAssociation.isValid()
               && weakAssociationRule.test(proposedWeakAssociation)) {
             LOGGER.log(

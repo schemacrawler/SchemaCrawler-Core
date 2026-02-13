@@ -8,8 +8,8 @@
 
 package schemacrawler.ermodel.associations;
 
-import static schemacrawler.ermodel.associations.WeakAssociationsUtility.normalizeColumnName;
-import static schemacrawler.ermodel.associations.WeakAssociationsUtility.removeId;
+import static schemacrawler.ermodel.associations.ImplicitAssociationsUtility.normalizeColumnName;
+import static schemacrawler.ermodel.associations.ImplicitAssociationsUtility.removeId;
 
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -63,7 +63,7 @@ final class IdMatcher implements Predicate<ColumnReference> {
 
     final boolean fkIsPartOfPk = fkColumn.isPartOfPrimaryKey();
 
-    final Matcher pkMatcher1 = WeakAssociationsUtility.ID_PATTERN.matcher(pkColumnName);
+    final Matcher pkMatcher1 = ImplicitAssociationsUtility.ID_PATTERN.matcher(pkColumnName);
     final boolean pkColNameHasId = pkMatcher1.find();
     // Check that the primary key column has a prefix, so that it is not equal to
     // something like simply "ID"

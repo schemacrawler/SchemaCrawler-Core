@@ -13,9 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.WeakAssociationBuilder;
 import schemacrawler.crawl.WeakAssociationBuilder.WeakAssociationColumn;
-import schemacrawler.ermodel.associations.WeakAssociationsAnalyzer;
-import schemacrawler.ermodel.associations.WeakAssociationsAnalyzerBuilder;
-import schemacrawler.ermodel.associations.WeakColumnReference;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
@@ -103,15 +103,15 @@ public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
   private void findWeakAssociations(final boolean inferExtensionTables) {
 
     final Catalog catalog = getCatalog();
-    final WeakAssociationsAnalyzerBuilder analyzerBuilder =
-        WeakAssociationsAnalyzerBuilder.builder(catalog.getTables()).withIdMatcher();
+    final ImplicitAssociationsAnalyzerBuilder analyzerBuilder =
+        ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables()).withIdMatcher();
     if (inferExtensionTables) {
       analyzerBuilder.withExtensionTableMatcher();
     }
 
-    final WeakAssociationsAnalyzer weakAssociationsAnalyzer = analyzerBuilder.build();
-    final Collection<WeakColumnReference> weakAssociations =
-        weakAssociationsAnalyzer.analyzeTables();
+    final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer = analyzerBuilder.build();
+    final Collection<ImplicitColumnReference> weakAssociations =
+        implicitAssociationsAnalyzer.analyzeTables();
 
     for (final ColumnReference weakAssociation : weakAssociations) {
       LOGGER.log(Level.INFO, new StringFormat("Adding weak association <%s> ", weakAssociation));

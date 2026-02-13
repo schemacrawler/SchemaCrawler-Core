@@ -9,7 +9,7 @@
 package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.ermodel.associations.WeakAssociationsUtility.normalizeColumnName;
+import static schemacrawler.ermodel.associations.ImplicitAssociationsUtility.normalizeColumnName;
 
 import java.util.function.Predicate;
 import java.util.logging.Level;

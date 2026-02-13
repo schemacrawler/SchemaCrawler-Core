@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Column;
 import schemacrawler.test.utility.crawl.LightTable;
 
-public class ProposedWeakAssociationTest {
+public class ProposedAssociationTest {
 
   @Test
   public void proposedWeakAssociation() {
@@ -25,11 +25,11 @@ public class ProposedWeakAssociationTest {
     final Column col1 = table1.addColumn("Id");
     final Column col2 = table1.addColumn("ColA");
 
-    assertThrows(NullPointerException.class, () -> new WeakColumnReference(null, col2));
-    assertThrows(NullPointerException.class, () -> new WeakColumnReference(col1, null));
-    assertThrows(NullPointerException.class, () -> new WeakColumnReference(null, null));
+    assertThrows(NullPointerException.class, () -> new ImplicitColumnReference(null, col2));
+    assertThrows(NullPointerException.class, () -> new ImplicitColumnReference(col1, null));
+    assertThrows(NullPointerException.class, () -> new ImplicitColumnReference(null, null));
 
-    final WeakColumnReference proposedWeakAssociation = new WeakColumnReference(col1, col2);
+    final ImplicitColumnReference proposedWeakAssociation = new ImplicitColumnReference(col1, col2);
     assertThat(proposedWeakAssociation.compareTo(null), is(-1));
     assertThat(proposedWeakAssociation.getKeySequence(), is(1));
 
@@ -38,6 +38,6 @@ public class ProposedWeakAssociationTest {
     assertThat(proposedWeakAssociation.toString(), is("Table1.Id ~~> Table1.ColA"));
     assertThat(proposedWeakAssociation.isValid(), is(true));
 
-    assertThat(new WeakColumnReference(col1, col1).isValid(), is(false));
+    assertThat(new ImplicitColumnReference(col1, col1).isValid(), is(false));
   }
 }

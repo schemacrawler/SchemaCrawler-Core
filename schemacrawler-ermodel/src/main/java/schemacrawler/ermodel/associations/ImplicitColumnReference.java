@@ -28,14 +28,14 @@ import schemacrawler.schema.ColumnReference;
  *   <li>Pairs with non-matching standard data types.
  * </ul>
  */
-public final class WeakColumnReference implements ColumnReference {
+public final class ImplicitColumnReference implements ColumnReference {
 
   @Serial private static final long serialVersionUID = 2986663326992262188L;
 
   private final Column foreignKeyColumn;
   private final Column primaryKeyColumn;
 
-  public WeakColumnReference(final Column foreignKeyColumn, final Column primaryKeyColumn) {
+  public ImplicitColumnReference(final Column foreignKeyColumn, final Column primaryKeyColumn) {
     this.foreignKeyColumn = requireNonNull(foreignKeyColumn, "No foreign key column provided");
     this.primaryKeyColumn = requireNonNull(primaryKeyColumn, "No primary key column provided");
   }

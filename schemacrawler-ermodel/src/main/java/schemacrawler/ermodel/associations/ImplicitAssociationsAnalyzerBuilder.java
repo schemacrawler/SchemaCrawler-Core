@@ -19,34 +19,34 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.Builder;
 
-public class WeakAssociationsAnalyzerBuilder implements Builder<WeakAssociationsAnalyzer> {
+public class ImplicitAssociationsAnalyzerBuilder implements Builder<ImplicitAssociationsAnalyzer> {
 
-  public static WeakAssociationsAnalyzerBuilder builder(final Collection<Table> allTables) {
+  public static ImplicitAssociationsAnalyzerBuilder builder(final Collection<Table> allTables) {
     requireNonNull(allTables, "No tables provided");
     final List<Table> tables = new ArrayList<>(allTables);
     Collections.sort(tables);
-    return new WeakAssociationsAnalyzerBuilder(List.copyOf(tables));
+    return new ImplicitAssociationsAnalyzerBuilder(List.copyOf(tables));
   }
 
   private final TableMatchKeys tableMatchKeys;
   private Predicate<ColumnReference> weakAssociationsRule;
 
-  private WeakAssociationsAnalyzerBuilder(final List<Table> allTables) {
+  private ImplicitAssociationsAnalyzerBuilder(final List<Table> allTables) {
     tableMatchKeys = new TableMatchKeys(allTables);
     weakAssociationsRule = colRef -> false;
   }
 
   @Override
-  public WeakAssociationsAnalyzer build() {
-    return new WeakAssociationsAnalyzer(tableMatchKeys, weakAssociationsRule);
+  public ImplicitAssociationsAnalyzer build() {
+    return new ImplicitAssociationsAnalyzer(tableMatchKeys, weakAssociationsRule);
   }
 
-  public WeakAssociationsAnalyzerBuilder withExtensionTableMatcher() {
+  public ImplicitAssociationsAnalyzerBuilder withExtensionTableMatcher() {
     weakAssociationsRule = weakAssociationsRule.or(new ExtensionTableMatcher(tableMatchKeys));
     return this;
   }
 
-  public WeakAssociationsAnalyzerBuilder withIdMatcher() {
+  public ImplicitAssociationsAnalyzerBuilder withIdMatcher() {
     weakAssociationsRule = weakAssociationsRule.or(new IdMatcher());
     return this;
   }

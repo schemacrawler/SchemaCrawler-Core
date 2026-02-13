@@ -32,7 +32,7 @@ import schemacrawler.schema.TableReference;
 import us.fatehi.utility.CollectionsUtility;
 
 /** Represents a weak association between two tables. */
-public final class WeakAssociation implements TableReference {
+public final class ImplicitAssociation implements TableReference {
 
   @Serial private static final long serialVersionUID = -246830743604473724L;
 
@@ -45,14 +45,14 @@ public final class WeakAssociation implements TableReference {
 
   private final Table fkTable;
   private final Table pkTable;
-  private final WeakColumnReference columnReference;
+  private final ImplicitColumnReference columnReference;
   private final TableConstraintColumn tableConstraintColumn;
   private final boolean isSelfReferencing;
   private final boolean isOptional;
 
   private final Map<String, Object> attributeMap;
 
-  public WeakAssociation(final WeakColumnReference columnReference) {
+  public ImplicitAssociation(final ImplicitColumnReference columnReference) {
     this.columnReference = requireNonNull(columnReference, "No column reference provided");
     final Column fkColumn = columnReference.getForeignKeyColumn();
 
