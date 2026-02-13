@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntitySubtype;
@@ -27,6 +29,7 @@ import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
+import us.fatehi.utility.Multimap;
 
 public class MutableERModel implements ERModel {
 
@@ -39,12 +42,16 @@ public class MutableERModel implements ERModel {
   private final Map<NamedObjectKey, Entity> entitiesMap;
   private final Map<NamedObjectKey, Relationship> relationshipsMap;
   private final Map<NamedObjectKey, Relationship> implicitRelationshipsMap;
+  private final Multimap<NamedObjectKey, Relationship> erMap;
+  private final Multimap<NamedObjectKey, Relationship> erImplicitMap;
 
   public MutableERModel() {
     tablesMap = new HashMap<>();
     entitiesMap = new HashMap<>();
     relationshipsMap = new HashMap<>();
     implicitRelationshipsMap = new HashMap<>();
+    erMap = new Multimap<>();
+    erImplicitMap = new Multimap<>();
   }
 
   @Override
@@ -74,8 +81,32 @@ public class MutableERModel implements ERModel {
   }
 
   @Override
+  public Collection<Relationship> getImplicitRelationshipsByEntity(final Entity entity) {
+    if (entity == null) {
+      return Collections.emptySet();
+    }
+    if (erImplicitMap.containsKey(entity.key())) {
+      final Set<Relationship> relationships = new TreeSet<>(erImplicitMap.get(entity.key()));
+      return List.copyOf(relationships);
+    }
+    return Collections.emptySet();
+  }
+
+  @Override
   public Collection<Relationship> getRelationships() {
     return List.copyOf(relationshipsMap.values().stream().sorted().toList());
+  }
+
+  @Override
+  public Collection<Relationship> getRelationshipsByEntity(final Entity entity) {
+    if (entity == null) {
+      return Collections.emptySet();
+    }
+    if (erMap.containsKey(entity.key())) {
+      final Set<Relationship> relationships = new TreeSet<>(erMap.get(entity.key()));
+      return List.copyOf(relationships);
+    }
+    return Collections.emptySet();
   }
 
   @Override
@@ -187,12 +218,24 @@ public class MutableERModel implements ERModel {
   void addImplicitRelationship(final Relationship relationship) {
     if (relationship != null) {
       implicitRelationshipsMap.put(relationship.key(), relationship);
+      if (relationship.getLeftEntity() != null) {
+        erImplicitMap.add(relationship.getLeftEntity().key(), relationship);
+      }
+      if (relationship.getRightEntity() != null) {
+        erImplicitMap.add(relationship.getRightEntity().key(), relationship);
+      }
     }
   }
 
   void addRelationship(final Relationship relationship) {
     if (relationship != null) {
       relationshipsMap.put(relationship.key(), relationship);
+      if (relationship.getLeftEntity() != null) {
+        erMap.add(relationship.getLeftEntity().key(), relationship);
+      }
+      if (relationship.getRightEntity() != null) {
+        erMap.add(relationship.getRightEntity().key(), relationship);
+      }
     }
   }
 

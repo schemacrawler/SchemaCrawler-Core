@@ -40,11 +40,27 @@ public interface ERModel extends Serializable {
   Collection<Relationship> getImplicitRelationships();
 
   /**
+   * Gets implicit relationships for an entity.
+   *
+   * @param entity Entity
+   * @return Implicit relationships for an entity
+   */
+  Collection<Relationship> getImplicitRelationshipsByEntity(Entity entity);
+
+  /**
    * Gets all modeled relationships.
    *
    * @return All modeled relationships
    */
   Collection<Relationship> getRelationships();
+
+  /**
+   * Gets modeled relationships for an entity.
+   *
+   * @param entity Entity
+   * @return Modeled relationships for an entity
+   */
+  Collection<Relationship> getRelationshipsByEntity(Entity entity);
 
   /**
    * Gets modeled relationships of a given cardinality.

@@ -84,6 +84,39 @@ public class ERModelTest {
         hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
   }
 
+  @Test
+  public void implicitRelationships(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Implicit relationships:");
+      for (final Relationship relationship : erModel.getImplicitRelationships()) {
+        out.println("- %s [%s]".formatted(relationship, relationship.getType().description()));
+        out.println("  - left: %s".formatted(relationship.getLeftEntity()));
+        out.println("  - right: %s".formatted(relationship.getRightEntity()));
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
+  @Test
+  public void implicitRelationshipsByEntity(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Implicit relationships by Entity:");
+      for (final Entity entity : erModel.getEntities()) {
+        out.println("- %s [%s]".formatted(entity, entity.getType()));
+        for (final Relationship relationship : erModel.getImplicitRelationshipsByEntity(entity)) {
+          out.println("  - %s".formatted(relationship.getName()));
+        }
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
   @BeforeAll
   public void loadCatalog(final Connection connection) {
     final SchemaCrawlerOptions schemaCrawlerOptions =
@@ -132,12 +165,15 @@ public class ERModelTest {
   }
 
   @Test
-  public void unmodeled(final TestContext testContext) {
+  public void relationshipsByEntity(final TestContext testContext) {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
-      out.println("# Unmodeled tables:");
-      for (final Table table : erModel.getUnmodeledTables()) {
-        out.println("- %s".formatted(table));
+      out.println("# Relationships by Entity:");
+      for (final Entity entity : erModel.getEntities()) {
+        out.println("- %s [%s]".formatted(entity, entity.getType()));
+        for (final Relationship relationship : erModel.getRelationshipsByEntity(entity)) {
+          out.println("  - %s".formatted(relationship.getName()));
+        }
       }
     }
     assertThat(
@@ -146,14 +182,12 @@ public class ERModelTest {
   }
 
   @Test
-  public void implicitRelationships(final TestContext testContext) {
+  public void unmodeled(final TestContext testContext) {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
-      out.println("# Implicit relationships:");
-      for (final Relationship relationship : erModel.getImplicitRelationships()) {
-        out.println("- %s [%s]".formatted(relationship, relationship.getType().description()));
-        out.println("  - left: %s".formatted(relationship.getLeftEntity()));
-        out.println("  - right: %s".formatted(relationship.getRightEntity()));
+      out.println("# Unmodeled tables:");
+      for (final Table table : erModel.getUnmodeledTables()) {
+        out.println("- %s".formatted(table));
       }
     }
     assertThat(
