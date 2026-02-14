@@ -1,5 +1,6 @@
 minimum
 {
+  "buildERModel": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,

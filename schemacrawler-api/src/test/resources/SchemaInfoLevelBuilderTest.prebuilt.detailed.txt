@@ -1,5 +1,6 @@
 detailed
 {
+  "buildERModel": true,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,

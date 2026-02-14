@@ -4,33 +4,22 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.schema.Column;
-import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableConstraintType;
+import schemacrawler.test.utility.crawl.LightColumn;
+import schemacrawler.test.utility.crawl.LightTable;
 
 public class ImplicitAssociationTest {
 
   @Test
   public void testImplicitAssociation() {
-    final Table fkTable = mock(Table.class);
-    when(fkTable.getName()).thenReturn("FK_TABLE");
-    final Table pkTable = mock(Table.class);
-    when(pkTable.getName()).thenReturn("PK_TABLE");
+    final LightTable fkTable = new LightTable("FK_TABLE");
+    final LightTable pkTable = new LightTable("PK_TABLE");
 
-    final Column fkColumn = mock(Column.class);
-    when(fkColumn.getName()).thenReturn("FK_COL");
-    when(fkColumn.getFullName()).thenReturn("FK_COL");
-    when(fkColumn.getParent()).thenReturn(fkTable);
-
-    final Column pkColumn = mock(Column.class);
-    when(pkColumn.getName()).thenReturn("PK_COL");
-    when(pkColumn.getFullName()).thenReturn("PK_COL");
-    when(pkColumn.getParent()).thenReturn(pkTable);
+    final LightColumn fkColumn = fkTable.addColumn("FK_COL");
+    final LightColumn pkColumn = pkTable.addColumn("PK_COL");
 
     final ImplicitColumnReference columnRef = new ImplicitColumnReference(fkColumn, pkColumn);
     final ImplicitAssociation implicitAssociation = new ImplicitAssociation(columnRef);
