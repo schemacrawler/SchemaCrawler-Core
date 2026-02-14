@@ -1,14 +1,45 @@
 # Entities:
 - PUBLIC.BOOKS.AUTHORS [strong_entity]
+  - relationships
+    - relationship: BOOKAUTHORS
 - PUBLIC.BOOKS.BOOKS [strong_entity]
+  - relationships
+    - relationship: BOOKAUTHORS
+    - relationship: FK_PREVIOUSEDITION
+    - relationship: FK_SALES_BOOK
 - PUBLIC.BOOKS.COUPONS [strong_entity]
+  - relationships
 - PUBLIC.BOOKS.CUSTOMERDATA [weak_entity]
+  - relationships
+    - relationship: FK_CUSTOMER
 - PUBLIC.BOOKS.CUSTOMERS [strong_entity]
+  - relationships
+    - relationship: FK_CUSTOMER
 - PUBLIC.BOOKS."Celebrities" [strong_entity]
+  - relationships
+    - relationship: SYS_FK_10131
 - PUBLIC.BOOKS."Celebrity Updates" [subtype]
   - super-type: PUBLIC.BOOKS."Celebrities"
+  - relationships
+    - relationship: SYS_FK_10131
 - PUBLIC.BOOKS.PUBLISHERS [strong_entity]
+  - relationships
+    - relationship: FK_ΒΙΒΛΊΑ_PUBLISHERS
 - PUBLIC.BOOKS.ΒΙΒΛΊΑ [strong_entity]
+  - relationships
+    - relationship: FK_ΒΙΒΛΊΑ_PUBLISHERS
 - PUBLIC.FOR_LINT.PUBLICATIONS [strong_entity]
+  - relationships
+    - relationship: FK_PUBLICATION_JOIN
+    - relationship: FK_PUBLICATIONS_WRITER
+    - relationship: FK_PUBLICATION
+    - relationship: FK_WRITERS_PUBLICATION
 - PUBLIC.FOR_LINT.WRITERS [strong_entity]
+  - relationships
+    - relationship: FK_WRITER_JOIN
+    - relationship: FK_PUBLICATIONS_WRITER
+    - relationship: FK_WRITER
+    - relationship: FK_WRITERS_PUBLICATION
 - PUBLIC."PUBLISHER SALES".REGIONS [strong_entity]
+  - relationships
+    - relationship: FK_SALES_REGIONS

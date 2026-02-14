@@ -9,8 +9,13 @@
 package schemacrawler.ermodel.implementation;
 
 import java.io.Serial;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.schema.Table;
 
 /** Conceptual entity backed by a SchemaCrawler table. */
@@ -19,17 +24,30 @@ class MutableEntity extends AbstractTableBacked implements Entity {
   @Serial private static final long serialVersionUID = 3946422106166202467L;
 
   private EntityType entityType;
+  private final Set<Relationship> relationships;
 
   public MutableEntity(final Table table) {
     super(table);
     entityType = EntityType.unknown;
     // No checks for partial table - exceptions will be thrown while calling
     // unsupported methods
+    relationships = new TreeSet<>();
+  }
+
+  @Override
+  public Collection<Relationship> getRelationships() {
+    return List.copyOf(relationships);
   }
 
   @Override
   public EntityType getType() {
     return entityType;
+  }
+
+  void addRelationship(final Relationship relationship) {
+    if (relationship != null) {
+      relationships.add(relationship);
+    }
   }
 
   void setEntityType(final EntityType entityType) {

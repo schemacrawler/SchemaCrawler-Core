@@ -55,14 +55,6 @@ public interface ERModel extends Serializable {
   Collection<Relationship> getRelationships();
 
   /**
-   * Gets modeled relationships for an entity.
-   *
-   * @param entity Entity
-   * @return Modeled relationships for an entity
-   */
-  Collection<Relationship> getRelationshipsByEntity(Entity entity);
-
-  /**
    * Gets modeled relationships of a given cardinality.
    *
    * @param cardinality Relationship cardinality

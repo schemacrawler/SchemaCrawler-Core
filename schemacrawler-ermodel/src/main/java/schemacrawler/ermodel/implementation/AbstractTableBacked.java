@@ -21,7 +21,7 @@ public class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
 
   @Serial private static final long serialVersionUID = 7423406592008806690L;
 
-  private Collection<EntityAttribute> entityAttributes;
+  private final Collection<EntityAttribute> entityAttributes;
 
   public AbstractTableBacked(final Table table) {
     super(table);

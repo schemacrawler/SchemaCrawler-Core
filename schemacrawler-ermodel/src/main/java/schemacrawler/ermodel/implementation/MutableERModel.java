@@ -42,7 +42,6 @@ public class MutableERModel implements ERModel {
   private final Map<NamedObjectKey, Entity> entitiesMap;
   private final Map<NamedObjectKey, Relationship> relationshipsMap;
   private final Map<NamedObjectKey, Relationship> implicitRelationshipsMap;
-  private final Multimap<NamedObjectKey, Relationship> erMap;
   private final Multimap<NamedObjectKey, Relationship> erImplicitMap;
 
   public MutableERModel() {
@@ -50,7 +49,6 @@ public class MutableERModel implements ERModel {
     entitiesMap = new HashMap<>();
     relationshipsMap = new HashMap<>();
     implicitRelationshipsMap = new HashMap<>();
-    erMap = new Multimap<>();
     erImplicitMap = new Multimap<>();
   }
 
@@ -95,18 +93,6 @@ public class MutableERModel implements ERModel {
   @Override
   public Collection<Relationship> getRelationships() {
     return List.copyOf(relationshipsMap.values().stream().sorted().toList());
-  }
-
-  @Override
-  public Collection<Relationship> getRelationshipsByEntity(final Entity entity) {
-    if (entity == null) {
-      return Collections.emptySet();
-    }
-    if (erMap.containsKey(entity.key())) {
-      final Set<Relationship> relationships = new TreeSet<>(erMap.get(entity.key()));
-      return List.copyOf(relationships);
-    }
-    return Collections.emptySet();
   }
 
   @Override
@@ -228,14 +214,19 @@ public class MutableERModel implements ERModel {
   }
 
   void addRelationship(final Relationship relationship) {
-    if (relationship != null) {
-      relationshipsMap.put(relationship.key(), relationship);
-      if (relationship.getLeftEntity() != null) {
-        erMap.add(relationship.getLeftEntity().key(), relationship);
-      }
-      if (relationship.getRightEntity() != null) {
-        erMap.add(relationship.getRightEntity().key(), relationship);
-      }
+    if (relationship == null) {
+      return;
+    }
+
+    relationshipsMap.put(relationship.key(), relationship);
+    final MutableEntity leftEntity = (MutableEntity) relationship.getLeftEntity();
+    if (leftEntity != null) {
+      leftEntity.addRelationship(relationship);
+    }
+
+    final MutableEntity rightEntity = (MutableEntity) relationship.getRightEntity();
+    if (rightEntity != null) {
+      rightEntity.addRelationship(relationship);
     }
   }
 

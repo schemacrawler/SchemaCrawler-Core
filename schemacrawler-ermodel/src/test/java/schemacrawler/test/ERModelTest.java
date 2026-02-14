@@ -77,6 +77,10 @@ public class ERModelTest {
         if (entity instanceof final EntitySubtype subentity) {
           out.println("  - super-type: %s".formatted(subentity.getSupertype()));
         }
+        out.println("  - relationships");
+        for (Relationship relationship : entity.getRelationships()) {
+          out.println("    - relationship: %s".formatted(relationship.getName()));
+        }
       }
     }
     assertThat(
@@ -156,23 +160,6 @@ public class ERModelTest {
         out.println("  - right: %s".formatted(relationship.getRightEntity()));
         if (relationship instanceof final ManyToManyRelationship mnRel) {
           out.println("  - bridge: %s".formatted(mnRel.getBridgeTable()));
-        }
-      }
-    }
-    assertThat(
-        outputOf(testout),
-        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
-  }
-
-  @Test
-  public void relationshipsByEntity(final TestContext testContext) {
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
-      out.println("# Relationships by Entity:");
-      for (final Entity entity : erModel.getEntities()) {
-        out.println("- %s [%s]".formatted(entity, entity.getType()));
-        for (final Relationship relationship : erModel.getRelationshipsByEntity(entity)) {
-          out.println("  - %s".formatted(relationship.getName()));
         }
       }
     }
