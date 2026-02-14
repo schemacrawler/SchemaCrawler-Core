@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.ermodel.weakassociations;
+package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
 
@@ -25,7 +25,7 @@ import schemacrawler.schema.Table;
 import us.fatehi.utility.string.StringFormat;
 
 /**
- * Analyzes tables to infer weak associations using naming heuristics.
+ * Analyzes tables to infer implicit associations using naming heuristics.
  *
  * <p>Flow:
  *
@@ -36,27 +36,28 @@ import us.fatehi.utility.string.StringFormat;
  *   <li>Validate proposed pairs and apply configured match rules.
  * </ol>
  */
-public final class WeakAssociationsAnalyzer {
+public final class ImplicitAssociationsAnalyzer {
 
-  private static final Logger LOGGER = Logger.getLogger(WeakAssociationsAnalyzer.class.getName());
+  private static final Logger LOGGER =
+      Logger.getLogger(ImplicitAssociationsAnalyzer.class.getName());
 
   private final TableMatchKeys tableMatchKeys;
-  private final Predicate<ColumnReference> weakAssociationRule;
+  private final Predicate<ColumnReference> implicitAssociationRule;
 
-  public WeakAssociationsAnalyzer(
-      final TableMatchKeys matchKeys, final Predicate<ColumnReference> weakAssociationRule) {
+  public ImplicitAssociationsAnalyzer(
+      final TableMatchKeys matchKeys, final Predicate<ColumnReference> implicitAssociationRule) {
     tableMatchKeys = requireNonNull(matchKeys, "No table match keys provided");
-    this.weakAssociationRule = requireNonNull(weakAssociationRule, "No rules provided");
+    this.implicitAssociationRule = requireNonNull(implicitAssociationRule, "No rules provided");
   }
 
-  public Collection<WeakColumnReference> analyzeTables() {
+  public Collection<ImplicitColumnReference> analyzeTables() {
     if (tableMatchKeys.getTables().size() < 2) {
       return Collections.emptySet();
     }
 
-    LOGGER.log(Level.INFO, "Finding weak associations");
+    LOGGER.log(Level.INFO, "Finding implicit associations");
 
-    final List<WeakColumnReference> weakAssociations = new ArrayList<>();
+    final List<ImplicitColumnReference> implicitAssociations = new ArrayList<>();
 
     final List<Table> tables = tableMatchKeys.getTables();
     final ColumnMatchKeys columnMatchKeys = new ColumnMatchKeys(tables);
@@ -90,20 +91,19 @@ public final class WeakAssociationsAnalyzer {
           if (fkColumn.isPartOfForeignKey()) {
             continue;
           }
-          final WeakColumnReference proposedWeakAssociation =
-              new WeakColumnReference(fkColumn, pkColumn);
-          if (proposedWeakAssociation.isValid()
-              && weakAssociationRule.test(proposedWeakAssociation)) {
+          final ImplicitColumnReference proposedAssociation =
+              new ImplicitColumnReference(fkColumn, pkColumn);
+          if (proposedAssociation.isValid() && implicitAssociationRule.test(proposedAssociation)) {
             LOGGER.log(
                 Level.FINE,
-                new StringFormat("Found weak association <%s>", proposedWeakAssociation));
-            weakAssociations.add(proposedWeakAssociation);
+                new StringFormat("Found implicit association <%s>", proposedAssociation));
+            implicitAssociations.add(proposedAssociation);
           }
         }
       }
     }
 
-    Collections.sort(weakAssociations);
-    return weakAssociations;
+    Collections.sort(implicitAssociations);
+    return implicitAssociations;
   }
 }

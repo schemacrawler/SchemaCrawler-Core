@@ -1,4 +1,4 @@
-# Weak relationships:
+# Implicit relationships:
 - PUBLIC.BOOKS.BOOKS.SCHCRWLR_3413FBAA_6FC9DD09 [(1..many)]
   - left: PUBLIC.BOOKS.BOOKS
   - right: PUBLIC.BOOKS.PUBLISHERS

@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntitySubtype;
@@ -27,6 +29,7 @@ import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
+import us.fatehi.utility.Multimap;
 
 public class MutableERModel implements ERModel {
 
@@ -38,13 +41,15 @@ public class MutableERModel implements ERModel {
   private final Map<NamedObjectKey, Table> tablesMap;
   private final Map<NamedObjectKey, Entity> entitiesMap;
   private final Map<NamedObjectKey, Relationship> relationshipsMap;
-  private final Map<NamedObjectKey, Relationship> weakRelationshipsMap;
+  private final Map<NamedObjectKey, Relationship> implicitRelationshipsMap;
+  private final Multimap<NamedObjectKey, Relationship> erImplicitMap;
 
   public MutableERModel() {
     tablesMap = new HashMap<>();
     entitiesMap = new HashMap<>();
     relationshipsMap = new HashMap<>();
-    weakRelationshipsMap = new HashMap<>();
+    implicitRelationshipsMap = new HashMap<>();
+    erImplicitMap = new Multimap<>();
   }
 
   @Override
@@ -66,6 +71,23 @@ public class MutableERModel implements ERModel {
             .filter(entity -> entity.getType().equals(entityType))
             .sorted()
             .toList());
+  }
+
+  @Override
+  public Collection<Relationship> getImplicitRelationships() {
+    return List.copyOf(implicitRelationshipsMap.values().stream().sorted().toList());
+  }
+
+  @Override
+  public Collection<Relationship> getImplicitRelationshipsByEntity(final Entity entity) {
+    if (entity == null) {
+      return Collections.emptySet();
+    }
+    if (erImplicitMap.containsKey(entity.key())) {
+      final Set<Relationship> relationships = new TreeSet<>(erImplicitMap.get(entity.key()));
+      return List.copyOf(relationships);
+    }
+    return Collections.emptySet();
   }
 
   @Override
@@ -120,44 +142,16 @@ public class MutableERModel implements ERModel {
   }
 
   @Override
-  public Collection<Relationship> getWeakRelationships() {
-    return List.copyOf(weakRelationshipsMap.values().stream().sorted().toList());
-  }
-
-  @Override
   public Optional<Relationship> lookupByBridgeTable(final Table table) {
     if (table == null) {
       return Optional.empty();
     }
     final NamedObjectKey key = table.key();
-    return relationshipsMap.values().stream()
-        .filter(relationship -> relationship.key().equals(key))
-        .findFirst();
-  }
-
-  @Override
-  public Optional<Relationship> lookupByBridgeTableName(final String tableName) {
-    return relationshipsMap.values().stream()
-        .filter(relationship -> relationship.getFullName().equals(tableName))
-        .findFirst();
-  }
-
-  @Override
-  public Optional<Relationship> lookupByTableReference(final TableReference tableRef) {
-    if (tableRef == null) {
-      return Optional.empty();
+    // Look up bridge table
+    if (relationshipsMap.containsKey(key)) {
+      return Optional.of(relationshipsMap.get(key));
     }
-    return Optional.ofNullable(relationshipsMap.get(tableRef.key()));
-  }
-
-  @Override
-  public Optional<Relationship> lookupByTableReferenceName(final String tableRefName) {
-    if (tableRefName == null) {
-      return Optional.empty();
-    }
-    return relationshipsMap.values().stream()
-        .filter(relationship -> relationship.getFullName().equals(tableRefName))
-        .findFirst();
+    return Optional.empty();
   }
 
   @Override
@@ -176,27 +170,69 @@ public class MutableERModel implements ERModel {
     return Optional.ofNullable(entitiesMap.get(key));
   }
 
+  @Override
+  public Optional<Relationship> lookupRelationship(final String relationshipName) {
+    if (relationshipName == null) {
+      return Optional.empty();
+    }
+    return relationshipsMap.values().stream()
+        .filter(relationship -> relationship.getFullName().equals(relationshipName))
+        .findFirst();
+  }
+
+  @Override
+  public Optional<Relationship> lookupRelationship(final TableReference tableRef) {
+    if (tableRef == null) {
+      return Optional.empty();
+    }
+    final NamedObjectKey key = tableRef.key();
+    if (relationshipsMap.containsKey(key)) {
+      return Optional.of(relationshipsMap.get(key));
+    }
+    if (implicitRelationshipsMap.containsKey(key)) {
+      return Optional.of(implicitRelationshipsMap.get(key));
+    }
+    return Optional.empty();
+  }
+
   void addEntity(final Entity entity) {
     if (entity != null) {
       entitiesMap.put(entity.key(), entity);
     }
   }
 
-  void addRelationship(final Relationship relationship) {
+  void addImplicitRelationship(final Relationship relationship) {
     if (relationship != null) {
-      relationshipsMap.put(relationship.key(), relationship);
+      implicitRelationshipsMap.put(relationship.key(), relationship);
+      if (relationship.getLeftEntity() != null) {
+        erImplicitMap.add(relationship.getLeftEntity().key(), relationship);
+      }
+      if (relationship.getRightEntity() != null) {
+        erImplicitMap.add(relationship.getRightEntity().key(), relationship);
+      }
+    }
+  }
+
+  void addRelationship(final Relationship relationship) {
+    if (relationship == null) {
+      return;
+    }
+
+    relationshipsMap.put(relationship.key(), relationship);
+    final MutableEntity leftEntity = (MutableEntity) relationship.getLeftEntity();
+    if (leftEntity != null) {
+      leftEntity.addRelationship(relationship);
+    }
+
+    final MutableEntity rightEntity = (MutableEntity) relationship.getRightEntity();
+    if (rightEntity != null) {
+      rightEntity.addRelationship(relationship);
     }
   }
 
   void addTable(final Table table) {
     if (table != null) {
       tablesMap.put(table.key(), table);
-    }
-  }
-
-  void addWeakRelationship(final Relationship relationship) {
-    if (relationship != null) {
-      weakRelationshipsMap.put(relationship.key(), relationship);
     }
   }
 

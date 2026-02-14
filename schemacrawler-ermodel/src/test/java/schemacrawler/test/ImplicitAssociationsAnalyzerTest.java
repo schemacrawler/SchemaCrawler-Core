@@ -20,9 +20,9 @@ import java.util.Collection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzer;
-import schemacrawler.ermodel.weakassociations.WeakAssociationsAnalyzerBuilder;
-import schemacrawler.ermodel.weakassociations.WeakColumnReference;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
@@ -39,7 +39,7 @@ import us.fatehi.test.utility.extensions.TestContext;
 @WithTestDatabase
 @ResolveTestContext
 @TestInstance(PER_CLASS)
-public class WeakAssociationsAnalyzerTest {
+public class ImplicitAssociationsAnalyzerTest {
 
   private Catalog catalog;
 
@@ -60,25 +60,25 @@ public class WeakAssociationsAnalyzerTest {
   }
 
   @Test
-  public void weakAssociations(final TestContext testContext, final Connection connection)
+  public void implicitAssociations(final TestContext testContext, final Connection connection)
       throws Exception {
 
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
-      final WeakAssociationsAnalyzerBuilder builder =
-          WeakAssociationsAnalyzerBuilder.builder(catalog.getTables())
+      final ImplicitAssociationsAnalyzerBuilder builder =
+          ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
               .withIdMatcher()
               .withExtensionTableMatcher();
 
-      final WeakAssociationsAnalyzer weakAssociationsAnalyzer = builder.build();
-      final Collection<WeakColumnReference> proposedWeakAssociations =
-          weakAssociationsAnalyzer.analyzeTables();
+      final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer = builder.build();
+      final Collection<ImplicitColumnReference> proposedAssociations =
+          implicitAssociationsAnalyzer.analyzeTables();
       assertThat(
-          "Proposed weak association count does not match",
-          proposedWeakAssociations.size(),
+          "Proposed implicit association count does not match",
+          proposedAssociations.size(),
           greaterThan(0));
-      for (final ColumnReference proposedWeakAssociation : proposedWeakAssociations) {
-        out.println("weak association: %s".formatted(proposedWeakAssociation));
+      for (final ColumnReference proposedAssociation : proposedAssociations) {
+        out.println("implicit association: %s".formatted(proposedAssociation));
       }
     }
 

@@ -6,10 +6,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.ermodel.weakassociations;
+package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.ermodel.weakassociations.WeakAssociationsUtility.ID_PATTERN;
+import static schemacrawler.ermodel.associations.ImplicitAssociationsUtility.ID_PATTERN;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.util.List;

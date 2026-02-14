@@ -1,4 +1,4 @@
-package schemacrawler.ermodel.weakassociations;
+package schemacrawler.ermodel.associations;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -13,10 +13,10 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableConstraintType;
 
-public class WeakAssociationTest {
+public class ImplicitAssociationTest {
 
   @Test
-  public void testWeakAssociation() {
+  public void testImplicitAssociation() {
     final Table fkTable = mock(Table.class);
     when(fkTable.getName()).thenReturn("FK_TABLE");
     final Table pkTable = mock(Table.class);
@@ -32,19 +32,19 @@ public class WeakAssociationTest {
     when(pkColumn.getFullName()).thenReturn("PK_COL");
     when(pkColumn.getParent()).thenReturn(pkTable);
 
-    final WeakColumnReference columnRef = new WeakColumnReference(fkColumn, pkColumn);
-    final WeakAssociation weakAssociation = new WeakAssociation(columnRef);
+    final ImplicitColumnReference columnRef = new ImplicitColumnReference(fkColumn, pkColumn);
+    final ImplicitAssociation implicitAssociation = new ImplicitAssociation(columnRef);
 
-    assertThat(weakAssociation.getName(), startsWith("SCHCRWLR_"));
-    assertThat(weakAssociation.getType(), is(TableConstraintType.unknown));
-    assertThat(weakAssociation.getForeignKeyTable(), is(fkTable));
-    assertThat(weakAssociation.getPrimaryKeyTable(), is(pkTable));
-    assertThat(weakAssociation.getColumnReferences().size(), is(1));
-    assertThat(weakAssociation.getColumnReferences().get(0), is(columnRef));
+    assertThat(implicitAssociation.getName(), startsWith("SCHCRWLR_"));
+    assertThat(implicitAssociation.getType(), is(TableConstraintType.unknown));
+    assertThat(implicitAssociation.getForeignKeyTable(), is(fkTable));
+    assertThat(implicitAssociation.getPrimaryKeyTable(), is(pkTable));
+    assertThat(implicitAssociation.getColumnReferences().size(), is(1));
+    assertThat(implicitAssociation.getColumnReferences().get(0), is(columnRef));
 
-    final TableConstraintColumn tcc = weakAssociation.getConstrainedColumns().get(0);
+    final TableConstraintColumn tcc = implicitAssociation.getConstrainedColumns().get(0);
     assertThat(tcc, notNullValue());
-    assertThat(tcc.getTableConstraint(), is(weakAssociation));
+    assertThat(tcc.getTableConstraint(), is(implicitAssociation));
     assertThat(tcc.getTableConstraintOrdinalPosition(), is(1));
     assertThat(tcc.getName(), is("FK_COL"));
   }

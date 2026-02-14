@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.ermodel.weakassociations;
+package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
 
@@ -21,9 +21,9 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 
 /**
- * Provides candidate key columns used for weak association inference.
+ * Provides candidate key columns used for implicit association inference.
  *
- * <p>To ensure high-confidence weak associations, this only considers single-column keys:
+ * <p>To ensure high-confidence implicit associations, this only considers single-column keys:
  *
  * <ul>
  *   <li>Single-column primary keys are included.

@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.ermodel.weakassociations;
+package schemacrawler.ermodel.associations;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
@@ -16,7 +16,7 @@ import schemacrawler.schema.Column;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
-public class WeakAssociationsUtility {
+public class ImplicitAssociationsUtility {
 
   public static final Pattern ID_PATTERN = Pattern.compile("_?(id|key|keyid)$", CASE_INSENSITIVE);
   private static final Pattern NOT_ALPHANUMERIC_PATTERN = Pattern.compile("[^\\p{L}\\d]");
@@ -35,14 +35,14 @@ public class WeakAssociationsUtility {
       return "";
     }
     final String columnName =
-        WeakAssociationsUtility.ID_PATTERN
+        ImplicitAssociationsUtility.ID_PATTERN
             .matcher(column.getName())
             .replaceFirst("")
             .toLowerCase(Locale.ROOT);
     return columnName;
   }
 
-  private WeakAssociationsUtility() {
+  private ImplicitAssociationsUtility() {
     // Prevent instantiation
   }
 }

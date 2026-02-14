@@ -1,4 +1,4 @@
-package schemacrawler.ermodel.weakassociations;
+package schemacrawler.ermodel.associations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -18,10 +18,10 @@ import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 
-public class WeakAssociationsAnalyzerFkTest {
+public class ImplicitAssociationsAnalyzerFkTest {
 
   @Test
-  public void weakAssociationAddedIfFkDoesNotExist() {
+  public void implicitAssociationAddedIfFkDoesNotExist() {
     // Table A (orders) with primary key "id"
     final Table tableA = mockTable("orders");
     final Column pkColumn = mockColumn(tableA, "id", true, false);
@@ -35,18 +35,18 @@ public class WeakAssociationsAnalyzerFkTest {
     // Analyzer setup
     final List<Table> tables = List.of(tableA, tableB);
     final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
-    final WeakAssociationsAnalyzer analyzer =
-        new WeakAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
+    final ImplicitAssociationsAnalyzer analyzer =
+        new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<WeakColumnReference> weakAssociations = analyzer.analyzeTables();
+    final Collection<ImplicitColumnReference> implicitAssociations = analyzer.analyzeTables();
 
     // Verify
-    assertThat("Should have one weak association", weakAssociations, hasSize(1));
+    assertThat("Should have one implicit association", implicitAssociations, hasSize(1));
   }
 
   @Test
-  public void weakAssociationNotAddedIfFkExists() {
+  public void implicitAssociationNotAddedIfFkExists() {
     // Table A (orders) with primary key "id"
     final Table tableA = mockTable("orders");
     final Column pkColumn = mockColumn(tableA, "id", true, false);
@@ -68,15 +68,17 @@ public class WeakAssociationsAnalyzerFkTest {
     // Analyzer setup
     final List<Table> tables = List.of(tableA, tableB);
     final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
-    final WeakAssociationsAnalyzer analyzer =
-        new WeakAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
+    final ImplicitAssociationsAnalyzer analyzer =
+        new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<WeakColumnReference> weakAssociations = analyzer.analyzeTables();
+    final Collection<ImplicitColumnReference> implicitAssociations = analyzer.analyzeTables();
 
     // Verify
     assertThat(
-        "Should not have weak associations because a real FK exists", weakAssociations, empty());
+        "Should not have implicit associations because a real FK exists",
+        implicitAssociations,
+        empty());
   }
 
   private Column mockColumn(

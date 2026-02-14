@@ -77,6 +77,43 @@ public class ERModelTest {
         if (entity instanceof final EntitySubtype subentity) {
           out.println("  - super-type: %s".formatted(subentity.getSupertype()));
         }
+        out.println("  - relationships");
+        for (Relationship relationship : entity.getRelationships()) {
+          out.println("    - relationship: %s".formatted(relationship.getName()));
+        }
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
+  @Test
+  public void implicitRelationships(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Implicit relationships:");
+      for (final Relationship relationship : erModel.getImplicitRelationships()) {
+        out.println("- %s [%s]".formatted(relationship, relationship.getType().description()));
+        out.println("  - left: %s".formatted(relationship.getLeftEntity()));
+        out.println("  - right: %s".formatted(relationship.getRightEntity()));
+      }
+    }
+    assertThat(
+        outputOf(testout),
+        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
+  @Test
+  public void implicitRelationshipsByEntity(final TestContext testContext) {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      out.println("# Implicit relationships by Entity:");
+      for (final Entity entity : erModel.getEntities()) {
+        out.println("- %s [%s]".formatted(entity, entity.getType()));
+        for (final Relationship relationship : erModel.getImplicitRelationshipsByEntity(entity)) {
+          out.println("  - %s".formatted(relationship.getName()));
+        }
       }
     }
     assertThat(
@@ -138,22 +175,6 @@ public class ERModelTest {
       out.println("# Unmodeled tables:");
       for (final Table table : erModel.getUnmodeledTables()) {
         out.println("- %s".formatted(table));
-      }
-    }
-    assertThat(
-        outputOf(testout),
-        hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
-  }
-
-  @Test
-  public void weakRelationships(final TestContext testContext) {
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
-      out.println("# Weak relationships:");
-      for (final Relationship relationship : erModel.getWeakRelationships()) {
-        out.println("- %s [%s]".formatted(relationship, relationship.getType().description()));
-        out.println("  - left: %s".formatted(relationship.getLeftEntity()));
-        out.println("  - right: %s".formatted(relationship.getRightEntity()));
       }
     }
     assertThat(

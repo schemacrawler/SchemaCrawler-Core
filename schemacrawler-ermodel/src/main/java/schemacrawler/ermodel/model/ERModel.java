@@ -33,6 +33,21 @@ public interface ERModel extends Serializable {
   Collection<Entity> getEntitiesByType(EntityType entityType);
 
   /**
+   * Gets implicit relationships inferred from the catalog.
+   *
+   * @return All implicit relationships
+   */
+  Collection<Relationship> getImplicitRelationships();
+
+  /**
+   * Gets implicit relationships for an entity.
+   *
+   * @param entity Entity
+   * @return Implicit relationships for an entity
+   */
+  Collection<Relationship> getImplicitRelationshipsByEntity(Entity entity);
+
+  /**
    * Gets all modeled relationships.
    *
    * @return All modeled relationships
@@ -70,13 +85,6 @@ public interface ERModel extends Serializable {
   Collection<Table> getUnmodeledTables();
 
   /**
-   * Gets weak relationships inferred from the catalog.
-   *
-   * @return All weak relationships
-   */
-  Collection<Relationship> getWeakRelationships();
-
-  /**
    * Look up a relationship by its bridge table.
    *
    * @param table Bridge table
@@ -85,33 +93,9 @@ public interface ERModel extends Serializable {
   Optional<Relationship> lookupByBridgeTable(Table table);
 
   /**
-   * Look up a relationship by its bridge table name.
+   * Look up an entity by its full name.
    *
-   * @param tableName Bridge table name
-   * @return Relationship, if found
-   */
-  Optional<Relationship> lookupByBridgeTableName(String tableName);
-
-  /**
-   * Look up a relationship by a table reference.
-   *
-   * @param tableRef Table reference.
-   * @return Relationship, if found
-   */
-  Optional<Relationship> lookupByTableReference(TableReference tableRef);
-
-  /**
-   * Look up a relationship by its table reference name.
-   *
-   * @param tableRefName table reference name
-   * @return Relationship, if found
-   */
-  Optional<Relationship> lookupByTableReferenceName(String tableRefName);
-
-  /**
-   * Look up an entity by its name.
-   *
-   * @param entityName Entity name
+   * @param entityName Full entity name
    * @return Entity, if found
    */
   Optional<Entity> lookupEntity(String entityName);
@@ -123,4 +107,21 @@ public interface ERModel extends Serializable {
    * @return Entity, if found
    */
   Optional<Entity> lookupEntity(Table table);
+
+  /**
+   * Look up a relationship by its full name. This may be the same as the full name of a bridge
+   * table, a foreign key, or an implicit relationship.
+   *
+   * @param relationshipName Full relationship name
+   * @return Relationship, if found
+   */
+  Optional<Relationship> lookupRelationship(String relationshipName);
+
+  /**
+   * Look up a relationship by a table reference.
+   *
+   * @param tableRef Table reference.
+   * @return Relationship, if found
+   */
+  Optional<Relationship> lookupRelationship(TableReference tableRef);
 }

@@ -6,10 +6,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.ermodel.weakassociations;
+package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.ermodel.weakassociations.WeakAssociationsUtility.normalizeColumnName;
+import static schemacrawler.ermodel.associations.ImplicitAssociationsUtility.normalizeColumnName;
 
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -20,9 +20,9 @@ import schemacrawler.schema.Table;
 import us.fatehi.utility.string.StringFormat;
 
 /**
- * Matches weak associations for extension tables that share a normalized primary key name with the
- * referenced table. Extension tables are tables where the foreign key column is also a primary key
- * or part of a unique index, representing a 1-to-1 or 1-to-0..1 relationship.
+ * Matches implicit associations for extension tables that share a normalized primary key name with
+ * the referenced table. Extension tables are tables where the foreign key column is also a primary
+ * key or part of a unique index, representing a 1-to-1 or 1-to-0..1 relationship.
  *
  * <p>This rule is optionally enabled via the {@code infer-extension-tables} option and requires the
  * foreign key column to be unique in the extension table.
@@ -38,14 +38,14 @@ final class ExtensionTableMatcher implements Predicate<ColumnReference> {
   }
 
   @Override
-  public boolean test(final ColumnReference proposedWeakAssociation) {
+  public boolean test(final ColumnReference proposedAssociation) {
 
-    if (proposedWeakAssociation == null) {
+    if (proposedAssociation == null) {
       return false;
     }
 
-    final Column fkColumn = proposedWeakAssociation.getForeignKeyColumn();
-    final Column pkColumn = proposedWeakAssociation.getPrimaryKeyColumn();
+    final Column fkColumn = proposedAssociation.getForeignKeyColumn();
+    final Column pkColumn = proposedAssociation.getPrimaryKeyColumn();
 
     final String pkColumnName = normalizeColumnName(pkColumn);
     final String fkColumnName = normalizeColumnName(fkColumn);
@@ -57,7 +57,7 @@ final class ExtensionTableMatcher implements Predicate<ColumnReference> {
       if (matches) {
         LOGGER.log(
             Level.FINE,
-            new StringFormat("ExtensionTableMatcher proposed <%s>", proposedWeakAssociation));
+            new StringFormat("ExtensionTableMatcher proposed <%s>", proposedAssociation));
       }
       return matches;
     }

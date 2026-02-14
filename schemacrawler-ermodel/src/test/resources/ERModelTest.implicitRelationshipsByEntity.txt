@@ -1,0 +1,16 @@
+# Implicit relationships by Entity:
+- PUBLIC.BOOKS.AUTHORS [strong_entity]
+- PUBLIC.BOOKS.BOOKS [strong_entity]
+  - SCHCRWLR_3413FBAA_6FC9DD09
+- PUBLIC.BOOKS.COUPONS [strong_entity]
+  - SCHCRWLR_7CE774BB_6ACF5085
+- PUBLIC.BOOKS.CUSTOMERDATA [weak_entity]
+- PUBLIC.BOOKS.CUSTOMERS [strong_entity]
+- PUBLIC.BOOKS."Celebrities" [strong_entity]
+- PUBLIC.BOOKS."Celebrity Updates" [subtype]
+- PUBLIC.BOOKS.PUBLISHERS [strong_entity]
+  - SCHCRWLR_3413FBAA_6FC9DD09
+- PUBLIC.BOOKS.ΒΙΒΛΊΑ [strong_entity]
+- PUBLIC.FOR_LINT.PUBLICATIONS [strong_entity]
+- PUBLIC.FOR_LINT.WRITERS [strong_entity]
+- PUBLIC."PUBLISHER SALES".REGIONS [strong_entity]
