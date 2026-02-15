@@ -99,11 +99,6 @@ public final class SchemaInfoLevelBuilder
     return this;
   }
 
-  public SchemaInfoLevelBuilder setBuildERModel(final boolean buildERModel) {
-    schemaInfoRetrievals.put(SchemaInfoRetrieval.buildERModel, buildERModel);
-    return this;
-  }
-
   public SchemaInfoLevelBuilder setRetrieveAdditionalColumnAttributes(
       final boolean retrieveAdditionalColumnAttributes) {
     schemaInfoRetrievals.put(

@@ -1,6 +1,5 @@
 standard
 {
-  "buildERModel": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,

@@ -1,6 +1,5 @@
 standard
 {
-  "buildERModel": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,
@@ -37,7 +36,6 @@ standard
 
 custom
 {
-  "buildERModel": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,
@@ -74,7 +72,6 @@ custom
 
 
 {
-  "buildERModel": false,
   "retrieveAdditionalColumnAttributes": false,
   "retrieveAdditionalColumnMetadata": false,
   "retrieveAdditionalDatabaseInfo": false,

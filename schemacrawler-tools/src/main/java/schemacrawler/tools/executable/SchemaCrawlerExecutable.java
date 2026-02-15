@@ -9,7 +9,6 @@
 package schemacrawler.tools.executable;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.schemacrawler.SchemaInfoRetrieval.buildERModel;
 import static schemacrawler.tools.utility.SchemaCrawlerUtility.matchSchemaRetrievalOptions;
 import static schemacrawler.tools.utility.SchemaCrawlerUtility.updateConnectionDataSource;
 import static us.fatehi.utility.Utility.requireNotBlank;
@@ -109,11 +108,7 @@ public final class SchemaCrawlerExecutable {
         loadCatalog();
       }
       if (erModel == null) {
-        if (schemaCrawlerOptions.loadOptions().schemaInfoLevel().is(buildERModel)) {
-          erModel = EntityModelUtility.buildERModel(catalog);
-        } else {
-          erModel = EntityModelUtility.buildEmptyERModel();
-        }
+        erModel = EntityModelUtility.buildEmptyERModel();
       }
 
       // Prepare to execute
