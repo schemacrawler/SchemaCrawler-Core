@@ -88,6 +88,7 @@ public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions>
   /** {@inheritDoc} */
   @Override
   public void initialize() {
+    super.initialize();
     checkOptions();
   }
 

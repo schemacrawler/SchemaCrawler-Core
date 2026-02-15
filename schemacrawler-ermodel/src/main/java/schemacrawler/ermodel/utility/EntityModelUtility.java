@@ -50,6 +50,7 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import schemacrawler.ermodel.implementation.ERModelBuilder;
+import schemacrawler.ermodel.implementation.MutableERModel;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityAttributeType;
@@ -65,6 +66,10 @@ import us.fatehi.utility.UtilityMarker;
 /** Utility for inferring entity model information from tables and foreign keys. */
 @UtilityMarker
 public class EntityModelUtility {
+
+  public static ERModel buildEmptyERModel() {
+    return new MutableERModel();
+  }
 
   public static ERModel buildERModel(final Catalog catalog) {
     requireNonNull(catalog, "No catalog provided");

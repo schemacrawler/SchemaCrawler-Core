@@ -17,6 +17,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -46,6 +48,7 @@ public final class SchemaCrawlerExecutable {
   private final String command;
   private Config additionalConfig;
   private Catalog catalog;
+  private ERModel erModel;
   private DatabaseConnectionSource dataSource;
   private OutputOptions outputOptions;
   private SchemaCrawlerOptions schemaCrawlerOptions;
@@ -70,7 +73,8 @@ public final class SchemaCrawlerExecutable {
         schemaRetrievalOptions = SchemaRetrievalOptionsBuilder.newSchemaRetrievalOptions();
       }
     } else {
-      // Match schema retrieval options, and update data source before any connections are used
+      // Match schema retrieval options, and update data source before any connections
+      // are used
       if (schemaRetrievalOptions == null) {
         schemaRetrievalOptions = matchSchemaRetrievalOptions(dataSource);
       }
@@ -103,9 +107,13 @@ public final class SchemaCrawlerExecutable {
       if (catalog == null) {
         loadCatalog();
       }
+      if (erModel == null) {
+        erModel = EntityModelUtility.buildEmptyERModel();
+      }
 
       // Prepare to execute
       scCommand.setCatalog(catalog);
+      scCommand.setERModel(erModel);
 
       if (scCommand.usesConnection()) {
         scCommand.setConnection(connection);
@@ -135,6 +143,10 @@ public final class SchemaCrawlerExecutable {
     return catalog;
   }
 
+  public ERModel getERModel() {
+    return erModel;
+  }
+
   public OutputOptions getOutputOptions() {
     return outputOptions;
   }
@@ -158,6 +170,10 @@ public final class SchemaCrawlerExecutable {
 
   public void setDataSource(final DatabaseConnectionSource dataSource) {
     this.dataSource = requireNonNull(dataSource, "No data source provided");
+  }
+
+  public void setERModel(final ERModel erModel) {
+    this.erModel = erModel;
   }
 
   public void setOutputOptions(final OutputOptions outputOptions) {

@@ -53,17 +53,18 @@ public final class ImplicitAssociation implements TableReference {
   private final Map<String, Object> attributeMap;
 
   public ImplicitAssociation(final ImplicitColumnReference columnReference) {
+
     this.columnReference = requireNonNull(columnReference, "No column reference provided");
+
     final Column fkColumn = columnReference.getForeignKeyColumn();
+    final Column pkColumn = columnReference.getPrimaryKeyColumn();
 
     fkTable = fkColumn.getParent();
-    pkTable = columnReference.getPrimaryKeyColumn().getParent();
+    pkTable = pkColumn.getParent();
 
     name =
         "SCHCRWLR_%1$08X_%2$08X"
-            .formatted(
-                fkColumn.getFullName().hashCode(),
-                columnReference.getPrimaryKeyColumn().getFullName().hashCode());
+            .formatted(fkTable.getFullName().hashCode(), pkTable.getFullName().hashCode());
     schema = fkTable.getSchema();
 
     tableConstraintColumn = TableConstraintColumnWrapper.createConstrainedColumn(fkColumn, this);
