@@ -122,23 +122,25 @@ public class ERModelBuilder implements Builder<ERModel> {
   }
 
   private MutableEntity lookupOrCreateEntity(final Table table) {
-    return entityMap.computeIfAbsent(
-        table.key(),
-        key -> {
-          final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
-          final EntityType entityType = modelInferrer.inferEntityType();
-          final MutableEntity newEntity;
-          if (entityType != EntityType.subtype) {
-            newEntity = new MutableEntity(table);
-            newEntity.setEntityType(entityType);
-          } else {
-            newEntity = new MutableEntitySubtype(table);
-            newEntity.setEntityType(entityType);
-            final Table superTypeTable = modelInferrer.inferSuperType().get();
-            ((MutableEntitySubtype) newEntity).setSupertype(lookupOrCreateEntity(superTypeTable));
-          }
-          erModel.addEntity(newEntity);
-          return newEntity;
-        });
+    final NamedObjectKey key = table.key();
+    final MutableEntity existing = entityMap.get(key);
+    if (existing != null) {
+      return existing;
+    }
+    final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
+    final EntityType entityType = modelInferrer.inferEntityType();
+    final MutableEntity newEntity;
+    if (entityType != EntityType.subtype) {
+      newEntity = new MutableEntity(table);
+      newEntity.setEntityType(entityType);
+    } else {
+      newEntity = new MutableEntitySubtype(table);
+      newEntity.setEntityType(entityType);
+      final Table superTypeTable = modelInferrer.inferSuperType().get();
+      ((MutableEntitySubtype) newEntity).setSupertype(lookupOrCreateEntity(superTypeTable));
+    }
+    entityMap.put(key, newEntity);
+    erModel.addEntity(newEntity);
+    return newEntity;
   }
 }
