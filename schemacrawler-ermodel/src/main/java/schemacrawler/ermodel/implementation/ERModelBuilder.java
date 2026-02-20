@@ -163,15 +163,15 @@ public class ERModelBuilder implements Builder<ERModel> {
           default -> new MutableEntity(table, entityType);
         };
 
-    entityMap.put(tableKey, entity);
-    erModel.addEntity(entity);
-
     if (entity instanceof final MutableEntitySubtype subEntity) {
       final Table superTypeTable = modelInferrer.inferSuperType().orElse(null);
       if (superTypeTable != null) {
         subEntity.setSupertype(lookupOrCreateEntity(superTypeTable));
       }
     }
+
+    entityMap.put(tableKey, entity);
+    erModel.addEntity(entity);
 
     return entity;
   }
