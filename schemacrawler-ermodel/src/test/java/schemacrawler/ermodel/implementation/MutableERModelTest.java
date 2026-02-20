@@ -5,10 +5,14 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static schemacrawler.ermodel.model.EntityType.strong_entity;
+import static schemacrawler.ermodel.model.EntityType.subtype;
+import static schemacrawler.ermodel.model.EntityType.unknown;
+import static schemacrawler.ermodel.model.EntityType.weak_entity;
+import static schemacrawler.ermodel.model.RelationshipCardinality.many_many;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.EntityType;
-import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.test.utility.crawl.LightTable;
@@ -19,33 +23,21 @@ public class MutableERModelTest {
   @Test
   public void testMutableEntity() {
     final LightTable table = new LightTable("TABLE");
-    final MutableEntity entity = new MutableEntity(table);
+    final MutableEntity entity = new MutableEntity(table, strong_entity);
 
-    assertThat(entity.getType(), is(EntityType.unknown));
-    entity.setEntityType(EntityType.strong_entity);
     assertThat(entity.getType(), is(EntityType.strong_entity));
-
-    // No change when null is set
-    entity.setEntityType(null);
-    assertThat(entity.getType(), is(EntityType.strong_entity));
-
-    // Possible to set to any type of entity
-    entity.setEntityType(EntityType.unknown);
-    assertThat(entity.getType(), is(EntityType.unknown));
   }
 
   @Test
   public void testMutableEntitySubtype() {
     final LightTable superTable = new LightTable("SUPER");
-    final MutableEntity superEntity = new MutableEntity(superTable);
-    superEntity.setEntityType(EntityType.strong_entity);
+    final MutableEntity superEntity = new MutableEntity(superTable, strong_entity);
 
     final LightTable subTable = new LightTable("SUB");
     final MutableEntitySubtype subEntity = new MutableEntitySubtype(subTable);
-    subEntity.setEntityType(EntityType.subtype);
     subEntity.setSupertype(superEntity);
 
-    assertThat(subEntity.getType(), is(EntityType.subtype));
+    assertThat(subEntity.getType(), is(subtype));
     assertThat(subEntity.getSupertype(), is(superEntity));
 
     final MutableERModel model = new MutableERModel();
@@ -61,12 +53,10 @@ public class MutableERModelTest {
     final MutableERModel model = new MutableERModel();
 
     final LightTable table1 = new LightTable("TABLE1");
-    final MutableEntity entity1 = new MutableEntity(table1);
-    entity1.setEntityType(EntityType.strong_entity);
+    final MutableEntity entity1 = new MutableEntity(table1, strong_entity);
 
     final LightTable table2 = new LightTable("TABLE2");
-    final MutableEntity entity2 = new MutableEntity(table2);
-    entity2.setEntityType(EntityType.weak_entity);
+    final MutableEntity entity2 = new MutableEntity(table2, weak_entity);
 
     model.addTable(table1);
     model.addEntity(entity1);
@@ -76,9 +66,9 @@ public class MutableERModelTest {
     assertThat(model.getTables(), containsInAnyOrder(table1, table2));
     assertThat(model.getEntities(), containsInAnyOrder(entity1, entity2));
 
-    assertThat(model.getEntitiesByType(EntityType.strong_entity), containsInAnyOrder(entity1));
-    assertThat(model.getEntitiesByType(EntityType.weak_entity), containsInAnyOrder(entity2));
-    assertThat(model.getEntitiesByType(EntityType.unknown), is(empty()));
+    assertThat(model.getEntitiesByType(strong_entity), containsInAnyOrder(entity1));
+    assertThat(model.getEntitiesByType(weak_entity), containsInAnyOrder(entity2));
+    assertThat(model.getEntitiesByType(unknown), is(empty()));
 
     assertThat(model.lookupEntity("TABLE1").isPresent(), is(true));
     assertThat(model.lookupEntity("TABLE1").get(), is(entity1));
@@ -92,14 +82,14 @@ public class MutableERModelTest {
     final MutableManyToManyRelationship rel = new MutableManyToManyRelationship(bridgeTable);
 
     final LightTable table1 = new LightTable("T1");
-    final MutableEntity entity1 = new MutableEntity(table1);
+    final MutableEntity entity1 = new MutableEntity(table1, strong_entity);
     final LightTable table2 = new LightTable("T2");
-    final MutableEntity entity2 = new MutableEntity(table2);
+    final MutableEntity entity2 = new MutableEntity(table2, weak_entity);
 
     rel.setLeftEntity(entity1);
     rel.setRightEntity(entity2);
 
-    assertThat(rel.getType(), is(RelationshipCardinality.many_many));
+    assertThat(rel.getType(), is(many_many));
     assertThat(rel.getLeftEntity(), is(entity1));
     assertThat(rel.getRightEntity(), is(entity2));
 
@@ -107,8 +97,7 @@ public class MutableERModelTest {
     model.addRelationship(rel);
 
     assertThat(model.getRelationships(), containsInAnyOrder(rel));
-    assertThat(
-        model.getRelationshipsByType(RelationshipCardinality.many_many), containsInAnyOrder(rel));
+    assertThat(model.getRelationshipsByType(many_many), containsInAnyOrder(rel));
     assertThat(model.lookupByBridgeTable(bridgeTable).get(), is(rel));
   }
 
@@ -144,11 +133,10 @@ public class MutableERModelTest {
 
     final MutableTableReferenceRelationship rel = new MutableTableReferenceRelationship(mockRef);
 
-    final MutableEntity pkEntity = new MutableEntity(pkTable);
-    final MutableEntity fkEntity = new MutableEntity(fkTable);
+    final MutableEntity pkEntity = new MutableEntity(pkTable, weak_entity);
+    final MutableEntity fkEntity = new MutableEntity(fkTable, weak_entity);
 
-    rel.setLeftEntity(fkEntity);
-    rel.setRightEntity(pkEntity);
+    rel.setEntities(fkEntity, pkEntity);
 
     assertThat(rel.getLeftEntity(), is(fkEntity));
     assertThat(rel.getRightEntity(), is(pkEntity));
@@ -156,9 +144,8 @@ public class MutableERModelTest {
 
     // Test mismatched entities
     final LightTable otherTable = new LightTable("OTHER");
-    final MutableEntity otherEntity = new MutableEntity(otherTable);
-    assertThrows(ExecutionRuntimeException.class, () -> rel.setLeftEntity(otherEntity));
-    assertThrows(ExecutionRuntimeException.class, () -> rel.setRightEntity(otherEntity));
+    final MutableEntity otherEntity = new MutableEntity(otherTable, weak_entity);
+    assertThrows(ExecutionRuntimeException.class, () -> rel.setEntities(otherEntity, otherEntity));
   }
 
   @Test
@@ -166,8 +153,7 @@ public class MutableERModelTest {
     final MutableERModel model = new MutableERModel();
 
     final LightTable modeledTable = new LightTable("MODELED");
-    final MutableEntity entity = new MutableEntity(modeledTable);
-    entity.setEntityType(EntityType.strong_entity);
+    final MutableEntity entity = new MutableEntity(modeledTable, strong_entity);
     model.addTable(modeledTable);
     model.addEntity(entity);
 

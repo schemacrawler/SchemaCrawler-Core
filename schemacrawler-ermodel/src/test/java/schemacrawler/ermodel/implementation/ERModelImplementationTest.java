@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static schemacrawler.ermodel.model.EntityType.strong_entity;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ public class ERModelImplementationTest {
     table.setRemarks("Table remarks");
     table.setAttribute("attr1", "value1");
 
-    final AbstractTableBacked tableBacked = new MutableEntity(table);
+    final AbstractTableBacked tableBacked = new MutableEntity(table, strong_entity);
 
     // NamedObject methods
     assertThat(tableBacked.getName(), is("TEST_TABLE"));

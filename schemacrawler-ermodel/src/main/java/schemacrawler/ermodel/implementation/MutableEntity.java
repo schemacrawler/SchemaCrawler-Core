@@ -8,6 +8,8 @@
 
 package schemacrawler.ermodel.implementation;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
@@ -23,12 +25,15 @@ class MutableEntity extends AbstractTableBacked implements Entity {
 
   @Serial private static final long serialVersionUID = 3946422106166202467L;
 
-  private EntityType entityType;
+  private final EntityType entityType;
   private final Set<Relationship> relationships;
 
-  public MutableEntity(final Table table) {
+  public MutableEntity(final Table table, final EntityType entityType) {
     super(table);
-    entityType = EntityType.unknown;
+
+    // No checks done about setting entity type for unknown or non entities
+    this.entityType = requireNonNull(entityType, "No entity type provided");
+
     // No checks for partial table - exceptions will be thrown while calling
     // unsupported methods
     relationships = new TreeSet<>();
@@ -48,12 +53,5 @@ class MutableEntity extends AbstractTableBacked implements Entity {
     if (relationship != null) {
       relationships.add(relationship);
     }
-  }
-
-  void setEntityType(final EntityType entityType) {
-    if (entityType != null) {
-      this.entityType = entityType;
-    }
-    // No checks done about setting entity type for unknown or non entities
   }
 }
