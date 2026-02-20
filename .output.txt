@@ -186,13 +186,13 @@ d-----          2/1/2026   2:39 PM                maven-status
 d-----          2/1/2026   2:40 PM                reports
 d-----          2/1/2026   2:39 PM                surefire-reports
 d-----          2/1/2026   2:39 PM                test-classes
--a----          2/1/2026   2:39 PM          37857 schemacrawler-ermodel-17.6.2-
+-a----          2/1/2026   2:39 PM          37857 schemacrawler-ermodel-17.6.3-
                                                   sources.jar
--a----          2/1/2026   2:39 PM          23806 schemacrawler-ermodel-17.6.2-
+-a----          2/1/2026   2:39 PM          23806 schemacrawler-ermodel-17.6.3-
                                                   test-sources.jar
--a----          2/1/2026   2:39 PM          42485 schemacrawler-ermodel-17.6.2-
+-a----          2/1/2026   2:39 PM          42485 schemacrawler-ermodel-17.6.3-
                                                   tests.jar
--a----          2/1/2026   2:39 PM          55318 schemacrawler-ermodel-17.6.2.
+-a----          2/1/2026   2:39 PM          55318 schemacrawler-ermodel-17.6.3.
                                                   jar
     Directory: C:\Users\sualeh\Code\_SchemaCrawler\SchemaCrawler-Core\schemacra
     wler-ermodel\target\classes
