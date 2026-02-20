@@ -16,6 +16,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import schemacrawler.ermodel.associations.ImplicitAssociation;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
@@ -29,8 +31,11 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.Builder;
+import us.fatehi.utility.string.StringFormat;
 
 public class ERModelBuilder implements Builder<ERModel> {
+
+  private static final Logger LOGGER = Logger.getLogger(ERModelBuilder.class.getName());
 
   private final Catalog catalog;
   final MutableERModel erModel;
@@ -103,17 +108,37 @@ public class ERModelBuilder implements Builder<ERModel> {
 
   private MutableTableReferenceRelationship createRelationship(
       final TableReference tableReference) {
-    final TableEntityModelInferrer modelInferrer =
-        getModelInferrer(tableReference.getForeignKeyTable());
+
+    final Table leftTable = tableReference.getForeignKeyTable();
+    final TableEntityModelInferrer modelInferrer = getModelInferrer(leftTable);
+
+    if (modelInferrer.inferBridgeTable()) {
+      LOGGER.log(
+          Level.FINE,
+          new StringFormat(
+              "Relationship <%s> not built from bridge table <%s>", tableReference, leftTable));
+      return null;
+    }
+
     final MutableTableReferenceRelationship rel =
         new MutableTableReferenceRelationship(tableReference);
     final RelationshipCardinality cardinality = modelInferrer.inferCardinality(tableReference);
     rel.setCardinality(cardinality);
 
-    final Table leftTable = tableReference.getForeignKeyTable();
-    rel.setLeftEntity(lookupOrCreateEntity(leftTable));
+    final MutableEntity leftEntity = lookupOrCreateEntity(leftTable);
     final Table rightTable = tableReference.getPrimaryKeyTable();
-    rel.setRightEntity(lookupOrCreateEntity(rightTable));
+    final MutableEntity rightEntity = lookupOrCreateEntity(rightTable);
+
+    if (leftEntity == null || rightEntity == null) {
+      LOGGER.log(
+          Level.FINE,
+          new StringFormat(
+              "Relationship <%s> cannot be built from <%s> -> <%s>",
+              tableReference, leftTable, rightTable));
+      return null;
+    }
+
+    rel.setEntities(leftEntity, rightEntity);
     return rel;
   }
 
@@ -122,23 +147,32 @@ public class ERModelBuilder implements Builder<ERModel> {
   }
 
   private MutableEntity lookupOrCreateEntity(final Table table) {
-    return entityMap.computeIfAbsent(
-        table.key(),
-        key -> {
-          final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
-          final EntityType entityType = modelInferrer.inferEntityType();
-          final MutableEntity newEntity;
-          if (entityType != EntityType.subtype) {
-            newEntity = new MutableEntity(table);
-            newEntity.setEntityType(entityType);
-          } else {
-            newEntity = new MutableEntitySubtype(table);
-            newEntity.setEntityType(entityType);
-            final Table superTypeTable = modelInferrer.inferSuperType().get();
-            ((MutableEntitySubtype) newEntity).setSupertype(lookupOrCreateEntity(superTypeTable));
-          }
-          erModel.addEntity(newEntity);
-          return newEntity;
-        });
+    if (table == null) {
+      return null;
+    }
+    final NamedObjectKey tableKey = table.key();
+    if (entityMap.containsKey(tableKey)) {
+      return entityMap.get(tableKey);
+    }
+
+    final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
+    final EntityType entityType = modelInferrer.inferEntityType();
+    final MutableEntity entity =
+        switch (entityType) {
+          case subtype -> new MutableEntitySubtype(table);
+          default -> new MutableEntity(table, entityType);
+        };
+
+    entityMap.put(tableKey, entity);
+    erModel.addEntity(entity);
+
+    if (entity instanceof final MutableEntitySubtype subEntity) {
+      final Table superTypeTable = modelInferrer.inferSuperType().orElse(null);
+      if (superTypeTable != null) {
+        subEntity.setSupertype(lookupOrCreateEntity(superTypeTable));
+      }
+    }
+
+    return entity;
   }
 }

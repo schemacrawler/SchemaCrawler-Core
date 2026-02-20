@@ -57,14 +57,12 @@ final class MutableTableReferenceRelationship extends AbstractDatabaseObjectBack
     }
   }
 
-  void setLeftEntity(final Entity leftEntity) {
+  void setEntities(final Entity leftEntity, final Entity rightEntity) {
     this.leftEntity = requireNonNull(leftEntity, "No left entity provided");
     if (!leftEntity.key().equals(getTableReference().getForeignKeyTable().key())) {
       throw new ExecutionRuntimeException("Table reference left key does not match");
     }
-  }
 
-  void setRightEntity(final Entity rightEntity) {
     this.rightEntity = requireNonNull(rightEntity, "No right entity provided");
     if (!rightEntity.key().equals(getTableReference().getPrimaryKeyTable().key())) {
       throw new ExecutionRuntimeException("Table reference right key does not match");
