@@ -9,23 +9,15 @@
 package schemacrawler.tools.executable;
 
 import java.util.Collection;
+
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
-import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
 import us.fatehi.utility.property.PropertyName;
 
-public interface SchemaCrawlerCommandProvider {
-
-  PluginCommand getCommandLineCommand();
-
-  default PluginCommand getHelpCommand() {
-    return getCommandLineCommand();
-  }
+public interface SchemaCrawlerCommandProvider extends CommandProvider<SchemaCrawlerCommand<?>> {
 
   Collection<PropertyName> getSupportedCommands();
-
-  SchemaCrawlerCommand<?> newSchemaCrawlerCommand(String command, Config config);
 
   boolean supportsOutputFormat(String command, OutputOptions outputOptions);
 

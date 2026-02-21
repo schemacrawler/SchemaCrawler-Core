@@ -33,7 +33,7 @@ public class CommandProviderSortTest {
     }
 
     @Override
-    public SchemaCrawlerCommand<?> newSchemaCrawlerCommand(
+    public SchemaCrawlerCommand<?> newCommand(
         final String command, final Config config) {
       return null;
     }
@@ -51,7 +51,7 @@ public class CommandProviderSortTest {
           List.of(new PropertyName("OtherCommandProvider", "OtherCommandProvider"))) {
 
         @Override
-        public SchemaCrawlerCommand<?> newSchemaCrawlerCommand(
+        public SchemaCrawlerCommand<?> newCommand(
             final String command, final Config config) {
           return null;
         }
