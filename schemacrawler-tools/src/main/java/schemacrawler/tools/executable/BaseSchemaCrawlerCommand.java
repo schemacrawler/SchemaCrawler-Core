@@ -22,8 +22,8 @@ import schemacrawler.tools.options.OutputOptionsBuilder;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
-public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions>
-    extends BaseCommand<C, Void> implements SchemaCrawlerCommand<C> {
+public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions> extends BaseCommand<C>
+    implements SchemaCrawlerCommand<C> {
 
   protected ERModel erModel;
   protected Identifiers identifiers;
@@ -36,13 +36,6 @@ public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions>
 
     schemaCrawlerOptions = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
     outputOptions = OutputOptionsBuilder.newOutputOptions();
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public final Void call() {
-    execute();
-    return null;
   }
 
   /** Runtime exceptions will be thrown if the command is not available. */

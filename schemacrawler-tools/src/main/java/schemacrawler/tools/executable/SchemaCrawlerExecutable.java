@@ -123,7 +123,7 @@ public final class SchemaCrawlerExecutable {
       LOGGER.log(Level.INFO, new StringFormat("Executing SchemaCrawler command <%s>", command));
       LOGGER.log(Level.CONFIG, new ObjectToStringFormat(scCommand.getIdentifiers()));
       LOGGER.log(Level.CONFIG, new ObjectToStringFormat(scCommand.getCommandOptions()));
-      scCommand.call();
+      scCommand.execute();
     } catch (final SchemaCrawlerException e) {
       throw e;
     } catch (final Exception e) {

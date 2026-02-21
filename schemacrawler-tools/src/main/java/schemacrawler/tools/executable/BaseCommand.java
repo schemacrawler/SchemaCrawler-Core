@@ -16,7 +16,7 @@ import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
-public abstract class BaseCommand<C, R> implements Command<C, R> {
+public abstract class BaseCommand<C> implements Command<C> {
 
   protected final PropertyName command;
   protected C commandOptions;
