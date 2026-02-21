@@ -8,6 +8,7 @@
 
 package schemacrawler.tools.executable;
 
+import java.sql.Connection;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.InformationSchemaViews;
@@ -21,6 +22,8 @@ public interface SchemaCrawlerCommand<C extends CommandOptions> extends Command<
    * Checks whether a command is available, and throws a runtime exception if it is not available.
    */
   void checkAvailability();
+
+  Connection getConnection();
 
   ERModel getERModel();
 
