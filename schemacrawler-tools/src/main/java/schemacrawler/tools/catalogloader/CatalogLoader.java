@@ -36,7 +36,7 @@ public interface CatalogLoader extends Comparable<CatalogLoader> {
 
   SchemaRetrievalOptions getSchemaRetrievalOptions();
 
-  void loadCatalog();
+  void execute();
 
   void setAdditionalConfiguration(Config additionalConfig);
 

@@ -44,7 +44,7 @@ public class ChainedCatalogLoader extends BaseCatalogLoader implements Iterable<
   }
 
   @Override
-  public void loadCatalog() {
+  public void execute() {
     Catalog catalog = null;
     final DatabaseConnectionSource dataSource = getDataSource();
     final SchemaCrawlerOptions schemaCrawlerOptions = getSchemaCrawlerOptions();
@@ -60,7 +60,7 @@ public class ChainedCatalogLoader extends BaseCatalogLoader implements Iterable<
       nextCatalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
       nextCatalogLoader.setAdditionalConfiguration(additionalConfig);
 
-      nextCatalogLoader.loadCatalog();
+      nextCatalogLoader.execute();
 
       catalog = nextCatalogLoader.getCatalog();
     }

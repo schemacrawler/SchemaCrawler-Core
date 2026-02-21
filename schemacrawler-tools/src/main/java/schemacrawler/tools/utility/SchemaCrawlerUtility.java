@@ -82,7 +82,7 @@ public final class SchemaCrawlerUtility {
     catalogLoader.setSchemaCrawlerOptions(schemaCrawlerOptions);
     catalogLoader.setAdditionalConfiguration(additionalConfig);
 
-    catalogLoader.loadCatalog();
+    catalogLoader.execute();
     final Catalog catalog = catalogLoader.getCatalog();
     requireNonNull(catalog, "Catalog could not be retrieved");
     return catalog;

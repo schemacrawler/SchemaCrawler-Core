@@ -56,7 +56,7 @@ public class TableRowCountsCatalogLoader extends BaseCatalogLoader {
   }
 
   @Override
-  public void loadCatalog() {
+  public void execute() {
     if (!isLoaded()) {
       return;
     }

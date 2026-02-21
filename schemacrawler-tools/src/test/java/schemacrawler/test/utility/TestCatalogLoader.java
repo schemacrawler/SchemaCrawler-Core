@@ -32,7 +32,7 @@ public class TestCatalogLoader extends BaseCatalogLoader {
   }
 
   @Override
-  public void loadCatalog() {
+  public void execute() {
     forceLoadFailureIfConfigured();
   }
 
