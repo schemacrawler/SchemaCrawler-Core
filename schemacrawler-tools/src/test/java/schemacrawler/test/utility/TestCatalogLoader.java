@@ -22,7 +22,7 @@ public class TestCatalogLoader extends BaseCatalogLoader {
 
   @Override
   public PluginCommand getCommandLineCommand() {
-    final PropertyName catalogLoaderName = getCatalogLoaderName();
+    final PropertyName catalogLoaderName = getCommandName();
     final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(catalogLoaderName);
     pluginCommand.addOption(
         "test-load-option",
@@ -32,7 +32,7 @@ public class TestCatalogLoader extends BaseCatalogLoader {
   }
 
   @Override
-  public void loadCatalog() {
+  public void execute() {
     forceLoadFailureIfConfigured();
   }
 

@@ -40,7 +40,7 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
 
   private static CommandRegistry commandRegistrySingleton;
 
-  public static final Comparator<? super CommandProvider> commandComparator =
+  public static final Comparator<? super SchemaCrawlerCommandProvider> commandComparator =
       (commandProvider1, commandProvider2) -> {
         final String fallbackProviderTypeName = "OperationCommandProvider";
         if (commandProvider1 == null || commandProvider2 == null) {
@@ -68,30 +68,30 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
     return commandRegistrySingleton;
   }
 
-  private static List<CommandProvider> loadCommandRegistry() {
+  private static List<SchemaCrawlerCommandProvider> loadCommandRegistry() {
 
     // Use thread-safe list
-    final List<CommandProvider> commandProviders = new CopyOnWriteArrayList<>();
+    final List<SchemaCrawlerCommandProvider> schemaCrawlerCommandProviders = new CopyOnWriteArrayList<>();
 
     try {
-      final ServiceLoader<CommandProvider> serviceLoader =
-          ServiceLoader.load(CommandProvider.class, CommandRegistry.class.getClassLoader());
-      for (final CommandProvider commandProvider : serviceLoader) {
+      final ServiceLoader<SchemaCrawlerCommandProvider> serviceLoader =
+          ServiceLoader.load(SchemaCrawlerCommandProvider.class, CommandRegistry.class.getClassLoader());
+      for (final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider : serviceLoader) {
         LOGGER.log(
             Level.CONFIG,
             new StringFormat(
                 "Loading command %s, provided by %s",
-                commandProvider.getSupportedCommands(), commandProvider.getClass().getName()));
-        commandProviders.add(commandProvider);
+                schemaCrawlerCommandProvider.getSupportedCommands(), schemaCrawlerCommandProvider.getClass().getName()));
+        schemaCrawlerCommandProviders.add(schemaCrawlerCommandProvider);
       }
     } catch (final Throwable e) {
       throw new InternalRuntimeException("Could not load extended command registry", e);
     }
 
-    return commandProviders;
+    return schemaCrawlerCommandProviders;
   }
 
-  private final List<CommandProvider> commandRegistry;
+  private final List<SchemaCrawlerCommandProvider> commandRegistry;
 
   private CommandRegistry() {
     commandRegistry = loadCommandRegistry();
@@ -102,14 +102,14 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
       final SchemaCrawlerOptions schemaCrawlerOptions,
       final Config additionalConfig,
       final OutputOptions outputOptions) {
-    final List<CommandProvider> executableCommandProviders = new ArrayList<>();
+    final List<SchemaCrawlerCommandProvider> executableCommandProviders = new ArrayList<>();
     findSupportedCommands(
         command, schemaCrawlerOptions, additionalConfig, outputOptions, executableCommandProviders);
     findSupportedOutputFormats(command, outputOptions, executableCommandProviders);
 
     Collections.sort(executableCommandProviders, commandComparator);
 
-    final CommandProvider executableCommandProvider = executableCommandProviders.get(0);
+    final SchemaCrawlerCommandProvider executableCommandProvider = executableCommandProviders.get(0);
     LOGGER.log(Level.INFO, new StringFormat("Matched provider <%s>", executableCommandProvider));
 
     final String errorMessage = "Cannot run command <%s>".formatted(command);
@@ -137,8 +137,8 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
   @Override
   public Collection<PluginCommand> getCommandLineCommands() {
     final Collection<PluginCommand> commandLineCommands = new HashSet<>();
-    for (final CommandProvider commandProvider : commandRegistry) {
-      commandLineCommands.add(commandProvider.getCommandLineCommand());
+    for (final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider : commandRegistry) {
+      commandLineCommands.add(schemaCrawlerCommandProvider.getCommandLineCommand());
     }
     return commandLineCommands;
   }
@@ -146,8 +146,8 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
   @Override
   public Collection<PluginCommand> getHelpCommands() {
     final Collection<PluginCommand> commandLineCommands = new HashSet<>();
-    for (final CommandProvider commandProvider : commandRegistry) {
-      commandLineCommands.add(commandProvider.getHelpCommand());
+    for (final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider : commandRegistry) {
+      commandLineCommands.add(schemaCrawlerCommandProvider.getHelpCommand());
     }
     return commandLineCommands;
   }
@@ -155,8 +155,8 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
   @Override
   public Collection<PropertyName> getRegisteredPlugins() {
     final Collection<PropertyName> supportedCommands = new HashSet<>();
-    for (final CommandProvider commandProvider : commandRegistry) {
-      supportedCommands.addAll(commandProvider.getSupportedCommands());
+    for (final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider : commandRegistry) {
+      supportedCommands.addAll(schemaCrawlerCommandProvider.getSupportedCommands());
     }
 
     final List<PropertyName> supportedCommandsOrdered = new ArrayList<>(supportedCommands);
@@ -169,12 +169,12 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
       final SchemaCrawlerOptions schemaCrawlerOptions,
       final Config additionalConfig,
       final OutputOptions outputOptions,
-      final List<CommandProvider> executableCommandProviders) {
-    for (final CommandProvider commandProvider : commandRegistry) {
-      if (commandProvider.supportsSchemaCrawlerCommand(
+      final List<SchemaCrawlerCommandProvider> executableCommandProviders) {
+    for (final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider : commandRegistry) {
+      if (schemaCrawlerCommandProvider.supportsSchemaCrawlerCommand(
           command, schemaCrawlerOptions, additionalConfig, outputOptions)) {
-        executableCommandProviders.add(commandProvider);
-        LOGGER.log(Level.FINE, new StringFormat("Adding command-provider <%s>", commandProvider));
+        executableCommandProviders.add(schemaCrawlerCommandProvider);
+        LOGGER.log(Level.FINE, new StringFormat("Adding command-provider <%s>", schemaCrawlerCommandProvider));
       }
     }
     if (executableCommandProviders.isEmpty()) {
@@ -185,10 +185,10 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
   private void findSupportedOutputFormats(
       final String command,
       final OutputOptions outputOptions,
-      final List<CommandProvider> executableCommandProviders) {
-    final Iterator<CommandProvider> iterator = executableCommandProviders.iterator();
+      final List<SchemaCrawlerCommandProvider> executableCommandProviders) {
+    final Iterator<SchemaCrawlerCommandProvider> iterator = executableCommandProviders.iterator();
     while (iterator.hasNext()) {
-      final CommandProvider executableCommandProvider = iterator.next();
+      final SchemaCrawlerCommandProvider executableCommandProvider = iterator.next();
       if (!executableCommandProvider.supportsOutputFormat(command, outputOptions)) {
         LOGGER.log(
             Level.FINE,

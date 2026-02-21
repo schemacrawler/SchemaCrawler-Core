@@ -10,6 +10,8 @@ package schemacrawler.tools.executable;
 
 import static java.util.Objects.requireNonNull;
 
+import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
@@ -20,9 +22,10 @@ import schemacrawler.tools.options.OutputOptionsBuilder;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
-public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions>
-    extends BaseCommand<C, Void> implements SchemaCrawlerCommand<C> {
+public abstract class BaseSchemaCrawlerCommand<P extends CommandOptions> extends BaseCommand<P>
+    implements SchemaCrawlerCommand<P> {
 
+  protected ERModel erModel;
   protected Identifiers identifiers;
   protected InformationSchemaViews informationSchemaViews;
   protected OutputOptions outputOptions;
@@ -35,27 +38,13 @@ public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions>
     outputOptions = OutputOptionsBuilder.newOutputOptions();
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public final Void call() {
-    execute();
-    return null;
-  }
-
   /** Runtime exceptions will be thrown if the command is not available. */
   @Override
   public abstract void checkAvailability() throws RuntimeException;
 
-  /** {@inheritDoc} */
   @Override
-  public final void configure(final C commandOptions) {
-    this.commandOptions = requireNonNull(commandOptions, "No command options provided");
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public final C getCommandOptions() {
-    return commandOptions;
+  public ERModel getERModel() {
+    return erModel;
   }
 
   /** {@inheritDoc} */
@@ -90,6 +79,14 @@ public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions>
   public void initialize() {
     super.initialize();
     checkOptions();
+    if (erModel == null) {
+      erModel = EntityModelUtility.buildEmptyERModel();
+    }
+  }
+
+  @Override
+  public void setERModel(final ERModel erModel) {
+    this.erModel = requireNonNull(erModel, "No ER model provided");
   }
 
   /** {@inheritDoc} */

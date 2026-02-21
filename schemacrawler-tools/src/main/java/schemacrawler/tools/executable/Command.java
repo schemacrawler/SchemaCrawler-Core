@@ -9,23 +9,26 @@
 package schemacrawler.tools.executable;
 
 import java.sql.Connection;
-import java.util.concurrent.Callable;
-import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler executable unit. */
-public interface Command<P, R> extends Callable<R> {
+public interface Command<P> {
 
   void configure(P parameters);
+
+  /**
+   * Executes command, after configuration and pre-checks. May throw runtime exceptions on errors.
+   */
+  void execute();
 
   Catalog getCatalog();
 
   PropertyName getCommandName();
 
-  Connection getConnection();
+  P getCommandOptions();
 
-  ERModel getERModel();
+  Connection getConnection();
 
   /** Initializes the command for execution. */
   void initialize();
@@ -33,8 +36,6 @@ public interface Command<P, R> extends Callable<R> {
   void setCatalog(Catalog catalog);
 
   void setConnection(Connection connection);
-
-  void setERModel(ERModel erModel);
 
   default boolean usesConnection() {
     return false;

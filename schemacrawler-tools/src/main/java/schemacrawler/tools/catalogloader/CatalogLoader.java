@@ -20,9 +20,9 @@ public interface CatalogLoader extends Comparable<CatalogLoader> {
 
   Catalog getCatalog();
 
-  PropertyName getCatalogLoaderName();
-
   PluginCommand getCommandLineCommand();
+
+  PropertyName getCommandName();
 
   DatabaseConnectionSource getDataSource();
 
@@ -36,7 +36,7 @@ public interface CatalogLoader extends Comparable<CatalogLoader> {
 
   SchemaRetrievalOptions getSchemaRetrievalOptions();
 
-  void loadCatalog();
+  void execute();
 
   void setAdditionalConfiguration(Config additionalConfig);
 

@@ -55,6 +55,7 @@ module us.fatehi.schemacrawler.schemacrawler {
   uses schemacrawler.tools.catalogloader.CatalogLoader;
   uses schemacrawler.tools.databaseconnector.DatabaseConnector;
   uses schemacrawler.tools.executable.CommandProvider;
+  uses schemacrawler.tools.executable.SchemaCrawlerCommandProvider;
 
   provides schemacrawler.tools.catalogloader.CatalogLoader with
       schemacrawler.loader.attributes.AttributesCatalogLoader,

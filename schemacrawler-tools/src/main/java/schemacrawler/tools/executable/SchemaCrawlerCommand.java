@@ -8,26 +8,21 @@
 
 package schemacrawler.tools.executable;
 
+import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.tools.options.OutputOptions;
 
 /** A SchemaCrawler tools executable unit. */
-public interface SchemaCrawlerCommand<C extends CommandOptions> extends Command<C, Void> {
+public interface SchemaCrawlerCommand<C extends CommandOptions> extends Command<C> {
 
   /**
    * Checks whether a command is available, and throws a runtime exception if it is not available.
    */
   void checkAvailability();
 
-  /**
-   * Executes functionality for SchemaCrawler, after database metadata has been obtained. May throw
-   * runtime exceptions on errors.
-   */
-  void execute();
-
-  C getCommandOptions();
+  ERModel getERModel();
 
   Identifiers getIdentifiers();
 
@@ -36,6 +31,8 @@ public interface SchemaCrawlerCommand<C extends CommandOptions> extends Command<
   OutputOptions getOutputOptions();
 
   SchemaCrawlerOptions getSchemaCrawlerOptions();
+
+  void setERModel(ERModel erModel);
 
   void setIdentifiers(Identifiers identifiers);
 

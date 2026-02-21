@@ -11,19 +11,16 @@ package schemacrawler.tools.executable;
 import static java.util.Objects.requireNonNull;
 
 import java.sql.Connection;
-import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
-public abstract class BaseCommand<C, R> implements Command<C, R> {
+public abstract class BaseCommand<P> implements Command<P> {
 
   protected final PropertyName command;
-  protected C commandOptions;
+  protected P commandOptions;
   protected Catalog catalog;
-  protected ERModel erModel;
   protected Connection connection;
 
   protected BaseCommand(final PropertyName command) {
@@ -31,7 +28,7 @@ public abstract class BaseCommand<C, R> implements Command<C, R> {
   }
 
   @Override
-  public void configure(final C commandOptions) {
+  public void configure(final P commandOptions) {
     this.commandOptions = requireNonNull(commandOptions, "No command options provided");
   }
 
@@ -45,21 +42,20 @@ public abstract class BaseCommand<C, R> implements Command<C, R> {
     return command;
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public final P getCommandOptions() {
+    return commandOptions;
+  }
+
   @Override
   public final Connection getConnection() {
     return connection;
   }
 
   @Override
-  public ERModel getERModel() {
-    return erModel;
-  }
-
-  @Override
   public void initialize() {
-    if (erModel == null) {
-      erModel = EntityModelUtility.buildEmptyERModel();
-    }
+    // Placeholder stub
   }
 
   @Override
@@ -74,11 +70,6 @@ public abstract class BaseCommand<C, R> implements Command<C, R> {
           "<%s> does not use a connection".formatted(command.getName()));
     }
     this.connection = connection;
-  }
-
-  @Override
-  public void setERModel(final ERModel erModel) {
-    this.erModel = requireNonNull(erModel, "No ER model provided");
   }
 
   /** {@inheritDoc} */

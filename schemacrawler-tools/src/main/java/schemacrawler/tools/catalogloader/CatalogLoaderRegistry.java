@@ -91,7 +91,7 @@ public final class CatalogLoaderRegistry extends BasePluginRegistry
   public Collection<PropertyName> getRegisteredPlugins() {
     final List<PropertyName> commandLineCommands = new ArrayList<>();
     for (final CatalogLoader catalogLoader : catalogLoaderRegistry) {
-      final PropertyName catalogLoaderName = catalogLoader.getCatalogLoaderName();
+      final PropertyName catalogLoaderName = catalogLoader.getCommandName();
       commandLineCommands.add(catalogLoaderName);
     }
     // Do not sort property names, since the loaders are already sorted in order of priority
