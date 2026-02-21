@@ -22,8 +22,8 @@ import schemacrawler.tools.options.OutputOptionsBuilder;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
-public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions> extends BaseCommand<C>
-    implements SchemaCrawlerCommand<C> {
+public abstract class BaseSchemaCrawlerCommand<P extends CommandOptions> extends BaseCommand<P>
+    implements SchemaCrawlerCommand<P> {
 
   protected ERModel erModel;
   protected Identifiers identifiers;
@@ -41,18 +41,6 @@ public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions> extends
   /** Runtime exceptions will be thrown if the command is not available. */
   @Override
   public abstract void checkAvailability() throws RuntimeException;
-
-  /** {@inheritDoc} */
-  @Override
-  public final void configure(final C commandOptions) {
-    this.commandOptions = requireNonNull(commandOptions, "No command options provided");
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public final C getCommandOptions() {
-    return commandOptions;
-  }
 
   @Override
   public ERModel getERModel() {

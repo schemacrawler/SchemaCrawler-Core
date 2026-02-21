@@ -22,8 +22,6 @@ public interface SchemaCrawlerCommand<C extends CommandOptions> extends Command<
    */
   void checkAvailability();
 
-  C getCommandOptions();
-
   ERModel getERModel();
 
   Identifiers getIdentifiers();

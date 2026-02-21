@@ -26,6 +26,8 @@ public interface Command<P> {
 
   PropertyName getCommandName();
 
+  P getCommandOptions();
+
   Connection getConnection();
 
   /** Initializes the command for execution. */

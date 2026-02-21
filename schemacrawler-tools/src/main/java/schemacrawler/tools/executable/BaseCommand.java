@@ -16,10 +16,10 @@ import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
-public abstract class BaseCommand<C> implements Command<C> {
+public abstract class BaseCommand<P> implements Command<P> {
 
   protected final PropertyName command;
-  protected C commandOptions;
+  protected P commandOptions;
   protected Catalog catalog;
   protected Connection connection;
 
@@ -28,7 +28,7 @@ public abstract class BaseCommand<C> implements Command<C> {
   }
 
   @Override
-  public void configure(final C commandOptions) {
+  public void configure(final P commandOptions) {
     this.commandOptions = requireNonNull(commandOptions, "No command options provided");
   }
 
@@ -40,6 +40,12 @@ public abstract class BaseCommand<C> implements Command<C> {
   @Override
   public final PropertyName getCommandName() {
     return command;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final P getCommandOptions() {
+    return commandOptions;
   }
 
   @Override
