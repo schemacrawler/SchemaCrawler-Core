@@ -13,8 +13,6 @@ import static schemacrawler.tools.utility.SchemaCrawlerUtility.matchSchemaRetrie
 import static schemacrawler.tools.utility.SchemaCrawlerUtility.updateConnectionDataSource;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.ermodel.model.ERModel;
@@ -81,13 +79,6 @@ public final class SchemaCrawlerExecutable {
       updateConnectionDataSource(dataSource, schemaRetrievalOptions);
     }
 
-    final Connection connection;
-
-    if (dataSource == null) {
-      connection = null;
-    } else {
-      connection = dataSource.get();
-    }
     try {
 
       // Load the command to see if it is available
@@ -116,7 +107,7 @@ public final class SchemaCrawlerExecutable {
       scCommand.setERModel(erModel);
 
       if (scCommand.usesConnection()) {
-        scCommand.setConnection(connection);
+        scCommand.setDataSource(dataSource);
       }
 
       // Execute
@@ -128,14 +119,6 @@ public final class SchemaCrawlerExecutable {
       throw e;
     } catch (final Exception e) {
       throw new ExecutionRuntimeException(e);
-    } finally {
-      if (connection != null) {
-        try {
-          connection.close();
-        } catch (final SQLException e) {
-          LOGGER.log(Level.WARNING, e.getMessage(), e);
-        }
-      }
     }
   }
 

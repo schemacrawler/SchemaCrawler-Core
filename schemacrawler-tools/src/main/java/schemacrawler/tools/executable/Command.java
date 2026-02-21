@@ -8,8 +8,8 @@
 
 package schemacrawler.tools.executable;
 
-import java.sql.Connection;
 import schemacrawler.schema.Catalog;
+import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler executable unit. */
@@ -28,14 +28,14 @@ public interface Command<P> {
 
   P getCommandOptions();
 
-  Connection getConnection();
+  DatabaseConnectionSource getDataSource();
 
   /** Initializes the command for execution. */
   void initialize();
 
   void setCatalog(Catalog catalog);
 
-  void setConnection(Connection connection);
+  void setDataSource(DatabaseConnectionSource dataSource);
 
   default boolean usesConnection() {
     return false;

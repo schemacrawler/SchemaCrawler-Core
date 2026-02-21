@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.sql.Connection;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
+import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
@@ -21,7 +21,7 @@ public abstract class BaseCommand<P> implements Command<P> {
   protected final PropertyName command;
   protected P commandOptions;
   protected Catalog catalog;
-  protected Connection connection;
+  private DatabaseConnectionSource dataSource;
 
   protected BaseCommand(final PropertyName command) {
     this.command = requireNonNull(command, "No command specified");
@@ -48,9 +48,16 @@ public abstract class BaseCommand<P> implements Command<P> {
     return commandOptions;
   }
 
-  @Override
   public final Connection getConnection() {
-    return connection;
+    if (usesConnection() && dataSource != null) {
+      return dataSource.get();
+    }
+    return null;
+  }
+
+  @Override
+  public final DatabaseConnectionSource getDataSource() {
+    return dataSource;
   }
 
   @Override
@@ -64,12 +71,8 @@ public abstract class BaseCommand<P> implements Command<P> {
   }
 
   @Override
-  public final void setConnection(final Connection connection) {
-    if (!usesConnection()) {
-      throw new ExecutionRuntimeException(
-          "<%s> does not use a connection".formatted(command.getName()));
-    }
-    this.connection = connection;
+  public final void setDataSource(final DatabaseConnectionSource dataSource) {
+    this.dataSource = dataSource;
   }
 
   /** {@inheritDoc} */
