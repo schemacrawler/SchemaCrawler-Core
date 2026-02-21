@@ -15,7 +15,7 @@ import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
 import us.fatehi.utility.property.PropertyName;
 
-public interface CommandProvider {
+public interface SchemaCrawlerCommandProvider {
 
   PluginCommand getCommandLineCommand();
 

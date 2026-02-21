@@ -18,7 +18,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.test.utility.testcommand.TestCommandProvider;
 import schemacrawler.tools.executable.BaseCommandProvider;
-import schemacrawler.tools.executable.CommandProvider;
+import schemacrawler.tools.executable.SchemaCrawlerCommandProvider;
 import schemacrawler.tools.executable.CommandRegistry;
 import schemacrawler.tools.executable.SchemaCrawlerCommand;
 import schemacrawler.tools.options.Config;
@@ -45,8 +45,8 @@ public class CommandProviderSortTest {
   }
 
   private final TestCommandProvider testCommandProvider = new TestCommandProvider();
-  private final CommandProvider fallbackCommandProvider = new OperationCommandProvider();
-  private final CommandProvider otherCommandProvider =
+  private final SchemaCrawlerCommandProvider fallbackCommandProvider = new OperationCommandProvider();
+  private final SchemaCrawlerCommandProvider otherCommandProvider =
       new BaseCommandProvider(
           List.of(new PropertyName("OtherCommandProvider", "OtherCommandProvider"))) {
 

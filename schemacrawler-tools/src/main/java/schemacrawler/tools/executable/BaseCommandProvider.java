@@ -20,7 +20,7 @@ import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
 import us.fatehi.utility.property.PropertyName;
 
-public abstract class BaseCommandProvider implements CommandProvider {
+public abstract class BaseCommandProvider implements SchemaCrawlerCommandProvider {
   private final Collection<PropertyName> supportedCommands;
 
   public BaseCommandProvider(final Collection<PropertyName> supportedCommands) {
