@@ -51,7 +51,7 @@ public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
 
   @Override
   public PluginCommand getCommandLineCommand() {
-    final PropertyName catalogLoaderName = getCatalogLoaderName();
+    final PropertyName catalogLoaderName = getCommandName();
     final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(catalogLoaderName);
     pluginCommand.addOption(
         OPTION_WEAK_ASSOCIATIONS,

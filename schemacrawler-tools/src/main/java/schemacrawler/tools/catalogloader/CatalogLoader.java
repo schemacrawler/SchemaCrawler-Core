@@ -20,9 +20,9 @@ public interface CatalogLoader extends Comparable<CatalogLoader> {
 
   Catalog getCatalog();
 
-  PropertyName getCatalogLoaderName();
-
   PluginCommand getCommandLineCommand();
+
+  PropertyName getCommandName();
 
   DatabaseConnectionSource getDataSource();
 
