@@ -8,6 +8,7 @@
 
 package schemacrawler.tools.executable;
 
+import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -29,6 +30,8 @@ public interface SchemaCrawlerCommand<C extends CommandOptions> extends Command<
 
   C getCommandOptions();
 
+  ERModel getERModel();
+
   Identifiers getIdentifiers();
 
   InformationSchemaViews getInformationSchemaViews();
@@ -36,6 +39,8 @@ public interface SchemaCrawlerCommand<C extends CommandOptions> extends Command<
   OutputOptions getOutputOptions();
 
   SchemaCrawlerOptions getSchemaCrawlerOptions();
+
+  void setERModel(ERModel erModel);
 
   void setIdentifiers(Identifiers identifiers);
 

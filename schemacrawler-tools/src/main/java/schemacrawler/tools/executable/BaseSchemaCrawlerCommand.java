@@ -10,6 +10,8 @@ package schemacrawler.tools.executable;
 
 import static java.util.Objects.requireNonNull;
 
+import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
@@ -23,6 +25,7 @@ import us.fatehi.utility.property.PropertyName;
 public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions>
     extends BaseCommand<C, Void> implements SchemaCrawlerCommand<C> {
 
+  protected ERModel erModel;
   protected Identifiers identifiers;
   protected InformationSchemaViews informationSchemaViews;
   protected OutputOptions outputOptions;
@@ -58,6 +61,11 @@ public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions>
     return commandOptions;
   }
 
+  @Override
+  public ERModel getERModel() {
+    return erModel;
+  }
+
   /** {@inheritDoc} */
   @Override
   public Identifiers getIdentifiers() {
@@ -90,6 +98,14 @@ public abstract class BaseSchemaCrawlerCommand<C extends CommandOptions>
   public void initialize() {
     super.initialize();
     checkOptions();
+    if (erModel == null) {
+      erModel = EntityModelUtility.buildEmptyERModel();
+    }
+  }
+
+  @Override
+  public void setERModel(final ERModel erModel) {
+    this.erModel = requireNonNull(erModel, "No ER model provided");
   }
 
   /** {@inheritDoc} */
