@@ -115,7 +115,7 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
     final String errorMessage = "Cannot run command <%s>".formatted(command);
     final SchemaCrawlerCommand<?> scCommand;
     try {
-      scCommand = executableCommandProvider.newSchemaCrawlerCommand(command, additionalConfig);
+      scCommand = executableCommandProvider.newCommand(command, additionalConfig);
       if (scCommand == null) {
         throw new ExecutionRuntimeException("No SchemaCrawler command instantiated");
       }

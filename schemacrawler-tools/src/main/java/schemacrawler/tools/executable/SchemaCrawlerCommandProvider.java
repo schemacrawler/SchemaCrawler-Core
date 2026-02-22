@@ -25,7 +25,7 @@ public interface SchemaCrawlerCommandProvider {
 
   Collection<PropertyName> getSupportedCommands();
 
-  SchemaCrawlerCommand<?> newSchemaCrawlerCommand(String command, Config config);
+  SchemaCrawlerCommand<?> newCommand(String command, Config config);
 
   boolean supportsOutputFormat(String command, OutputOptions outputOptions);
 
