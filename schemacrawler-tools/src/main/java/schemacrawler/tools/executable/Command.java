@@ -9,6 +9,7 @@
 package schemacrawler.tools.executable;
 
 import schemacrawler.schema.Catalog;
+import schemacrawler.schemacrawler.Options;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 
