@@ -8,6 +8,7 @@
 
 package schemacrawler.loader.counts;
 
+import static java.util.Objects.requireNonNull;
 import static schemacrawler.filter.ReducerFactory.getTableReducer;
 
 import java.util.logging.Level;
@@ -23,16 +24,59 @@ import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 
-public class TableRowCountsCatalogLoader extends BaseCatalogLoader {
+public class TableRowCountsCatalogLoader
+    extends BaseCatalogLoader<TableRowCountsCatalogLoaderOptions> {
 
   private static final Logger LOGGER =
       Logger.getLogger(TableRowCountsCatalogLoader.class.getName());
 
-  private static final String OPTION_NO_EMPTY_TABLES = "no-empty-tables";
-  private static final String OPTION_LOAD_ROW_COUNTS = "load-row-counts";
+  static final String OPTION_NO_EMPTY_TABLES = "no-empty-tables";
+  static final String OPTION_LOAD_ROW_COUNTS = "load-row-counts";
 
   public TableRowCountsCatalogLoader() {
     super(new PropertyName("countsloader", "Loader for table row counts"), 2);
+  }
+
+  @Override
+  public void execute() {
+    if (!isLoaded()) {
+      return;
+    }
+
+    LOGGER.log(Level.INFO, "Retrieving table row counts");
+    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadTableRowCounts", 1); ) {
+      final Catalog catalog = getCatalog();
+      final TableRowCountsRetriever rowCountsRetriever =
+          new TableRowCountsRetriever(getDataSource(), catalog);
+      final TableRowCountsCatalogLoaderOptions commandOptions = getCommandOptions();
+
+      final boolean loadRowCounts = commandOptions.loadRowCounts();
+      if (!loadRowCounts) {
+        LOGGER.log(Level.INFO, "Not retrieving table row counts, since this was not requested");
+        return;
+      }
+      taskRunner.add(
+          new TaskDefinition(
+              "retrieveTableRowCounts", () -> rowCountsRetriever.retrieveTableRowCounts()));
+      taskRunner.submit();
+
+      final boolean noEmptyTables = commandOptions.noEmptyTables();
+      if (!noEmptyTables) {
+        LOGGER.log(Level.INFO, "Not removing empty tables");
+        return;
+      }
+      taskRunner.add(
+          new TaskDefinition(
+              "filterEmptyTables",
+              () ->
+                  catalog.reduce(
+                      Table.class, getTableReducer(new TableRowCountsFilter(noEmptyTables)))));
+      taskRunner.submit();
+
+      LOGGER.log(Level.INFO, taskRunner.report());
+    } catch (final Exception e) {
+      throw new ExecutionRuntimeException("Exception retrieving table row counts", e);
+    }
   }
 
   @Override
@@ -56,44 +100,8 @@ public class TableRowCountsCatalogLoader extends BaseCatalogLoader {
   }
 
   @Override
-  public void execute() {
-    if (!isLoaded()) {
-      return;
-    }
-
-    LOGGER.log(Level.INFO, "Retrieving table row counts");
-    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadTableRowCounts", 1); ) {
-      final Catalog catalog = getCatalog();
-      final TableRowCountsRetriever rowCountsRetriever =
-          new TableRowCountsRetriever(getDataSource(), catalog);
-      final Config config = getAdditionalConfiguration();
-      taskRunner.add(
-          new TaskDefinition(
-              "retrieveTableRowCounts",
-              () -> {
-                final boolean loadRowCounts = config.getBooleanValue(OPTION_LOAD_ROW_COUNTS, false);
-                if (loadRowCounts) {
-                  rowCountsRetriever.retrieveTableRowCounts();
-                } else {
-                  LOGGER.log(
-                      Level.INFO, "Not retrieving table row counts, since this was not requested");
-                }
-              }));
-      taskRunner.submit();
-
-      taskRunner.add(
-          new TaskDefinition(
-              "filterEmptyTables",
-              () -> {
-                final boolean noEmptyTables = config.getBooleanValue(OPTION_NO_EMPTY_TABLES, false);
-                catalog.reduce(
-                    Table.class, getTableReducer(new TableRowCountsFilter(noEmptyTables)));
-              }));
-      taskRunner.submit();
-
-      LOGGER.log(Level.INFO, taskRunner.report());
-    } catch (final Exception e) {
-      throw new ExecutionRuntimeException("Exception retrieving table row counts", e);
-    }
+  public void setAdditionalConfiguration(final Config additionalConfig) {
+    requireNonNull(additionalConfig, "No config provided");
+    setCommandOptions(TableRowCountsCatalogLoaderOptions.fromConfig(additionalConfig));
   }
 }

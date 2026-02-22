@@ -13,7 +13,7 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler executable unit. */
-public interface Command<P> {
+public interface Command<P extends CommandOptions> {
 
   void configure(P parameters);
 

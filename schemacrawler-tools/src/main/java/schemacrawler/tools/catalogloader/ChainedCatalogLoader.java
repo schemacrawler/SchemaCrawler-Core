@@ -18,17 +18,24 @@ import java.util.logging.Logger;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
+import schemacrawler.tools.catalogloader.ChainedCatalogLoader.ChainedCatalogLoaderOptions;
+import schemacrawler.tools.executable.CommandOptions;
 import schemacrawler.tools.options.Config;
+import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.StringFormat;
 
-public class ChainedCatalogLoader extends BaseCatalogLoader implements Iterable<CatalogLoader> {
+public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoaderOptions>
+    implements Iterable<CatalogLoader> {
+
+  static record ChainedCatalogLoaderOptions() implements CommandOptions {}
 
   private static final Logger LOGGER = Logger.getLogger(ChainedCatalogLoader.class.getName());
 
   private final List<CatalogLoader> chainedCatalogLoaders;
+  private Config additionalConfig;
 
   public ChainedCatalogLoader(final List<CatalogLoader> chainedCatalogLoaders) {
     super(
@@ -39,17 +46,11 @@ public class ChainedCatalogLoader extends BaseCatalogLoader implements Iterable<
   }
 
   @Override
-  public Iterator<CatalogLoader> iterator() {
-    return chainedCatalogLoaders.iterator();
-  }
-
-  @Override
   public void execute() {
     Catalog catalog = null;
     final DatabaseConnectionSource dataSource = getDataSource();
     final SchemaCrawlerOptions schemaCrawlerOptions = getSchemaCrawlerOptions();
     final SchemaRetrievalOptions schemaRetrievalOptions = getSchemaRetrievalOptions();
-    final Config additionalConfig = getAdditionalConfiguration();
     for (final CatalogLoader nextCatalogLoader : chainedCatalogLoaders) {
       LOGGER.log(
           Level.CONFIG,
@@ -66,6 +67,21 @@ public class ChainedCatalogLoader extends BaseCatalogLoader implements Iterable<
     }
     MetaDataUtility.logCatalogSummary(catalog, Level.INFO);
     setCatalog(catalog);
+  }
+
+  @Override
+  public Iterator<CatalogLoader> iterator() {
+    return chainedCatalogLoaders.iterator();
+  }
+
+  @Override
+  public void setAdditionalConfiguration(final Config additionalConfig) {
+    setCommandOptions(new ChainedCatalogLoaderOptions());
+
+    if (additionalConfig == null) {
+      this.additionalConfig = ConfigUtility.newConfig();
+    }
+    this.additionalConfig = additionalConfig;
   }
 
   @Override
