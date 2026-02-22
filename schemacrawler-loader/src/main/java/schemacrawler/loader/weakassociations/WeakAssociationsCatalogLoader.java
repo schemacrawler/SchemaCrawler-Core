@@ -8,6 +8,8 @@
 
 package schemacrawler.loader.weakassociations;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
