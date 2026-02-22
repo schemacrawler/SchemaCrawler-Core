@@ -84,6 +84,21 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
   }
 
   @Override
+  public Iterator<CatalogLoader> iterator() {
+    return chainedCatalogLoaders.iterator();
+  }
+
+  @Override
+  public void setAdditionalConfiguration(final Config additionalConfig) {
+    setCommandOptions(new ChainedCatalogLoaderOptions());
+
+    if (additionalConfig == null) {
+      this.additionalConfig = ConfigUtility.newConfig();
+    }
+    this.additionalConfig = additionalConfig;
+  }
+
+  @Override
   public String toString() {
     return "CatalogLoaderProvider [" + catalogLoaderProviders + "]";
   }
