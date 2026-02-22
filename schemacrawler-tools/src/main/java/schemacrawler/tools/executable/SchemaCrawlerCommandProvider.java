@@ -14,7 +14,8 @@ import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
 import us.fatehi.utility.property.PropertyName;
 
-public interface SchemaCrawlerCommandProvider extends CommandProvider {
+public interface SchemaCrawlerCommandProvider<C extends SchemaCrawlerCommand<?>>
+    extends CommandProvider<C> {
 
   Collection<PropertyName> getSupportedCommands();
 

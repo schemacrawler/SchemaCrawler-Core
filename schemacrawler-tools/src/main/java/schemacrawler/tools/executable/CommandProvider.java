@@ -11,7 +11,7 @@ package schemacrawler.tools.executable;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
 
-public interface CommandProvider {
+public interface CommandProvider<C extends Command<?>> {
 
   PluginCommand getCommandLineCommand();
 
@@ -19,5 +19,5 @@ public interface CommandProvider {
     return getCommandLineCommand();
   }
 
-  SchemaCrawlerCommand<?> newCommand(String command, Config config);
+  C newCommand(String command, Config config);
 }
