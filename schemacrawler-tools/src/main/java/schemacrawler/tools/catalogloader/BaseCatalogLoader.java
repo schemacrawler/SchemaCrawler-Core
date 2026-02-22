@@ -21,13 +21,13 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
+import schemacrawler.tools.executable.CommandOptions;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.options.Config;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.StringFormat;
 
-public abstract class BaseCatalogLoader implements CatalogLoader {
+public abstract class BaseCatalogLoader<P extends CommandOptions> implements CatalogLoader {
 
   private static final Logger LOGGER = Logger.getLogger(BaseCatalogLoader.class.getName());
 
@@ -39,7 +39,7 @@ public abstract class BaseCatalogLoader implements CatalogLoader {
   private final PropertyName catalogLoaderName;
   private SchemaRetrievalOptions schemaRetrievalOptions;
   private SchemaCrawlerOptions schemaCrawlerOptions;
-  private Config additionalConfig;
+  private P commandOptions;
   private DatabaseConnectionSource dataSource;
   private Catalog catalog;
 
@@ -59,13 +59,13 @@ public abstract class BaseCatalogLoader implements CatalogLoader {
   }
 
   @Override
-  public final PropertyName getCommandName() {
-    return catalogLoaderName;
+  public PluginCommand getCommandLineCommand() {
+    return PluginCommand.empty();
   }
 
   @Override
-  public PluginCommand getCommandLineCommand() {
-    return PluginCommand.empty();
+  public final PropertyName getCommandName() {
+    return catalogLoaderName;
   }
 
   @Override
@@ -94,14 +94,6 @@ public abstract class BaseCatalogLoader implements CatalogLoader {
     return schemaRetrievalOptions;
   }
 
-  /**
-   * @param additionalConfig the additionalConfig to set
-   */
-  @Override
-  public final void setAdditionalConfiguration(final Config additionalConfig) {
-    this.additionalConfig = additionalConfig;
-  }
-
   @Override
   public final void setCatalog(final Catalog catalog) {
     if (catalog != null) {
@@ -125,8 +117,8 @@ public abstract class BaseCatalogLoader implements CatalogLoader {
     this.schemaRetrievalOptions = schemaRetrievalOptions;
   }
 
-  protected final Config getAdditionalConfiguration() {
-    return additionalConfig;
+  protected final P getCommandOptions() {
+    return commandOptions;
   }
 
   protected final boolean isDatabaseSystemIdentifier(final String databaseSystemIdentifier) {
@@ -143,5 +135,9 @@ public abstract class BaseCatalogLoader implements CatalogLoader {
 
   protected final boolean isLoaded() {
     return catalog != null;
+  }
+
+  protected void setCommandOptions(P commandOptions) {
+    this.commandOptions = commandOptions;
   }
 }

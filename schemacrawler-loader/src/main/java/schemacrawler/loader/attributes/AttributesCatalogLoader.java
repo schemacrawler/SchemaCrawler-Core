@@ -8,8 +8,8 @@
 
 package schemacrawler.loader.attributes;
 
+import static java.util.Objects.requireNonNull;
 import static schemacrawler.loader.attributes.model.CatalogAttributesUtility.readCatalogAttributes;
-import static us.fatehi.utility.Utility.isBlank;
 
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -34,7 +34,6 @@ import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import schemacrawler.tools.catalogloader.BaseCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
-import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.ioresource.InputResource;
 import us.fatehi.utility.ioresource.InputResourceUtility;
 import us.fatehi.utility.property.PropertyName;
@@ -43,11 +42,11 @@ import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 import us.fatehi.utility.string.StringFormat;
 
-public class AttributesCatalogLoader extends BaseCatalogLoader {
+public class AttributesCatalogLoader extends BaseCatalogLoader<AttributesCatalogLoaderOptions> {
 
   private static final Logger LOGGER = Logger.getLogger(AttributesCatalogLoader.class.getName());
 
-  private static final String OPTION_ATTRIBUTES_FILE = "attributes-file";
+  static final String OPTION_ATTRIBUTES_FILE = "attributes-file";
 
   public AttributesCatalogLoader() {
     super(
@@ -57,34 +56,24 @@ public class AttributesCatalogLoader extends BaseCatalogLoader {
   }
 
   @Override
-  public PluginCommand getCommandLineCommand() {
-    final PropertyName catalogLoaderName = getCommandName();
-    final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(catalogLoaderName);
-    pluginCommand.addOption(
-        OPTION_ATTRIBUTES_FILE,
-        String.class,
-        "Path to a YAML file with table and column attributes to add to the schema");
-    return pluginCommand;
-  }
-
-  @Override
   public void execute() {
     if (!isLoaded()) {
       return;
     }
 
-    LOGGER.log(Level.INFO, "Retrieving catalog attributes");
+    final AttributesCatalogLoaderOptions commandOptions = getCommandOptions();
 
+    if (!commandOptions.hasCatalogAttributesFile()) {
+      LOGGER.log(Level.CONFIG, "No catalog attributes file specified");
+      return;
+    }
+
+    LOGGER.log(Level.INFO, "Retrieving catalog attributes");
+    final String catalogAttributesFile = commandOptions.catalogAttributesFile();
     try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadAttributes", 1); ) {
       final Catalog catalog = getCatalog();
-      final Config config =
-          Optional.ofNullable(getAdditionalConfiguration()).orElseGet(ConfigUtility::newConfig);
       final TaskDefinition.TaskRunnable taskRunnable =
           () -> {
-            final String catalogAttributesFile = config.getStringValue(OPTION_ATTRIBUTES_FILE);
-            if (isBlank(catalogAttributesFile)) {
-              return;
-            }
             final InputResource inputResource =
                 resolveCatalogAttributesInputResource(catalogAttributesFile)
                     .orElseThrow(
@@ -105,6 +94,23 @@ public class AttributesCatalogLoader extends BaseCatalogLoader {
     } catch (final Exception e) {
       throw new ExecutionRuntimeException("Exception loading catalog attributes", e);
     }
+  }
+
+  @Override
+  public PluginCommand getCommandLineCommand() {
+    final PropertyName catalogLoaderName = getCommandName();
+    final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(catalogLoaderName);
+    pluginCommand.addOption(
+        OPTION_ATTRIBUTES_FILE,
+        String.class,
+        "Path to a YAML file with table and column attributes to add to the schema");
+    return pluginCommand;
+  }
+
+  @Override
+  public void setAdditionalConfiguration(final Config additionalConfig) {
+    requireNonNull(additionalConfig, "No config provided");
+    setCommandOptions(AttributesCatalogLoaderOptions.fromConfig(additionalConfig));
   }
 
   private void loadAlternateKeys(final Catalog catalog, final CatalogAttributes catalogAttributes) {

@@ -10,9 +10,15 @@ package schemacrawler.tools.catalogloader;
 
 import schemacrawler.crawl.SchemaCrawler;
 import schemacrawler.schema.Catalog;
+import schemacrawler.tools.catalogloader.SchemaCrawlerCatalogLoader.SchemaCrawlerCatalogLoaderOptions;
+import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
-public class SchemaCrawlerCatalogLoader extends BaseCatalogLoader {
+public class SchemaCrawlerCatalogLoader
+    extends BaseCatalogLoader<SchemaCrawlerCatalogLoaderOptions> {
+
+  static record SchemaCrawlerCatalogLoaderOptions() implements CommandOptions {}
 
   public SchemaCrawlerCatalogLoader() {
     super(new PropertyName("schemacrawlerloader", "Loader for SchemaCrawler metadata catalog"), 0);
@@ -28,5 +34,10 @@ public class SchemaCrawlerCatalogLoader extends BaseCatalogLoader {
         new SchemaCrawler(getDataSource(), getSchemaRetrievalOptions(), getSchemaCrawlerOptions());
     final Catalog catalog = schemaCrawler.crawl();
     setCatalog(catalog);
+  }
+
+  @Override
+  public void setAdditionalConfiguration(final Config additionalConfig) {
+    setCommandOptions(new SchemaCrawlerCatalogLoaderOptions());
   }
 }

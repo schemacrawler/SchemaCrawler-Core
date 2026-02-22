@@ -8,6 +8,8 @@
 
 package schemacrawler.loader.weakassociations;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,16 +39,43 @@ import us.fatehi.utility.string.StringFormat;
  * Enabling these options can have a significant performance impact on schema loading, as it
  * involves analyzing naming patterns across all tables.
  */
-public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
+public final class WeakAssociationsCatalogLoader
+    extends BaseCatalogLoader<WeakAssociationsCatalogLoaderOptions> {
 
   private static final Logger LOGGER =
       Logger.getLogger(WeakAssociationsCatalogLoader.class.getName());
 
-  private static final String OPTION_WEAK_ASSOCIATIONS = "weak-associations";
-  private static final String OPTION_INFER_EXTENSION_TABLES = "infer-extension-tables";
+  static final String OPTION_WEAK_ASSOCIATIONS = "weak-associations";
+  static final String OPTION_INFER_EXTENSION_TABLES = "infer-extension-tables";
 
   public WeakAssociationsCatalogLoader() {
     super(new PropertyName("weakassociationsloader", "Loader for weak associations"), 3);
+  }
+
+  @Override
+  public void execute() {
+    if (!isLoaded()) {
+      return;
+    }
+
+    final WeakAssociationsCatalogLoaderOptions commandOptions = getCommandOptions();
+    final boolean findWeakAssociations = commandOptions.findWeakAssociations();
+    final boolean inferExtensionTables = commandOptions.inferExtensionTables();
+    if (!findWeakAssociations) {
+      LOGGER.log(Level.INFO, "Not retrieving weak associations, since this was not requested");
+      return;
+    }
+    LOGGER.log(Level.INFO, "Finding weak associations");
+
+    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadWeakAssociations", 1); ) {
+      taskRunner.add(
+          new TaskDefinition(
+              "retrieveWeakAssociations", () -> findWeakAssociations(inferExtensionTables)));
+      taskRunner.submit();
+      LOGGER.log(Level.INFO, taskRunner.report());
+    } catch (final Exception e) {
+      throw new ExecutionRuntimeException("Exception retrieving weak association information", e);
+    }
   }
 
   @Override
@@ -70,34 +99,9 @@ public final class WeakAssociationsCatalogLoader extends BaseCatalogLoader {
   }
 
   @Override
-  public void execute() {
-    if (!isLoaded()) {
-      return;
-    }
-
-    LOGGER.log(Level.INFO, "Finding weak associations");
-    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadWeakAssociations", 1); ) {
-      taskRunner.add(
-          new TaskDefinition(
-              "retrieveWeakAssociations",
-              () -> {
-                final Config config = getAdditionalConfiguration();
-                final boolean findWeakAssociations =
-                    config.getBooleanValue(OPTION_WEAK_ASSOCIATIONS, false);
-                final boolean inferExtensionTables =
-                    config.getBooleanValue(OPTION_INFER_EXTENSION_TABLES, false);
-                if (findWeakAssociations) {
-                  findWeakAssociations(inferExtensionTables);
-                } else {
-                  LOGGER.log(
-                      Level.INFO, "Not retrieving weak associations, since this was not requested");
-                }
-              }));
-      taskRunner.submit();
-      LOGGER.log(Level.INFO, taskRunner.report());
-    } catch (final Exception e) {
-      throw new ExecutionRuntimeException("Exception retrieving weak association information", e);
-    }
+  public void setAdditionalConfiguration(final Config additionalConfig) {
+    requireNonNull(additionalConfig, "No config provided");
+    setCommandOptions(WeakAssociationsCatalogLoaderOptions.fromConfig(additionalConfig));
   }
 
   private void findWeakAssociations(final boolean inferExtensionTables) {
