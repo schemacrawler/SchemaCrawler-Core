@@ -12,11 +12,12 @@ import static java.util.Objects.requireNonNull;
 
 import java.sql.Connection;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schemacrawler.Options;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
-public abstract class BaseCommand<P> implements Command<P> {
+public abstract class BaseCommand<P extends Options> implements Command<P> {
 
   protected final PropertyName command;
   protected P commandOptions;
