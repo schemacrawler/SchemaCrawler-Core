@@ -12,7 +12,8 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
 
-public interface SchemaCrawlerCommandProvider extends CommandProvider {
+public interface SchemaCrawlerCommandProvider<C extends SchemaCrawlerCommand<?>>
+    extends CommandProvider<C> {
 
   boolean supportsOutputFormat(String command, OutputOptions outputOptions);
 
