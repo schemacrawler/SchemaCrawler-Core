@@ -76,4 +76,8 @@ public abstract class BaseCatalogLoader<P extends CommandOptions> extends BaseCo
   protected final boolean isLoaded() {
     return catalog != null;
   }
+
+  protected void setCommandOptions(P commandOptions) {
+    this.commandOptions = commandOptions;
+  }
 }
