@@ -8,7 +8,6 @@
 
 package schemacrawler.plugin;
 
-import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class EnumDataTypeInfo implements TypedObject<EnumDataTypeTypes> {
   }
 
   public static final EnumDataTypeInfo EMPTY_ENUM_DATA_TYPE_INFO =
-      new EnumDataTypeInfo(EnumDataTypeTypes.not_enumerated, emptyList());
+      new EnumDataTypeInfo(EnumDataTypeTypes.not_enumerated, List.of());
 
   private final EnumDataTypeTypes type;
   private final List<String> enumValues;

@@ -8,8 +8,6 @@
 
 package schemacrawler.loader.attributes.model;
 
-import static java.util.Collections.emptyList;
-
 import java.beans.ConstructorProperties;
 import java.io.Serial;
 import java.util.Iterator;
@@ -38,7 +36,7 @@ public class TableAttributes extends ObjectAttributes implements Iterable<Column
     this.catalogName = catalogName;
     this.schemaName = schemaName;
     if (columns == null) {
-      this.columns = emptyList();
+      this.columns = List.of();
     } else {
       this.columns = List.copyOf(columns);
     }

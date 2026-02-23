@@ -13,7 +13,6 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -84,7 +83,7 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public Collection<PrimaryKey> getAlternateKeys() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
@@ -99,12 +98,12 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public Collection<ForeignKey> getExportedForeignKeys() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
   public Collection<ForeignKey> getForeignKeys() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
@@ -114,12 +113,12 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public Collection<ForeignKey> getImportedForeignKeys() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
   public Collection<Index> getIndexes() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
@@ -129,17 +128,17 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public Collection<Privilege<Table>> getPrivileges() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
   public Collection<Table> getRelatedTables(final TableRelationshipType tableRelationshipType) {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
   public Collection<TableConstraint> getTableConstraints() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
@@ -159,13 +158,13 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public Collection<DatabaseObject> getUsedByObjects() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
   @Deprecated(forRemoval = true)
   public Collection<WeakAssociation> getWeakAssociations() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override

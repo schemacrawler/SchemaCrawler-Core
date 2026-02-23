@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.EnumUtility.enumValue;
 import static us.fatehi.utility.Utility.isBlank;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,7 +41,7 @@ public final class Config implements Options, ReadConfig {
    */
   @Deprecated(forRemoval = true)
   public Config() {
-    this(Collections.emptyMap());
+    this(Map.of());
   }
 
   /**
@@ -53,7 +52,7 @@ public final class Config implements Options, ReadConfig {
    */
   @Deprecated(forRemoval = true)
   public Config(final Config config) {
-    this(Collections.emptyMap());
+    this(Map.of());
     merge(config);
   }
 

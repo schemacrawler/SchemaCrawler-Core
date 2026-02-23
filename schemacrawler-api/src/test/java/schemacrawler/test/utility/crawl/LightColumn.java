@@ -14,7 +14,7 @@ import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.enumCo
 
 import java.io.Serial;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -106,7 +106,7 @@ public final class LightColumn extends AbstractLightDatabaseObject implements Co
 
   @Override
   public Collection<Privilege<Column>> getPrivileges() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override

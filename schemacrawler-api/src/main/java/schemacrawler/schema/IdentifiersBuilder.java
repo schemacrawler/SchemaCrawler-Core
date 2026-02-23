@@ -10,8 +10,10 @@ package schemacrawler.schema;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.CollectionsUtility.splitList;
+import static us.fatehi.utility.Utility.isBlank;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.io.BufferedReader;
 import java.sql.Connection;
@@ -19,15 +21,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static java.util.Objects.requireNonNull;
-
-import static us.fatehi.utility.Utility.isBlank;
-import static us.fatehi.utility.Utility.trimToEmpty;
-
 import schemacrawler.schemacrawler.OptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import us.fatehi.utility.ioresource.ClasspathInputResource;
@@ -68,7 +65,7 @@ public class IdentifiersBuilder implements OptionsBuilder<IdentifiersBuilder, Id
       LOGGER.log(Level.WARNING, "Could not retrieve SQL keywords metadata", e);
     }
     if (isBlank(sqlKeywords)) {
-      return emptyList();
+      return List.of();
     }
 
     return toUpperCase(asList(splitList(sqlKeywords)));

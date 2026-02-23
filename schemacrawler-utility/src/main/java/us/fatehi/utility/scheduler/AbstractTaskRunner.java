@@ -21,7 +21,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.BiFunction;
@@ -137,7 +137,7 @@ abstract class AbstractTaskRunner implements TaskRunner {
     final Collection<TimedTaskResult> runTaskResults;
     requireNonNull(taskDefinitions, "Tasks not provided");
     if (taskDefinitions.isEmpty()) {
-      runTaskResults = Collections.emptyList();
+      runTaskResults = List.of();
     } else {
       runTaskResults = runTimed(taskDefinitions);
     }

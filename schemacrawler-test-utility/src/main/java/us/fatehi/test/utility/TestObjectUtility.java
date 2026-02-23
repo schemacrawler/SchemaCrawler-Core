@@ -27,7 +27,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -281,7 +280,7 @@ public class TestObjectUtility {
       return Optional.empty();
     }
     if (Collection.class.isAssignableFrom(returnType)) {
-      return Collections.emptyList();
+      return List.of();
     }
     throw new UnsupportedOperationException(method.toString());
   }

@@ -11,7 +11,6 @@ package schemacrawler.ermodel.implementation;
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -324,7 +323,7 @@ public final class TableEntityModelInferrer {
             Set.copyOf(parentTable.getPrimaryKey().getConstrainedColumns());
         parentPkColumnsMap.put(fk.key(), parentPkColumns);
       } else {
-        parentPkColumnsMap.put(fk.key(), Collections.emptySet());
+        parentPkColumnsMap.put(fk.key(), Set.of());
       }
     }
   }
