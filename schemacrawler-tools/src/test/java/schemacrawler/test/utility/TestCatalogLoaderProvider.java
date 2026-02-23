@@ -49,13 +49,11 @@ public class TestCatalogLoaderProvider extends BaseCatalogLoaderProvider {
     if (config == null) {
       throw new IllegalArgumentException("No config provided");
     }
-    final TestCatalogLoader loader = new TestCatalogLoader(NAME);
-
-    // Check command name
-    if (!loader.getCommandName().getName().equals(command)) {
+    if (!NAME.getName().equals(command)) {
       throw new IllegalArgumentException("Bad catalog loader command <%s>".formatted(command));
     }
 
+    final TestCatalogLoader loader = new TestCatalogLoader(NAME);
     loader.configure(new TestCatalogLoaderOptions());
 
     return loader;

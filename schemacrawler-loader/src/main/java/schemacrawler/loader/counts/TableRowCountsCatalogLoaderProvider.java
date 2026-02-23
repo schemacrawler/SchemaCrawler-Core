@@ -52,13 +52,11 @@ public class TableRowCountsCatalogLoaderProvider extends BaseCatalogLoaderProvid
     if (config == null) {
       throw new IllegalArgumentException("No config provided");
     }
-    final TableRowCountsCatalogLoader loader = new TableRowCountsCatalogLoader(NAME);
-
-    // Check command name
-    if (!loader.getCommandName().getName().equals(command)) {
+    if (!NAME.getName().equals(command)) {
       throw new IllegalArgumentException("Bad catalog loader command <%s>".formatted(command));
     }
 
+    final TableRowCountsCatalogLoader loader = new TableRowCountsCatalogLoader(NAME);
     final TableRowCountsCatalogLoaderOptions options = createOptionsfromConfig(config);
     loader.configure(options);
 
