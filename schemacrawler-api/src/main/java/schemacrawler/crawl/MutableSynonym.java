@@ -13,7 +13,7 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Synonym;
@@ -41,10 +41,18 @@ final class MutableSynonym extends AbstractDatabaseObject implements Synonym {
 
   @Override
   public Collection<? extends DatabaseObject> getReferencedObjects() {
-    return Collections.singletonList(referencedObject);
+    if (hasReferencedObject()) {
+      return List.of(referencedObject);
+    }
+    return List.of();
   }
 
   void setReferencedObject(final DatabaseObject referencedObject) {
     this.referencedObject = requireNonNull(referencedObject, "Referenced object not provided");
+  }
+
+  @Override
+  public boolean hasReferencedObject() {
+    return referencedObject != null;
   }
 }

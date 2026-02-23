@@ -53,7 +53,7 @@ public class MutableDatabaseObjectsTest {
 
     assertThat(synonym.getReferencedObject(), is(nullValue()));
     assertThat(synonym.getReferencedObject(), is(nullValue()));
-    assertThat(synonym.getReferencedObjects(), contains(nullValue()));
+    assertThat(synonym.getReferencedObjects().isEmpty(), is(true));
   }
 
   @Test

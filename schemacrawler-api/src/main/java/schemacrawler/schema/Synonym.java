@@ -21,4 +21,11 @@ public interface Synonym extends DatabaseObject, ReferencingObject {
    * @return Referenced object.
    */
   DatabaseObject getReferencedObject();
+
+  /**
+   * Checks if the referenced object is available.
+   *
+   * @return If there is a referenced object available.
+   */
+  boolean hasReferencedObject();
 }
