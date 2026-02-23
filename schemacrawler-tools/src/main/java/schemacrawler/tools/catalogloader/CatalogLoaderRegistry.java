@@ -72,19 +72,9 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry {
     return new ChainedCatalogLoader(chainedCatalogLoaders, additionalConfig);
   }
 
-  @Override
-  public Collection<PropertyName> getRegisteredPlugins() {
-    final List<PropertyName> commandLineCommands = new ArrayList<>();
-    for (final CatalogLoaderProvider catalogLoaderProvider : catalogLoaderRegistry) {
-      commandLineCommands.addAll(catalogLoaderProvider.getSupportedCommands());
-    }
-    commandLineCommands.sort(naturalOrder());
-    return commandLineCommands;
-  }
-
   public ChainedCatalogLoader newChainedCatalogLoader(final Config additionalConfig) {
-    // Make a defensive copy of the list of catalog loaders
-    final List<CatalogLoaderProvider> chainedCatalogLoaders = List.copyOf(catalogLoaderRegistry);
+    final List<CatalogLoaderProvider> chainedCatalogLoaders =
+        getCommandProviders().stream().map(provider -> (CatalogLoaderProvider) provider).toList();
     return new ChainedCatalogLoader(chainedCatalogLoaders, additionalConfig);
   }
 }
