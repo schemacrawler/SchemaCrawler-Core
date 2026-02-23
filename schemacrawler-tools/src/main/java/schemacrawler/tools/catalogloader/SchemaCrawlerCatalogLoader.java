@@ -34,9 +34,4 @@ public class SchemaCrawlerCatalogLoader
     final Catalog catalog = schemaCrawler.crawl();
     setCatalog(catalog);
   }
-
-  @Override
-  public void setAdditionalConfiguration(final Config additionalConfig) {
-    setCommandOptions(new SchemaCrawlerCatalogLoaderOptions());
-  }
 }
