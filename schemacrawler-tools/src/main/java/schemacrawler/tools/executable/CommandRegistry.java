@@ -91,7 +91,7 @@ public final class CommandRegistry extends BasePluginCommandRegistry {
     super("SchemaCrawler Commands", loadCommandRegistry());
   }
 
-  public SchemaCrawlerCommand configureNewCommand(
+  public SchemaCrawlerCommand<?> configureNewCommand(
       final String command,
       final SchemaCrawlerOptions schemaCrawlerOptions,
       final Config additionalConfig,
@@ -108,7 +108,7 @@ public final class CommandRegistry extends BasePluginCommandRegistry {
     LOGGER.log(Level.INFO, new StringFormat("Matched provider <%s>", executableCommandProvider));
 
     final String errorMessage = "Cannot run command <%s>".formatted(command);
-    final SchemaCrawlerCommand scCommand;
+    final SchemaCrawlerCommand<?> scCommand;
     try {
       scCommand =
           (SchemaCrawlerCommand<?>) executableCommandProvider.newCommand(command, additionalConfig);
