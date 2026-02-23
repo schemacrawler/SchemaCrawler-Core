@@ -83,6 +83,7 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
   private final Map<String, DatabaseConnector> databaseConnectorRegistry;
 
   private DatabaseConnectorRegistry() {
+    super("SchemaCrawler Database Server Plugins");
     databaseConnectorRegistry = loadDatabaseConnectorRegistry();
   }
 
@@ -134,11 +135,6 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
       commandLineHelpCommands.add(databaseConnector.getHelpCommand());
     }
     return commandLineHelpCommands;
-  }
-
-  @Override
-  public String getName() {
-    return "SchemaCrawler Database Server Plugins";
   }
 
   @Override

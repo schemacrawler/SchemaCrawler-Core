@@ -57,12 +57,7 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry {
   }
 
   private CatalogLoaderRegistry() {
-    super(loadCatalogLoaderRegistry());
-  }
-
-  @Override
-  public String getName() {
-    return "SchemaCrawler Catalog Loaders";
+    super("SchemaCrawler Catalog Loaders", loadCatalogLoaderRegistry());
   }
 
   public ChainedCatalogLoader newChainedCatalogLoader(final Config additionalConfig) {

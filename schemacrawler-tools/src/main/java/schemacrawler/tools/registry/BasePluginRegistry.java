@@ -8,6 +8,8 @@
 
 package schemacrawler.tools.registry;
 
+import static us.fatehi.utility.Utility.requireNotBlank;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.property.PropertyNameUtility;
@@ -16,8 +18,19 @@ public abstract class BasePluginRegistry implements PluginRegistry {
 
   private static final Logger LOGGER = Logger.getLogger(BasePluginRegistry.class.getName());
 
+  private final String registryName;
+
+  protected BasePluginRegistry(final String registryName) {
+    this.registryName = requireNotBlank(registryName, "No registry name provided");
+  }
+
   @Override
-  public void log() {
+  public final String getName() {
+    return registryName;
+  }
+
+  @Override
+  public final void log() {
     final boolean log = LOGGER.isLoggable(Level.CONFIG);
     if (!log) {
       return;

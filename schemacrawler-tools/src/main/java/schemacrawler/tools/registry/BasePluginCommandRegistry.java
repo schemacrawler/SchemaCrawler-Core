@@ -28,7 +28,9 @@ public abstract class BasePluginCommandRegistry extends BasePluginRegistry
 
   private final List<? extends CommandProvider> commandProviders;
 
-  protected BasePluginCommandRegistry(final List<? extends CommandProvider> commandProviders) {
+  protected BasePluginCommandRegistry(
+      final String registryName, final List<? extends CommandProvider> commandProviders) {
+    super(registryName);
     this.commandProviders =
         requireNonNull(commandProviders, "No command provider registry provided");
   }
@@ -53,11 +55,6 @@ public abstract class BasePluginCommandRegistry extends BasePluginRegistry
       }
     }
     return commandLineCommands;
-  }
-
-  @Override
-  public String getName() {
-    return "SchemaCrawler Commands";
   }
 
   @Override
