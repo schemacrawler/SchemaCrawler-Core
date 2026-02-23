@@ -9,7 +9,6 @@
 package schemacrawler.test.utility.crawl;
 
 import java.io.Serial;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import schemacrawler.schema.ColumnReference;
@@ -42,12 +41,12 @@ public final class LightTableReference extends AbstractLightDatabaseObject
 
   @Override
   public List<ColumnReference> getColumnReferences() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
   public List<TableConstraintColumn> getConstrainedColumns() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override

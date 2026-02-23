@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Table;
@@ -33,7 +32,7 @@ public class TableMatchKeysTest {
     assertThrows(NullPointerException.class, () -> new TableMatchKeys(null));
 
     // 2.
-    matchkeys = new TableMatchKeys(Collections.emptyList());
+    matchkeys = new TableMatchKeys(List.of());
     assertThat(matchkeys.toString(), is("{}"));
 
     withoutPrefix = matchkeys.get(new LightTable("table0"));

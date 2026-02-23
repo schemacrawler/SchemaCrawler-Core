@@ -7,7 +7,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.ERModel;
@@ -26,7 +25,7 @@ public class ERModelBuilderTest {
   public void testConcurrentModificationException() {
     final Table superTable = spy(new LightTable("SUPER_TABLE"));
     when(superTable.hasPrimaryKey()).thenReturn(true);
-    when(superTable.getImportedForeignKeys()).thenReturn(Collections.emptyList());
+    when(superTable.getImportedForeignKeys()).thenReturn(List.of());
 
     final PrimaryKey superPk = mock(PrimaryKey.class);
     final TableConstraintColumn superPkCol = mock(TableConstraintColumn.class);
@@ -54,8 +53,8 @@ public class ERModelBuilderTest {
 
     when(subTable.getImportedForeignKeys()).thenReturn(List.of(fk));
     // TableEntityModelInferrer needs foreign keys too
-    when(subTable.getForeignKeys()).thenReturn(Collections.emptyList());
-    when(superTable.getForeignKeys()).thenReturn(Collections.emptyList());
+    when(subTable.getForeignKeys()).thenReturn(List.of());
+    when(superTable.getForeignKeys()).thenReturn(List.of());
 
     final Catalog catalog = mock(Catalog.class);
     when(catalog.getTables()).thenReturn(Arrays.asList(subTable, superTable));

@@ -16,7 +16,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.utility.JavaSqlTypes;
@@ -39,7 +38,7 @@ public class LightColumnDataTypeUtility {
     ColumnDataTypeInvocationHandler(final String name, final List<String> enumValues) {
       this.name = requireNotBlank(name, "No name provided");
       isEnumerated = enumValues != null;
-      this.enumValues = isEnumerated ? enumValues : Collections.emptyList();
+      this.enumValues = isEnumerated ? enumValues : List.of();
     }
 
     @Override

@@ -52,7 +52,7 @@ public final class ImplicitAssociationsAnalyzer {
 
   public Collection<ImplicitColumnReference> analyzeTables() {
     if (tableMatchKeys.getTables().size() < 2) {
-      return Collections.emptySet();
+      return List.of();
     }
 
     LOGGER.log(Level.INFO, "Finding implicit associations");

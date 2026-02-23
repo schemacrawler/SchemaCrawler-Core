@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.fatehi.utility.ProcessExecutor;
@@ -43,7 +43,7 @@ public class ProcessExecutorTest {
   public void testCallWithEmptyCommand(@TempDir final Path tempDir) throws Exception {
 
     final ProcessExecutor processExecutor = new ProcessExecutor();
-    processExecutor.setCommandLine(Collections.emptyList());
+    processExecutor.setCommandLine(List.of());
 
     processExecutor.call();
 

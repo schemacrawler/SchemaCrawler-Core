@@ -9,16 +9,16 @@
 package schemacrawler.tools.registry;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 
 public interface PluginCommandRegistry extends PluginRegistry {
 
   default Collection<PluginCommand> getCommandLineCommands() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   default Collection<PluginCommand> getHelpCommands() {
-    return Collections.emptyList();
+    return List.of();
   }
 }

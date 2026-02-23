@@ -8,27 +8,18 @@
 
 package schemacrawler.tools.catalogloader;
 
-import static java.util.Comparator.naturalOrder;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
-import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
-import schemacrawler.tools.registry.BasePluginRegistry;
-import schemacrawler.tools.registry.PluginCommandRegistry;
-import us.fatehi.utility.property.PropertyName;
+import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
 
 /** Registry for registered catalog orders, in order of priority. */
-public final class CatalogLoaderRegistry extends BasePluginRegistry
-    implements PluginCommandRegistry {
+public final class CatalogLoaderRegistry extends BasePluginCommandRegistry {
 
   private static final Logger LOGGER = Logger.getLogger(CatalogLoaderRegistry.class.getName());
 
@@ -65,28 +56,8 @@ public final class CatalogLoaderRegistry extends BasePluginRegistry
     return catalogLoaderRegistry;
   }
 
-  private final List<CatalogLoaderProvider> catalogLoaderRegistry;
-
   private CatalogLoaderRegistry() {
-    catalogLoaderRegistry = loadCatalogLoaderRegistry();
-  }
-
-  @Override
-  public Collection<PluginCommand> getCommandLineCommands() {
-    final Collection<PluginCommand> commandLineCommands = new HashSet<>();
-    for (final CatalogLoaderProvider catalogLoader : catalogLoaderRegistry) {
-      commandLineCommands.add(catalogLoader.getCommandLineCommand());
-    }
-    return commandLineCommands;
-  }
-
-  @Override
-  public Collection<PluginCommand> getHelpCommands() {
-    final Collection<PluginCommand> commandLineCommands = new HashSet<>();
-    for (final CatalogLoaderProvider catalogLoader : catalogLoaderRegistry) {
-      commandLineCommands.add(catalogLoader.getHelpCommand());
-    }
-    return commandLineCommands;
+    super(loadCatalogLoaderRegistry());
   }
 
   @Override
@@ -94,19 +65,9 @@ public final class CatalogLoaderRegistry extends BasePluginRegistry
     return "SchemaCrawler Catalog Loaders";
   }
 
-  @Override
-  public Collection<PropertyName> getRegisteredPlugins() {
-    final List<PropertyName> commandLineCommands = new ArrayList<>();
-    for (final CatalogLoaderProvider catalogLoaderProvider : catalogLoaderRegistry) {
-      commandLineCommands.addAll(catalogLoaderProvider.getSupportedCommands());
-    }
-    commandLineCommands.sort(naturalOrder());
-    return commandLineCommands;
-  }
-
   public ChainedCatalogLoader newChainedCatalogLoader(final Config additionalConfig) {
-    // Make a defensive copy of the list of catalog loaders
-    final List<CatalogLoaderProvider> chainedCatalogLoaders = List.copyOf(catalogLoaderRegistry);
+    final List<CatalogLoaderProvider> chainedCatalogLoaders =
+        getCommandProviders().stream().map(provider -> (CatalogLoaderProvider) provider).toList();
     return new ChainedCatalogLoader(chainedCatalogLoaders, additionalConfig);
   }
 }

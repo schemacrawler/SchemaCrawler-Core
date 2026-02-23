@@ -18,8 +18,8 @@ import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -67,7 +67,7 @@ public class AlternateKeysAttributesTest {
                     "  ",
                     "alternate_key",
                     List.of("remarks", "other remarks"),
-                    Collections.emptyMap(),
+                    Map.of(),
                     List.of("column1", "column2")));
     assertThat(exception.getMessage(), is("No table name provided"));
 
@@ -81,8 +81,8 @@ public class AlternateKeysAttributesTest {
                     "table",
                     "alternate_key",
                     List.of("remarks", "other remarks"),
-                    Collections.emptyMap(),
-                    Collections.emptyList()));
+                    Map.of(),
+                    List.of()));
     assertThat(exception.getMessage(), is("No columns provided"));
 
     exception =
@@ -95,7 +95,7 @@ public class AlternateKeysAttributesTest {
                     "table",
                     "alternate_key",
                     List.of("remarks", "other remarks"),
-                    Collections.emptyMap(),
+                    Map.of(),
                     null));
     assertThat(exception.getMessage(), is("No columns provided"));
 
@@ -106,7 +106,7 @@ public class AlternateKeysAttributesTest {
             "table",
             "alternate_key",
             List.of("remarks", "other remarks"),
-            Collections.emptyMap(),
+            Map.of(),
             List.of("column1", "column2"));
     assertThat(
         alternateKeyAttributes.toString(),

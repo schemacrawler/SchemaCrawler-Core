@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +29,7 @@ public class PrefixMatchesTest {
     assertThrows(NullPointerException.class, () -> new PrefixMatches(null, "_"));
 
     // 2.
-    matchkeys = new PrefixMatches(Collections.emptyList(), "_");
+    matchkeys = new PrefixMatches(List.of(), "_");
     assertThat(matchkeys.toString(), is("{}"));
 
     withoutPrefix = matchkeys.get("key0");
