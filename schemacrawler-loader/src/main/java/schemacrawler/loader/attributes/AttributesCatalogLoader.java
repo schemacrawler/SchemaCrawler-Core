@@ -8,7 +8,6 @@
 
 package schemacrawler.loader.attributes;
 
-import static java.util.Objects.requireNonNull;
 import static schemacrawler.loader.attributes.model.CatalogAttributesUtility.readCatalogAttributes;
 
 import java.util.Map.Entry;
@@ -87,23 +86,6 @@ public class AttributesCatalogLoader extends BaseCatalogLoader<AttributesCatalog
     } catch (final Exception e) {
       throw new ExecutionRuntimeException("Exception loading catalog attributes", e);
     }
-  }
-
-  @Override
-  public PluginCommand getCommandLineCommand() {
-    final PropertyName catalogLoaderName = getCommandName();
-    final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(catalogLoaderName);
-    pluginCommand.addOption(
-        OPTION_ATTRIBUTES_FILE,
-        String.class,
-        "Path to a YAML file with table and column attributes to add to the schema");
-    return pluginCommand;
-  }
-
-  @Override
-  public void setAdditionalConfiguration(final Config additionalConfig) {
-    requireNonNull(additionalConfig, "No config provided");
-    setCommandOptions(AttributesCatalogLoaderOptions.fromConfig(additionalConfig));
   }
 
   private void loadAlternateKeys(final Catalog catalog, final CatalogAttributes catalogAttributes) {

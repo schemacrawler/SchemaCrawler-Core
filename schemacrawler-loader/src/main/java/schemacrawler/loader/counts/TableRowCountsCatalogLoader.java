@@ -8,7 +8,6 @@
 
 package schemacrawler.loader.counts;
 
-import static java.util.Objects.requireNonNull;
 import static schemacrawler.filter.ReducerFactory.getTableReducer;
 
 import java.util.logging.Level;
