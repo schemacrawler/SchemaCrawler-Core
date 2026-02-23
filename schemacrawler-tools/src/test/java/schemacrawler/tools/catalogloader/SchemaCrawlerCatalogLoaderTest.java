@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
+import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.test.utility.TestDatabaseDriver;
 import us.fatehi.utility.datasource.ConnectionDatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
@@ -27,7 +28,7 @@ public class SchemaCrawlerCatalogLoaderTest {
 
   @Test
   public void connection() throws SQLException {
-    final CatalogLoader catalogLoader = new SchemaCrawlerCatalogLoader();
+    final CatalogLoader catalogLoader = newSchemaCrawlerCatalogLoader();
 
     assertThat(catalogLoader.getDataSource(), is(nullValue()));
 
@@ -42,7 +43,7 @@ public class SchemaCrawlerCatalogLoaderTest {
 
   @Test
   public void schemaCrawlerOptions() {
-    final CatalogLoader catalogLoader = new SchemaCrawlerCatalogLoader();
+    final CatalogLoader catalogLoader = newSchemaCrawlerCatalogLoader();
 
     assertThat(catalogLoader.getSchemaCrawlerOptions(), is(not(nullValue())));
 
@@ -56,7 +57,7 @@ public class SchemaCrawlerCatalogLoaderTest {
 
   @Test
   public void schemaRetrievalOptions() {
-    final CatalogLoader catalogLoader = new SchemaCrawlerCatalogLoader();
+    final CatalogLoader catalogLoader = newSchemaCrawlerCatalogLoader();
 
     assertThat(catalogLoader.getSchemaRetrievalOptions(), is(not(nullValue())));
 
@@ -65,5 +66,10 @@ public class SchemaCrawlerCatalogLoaderTest {
     assertThat(catalogLoader.getSchemaRetrievalOptions(), is(not(nullValue())));
     assertThat(
         catalogLoader.getSchemaRetrievalOptions().equals(schemaRetrievalOptionsDefault), is(true));
+  }
+
+  private SchemaCrawlerCatalogLoader newSchemaCrawlerCatalogLoader() {
+    return new SchemaCrawlerCatalogLoaderProvider()
+        .newCommand("schemacrawlerloader", ConfigUtility.newConfig());
   }
 }

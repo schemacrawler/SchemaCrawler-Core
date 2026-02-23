@@ -8,7 +8,6 @@
 
 package schemacrawler.loader.counts;
 
-import static java.util.Objects.requireNonNull;
 import static schemacrawler.filter.ReducerFactory.getTableReducer;
 
 import java.util.logging.Level;
@@ -17,8 +16,6 @@ import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.catalogloader.BaseCatalogLoader;
-import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
@@ -30,11 +27,8 @@ public class TableRowCountsCatalogLoader
   private static final Logger LOGGER =
       Logger.getLogger(TableRowCountsCatalogLoader.class.getName());
 
-  static final String OPTION_NO_EMPTY_TABLES = "no-empty-tables";
-  static final String OPTION_LOAD_ROW_COUNTS = "load-row-counts";
-
-  public TableRowCountsCatalogLoader() {
-    super(new PropertyName("countsloader", "Loader for table row counts"), 2);
+  TableRowCountsCatalogLoader(final PropertyName name) {
+    super(name, 2);
   }
 
   @Override
@@ -77,31 +71,5 @@ public class TableRowCountsCatalogLoader
     } catch (final Exception e) {
       throw new ExecutionRuntimeException("Exception retrieving table row counts", e);
     }
-  }
-
-  @Override
-  public PluginCommand getCommandLineCommand() {
-    final PropertyName catalogLoaderName = getCommandName();
-    final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(catalogLoaderName);
-    pluginCommand
-        .addOption(
-            OPTION_LOAD_ROW_COUNTS,
-            Boolean.class,
-            "Loads row counts for each table",
-            "This can be a time consuming operation",
-            "Optional, defaults to false")
-        .addOption(
-            OPTION_NO_EMPTY_TABLES,
-            Boolean.class,
-            "Includes only tables that have rows of data",
-            "Requires table row counts to be loaded",
-            "Optional, default is false");
-    return pluginCommand;
-  }
-
-  @Override
-  public void setAdditionalConfiguration(final Config additionalConfig) {
-    requireNonNull(additionalConfig, "No config provided");
-    setCommandOptions(TableRowCountsCatalogLoaderOptions.fromConfig(additionalConfig));
   }
 }
