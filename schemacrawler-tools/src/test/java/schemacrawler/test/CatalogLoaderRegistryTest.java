@@ -17,13 +17,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static schemacrawler.test.utility.PluginRegistryTestUtility.reload;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.test.utility.TestCatalogLoaderProvider;
-import schemacrawler.tools.catalogloader.CatalogLoaderProvider;
 import schemacrawler.tools.catalogloader.CatalogLoaderRegistry;
 import schemacrawler.tools.catalogloader.ChainedCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
@@ -57,10 +55,7 @@ public class CatalogLoaderRegistryTest {
         CatalogLoaderRegistry.getCatalogLoaderRegistry()
             .newChainedCatalogLoader(ConfigUtility.newConfig());
 
-    final List<CatalogLoaderProvider> catalogLoaders = new ArrayList<>();
-    chainedCatalogLoaders.forEach(catalogLoaders::add);
-
-    assertThat(catalogLoaders, hasSize(2));
+    assertThat(chainedCatalogLoaders.size(), is(2));
   }
 
   @Test
