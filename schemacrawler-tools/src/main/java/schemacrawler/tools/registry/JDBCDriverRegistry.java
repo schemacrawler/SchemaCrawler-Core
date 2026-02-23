@@ -57,16 +57,12 @@ public class JDBCDriverRegistry extends BasePluginRegistry {
   private final Collection<PropertyName> jdbcDrivers;
 
   private JDBCDriverRegistry() {
+    super("JDBC Drivers");
     jdbcDrivers = loadJDBCDrivers();
   }
 
   @Override
   public Collection<PropertyName> getRegisteredPlugins() {
     return List.copyOf(jdbcDrivers);
-  }
-
-  @Override
-  public String getName() {
-    return "JDBC Drivers";
   }
 }

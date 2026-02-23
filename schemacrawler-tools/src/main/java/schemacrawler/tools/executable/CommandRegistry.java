@@ -88,7 +88,7 @@ public final class CommandRegistry extends BasePluginCommandRegistry {
   }
 
   private CommandRegistry() {
-    super(loadCommandRegistry());
+    super("SchemaCrawler Commands", loadCommandRegistry());
   }
 
   public SchemaCrawlerCommand<?> configureNewCommand(
@@ -137,15 +137,14 @@ public final class CommandRegistry extends BasePluginCommandRegistry {
       final OutputOptions outputOptions,
       final List<SchemaCrawlerCommandProvider> executableCommandProviders) {
     for (final CommandProvider commandProvider : getCommandProviders()) {
-      if (commandProvider
-          instanceof final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider) {
-        if (schemaCrawlerCommandProvider.supportsSchemaCrawlerCommand(
-            command, schemaCrawlerOptions, additionalConfig, outputOptions)) {
-          executableCommandProviders.add(schemaCrawlerCommandProvider);
-          LOGGER.log(
-              Level.FINE,
-              new StringFormat("Adding command-provider <%s>", schemaCrawlerCommandProvider));
-        }
+      if ((commandProvider
+              instanceof final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider)
+          && schemaCrawlerCommandProvider.supportsSchemaCrawlerCommand(
+              command, schemaCrawlerOptions, additionalConfig, outputOptions)) {
+        executableCommandProviders.add(schemaCrawlerCommandProvider);
+        LOGGER.log(
+            Level.FINE,
+            new StringFormat("Adding command-provider <%s>", schemaCrawlerCommandProvider));
       }
     }
     if (executableCommandProviders.isEmpty()) {
@@ -174,10 +173,5 @@ public final class CommandRegistry extends BasePluginCommandRegistry {
           "Output format <%s> not supported for command <%s>"
               .formatted(outputOptions.getOutputFormatValue(), command));
     }
-  }
-
-  @Override
-  public String getName() {
-    return "SchemaCrawler Commands";
   }
 }
