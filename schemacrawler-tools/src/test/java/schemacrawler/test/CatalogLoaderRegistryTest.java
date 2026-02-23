@@ -22,11 +22,12 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
-import schemacrawler.test.utility.TestCatalogLoader;
-import schemacrawler.tools.catalogloader.CatalogLoader;
+import schemacrawler.test.utility.TestCatalogLoaderProvider;
+import schemacrawler.tools.catalogloader.CatalogLoaderProvider;
 import schemacrawler.tools.catalogloader.CatalogLoaderRegistry;
 import schemacrawler.tools.catalogloader.ChainedCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
+import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.property.PropertyName;
 
 public class CatalogLoaderRegistryTest {
@@ -53,9 +54,10 @@ public class CatalogLoaderRegistryTest {
   @Test
   public void chainedCatalogLoaders() {
     final ChainedCatalogLoader chainedCatalogLoaders =
-        CatalogLoaderRegistry.getCatalogLoaderRegistry().newChainedCatalogLoader();
+        CatalogLoaderRegistry.getCatalogLoaderRegistry()
+            .newChainedCatalogLoader(ConfigUtility.newConfig());
 
-    final List<CatalogLoader> catalogLoaders = new ArrayList<>();
+    final List<CatalogLoaderProvider> catalogLoaders = new ArrayList<>();
     chainedCatalogLoaders.forEach(catalogLoaders::add);
 
     assertThat(catalogLoaders, hasSize(2));
@@ -83,7 +85,7 @@ public class CatalogLoaderRegistryTest {
     restoreSystemProperties(
         () -> {
           System.setProperty(
-              TestCatalogLoader.class.getName() + ".force-instantiation-failure", "throw");
+              TestCatalogLoaderProvider.class.getName() + ".force-instantiation-failure", "throw");
 
           assertThrows(InternalRuntimeException.class, () -> reload(CatalogLoaderRegistry.class));
         });

@@ -11,66 +11,35 @@ package schemacrawler.tools.catalogloader;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.nullsLast;
 import static java.util.Objects.compare;
-import static java.util.Objects.requireNonNull;
 
 import java.util.Comparator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
+import schemacrawler.tools.executable.BaseCommand;
 import schemacrawler.tools.executable.CommandOptions;
-import schemacrawler.tools.executable.commandline.PluginCommand;
-import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
-import us.fatehi.utility.string.StringFormat;
 
-public abstract class BaseCatalogLoader<P extends CommandOptions> implements CatalogLoader {
+public abstract class BaseCatalogLoader<P extends CommandOptions> extends BaseCommand<P>
+    implements CatalogLoader<P> {
 
-  private static final Logger LOGGER = Logger.getLogger(BaseCatalogLoader.class.getName());
-
-  private static Comparator<CatalogLoader> comparator =
-      nullsLast(comparingInt(CatalogLoader::getPriority))
+  public static Comparator<CatalogLoader<?>> comparator =
+      nullsLast(comparingInt(CatalogLoader<?>::getPriority))
           .thenComparing(loader -> loader.getCommandName().getName());
 
   private final int priority;
-  private final PropertyName catalogLoaderName;
   private SchemaRetrievalOptions schemaRetrievalOptions;
   private SchemaCrawlerOptions schemaCrawlerOptions;
-  private P commandOptions;
-  private DatabaseConnectionSource dataSource;
-  private Catalog catalog;
 
   protected BaseCatalogLoader(final PropertyName catalogLoaderName, final int priority) {
-    this.catalogLoaderName = requireNonNull(catalogLoaderName, "No catalog loader name provided");
+    super(catalogLoaderName);
     this.priority = priority;
   }
 
   @Override
-  public final int compareTo(final CatalogLoader otherCatalogLoader) {
+  public final int compareTo(final CatalogLoader<P> otherCatalogLoader) {
     return compare(this, otherCatalogLoader, comparator);
-  }
-
-  @Override
-  public final Catalog getCatalog() {
-    return catalog;
-  }
-
-  @Override
-  public PluginCommand getCommandLineCommand() {
-    return PluginCommand.empty();
-  }
-
-  @Override
-  public final PropertyName getCommandName() {
-    return catalogLoaderName;
-  }
-
-  @Override
-  public final DatabaseConnectionSource getDataSource() {
-    return dataSource;
   }
 
   @Override
@@ -95,19 +64,6 @@ public abstract class BaseCatalogLoader<P extends CommandOptions> implements Cat
   }
 
   @Override
-  public final void setCatalog(final Catalog catalog) {
-    if (catalog != null) {
-      LOGGER.log(Level.INFO, new StringFormat("Loaded catalog with loader <%s>", this.getClass()));
-    }
-    this.catalog = catalog;
-  }
-
-  @Override
-  public final void setDataSource(final DatabaseConnectionSource dataSource) {
-    this.dataSource = dataSource;
-  }
-
-  @Override
   public final void setSchemaCrawlerOptions(final SchemaCrawlerOptions schemaCrawlerOptions) {
     this.schemaCrawlerOptions = schemaCrawlerOptions;
   }
@@ -117,27 +73,7 @@ public abstract class BaseCatalogLoader<P extends CommandOptions> implements Cat
     this.schemaRetrievalOptions = schemaRetrievalOptions;
   }
 
-  protected final P getCommandOptions() {
-    return commandOptions;
-  }
-
-  protected final boolean isDatabaseSystemIdentifier(final String databaseSystemIdentifier) {
-    final String actualDatabaseSystemIdentifier =
-        getSchemaRetrievalOptions().getDatabaseServerType().getDatabaseSystemIdentifier();
-    if (actualDatabaseSystemIdentifier == null && databaseSystemIdentifier == null) {
-      return true;
-    }
-    if (actualDatabaseSystemIdentifier != null) {
-      return actualDatabaseSystemIdentifier.equals(databaseSystemIdentifier);
-    }
-    return false;
-  }
-
   protected final boolean isLoaded() {
     return catalog != null;
-  }
-
-  protected void setCommandOptions(P commandOptions) {
-    this.commandOptions = commandOptions;
   }
 }

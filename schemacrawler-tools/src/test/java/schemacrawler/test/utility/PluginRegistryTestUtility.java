@@ -17,10 +17,6 @@ import schemacrawler.tools.registry.PluginRegistry;
 
 public final class PluginRegistryTestUtility {
 
-  private PluginRegistryTestUtility() {
-    // Prevent instantiation
-  }
-
   public static void reload(final Class<? extends PluginRegistry> registryClass) {
     Constructor<? extends PluginRegistry> constructor = null;
     try {
@@ -37,5 +33,9 @@ public final class PluginRegistryTestUtility {
       }
       fail(e);
     }
+  }
+
+  private PluginRegistryTestUtility() {
+    // Prevent instantiation
   }
 }
