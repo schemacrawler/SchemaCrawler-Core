@@ -52,13 +52,11 @@ public class WeakAssociationsCatalogLoaderProvider extends BaseCatalogLoaderProv
     if (config == null) {
       throw new IllegalArgumentException("No config provided");
     }
-    final WeakAssociationsCatalogLoader loader = new WeakAssociationsCatalogLoader(NAME);
-
-    // Check command name
-    if (!loader.getCommandName().getName().equals(command)) {
+    if (!NAME.getName().equals(command)) {
       throw new IllegalArgumentException("Bad catalog loader command <%s>".formatted(command));
     }
 
+    final WeakAssociationsCatalogLoader loader = new WeakAssociationsCatalogLoader(NAME);
     final WeakAssociationsCatalogLoaderOptions options = createOptionsfromConfig(config);
     loader.configure(options);
 
