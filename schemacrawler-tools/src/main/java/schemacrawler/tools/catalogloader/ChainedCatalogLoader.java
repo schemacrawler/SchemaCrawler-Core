@@ -90,11 +90,7 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
   private List<CatalogLoader<?>> getChainedCatalogLoaders() {
     final List<CatalogLoader<?>> catalogLoaders = new ArrayList<>();
     for (final CatalogLoaderProvider catalogLoaderProvider : catalogLoaderProviders) {
-      final List<PropertyName> supportedCommands =
-          new ArrayList<>(catalogLoaderProvider.getSupportedCommands());
-      final String command = supportedCommands.get(0).getName();
-      final CatalogLoader<?> catalogLoader =
-          catalogLoaderProvider.newCommand(command, additionalConfig);
+      final CatalogLoader<?> catalogLoader = catalogLoaderProvider.newCommand(additionalConfig);
       catalogLoaders.add(catalogLoader);
     }
     Collections.sort(catalogLoaders, BaseCatalogLoader.comparator);

@@ -50,11 +50,8 @@ public class WeakAssociationsCatalogLoaderProvider extends BaseCatalogLoaderProv
   }
 
   @Override
-  public WeakAssociationsCatalogLoader newCommand(final String command, final Config config) {
+  public WeakAssociationsCatalogLoader newCommand(final Config config) {
     requireNonNull(config, "No config provided");
-    if (!NAME.getName().equals(command)) {
-      throw new IllegalArgumentException("Bad catalog loader command <%s>".formatted(command));
-    }
 
     final WeakAssociationsCatalogLoader loader = new WeakAssociationsCatalogLoader(NAME);
     final WeakAssociationsCatalogLoaderOptions options = createOptionsfromConfig(config);

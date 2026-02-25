@@ -8,6 +8,8 @@
 
 package schemacrawler.test.utility;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.List;
 import org.jspecify.annotations.NonNull;
@@ -43,21 +45,11 @@ public class TestCatalogLoaderProvider extends BaseCatalogLoaderProvider {
   }
 
   @Override
-  public TestCatalogLoader newCommand(final String command, final Config config) {
+  public TestCatalogLoader newCommand(final Config config) {
     forceLoadFailureIfConfigured();
-
-    if (config == null) {
-      throw new IllegalArgumentException("No config provided");
-    }
+    requireNonNull(config, "No config provided");
     final TestCatalogLoader loader = new TestCatalogLoader(NAME);
-
-    // Check command name
-    if (!loader.getCommandName().getName().equals(command)) {
-      throw new IllegalArgumentException("Bad catalog loader command <%s>".formatted(command));
-    }
-
     loader.configure(new TestCatalogLoaderOptions());
-
     return loader;
   }
 
