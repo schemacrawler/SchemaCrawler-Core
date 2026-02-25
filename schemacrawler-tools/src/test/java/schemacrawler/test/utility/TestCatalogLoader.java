@@ -11,39 +11,21 @@ package schemacrawler.test.utility;
 import schemacrawler.test.utility.TestCatalogLoader.TestCatalogLoaderOptions;
 import schemacrawler.tools.catalogloader.BaseCatalogLoader;
 import schemacrawler.tools.executable.CommandOptions;
-import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.options.Config;
 import us.fatehi.utility.SystemExitException;
 import us.fatehi.utility.property.PropertyName;
 
-public class TestCatalogLoader extends BaseCatalogLoader<TestCatalogLoaderOptions> {
+class TestCatalogLoader extends BaseCatalogLoader<TestCatalogLoaderOptions> {
 
   public static class TestCatalogLoaderOptions implements CommandOptions {}
 
-  public TestCatalogLoader() {
-    super(new PropertyName("testloader", "Loader for testing"), 3);
+  TestCatalogLoader(final PropertyName catalogLoaderName) {
+    super(catalogLoaderName, 3);
     forceInstantiationFailureIfConfigured();
   }
 
   @Override
   public void execute() {
     forceLoadFailureIfConfigured();
-  }
-
-  @Override
-  public PluginCommand getCommandLineCommand() {
-    final PropertyName catalogLoaderName = getCommandName();
-    final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(catalogLoaderName);
-    pluginCommand.addOption(
-        "test-load-option",
-        Boolean.class,
-        "Check that the test option is added to the load command");
-    return pluginCommand;
-  }
-
-  @Override
-  public void setAdditionalConfiguration(final Config additionalConfig) {
-    setCommandOptions(new TestCatalogLoaderOptions());
   }
 
   private void forceInstantiationFailureIfConfigured() {

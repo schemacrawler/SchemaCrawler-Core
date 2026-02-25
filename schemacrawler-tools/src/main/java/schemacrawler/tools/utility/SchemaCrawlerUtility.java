@@ -73,14 +73,14 @@ public final class SchemaCrawlerUtility {
 
     final CatalogLoaderRegistry catalogLoaderRegistry =
         CatalogLoaderRegistry.getCatalogLoaderRegistry();
-    final CatalogLoader catalogLoader = catalogLoaderRegistry.newChainedCatalogLoader();
+    final CatalogLoader catalogLoader =
+        catalogLoaderRegistry.newChainedCatalogLoader(additionalConfig);
 
     LOGGER.log(Level.CONFIG, new StringFormat("Catalog loader: %s", catalogLoader));
 
     catalogLoader.setDataSource(dataSource);
     catalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
     catalogLoader.setSchemaCrawlerOptions(schemaCrawlerOptions);
-    catalogLoader.setAdditionalConfiguration(additionalConfig);
 
     catalogLoader.execute();
     final Catalog catalog = catalogLoader.getCatalog();

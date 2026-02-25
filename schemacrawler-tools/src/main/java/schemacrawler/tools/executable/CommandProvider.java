@@ -8,8 +8,10 @@
 
 package schemacrawler.tools.executable;
 
+import java.util.Collection;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
+import us.fatehi.utility.property.PropertyName;
 
 public interface CommandProvider {
 
@@ -19,5 +21,7 @@ public interface CommandProvider {
     return getCommandLineCommand();
   }
 
-  SchemaCrawlerCommand<?> newCommand(String command, Config config);
+  Collection<PropertyName> getSupportedCommands();
+
+  <C extends Command<P>, P extends CommandOptions> C newCommand(String command, Config config);
 }

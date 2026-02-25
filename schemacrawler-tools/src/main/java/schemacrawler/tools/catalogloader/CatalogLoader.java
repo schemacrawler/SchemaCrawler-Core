@@ -12,25 +12,15 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.tools.executable.Command;
 import schemacrawler.tools.executable.CommandOptions;
-import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.options.Config;
 
 public interface CatalogLoader<P extends CommandOptions>
     extends Command<P>, Comparable<CatalogLoader<P>> {
-
-  PluginCommand getCommandLineCommand();
-
-  default PluginCommand getHelpCommand() {
-    return getCommandLineCommand();
-  }
 
   int getPriority();
 
   SchemaCrawlerOptions getSchemaCrawlerOptions();
 
   SchemaRetrievalOptions getSchemaRetrievalOptions();
-
-  void setAdditionalConfiguration(Config additionalConfig);
 
   void setSchemaCrawlerOptions(SchemaCrawlerOptions schemaCrawlerOptions);
 

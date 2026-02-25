@@ -19,7 +19,6 @@ import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.tools.executable.BaseCommand;
 import schemacrawler.tools.executable.CommandOptions;
-import schemacrawler.tools.executable.commandline.PluginCommand;
 import us.fatehi.utility.property.PropertyName;
 
 public abstract class BaseCatalogLoader<P extends CommandOptions> extends BaseCommand<P>
@@ -41,11 +40,6 @@ public abstract class BaseCatalogLoader<P extends CommandOptions> extends BaseCo
   @Override
   public final int compareTo(final CatalogLoader<P> otherCatalogLoader) {
     return compare(this, otherCatalogLoader, comparator);
-  }
-
-  @Override
-  public PluginCommand getCommandLineCommand() {
-    return PluginCommand.empty();
   }
 
   @Override
@@ -79,23 +73,7 @@ public abstract class BaseCatalogLoader<P extends CommandOptions> extends BaseCo
     this.schemaRetrievalOptions = schemaRetrievalOptions;
   }
 
-  protected final boolean isDatabaseSystemIdentifier(final String databaseSystemIdentifier) {
-    final String actualDatabaseSystemIdentifier =
-        getSchemaRetrievalOptions().getDatabaseServerType().getDatabaseSystemIdentifier();
-    if (actualDatabaseSystemIdentifier == null && databaseSystemIdentifier == null) {
-      return true;
-    }
-    if (actualDatabaseSystemIdentifier != null) {
-      return actualDatabaseSystemIdentifier.equals(databaseSystemIdentifier);
-    }
-    return false;
-  }
-
   protected final boolean isLoaded() {
     return catalog != null;
-  }
-
-  protected void setCommandOptions(P commandOptions) {
-    this.commandOptions = commandOptions;
   }
 }
