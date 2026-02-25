@@ -8,7 +8,6 @@
 
 package schemacrawler.loader.attributes;
 
-import static java.util.Objects.requireNonNull;
 import static schemacrawler.loader.attributes.model.CatalogAttributesUtility.readCatalogAttributes;
 
 import java.util.Map.Entry;
@@ -32,8 +31,6 @@ import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import schemacrawler.tools.catalogloader.BaseCatalogLoader;
-import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.options.Config;
 import us.fatehi.utility.ioresource.InputResource;
 import us.fatehi.utility.ioresource.InputResourceUtility;
 import us.fatehi.utility.property.PropertyName;
@@ -48,11 +45,8 @@ public class AttributesCatalogLoader extends BaseCatalogLoader<AttributesCatalog
 
   static final String OPTION_ATTRIBUTES_FILE = "attributes-file";
 
-  public AttributesCatalogLoader() {
-    super(
-        new PropertyName(
-            "attributesloader", "Loader for catalog attributes, such as remarks or tags"),
-        2);
+  AttributesCatalogLoader(final PropertyName catalogLoaderName) {
+    super(catalogLoaderName, 2);
   }
 
   @Override
@@ -94,23 +88,6 @@ public class AttributesCatalogLoader extends BaseCatalogLoader<AttributesCatalog
     } catch (final Exception e) {
       throw new ExecutionRuntimeException("Exception loading catalog attributes", e);
     }
-  }
-
-  @Override
-  public PluginCommand getCommandLineCommand() {
-    final PropertyName catalogLoaderName = getCommandName();
-    final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(catalogLoaderName);
-    pluginCommand.addOption(
-        OPTION_ATTRIBUTES_FILE,
-        String.class,
-        "Path to a YAML file with table and column attributes to add to the schema");
-    return pluginCommand;
-  }
-
-  @Override
-  public void setAdditionalConfiguration(final Config additionalConfig) {
-    requireNonNull(additionalConfig, "No config provided");
-    setCommandOptions(AttributesCatalogLoaderOptions.fromConfig(additionalConfig));
   }
 
   private void loadAlternateKeys(final Catalog catalog, final CatalogAttributes catalogAttributes) {

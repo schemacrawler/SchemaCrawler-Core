@@ -16,8 +16,19 @@ public abstract class BasePluginRegistry implements PluginRegistry {
 
   private static final Logger LOGGER = Logger.getLogger(BasePluginRegistry.class.getName());
 
+  private final String registryName;
+
+  public BasePluginRegistry(final String registryName) {
+    this.registryName = registryName;
+  }
+
   @Override
-  public void log() {
+  public final String getName() {
+    return registryName;
+  }
+
+  @Override
+  public final void log() {
     final boolean log = LOGGER.isLoggable(Level.CONFIG);
     if (!log) {
       return;

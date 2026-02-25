@@ -8,8 +8,6 @@
 
 package schemacrawler.loader.weakassociations;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +22,6 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.catalogloader.BaseCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
@@ -48,8 +45,8 @@ public final class WeakAssociationsCatalogLoader
   static final String OPTION_WEAK_ASSOCIATIONS = "weak-associations";
   static final String OPTION_INFER_EXTENSION_TABLES = "infer-extension-tables";
 
-  public WeakAssociationsCatalogLoader() {
-    super(new PropertyName("weakassociationsloader", "Loader for weak associations"), 3);
+  public WeakAssociationsCatalogLoader(final PropertyName catalogLoaderName) {
+    super(catalogLoaderName, 3);
   }
 
   @Override
@@ -76,32 +73,6 @@ public final class WeakAssociationsCatalogLoader
     } catch (final Exception e) {
       throw new ExecutionRuntimeException("Exception retrieving weak association information", e);
     }
-  }
-
-  @Override
-  public PluginCommand getCommandLineCommand() {
-    final PropertyName catalogLoaderName = getCommandName();
-    final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(catalogLoaderName);
-    pluginCommand.addOption(
-        OPTION_WEAK_ASSOCIATIONS,
-        Boolean.class,
-        "Analyzes the schema to find weak associations between tables, based on table and column"
-            + " naming patterns",
-        "This can be a time consuming operation",
-        "Optional, defaults to false");
-    pluginCommand.addOption(
-        OPTION_INFER_EXTENSION_TABLES,
-        Boolean.class,
-        "Infers extension tables that have similarly named primary keys, and reports them as weak"
-            + " associations",
-        "Optional, defaults to false");
-    return pluginCommand;
-  }
-
-  @Override
-  public void setAdditionalConfiguration(final Config additionalConfig) {
-    requireNonNull(additionalConfig, "No config provided");
-    setCommandOptions(WeakAssociationsCatalogLoaderOptions.fromConfig(additionalConfig));
   }
 
   private void findWeakAssociations(final boolean inferExtensionTables) {

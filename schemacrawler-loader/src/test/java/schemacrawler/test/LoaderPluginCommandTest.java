@@ -12,9 +12,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.loader.attributes.AttributesCatalogLoader;
-import schemacrawler.loader.counts.TableRowCountsCatalogLoader;
-import schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoader;
+import schemacrawler.loader.attributes.AttributesCatalogLoaderProvider;
+import schemacrawler.loader.counts.TableRowCountsCatalogLoaderProvider;
+import schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoaderProvider;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 
 public class LoaderPluginCommandTest {
@@ -23,7 +23,7 @@ public class LoaderPluginCommandTest {
   public void loaderPluginCommands() {
 
     final PluginCommand rowCountsPluginCommand =
-        new TableRowCountsCatalogLoader().getCommandLineCommand();
+        new TableRowCountsCatalogLoaderProvider().getCommandLineCommand();
     assertThat(
         rowCountsPluginCommand.toString(),
         is(
@@ -35,7 +35,7 @@ public class LoaderPluginCommandTest {
             """));
 
     final PluginCommand attributesPluginCommand =
-        new AttributesCatalogLoader().getCommandLineCommand();
+        new AttributesCatalogLoaderProvider().getCommandLineCommand();
     assertThat(
         attributesPluginCommand.toString(),
         is(
@@ -46,7 +46,7 @@ public class LoaderPluginCommandTest {
             """));
 
     final PluginCommand weakAssociationsPluginCommand =
-        new WeakAssociationsCatalogLoader().getCommandLineCommand();
+        new WeakAssociationsCatalogLoaderProvider().getCommandLineCommand();
     assertThat(
         weakAssociationsPluginCommand.toString(),
         is(

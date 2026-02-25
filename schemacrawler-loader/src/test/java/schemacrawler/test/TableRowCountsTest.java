@@ -18,9 +18,7 @@ import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
 import java.util.Arrays;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Schema;
@@ -44,34 +42,7 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
 @WithTestDatabase
 @ResolveTestContext
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TableRowCountsTest {
-
-  private Catalog catalog;
-
-  @BeforeAll
-  public void loadCatalog(final DatabaseConnectionSource dataSource) throws Exception {
-
-    final SchemaRetrievalOptions schemaRetrievalOptions =
-        DatabaseTestUtility.newSchemaRetrievalOptions();
-
-    final LimitOptionsBuilder limitOptionsBuilder =
-        LimitOptionsBuilder.builder()
-            .includeSchemas(new RegularExpressionExclusionRule(".*\\.FOR_LINT"));
-    final LoadOptionsBuilder loadOptionsBuilder =
-        LoadOptionsBuilder.builder().withSchemaInfoLevel(SchemaInfoLevelBuilder.standard());
-    final SchemaCrawlerOptions schemaCrawlerOptions =
-        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
-            .withLimitOptions(limitOptionsBuilder.toOptions())
-            .withLoadOptions(loadOptionsBuilder.toOptions());
-
-    final Config additionalConfig = ConfigUtility.newConfig();
-    additionalConfig.put("load-row-counts", true);
-
-    catalog =
-        SchemaCrawlerUtility.getCatalog(
-            dataSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
-  }
 
   @Test
   public void noEmptyTables(
@@ -108,9 +79,31 @@ public class TableRowCountsTest {
   }
 
   @Test
-  public void rowCounts(final TestContext testContext) throws Exception {
+  public void rowCounts(final TestContext testContext, final DatabaseConnectionSource dataSource)
+      throws Exception {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
+
+      final SchemaRetrievalOptions schemaRetrievalOptions =
+          DatabaseTestUtility.newSchemaRetrievalOptions();
+
+      final LimitOptionsBuilder limitOptionsBuilder =
+          LimitOptionsBuilder.builder()
+              .includeSchemas(new RegularExpressionExclusionRule(".*\\.FOR_LINT"));
+      final LoadOptionsBuilder loadOptionsBuilder =
+          LoadOptionsBuilder.builder().withSchemaInfoLevel(SchemaInfoLevelBuilder.standard());
+      final SchemaCrawlerOptions schemaCrawlerOptions =
+          SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+              .withLimitOptions(limitOptionsBuilder.toOptions())
+              .withLoadOptions(loadOptionsBuilder.toOptions());
+
+      final Config additionalConfig = ConfigUtility.newConfig();
+      additionalConfig.put("load-row-counts", true);
+
+      final Catalog catalog =
+          SchemaCrawlerUtility.getCatalog(
+              dataSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(5));
       for (final Schema schema : schemas) {

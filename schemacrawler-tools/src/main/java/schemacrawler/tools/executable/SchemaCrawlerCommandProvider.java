@@ -8,15 +8,14 @@
 
 package schemacrawler.tools.executable;
 
-import java.util.Collection;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
-import us.fatehi.utility.property.PropertyName;
 
 public interface SchemaCrawlerCommandProvider extends CommandProvider {
 
-  Collection<PropertyName> getSupportedCommands();
+  @Override
+  SchemaCrawlerCommand<?> newCommand(String command, Config config);
 
   boolean supportsOutputFormat(String command, OutputOptions outputOptions);
 

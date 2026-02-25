@@ -57,11 +57,11 @@ module us.fatehi.schemacrawler.schemacrawler {
   uses schemacrawler.tools.executable.CommandProvider;
   uses schemacrawler.tools.executable.SchemaCrawlerCommandProvider;
 
-  provides schemacrawler.tools.catalogloader.CatalogLoader with
-      schemacrawler.loader.attributes.AttributesCatalogLoader,
-      schemacrawler.loader.counts.TableRowCountsCatalogLoader,
-      schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoader,
-      schemacrawler.tools.catalogloader.SchemaCrawlerCatalogLoader;
+  provides schemacrawler.tools.catalogloader.CatalogLoaderProvider with
+      schemacrawler.loader.attributes.AttributesCatalogLoaderProvider,
+      schemacrawler.loader.counts.TableRowCountsCatalogLoaderProvider,
+      schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoaderProvider,
+      schemacrawler.tools.catalogloader.SchemaCrawlerCatalogLoaderProvider;
 
   // Allow reflection of schema model
   opens schemacrawler.schema to
