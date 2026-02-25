@@ -8,23 +8,17 @@
 
 package schemacrawler.tools.catalogloader;
 
-import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
+import schemacrawler.tools.executable.Command;
+import schemacrawler.tools.executable.CommandOptions;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
-import us.fatehi.utility.datasource.DatabaseConnectionSource;
-import us.fatehi.utility.property.PropertyName;
 
-public interface CatalogLoader extends Comparable<CatalogLoader> {
-
-  Catalog getCatalog();
+public interface CatalogLoader<P extends CommandOptions>
+    extends Command<P>, Comparable<CatalogLoader<P>> {
 
   PluginCommand getCommandLineCommand();
-
-  PropertyName getCommandName();
-
-  DatabaseConnectionSource getDataSource();
 
   default PluginCommand getHelpCommand() {
     return getCommandLineCommand();
@@ -36,13 +30,7 @@ public interface CatalogLoader extends Comparable<CatalogLoader> {
 
   SchemaRetrievalOptions getSchemaRetrievalOptions();
 
-  void execute();
-
   void setAdditionalConfiguration(Config additionalConfig);
-
-  void setCatalog(Catalog catalog);
-
-  void setDataSource(DatabaseConnectionSource dataSource);
 
   void setSchemaCrawlerOptions(SchemaCrawlerOptions schemaCrawlerOptions);
 

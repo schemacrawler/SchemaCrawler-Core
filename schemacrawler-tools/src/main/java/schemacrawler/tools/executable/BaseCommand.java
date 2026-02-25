@@ -67,7 +67,8 @@ public abstract class BaseCommand<P extends CommandOptions> implements Command<P
 
   @Override
   public final void setCatalog(final Catalog catalog) {
-    this.catalog = requireNonNull(catalog, "No catalog provided");
+    // this.catalog = requireNonNull(catalog, "No catalog provided");
+    this.catalog = catalog;
   }
 
   @Override

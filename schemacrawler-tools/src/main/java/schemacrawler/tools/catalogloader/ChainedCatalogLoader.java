@@ -76,8 +76,6 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
 
   @Override
   public void setAdditionalConfiguration(final Config additionalConfig) {
-    setCommandOptions(new ChainedCatalogLoaderOptions());
-
     if (additionalConfig == null) {
       this.additionalConfig = ConfigUtility.newConfig();
     }
