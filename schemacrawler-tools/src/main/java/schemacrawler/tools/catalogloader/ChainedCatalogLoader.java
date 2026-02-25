@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,8 +26,7 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.StringFormat;
 
-public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoaderOptions>
-    implements Iterable<CatalogLoaderProvider> {
+public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoaderOptions> {
 
   static record ChainedCatalogLoaderOptions() implements CommandOptions {}
 
@@ -80,9 +78,8 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
     MetaDataUtility.logCatalogSummary(catalog, Level.INFO);
   }
 
-  @Override
-  public Iterator<CatalogLoaderProvider> iterator() {
-    return catalogLoaderProviders.iterator();
+  public int size() {
+    return catalogLoaderProviders.size();
   }
 
   @Override
