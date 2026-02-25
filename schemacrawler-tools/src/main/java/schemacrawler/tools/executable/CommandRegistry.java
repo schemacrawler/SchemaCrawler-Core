@@ -71,17 +71,20 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
   private static List<SchemaCrawlerCommandProvider> loadCommandRegistry() {
 
     // Use thread-safe list
-    final List<SchemaCrawlerCommandProvider> schemaCrawlerCommandProviders = new CopyOnWriteArrayList<>();
+    final List<SchemaCrawlerCommandProvider> schemaCrawlerCommandProviders =
+        new CopyOnWriteArrayList<>();
 
     try {
       final ServiceLoader<SchemaCrawlerCommandProvider> serviceLoader =
-          ServiceLoader.load(SchemaCrawlerCommandProvider.class, CommandRegistry.class.getClassLoader());
+          ServiceLoader.load(
+              SchemaCrawlerCommandProvider.class, CommandRegistry.class.getClassLoader());
       for (final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider : serviceLoader) {
         LOGGER.log(
             Level.CONFIG,
             new StringFormat(
                 "Loading command %s, provided by %s",
-                schemaCrawlerCommandProvider.getSupportedCommands(), schemaCrawlerCommandProvider.getClass().getName()));
+                schemaCrawlerCommandProvider.getSupportedCommands(),
+                schemaCrawlerCommandProvider.getClass().getName()));
         schemaCrawlerCommandProviders.add(schemaCrawlerCommandProvider);
       }
     } catch (final Throwable e) {
@@ -94,6 +97,7 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
   private final List<SchemaCrawlerCommandProvider> commandRegistry;
 
   private CommandRegistry() {
+    super("SchemaCrawler Commands");
     commandRegistry = loadCommandRegistry();
   }
 
@@ -109,7 +113,8 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
 
     Collections.sort(executableCommandProviders, commandComparator);
 
-    final SchemaCrawlerCommandProvider executableCommandProvider = executableCommandProviders.get(0);
+    final SchemaCrawlerCommandProvider executableCommandProvider =
+        executableCommandProviders.get(0);
     LOGGER.log(Level.INFO, new StringFormat("Matched provider <%s>", executableCommandProvider));
 
     final String errorMessage = "Cannot run command <%s>".formatted(command);
@@ -174,7 +179,9 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
       if (schemaCrawlerCommandProvider.supportsSchemaCrawlerCommand(
           command, schemaCrawlerOptions, additionalConfig, outputOptions)) {
         executableCommandProviders.add(schemaCrawlerCommandProvider);
-        LOGGER.log(Level.FINE, new StringFormat("Adding command-provider <%s>", schemaCrawlerCommandProvider));
+        LOGGER.log(
+            Level.FINE,
+            new StringFormat("Adding command-provider <%s>", schemaCrawlerCommandProvider));
       }
     }
     if (executableCommandProviders.isEmpty()) {
@@ -203,10 +210,5 @@ public final class CommandRegistry extends BasePluginRegistry implements PluginC
           "Output format <%s> not supported for command <%s>"
               .formatted(outputOptions.getOutputFormatValue(), command));
     }
-  }
-
-  @Override
-  public String getName() {
-    return "SchemaCrawler Commands";
   }
 }

@@ -68,6 +68,7 @@ public final class CatalogLoaderRegistry extends BasePluginRegistry
   private final List<CatalogLoaderProvider> catalogLoaderRegistry;
 
   private CatalogLoaderRegistry() {
+    super("SchemaCrawler Catalog Loaders");
     catalogLoaderRegistry = loadCatalogLoaderRegistry();
   }
 
@@ -87,11 +88,6 @@ public final class CatalogLoaderRegistry extends BasePluginRegistry
       commandLineCommands.add(catalogLoader.getHelpCommand());
     }
     return commandLineCommands;
-  }
-
-  @Override
-  public String getName() {
-    return "SchemaCrawler Catalog Loaders";
   }
 
   @Override
