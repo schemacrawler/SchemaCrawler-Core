@@ -9,7 +9,6 @@
 package schemacrawler.tools.catalogloader;
 
 import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,8 +28,10 @@ public class SchemaCrawlerCatalogLoaderProvider extends BaseCatalogLoaderProvide
 
   @Override
   public SchemaCrawlerCatalogLoader newCommand(final String command, final Config config) {
-    requireNotBlank(command, "No command provided");
     requireNonNull(config, "No config provided");
+    if (!NAME.getName().equals(command)) {
+      throw new IllegalArgumentException("Bad catalog loader command <%s>".formatted(command));
+    }
     final SchemaCrawlerCatalogLoader loader = new SchemaCrawlerCatalogLoader(NAME);
     loader.configure(new SchemaCrawlerCatalogLoaderOptions());
     return loader;

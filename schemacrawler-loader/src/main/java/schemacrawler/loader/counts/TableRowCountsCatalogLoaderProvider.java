@@ -8,6 +8,8 @@
 
 package schemacrawler.loader.counts;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.List;
 import schemacrawler.tools.catalogloader.BaseCatalogLoaderProvider;
@@ -49,16 +51,12 @@ public class TableRowCountsCatalogLoaderProvider extends BaseCatalogLoaderProvid
 
   @Override
   public TableRowCountsCatalogLoader newCommand(final String command, final Config config) {
-    if (config == null) {
-      throw new IllegalArgumentException("No config provided");
-    }
-    final TableRowCountsCatalogLoader loader = new TableRowCountsCatalogLoader(NAME);
-
-    // Check command name
-    if (!loader.getCommandName().getName().equals(command)) {
+    requireNonNull(config, "No config provided");
+    if (!NAME.getName().equals(command)) {
       throw new IllegalArgumentException("Bad catalog loader command <%s>".formatted(command));
     }
 
+    final TableRowCountsCatalogLoader loader = new TableRowCountsCatalogLoader(NAME);
     final TableRowCountsCatalogLoaderOptions options = createOptionsfromConfig(config);
     loader.configure(options);
 

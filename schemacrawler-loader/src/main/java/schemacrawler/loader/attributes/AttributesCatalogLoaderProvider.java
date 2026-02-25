@@ -8,6 +8,8 @@
 
 package schemacrawler.loader.attributes;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.List;
 import schemacrawler.tools.catalogloader.BaseCatalogLoaderProvider;
@@ -40,16 +42,12 @@ public class AttributesCatalogLoaderProvider extends BaseCatalogLoaderProvider {
 
   @Override
   public AttributesCatalogLoader newCommand(final String command, final Config config) {
-    if (config == null) {
-      throw new IllegalArgumentException("No config provided");
-    }
-    final AttributesCatalogLoader loader = new AttributesCatalogLoader(NAME);
-
-    // Check command name
-    if (!loader.getCommandName().getName().equals(command)) {
+    requireNonNull(config, "No config provided");
+    if (!NAME.getName().equals(command)) {
       throw new IllegalArgumentException("Bad catalog loader command <%s>".formatted(command));
     }
 
+    final AttributesCatalogLoader loader = new AttributesCatalogLoader(NAME);
     final AttributesCatalogLoaderOptions options = createOptionsfromConfig(config);
     loader.configure(options);
 
