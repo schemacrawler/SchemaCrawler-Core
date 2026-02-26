@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.EnumUtility.enumValue;
 import static us.fatehi.utility.Utility.isBlank;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,29 +32,6 @@ public final class Config implements Options, ReadConfig {
   public static final Logger LOGGER = Logger.getLogger(Config.class.getName());
 
   private final Map<String, Object> configMap;
-
-  /**
-   * Creates an empty config.
-   *
-   * @deprecated
-   * @see ConfigUtility#newConfig()
-   */
-  @Deprecated(forRemoval = true)
-  public Config() {
-    this(Collections.emptyMap());
-  }
-
-  /**
-   * Copies a config.
-   *
-   * @deprecated
-   * @see ConfigUtility#fromConfig(Config)
-   */
-  @Deprecated(forRemoval = true)
-  public Config(final Config config) {
-    this(Collections.emptyMap());
-    merge(config);
-  }
 
   /**
    * Copies config into a map.
