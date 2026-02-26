@@ -8,8 +8,6 @@
 
 package schemacrawler.loader.attributes.model;
 
-import static java.util.Collections.emptyList;
-
 import java.beans.ConstructorProperties;
 import java.io.Serial;
 import java.util.List;
@@ -40,17 +38,17 @@ public final class CatalogAttributes extends ObjectAttributes {
       final List<AlternateKeyAttributes> alternateKeys) {
     super(name, remarks, attributes);
     if (tables == null) {
-      this.tables = emptyList();
+      this.tables = List.of();
     } else {
       this.tables = List.copyOf(tables);
     }
     if (weakAssociations == null) {
-      this.weakAssociations = emptyList();
+      this.weakAssociations = List.of();
     } else {
       this.weakAssociations = List.copyOf(weakAssociations);
     }
     if (alternateKeys == null) {
-      this.alternateKeys = emptyList();
+      this.alternateKeys = List.of();
     } else {
       this.alternateKeys = List.copyOf(alternateKeys);
     }

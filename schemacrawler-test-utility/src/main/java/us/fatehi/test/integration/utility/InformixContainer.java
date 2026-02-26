@@ -12,7 +12,6 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.Set;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
@@ -56,7 +55,7 @@ public class InformixContainer extends JdbcDatabaseContainer<InformixContainer> 
 
   @Override
   public Set<Integer> getLivenessCheckPortNumbers() {
-    return Collections.singleton(getJdbcPort());
+    return Set.of(getJdbcPort());
   }
 
   @Override

@@ -8,7 +8,6 @@
 
 package schemacrawler.test;
 
-import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,6 +21,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import schemacrawler.plugin.EnumDataTypeInfo;
@@ -192,7 +192,7 @@ public class SchemaRetrievalOptionsBuilderTest {
 
     builder.withEnumDataTypeHelper(
         (column, columnDataType, connection) ->
-            new EnumDataTypeInfo(EnumDataTypeTypes.enumerated_column, emptyList()));
+            new EnumDataTypeInfo(EnumDataTypeTypes.enumerated_column, List.of()));
     assertThat(
         builder.toOptions().getEnumDataTypeHelper().getEnumDataTypeInfo(null, null, null).getType(),
         is(EnumDataTypeInfo.EnumDataTypeTypes.enumerated_column));

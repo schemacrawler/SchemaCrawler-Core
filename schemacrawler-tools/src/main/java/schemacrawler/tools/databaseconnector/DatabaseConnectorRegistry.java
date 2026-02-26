@@ -119,6 +119,11 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
     return UNKNOWN;
   }
 
+  @Override
+  public Collection getCommandLineCommands() {
+    return List.of();
+  }
+
   public List<DatabaseServerType> getDatabaseServerTypes() {
     final List<DatabaseServerType> databaseServerTypes = new ArrayList<>();
     for (final DatabaseConnector databaseConnector : databaseConnectorRegistry.values()) {

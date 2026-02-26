@@ -11,7 +11,7 @@ package schemacrawler.test.utility.crawl;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import schemacrawler.schema.DatabaseInfo;
 import us.fatehi.utility.database.DatabaseInformation;
 import us.fatehi.utility.property.Property;
@@ -58,12 +58,12 @@ public class LightDatabaseInfo implements DatabaseInfo {
 
   @Override
   public Collection<Property> getProperties() {
-    return Collections.emptySet();
+    return List.of();
   }
 
   @Override
   public Collection<Property> getServerInfo() {
-    return Collections.emptySet();
+    return List.of();
   }
 
   @Override

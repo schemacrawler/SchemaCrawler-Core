@@ -10,7 +10,6 @@ package schemacrawler.test.utility.crawl;
 
 import java.io.Serial;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.DatabaseObject;
@@ -37,12 +36,12 @@ public class LightRoutine extends AbstractLightDatabaseObject implements Routine
 
   @Override
   public <C extends RoutineParameter<? extends Routine>> List<C> getParameters() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override
   public Collection<? extends DatabaseObject> getReferencedObjects() {
-    return Collections.emptyList();
+    return List.of();
   }
 
   @Override

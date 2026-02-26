@@ -12,7 +12,6 @@ import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.sql.Connection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +53,7 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
     defaultDatabase = "";
     userCredentials = new MultiUseUserCredentials();
     connectionInitializer = connection -> {};
-    additionalDriverProperties = Collections.emptySet();
+    additionalDriverProperties = Set.of();
   }
 
   @Override
@@ -78,7 +77,7 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
   public DatabaseConnectionSourceBuilder withAdditionalDriverProperties(
       final Set<String> additionalDriverProperties) {
     if (additionalDriverProperties == null) {
-      this.additionalDriverProperties = Collections.emptySet();
+      this.additionalDriverProperties = Set.of();
     } else {
       this.additionalDriverProperties = additionalDriverProperties;
     }

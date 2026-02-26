@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ public class SimpleDatabaseConnectionSourceTest {
         () ->
             new SimpleDatabaseConnectionSource(
                 "<bad-url>",
-                Collections.emptySet(),
+                Set.of(),
                 null,
                 new MultiUseUserCredentials("user", "!"),
                 connection -> {}));
@@ -80,7 +80,7 @@ public class SimpleDatabaseConnectionSourceTest {
     databaseConnectionSource =
         new SimpleDatabaseConnectionSource(
             connectionUrl,
-            Collections.emptySet(),
+            Set.of(),
             new HashMap<>(),
             new MultiUseUserCredentials(userName, password),
             connection -> {});

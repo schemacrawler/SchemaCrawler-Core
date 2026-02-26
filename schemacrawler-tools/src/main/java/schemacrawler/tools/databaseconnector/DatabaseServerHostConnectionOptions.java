@@ -10,7 +10,6 @@ package schemacrawler.tools.databaseconnector;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Collections;
 import java.util.Map;
 
 public record DatabaseServerHostConnectionOptions(
@@ -23,6 +22,6 @@ public record DatabaseServerHostConnectionOptions(
 
   public DatabaseServerHostConnectionOptions {
     databaseSystemIdentifier = requireNonNull(databaseSystemIdentifier, "No server provided");
-    urlx = urlx == null ? Collections.emptyMap() : Map.copyOf(urlx);
+    urlx = urlx == null ? Map.of() : Map.copyOf(urlx);
   }
 }
