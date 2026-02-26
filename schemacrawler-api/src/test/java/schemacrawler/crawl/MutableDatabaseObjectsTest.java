@@ -11,6 +11,7 @@ package schemacrawler.crawl;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -53,7 +54,7 @@ public class MutableDatabaseObjectsTest {
 
     assertThat(synonym.getReferencedObject(), is(nullValue()));
     assertThat(synonym.getReferencedObject(), is(nullValue()));
-    assertThat(synonym.getReferencedObjects(), contains(nullValue()));
+    assertThat(synonym.getReferencedObjects(), hasSize(0));
   }
 
   @Test

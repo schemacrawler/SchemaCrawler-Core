@@ -41,7 +41,15 @@ final class MutableSynonym extends AbstractDatabaseObject implements Synonym {
 
   @Override
   public Collection<? extends DatabaseObject> getReferencedObjects() {
-    return List.of(referencedObject);
+    if (hasReferencedObject()) {
+      return List.of(referencedObject);
+    }
+    return List.of();
+  }
+
+  @Override
+  public boolean hasReferencedObject() {
+    return referencedObject != null;
   }
 
   void setReferencedObject(final DatabaseObject referencedObject) {
