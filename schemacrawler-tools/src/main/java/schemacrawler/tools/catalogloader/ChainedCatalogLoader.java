@@ -22,6 +22,7 @@ import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
+import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
 
 public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoaderOptions> {
@@ -56,16 +57,23 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
     getSchemaCrawlerOptions();
     final SchemaRetrievalOptions schemaRetrievalOptions = getSchemaRetrievalOptions();
     for (final CatalogLoader<?> catalogLoader : catalogLoaders) {
-      LOGGER.log(
-          Level.CONFIG,
-          new StringFormat("Loading catalog with <%s>", catalogLoader.getCommandName().getName()));
+
+      // Initialize, and check if the command is available
+      catalogLoader.initialize();
+
       if (catalog != null) {
         // Initially catalog will be null until it is first loaded
         catalogLoader.setCatalog(catalog);
       }
-      catalogLoader.setDataSource(dataSource);
+
+      if (catalogLoader.usesConnection()) {
+        catalogLoader.setDataSource(dataSource);
+      }
       catalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
 
+      // Execute
+      LOGGER.log(Level.INFO, new StringFormat("Executing catalog loader <%s>", command));
+      LOGGER.log(Level.CONFIG, new ObjectToStringFormat(catalogLoader.getCommandOptions()));
       catalogLoader.execute();
 
       catalog = catalogLoader.getCatalog();
@@ -80,5 +88,10 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
   @Override
   public String toString() {
     return "CatalogLoaderProvider [" + catalogLoaders + "]";
+  }
+
+  @Override
+  public boolean usesConnection() {
+    return true;
   }
 }
