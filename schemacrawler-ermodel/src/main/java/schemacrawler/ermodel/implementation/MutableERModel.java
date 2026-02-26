@@ -12,7 +12,6 @@ import static java.util.function.Predicate.not;
 
 import java.io.Serial;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +63,7 @@ public class MutableERModel implements ERModel {
   @Override
   public Collection<Entity> getEntitiesByType(final EntityType entityType) {
     if (entityType == null) {
-      return Collections.emptySet();
+      return List.of();
     }
     return List.copyOf(
         entitiesMap.values().stream()
@@ -81,13 +80,13 @@ public class MutableERModel implements ERModel {
   @Override
   public Collection<Relationship> getImplicitRelationshipsByEntity(final Entity entity) {
     if (entity == null) {
-      return Collections.emptySet();
+      return List.of();
     }
     if (erImplicitMap.containsKey(entity.key())) {
       final Set<Relationship> relationships = new TreeSet<>(erImplicitMap.get(entity.key()));
       return List.copyOf(relationships);
     }
-    return Collections.emptySet();
+    return List.of();
   }
 
   @Override
@@ -99,7 +98,7 @@ public class MutableERModel implements ERModel {
   public Collection<Relationship> getRelationshipsByType(
       final RelationshipCardinality cardinality) {
     if (cardinality == null) {
-      return Collections.emptySet();
+      return List.of();
     }
     return List.copyOf(
         relationshipsMap.values().stream()
@@ -111,7 +110,7 @@ public class MutableERModel implements ERModel {
   @Override
   public Collection<EntitySubtype> getSubtypesOf(final Entity supertype) {
     if (supertype == null) {
-      return Collections.emptySet();
+      return List.of();
     }
     return List.copyOf(
         getSubtypes().stream()

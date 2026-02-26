@@ -17,8 +17,8 @@ import static org.hamcrest.Matchers.nullValue;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -68,7 +68,7 @@ public class TestDatabaseConnectionSourceTest {
     databaseConnectionSource =
         new SingleDatabaseConnectionSource(
             connectionUrl,
-            Collections.emptySet(),
+            Set.of(),
             connectionProperties,
             new MultiUseUserCredentials(userName, password),
             connection -> {});
