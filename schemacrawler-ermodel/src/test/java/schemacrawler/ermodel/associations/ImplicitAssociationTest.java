@@ -79,13 +79,6 @@ public class ImplicitAssociationTest {
 
   @Test
   public void testImplicitAssociationCompareTo() {
-    final LightTable fkTable1 = new LightTable("FK_TABLE1");
-    final LightTable pkTable1 = new LightTable("PK_TABLE1");
-    final LightColumn fkColumn1 = fkTable1.addColumn("FK_COL1");
-    final LightColumn pkColumn1 = pkTable1.addColumn("PK_COL1");
-    final ImplicitColumnReference columnRef1 = new ImplicitColumnReference(fkColumn1, pkColumn1);
-    final ImplicitAssociation implicitAssociation1 = new ImplicitAssociation(columnRef1);
-
     final LightTable fkTable2 = new LightTable("FK_TABLE2");
     final LightTable pkTable2 = new LightTable("PK_TABLE2");
     final LightColumn fkColumn2 = fkTable2.addColumn("FK_COL2");
@@ -93,8 +86,8 @@ public class ImplicitAssociationTest {
     final ImplicitColumnReference columnRef2 = new ImplicitColumnReference(fkColumn2, pkColumn2);
     final ImplicitAssociation implicitAssociation2 = new ImplicitAssociation(columnRef2);
 
-    assertThat(implicitAssociation1.compareTo(implicitAssociation2), not(0));
-    assertThat(implicitAssociation1.compareTo(implicitAssociation1), is(0));
+    assertThat(implicitAssociation.compareTo(implicitAssociation2), not(0));
+    assertThat(implicitAssociation.compareTo(implicitAssociation), is(0));
   }
 
   @Test
@@ -154,7 +147,8 @@ public class ImplicitAssociationTest {
 
     // Self-referencing
     final LightColumn selfFkColumn = pkTable.addColumn("SELF_FK");
-    final ImplicitColumnReference selfColumnRef = new ImplicitColumnReference(selfFkColumn, pkColumn);
+    final ImplicitColumnReference selfColumnRef =
+        new ImplicitColumnReference(selfFkColumn, pkColumn);
     final ImplicitAssociation selfImplicitAssociation = new ImplicitAssociation(selfColumnRef);
     assertThat(selfImplicitAssociation.isSelfReferencing(), is(true));
   }
