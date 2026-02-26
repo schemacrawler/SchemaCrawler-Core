@@ -97,7 +97,7 @@ public class SchemaCrawlerExecutableTest {
     executable2.setAdditionalConfiguration(config);
     final ExecutionRuntimeException ex2 =
         assertThrows(ExecutionRuntimeException.class, () -> executable2.execute());
-    assertThat(ex2.getMessage(), is("Cannot run command <" + command2 + ">"));
+    assertThat(ex2.getMessage(), is("Cannot configure command <" + command2 + ">"));
   }
 
   @Test

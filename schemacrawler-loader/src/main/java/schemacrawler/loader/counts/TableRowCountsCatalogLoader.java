@@ -75,4 +75,9 @@ public class TableRowCountsCatalogLoader
       throw new ExecutionRuntimeException("Exception retrieving table row counts", e);
     }
   }
+
+  @Override
+  public boolean usesConnection() {
+    return true;
+  }
 }

@@ -13,8 +13,7 @@ import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.tools.executable.Command;
 import schemacrawler.tools.executable.CommandOptions;
 
-public interface CatalogLoader<P extends CommandOptions>
-    extends Command<P>, Comparable<CatalogLoader<P>> {
+public interface CatalogLoader<P extends CommandOptions> extends Command<P> {
 
   int getPriority();
 

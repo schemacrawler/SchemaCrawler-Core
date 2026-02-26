@@ -69,7 +69,6 @@ public class SchemaCrawlerCatalogLoaderTest {
   }
 
   private SchemaCrawlerCatalogLoader newSchemaCrawlerCatalogLoader() {
-    return new SchemaCrawlerCatalogLoaderProvider()
-        .newCommand("schemacrawlerloader", ConfigUtility.newConfig());
+    return new SchemaCrawlerCatalogLoaderProvider().newCommand(ConfigUtility.newConfig());
   }
 }

@@ -34,4 +34,9 @@ public class SchemaCrawlerCatalogLoader
     final Catalog catalog = schemaCrawler.crawl();
     setCatalog(catalog);
   }
+
+  @Override
+  public boolean usesConnection() {
+    return true;
+  }
 }

@@ -8,6 +8,8 @@
 
 package schemacrawler.loader.weakassociations;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.List;
 import schemacrawler.tools.catalogloader.BaseCatalogLoaderProvider;
@@ -48,17 +50,10 @@ public class WeakAssociationsCatalogLoaderProvider extends BaseCatalogLoaderProv
   }
 
   @Override
-  public WeakAssociationsCatalogLoader newCommand(final String command, final Config config) {
-    if (config == null) {
-      throw new IllegalArgumentException("No config provided");
-    }
+  public WeakAssociationsCatalogLoader newCommand(final Config config) {
+    requireNonNull(config, "No config provided");
+
     final WeakAssociationsCatalogLoader loader = new WeakAssociationsCatalogLoader(NAME);
-
-    // Check command name
-    if (!loader.getCommandName().getName().equals(command)) {
-      throw new IllegalArgumentException("Bad catalog loader command <%s>".formatted(command));
-    }
-
     final WeakAssociationsCatalogLoaderOptions options = createOptionsfromConfig(config);
     loader.configure(options);
 

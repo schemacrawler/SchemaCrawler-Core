@@ -13,6 +13,5 @@ import schemacrawler.tools.options.Config;
 
 public interface CatalogLoaderProvider extends CommandProvider {
 
-  @Override
-  CatalogLoader<?> newCommand(String command, Config config);
+  CatalogLoader<?> newCommand(Config config);
 }
