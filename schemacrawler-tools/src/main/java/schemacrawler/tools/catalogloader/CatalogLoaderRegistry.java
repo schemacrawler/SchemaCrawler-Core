@@ -8,12 +8,21 @@
 
 package schemacrawler.tools.catalogloader;
 
+import static java.util.Comparator.comparingInt;
+import static java.util.Comparator.nullsLast;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
+import schemacrawler.schemacrawler.exceptions.SchemaCrawlerException;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
@@ -22,6 +31,10 @@ import us.fatehi.utility.string.StringFormat;
 public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<CatalogLoaderProvider> {
 
   private static final Logger LOGGER = Logger.getLogger(CatalogLoaderRegistry.class.getName());
+
+  private static Comparator<CatalogLoader<?>> catalogLoaderComparator =
+      nullsLast(comparingInt(CatalogLoader<?>::getPriority))
+          .thenComparing(loader -> loader.getCommandName().getName());
 
   private static CatalogLoaderRegistry catalogLoaderRegistrySingleton;
 
@@ -60,9 +73,43 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
     super("SchemaCrawler Catalog Loaders", loadCatalogLoaderRegistry());
   }
 
-  public ChainedCatalogLoader newChainedCatalogLoader(final Config additionalConfig) {
+  public ChainedCatalogLoader newChainedCatalogLoader(
+      final SchemaCrawlerOptions schemaCrawlerOptions, final Config additionalConfig) {
     // Make a defensive copy of the list of catalog loaders
-    final List<CatalogLoaderProvider> chainedCatalogLoaders = getCommandProviderRegistry();
+    final List<CatalogLoader<?>> chainedCatalogLoaders =
+        configureCatalogLoaders(schemaCrawlerOptions, additionalConfig);
     return new ChainedCatalogLoader(chainedCatalogLoaders, additionalConfig);
+  }
+
+  private List<CatalogLoader<?>> configureCatalogLoaders(
+      final SchemaCrawlerOptions schemaCrawlerOptions, final Config additionalConfig) {
+    final List<CatalogLoader<?>> catalogLoaders = new ArrayList<>();
+    for (final CatalogLoaderProvider catalogLoaderProvider : getCommandProviders()) {
+      try {
+        final CatalogLoader<?> catalogLoader = catalogLoaderProvider.newCommand(additionalConfig);
+        if (catalogLoader == null) {
+          LOGGER.log(
+              Level.WARNING,
+              new StringFormat("Catalog loader <%s> not instantiated", catalogLoaderProvider));
+          continue;
+        }
+        catalogLoader.setSchemaCrawlerOptions(schemaCrawlerOptions);
+
+        catalogLoaders.add(catalogLoader);
+      } catch (final SchemaCrawlerException e) {
+        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        throw new ExecutionRuntimeException(
+            "Catalog loader <%s> not instantiated".formatted(catalogLoaderProvider), e);
+      } catch (final Throwable e) {
+        // Mainly catch NoClassDefFoundError, which is a Throwable,
+        // for missing third-party jars
+        LOGGER.log(Level.CONFIG, e.getMessage(), e);
+        throw new InternalRuntimeException(
+            "Catalog loader <%s> not instantiated".formatted(catalogLoaderProvider));
+      }
+    }
+
+    Collections.sort(catalogLoaders, catalogLoaderComparator);
+    return catalogLoaders;
   }
 }

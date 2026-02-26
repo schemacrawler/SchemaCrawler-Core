@@ -11,11 +11,9 @@ package schemacrawler.tools.catalogloader;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.tools.catalogloader.ChainedCatalogLoader.ChainedCatalogLoaderOptions;
 import schemacrawler.tools.executable.CommandOptions;
@@ -32,16 +30,16 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
 
   private static final Logger LOGGER = Logger.getLogger(ChainedCatalogLoader.class.getName());
 
-  private final List<CatalogLoaderProvider> catalogLoaderProviders;
+  private final List<CatalogLoader<?>> catalogLoaders;
   private final Config additionalConfig;
 
   public ChainedCatalogLoader(
-      final List<CatalogLoaderProvider> catalogLoaderProviders, final Config additionalConfig) {
+      final List<CatalogLoader<?>> catalogLoaders, final Config additionalConfig) {
     super(
         new PropertyName("chainloader", "Chain of all catalog loaders, called in turn by priority"),
         Integer.MIN_VALUE);
-    requireNonNull(catalogLoaderProviders);
-    this.catalogLoaderProviders = new ArrayList<>(catalogLoaderProviders);
+    requireNonNull(catalogLoaders);
+    this.catalogLoaders = new ArrayList<>(catalogLoaders);
 
     if (additionalConfig == null) {
       this.additionalConfig = ConfigUtility.newConfig();
@@ -55,45 +53,32 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
   @Override
   public void execute() {
     final DatabaseConnectionSource dataSource = getDataSource();
-    final SchemaCrawlerOptions schemaCrawlerOptions = getSchemaCrawlerOptions();
+    getSchemaCrawlerOptions();
     final SchemaRetrievalOptions schemaRetrievalOptions = getSchemaRetrievalOptions();
-    final List<CatalogLoader<?>> catalogLoaders = getChainedCatalogLoaders();
-    for (final CatalogLoader<?> nextCatalogLoader : catalogLoaders) {
+    for (final CatalogLoader<?> catalogLoader : catalogLoaders) {
       LOGGER.log(
           Level.CONFIG,
-          new StringFormat(
-              "Loading catalog with <%s>", nextCatalogLoader.getCommandName().getName()));
+          new StringFormat("Loading catalog with <%s>", catalogLoader.getCommandName().getName()));
       if (catalog != null) {
         // Initially catalog will be null until it is first loaded
-        nextCatalogLoader.setCatalog(catalog);
+        catalogLoader.setCatalog(catalog);
       }
-      nextCatalogLoader.setDataSource(dataSource);
-      nextCatalogLoader.setSchemaCrawlerOptions(schemaCrawlerOptions);
-      nextCatalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
+      catalogLoader.setDataSource(dataSource);
+      catalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
 
-      nextCatalogLoader.execute();
+      catalogLoader.execute();
 
-      catalog = nextCatalogLoader.getCatalog();
+      catalog = catalogLoader.getCatalog();
     }
     MetaDataUtility.logCatalogSummary(catalog, Level.INFO);
   }
 
   public int size() {
-    return catalogLoaderProviders.size();
+    return catalogLoaders.size();
   }
 
   @Override
   public String toString() {
-    return "CatalogLoaderProvider [" + catalogLoaderProviders + "]";
-  }
-
-  private List<CatalogLoader<?>> getChainedCatalogLoaders() {
-    final List<CatalogLoader<?>> catalogLoaders = new ArrayList<>();
-    for (final CatalogLoaderProvider catalogLoaderProvider : catalogLoaderProviders) {
-      final CatalogLoader<?> catalogLoader = catalogLoaderProvider.newCommand(additionalConfig);
-      catalogLoaders.add(catalogLoader);
-    }
-    Collections.sort(catalogLoaders, BaseCatalogLoader.comparator);
-    return catalogLoaders;
+    return "CatalogLoaderProvider [" + catalogLoaders + "]";
   }
 }

@@ -22,19 +22,18 @@ import us.fatehi.utility.property.PropertyName;
 public abstract class BasePluginCommandRegistry<R extends CommandProvider>
     extends BasePluginRegistry implements PluginCommandRegistry<R> {
 
-  private final List<R> commandProviderRegistry;
+  private final List<R> commandProviders;
 
-  protected BasePluginCommandRegistry(final String name, final List<R> commandProviderRegistry) {
+  protected BasePluginCommandRegistry(final String name, final List<R> commandProviders) {
     super(name);
-    this.commandProviderRegistry =
-        List.copyOf(
-            requireNonNull(commandProviderRegistry, "No command provider registry provided"));
+    this.commandProviders =
+        List.copyOf(requireNonNull(commandProviders, "No command providers provided"));
   }
 
   @Override
   public final Collection<PluginCommand> getCommandLineCommands() {
     final Collection<PluginCommand> commandLineCommands = new HashSet<>();
-    for (final R commandProvider : commandProviderRegistry) {
+    for (final R commandProvider : commandProviders) {
       if (commandProvider != null) {
         commandLineCommands.add(commandProvider.getCommandLineCommand());
       }
@@ -42,14 +41,14 @@ public abstract class BasePluginCommandRegistry<R extends CommandProvider>
     return commandLineCommands;
   }
 
-  protected List<R> getCommandProviderRegistry() {
-    return List.copyOf(commandProviderRegistry);
+  protected List<R> getCommandProviders() {
+    return List.copyOf(commandProviders);
   }
 
   @Override
   public final Collection<PluginCommand> getHelpCommands() {
     final Collection<PluginCommand> commandLineCommands = new HashSet<>();
-    for (final R commandProvider : commandProviderRegistry) {
+    for (final R commandProvider : commandProviders) {
       if (commandProvider != null) {
         commandLineCommands.add(commandProvider.getHelpCommand());
       }
@@ -60,7 +59,7 @@ public abstract class BasePluginCommandRegistry<R extends CommandProvider>
   @Override
   public final Collection<PropertyName> getRegisteredPlugins() {
     final Collection<PropertyName> supportedCommands = new HashSet<>();
-    for (final R commandProvider : commandProviderRegistry) {
+    for (final R commandProvider : commandProviders) {
       if (commandProvider != null) {
         supportedCommands.addAll(commandProvider.getSupportedCommands());
       }

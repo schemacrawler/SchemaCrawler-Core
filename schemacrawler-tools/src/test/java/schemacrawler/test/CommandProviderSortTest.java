@@ -18,9 +18,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.test.utility.testcommand.TestCommandProvider;
 import schemacrawler.tools.executable.BaseCommandProvider;
-import schemacrawler.tools.executable.SchemaCrawlerCommandProvider;
 import schemacrawler.tools.executable.CommandRegistry;
 import schemacrawler.tools.executable.SchemaCrawlerCommand;
+import schemacrawler.tools.executable.SchemaCrawlerCommandProvider;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
 import us.fatehi.utility.property.PropertyName;
@@ -33,8 +33,7 @@ public class CommandProviderSortTest {
     }
 
     @Override
-    public SchemaCrawlerCommand<?> newCommand(
-        final String command, final Config config) {
+    public SchemaCrawlerCommand<?> newCommand(final String command, final Config config) {
       return null;
     }
 
@@ -45,14 +44,14 @@ public class CommandProviderSortTest {
   }
 
   private final TestCommandProvider testCommandProvider = new TestCommandProvider();
-  private final SchemaCrawlerCommandProvider fallbackCommandProvider = new OperationCommandProvider();
+  private final SchemaCrawlerCommandProvider fallbackCommandProvider =
+      new OperationCommandProvider();
   private final SchemaCrawlerCommandProvider otherCommandProvider =
       new BaseCommandProvider(
           List.of(new PropertyName("OtherCommandProvider", "OtherCommandProvider"))) {
 
         @Override
-        public SchemaCrawlerCommand<?> newCommand(
-            final String command, final Config config) {
+        public SchemaCrawlerCommand<?> newCommand(final String command, final Config config) {
           return null;
         }
 
@@ -66,25 +65,31 @@ public class CommandProviderSortTest {
   @Test
   public void sort() {
     assertThat(
-        CommandRegistry.commandComparator.compare(testCommandProvider, testCommandProvider), is(0));
+        CommandRegistry.commandProviderComparator.compare(testCommandProvider, testCommandProvider),
+        is(0));
     assertThat(
-        CommandRegistry.commandComparator.compare(testCommandProvider, otherCommandProvider),
+        CommandRegistry.commandProviderComparator.compare(
+            testCommandProvider, otherCommandProvider),
         is(greaterThan(0)));
     assertThat(
-        CommandRegistry.commandComparator.compare(otherCommandProvider, testCommandProvider),
+        CommandRegistry.commandProviderComparator.compare(
+            otherCommandProvider, testCommandProvider),
         is(lessThan(0)));
   }
 
   @Test
   public void sortForFallBack() {
     assertThat(
-        CommandRegistry.commandComparator.compare(fallbackCommandProvider, fallbackCommandProvider),
+        CommandRegistry.commandProviderComparator.compare(
+            fallbackCommandProvider, fallbackCommandProvider),
         is(0));
     assertThat(
-        CommandRegistry.commandComparator.compare(testCommandProvider, fallbackCommandProvider),
+        CommandRegistry.commandProviderComparator.compare(
+            testCommandProvider, fallbackCommandProvider),
         is(lessThan(0)));
     assertThat(
-        CommandRegistry.commandComparator.compare(fallbackCommandProvider, testCommandProvider),
+        CommandRegistry.commandProviderComparator.compare(
+            fallbackCommandProvider, testCommandProvider),
         is(greaterThan(0)));
   }
 
@@ -92,12 +97,12 @@ public class CommandProviderSortTest {
   public void sortNull() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> CommandRegistry.commandComparator.compare(null, null));
+        () -> CommandRegistry.commandProviderComparator.compare(null, null));
     assertThrows(
         IllegalArgumentException.class,
-        () -> CommandRegistry.commandComparator.compare(testCommandProvider, null));
+        () -> CommandRegistry.commandProviderComparator.compare(testCommandProvider, null));
     assertThrows(
         IllegalArgumentException.class,
-        () -> CommandRegistry.commandComparator.compare(null, fallbackCommandProvider));
+        () -> CommandRegistry.commandProviderComparator.compare(null, fallbackCommandProvider));
   }
 }

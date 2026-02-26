@@ -33,7 +33,7 @@ public final class CommandRegistry extends BasePluginCommandRegistry<SchemaCrawl
 
   private static CommandRegistry commandRegistrySingleton;
 
-  public static final Comparator<? super SchemaCrawlerCommandProvider> commandComparator =
+  public static final Comparator<? super SchemaCrawlerCommandProvider> commandProviderComparator =
       (commandProvider1, commandProvider2) -> {
         final String fallbackProviderTypeName = "OperationCommandProvider";
         if (commandProvider1 == null || commandProvider2 == null) {
@@ -101,13 +101,13 @@ public final class CommandRegistry extends BasePluginCommandRegistry<SchemaCrawl
         command, schemaCrawlerOptions, additionalConfig, outputOptions, executableCommandProviders);
     findSupportedOutputFormats(command, outputOptions, executableCommandProviders);
 
-    Collections.sort(executableCommandProviders, commandComparator);
+    Collections.sort(executableCommandProviders, commandProviderComparator);
 
     final SchemaCrawlerCommandProvider executableCommandProvider =
         executableCommandProviders.get(0);
     LOGGER.log(Level.INFO, new StringFormat("Matched provider <%s>", executableCommandProvider));
 
-    final String errorMessage = "Cannot run command <%s>".formatted(command);
+    final String errorMessage = "Cannot configure command <%s>".formatted(command);
     final SchemaCrawlerCommand<?> scCommand;
     try {
       scCommand = executableCommandProvider.newCommand(command, additionalConfig);
@@ -135,8 +135,7 @@ public final class CommandRegistry extends BasePluginCommandRegistry<SchemaCrawl
       final Config additionalConfig,
       final OutputOptions outputOptions,
       final List<SchemaCrawlerCommandProvider> executableCommandProviders) {
-    for (final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider :
-        getCommandProviderRegistry()) {
+    for (final SchemaCrawlerCommandProvider schemaCrawlerCommandProvider : getCommandProviders()) {
       if (schemaCrawlerCommandProvider.supportsSchemaCrawlerCommand(
           command, schemaCrawlerOptions, additionalConfig, outputOptions)) {
         executableCommandProviders.add(schemaCrawlerCommandProvider);

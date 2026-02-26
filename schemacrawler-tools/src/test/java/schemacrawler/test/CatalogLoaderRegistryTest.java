@@ -20,6 +20,7 @@ import static schemacrawler.test.utility.PluginRegistryTestUtility.reload;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.test.utility.TestCatalogLoaderProvider;
 import schemacrawler.tools.catalogloader.CatalogLoaderRegistry;
@@ -53,7 +54,8 @@ public class CatalogLoaderRegistryTest {
   public void chainedCatalogLoaders() {
     final ChainedCatalogLoader chainedCatalogLoaders =
         CatalogLoaderRegistry.getCatalogLoaderRegistry()
-            .newChainedCatalogLoader(ConfigUtility.newConfig());
+            .newChainedCatalogLoader(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions(), ConfigUtility.newConfig());
 
     assertThat(chainedCatalogLoaders.size(), is(2));
   }

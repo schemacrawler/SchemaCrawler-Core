@@ -8,11 +8,6 @@
 
 package schemacrawler.tools.catalogloader;
 
-import static java.util.Comparator.comparingInt;
-import static java.util.Comparator.nullsLast;
-import static java.util.Objects.compare;
-
-import java.util.Comparator;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
@@ -24,10 +19,6 @@ import us.fatehi.utility.property.PropertyName;
 public abstract class BaseCatalogLoader<P extends CommandOptions> extends BaseCommand<P>
     implements CatalogLoader<P> {
 
-  public static Comparator<CatalogLoader<?>> comparator =
-      nullsLast(comparingInt(CatalogLoader<?>::getPriority))
-          .thenComparing(loader -> loader.getCommandName().getName());
-
   private final int priority;
   private SchemaRetrievalOptions schemaRetrievalOptions;
   private SchemaCrawlerOptions schemaCrawlerOptions;
@@ -35,11 +26,6 @@ public abstract class BaseCatalogLoader<P extends CommandOptions> extends BaseCo
   protected BaseCatalogLoader(final PropertyName catalogLoaderName, final int priority) {
     super(catalogLoaderName);
     this.priority = priority;
-  }
-
-  @Override
-  public final int compareTo(final CatalogLoader<P> otherCatalogLoader) {
-    return compare(this, otherCatalogLoader, comparator);
   }
 
   @Override
