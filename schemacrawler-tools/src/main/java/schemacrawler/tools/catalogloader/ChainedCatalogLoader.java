@@ -54,13 +54,8 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
   @Override
   public void execute() {
     final DatabaseConnectionSource dataSource = getDataSource();
-    getSchemaCrawlerOptions();
     final SchemaRetrievalOptions schemaRetrievalOptions = getSchemaRetrievalOptions();
     for (final CatalogLoader<?> catalogLoader : catalogLoaders) {
-
-      // Initialize, and check if the command is available
-      catalogLoader.initialize();
-
       if (catalog != null) {
         // Initially catalog will be null until it is first loaded
         catalogLoader.setCatalog(catalog);
@@ -79,6 +74,15 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
       catalog = catalogLoader.getCatalog();
     }
     MetaDataUtility.logCatalogSummary(catalog, Level.INFO);
+  }
+
+  @Override
+  public void initialize() {
+    super.initialize();
+    for (final CatalogLoader<?> catalogLoader : catalogLoaders) {
+      // Initialize, and check if the command is available
+      catalogLoader.initialize();
+    }
   }
 
   public int size() {
