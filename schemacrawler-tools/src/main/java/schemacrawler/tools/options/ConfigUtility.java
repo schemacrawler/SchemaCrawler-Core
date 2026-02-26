@@ -8,7 +8,6 @@
 
 package schemacrawler.tools.options;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import us.fatehi.utility.PropertiesUtility;
@@ -56,7 +55,7 @@ public final class ConfigUtility {
    * @return New `Config`
    */
   public static Config newConfig() {
-    return fromMap(Collections.emptyMap());
+    return fromMap(Map.of());
   }
 
   private ConfigUtility() {
