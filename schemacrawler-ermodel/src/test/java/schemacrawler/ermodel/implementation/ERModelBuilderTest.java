@@ -7,7 +7,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.ERModel;
@@ -30,7 +29,7 @@ public class ERModelBuilderTest {
 
     final PrimaryKey superPk = mock(PrimaryKey.class);
     final TableConstraintColumn superPkCol = mock(TableConstraintColumn.class);
-    when(superPk.getConstrainedColumns()).thenReturn(Collections.singletonList(superPkCol));
+    when(superPk.getConstrainedColumns()).thenReturn(List.of(superPkCol));
     when(superTable.getPrimaryKey()).thenReturn(superPk);
 
     final Table subTable = spy(new LightTable("SUB_TABLE"));
@@ -38,7 +37,7 @@ public class ERModelBuilderTest {
 
     final TableConstraintColumn subPkCol = mock(TableConstraintColumn.class);
     final PrimaryKey subPk = mock(PrimaryKey.class);
-    when(subPk.getConstrainedColumns()).thenReturn(Collections.singletonList(subPkCol));
+    when(subPk.getConstrainedColumns()).thenReturn(List.of(subPkCol));
     when(subTable.getPrimaryKey()).thenReturn(subPk);
 
     final ForeignKey fk = spy(ForeignKey.class);
@@ -50,9 +49,9 @@ public class ERModelBuilderTest {
     final ColumnReference colRef = mock(ColumnReference.class);
     when(colRef.getPrimaryKeyColumn()).thenReturn(superPkCol);
     when(colRef.getForeignKeyColumn()).thenReturn(subPkCol);
-    when(fk.getColumnReferences()).thenReturn(Collections.singletonList(colRef));
+    when(fk.getColumnReferences()).thenReturn(List.of(colRef));
 
-    when(subTable.getImportedForeignKeys()).thenReturn(Collections.singletonList(fk));
+    when(subTable.getImportedForeignKeys()).thenReturn(List.of(fk));
     // TableEntityModelInferrer needs foreign keys too
     when(subTable.getForeignKeys()).thenReturn(List.of());
     when(superTable.getForeignKeys()).thenReturn(List.of());
