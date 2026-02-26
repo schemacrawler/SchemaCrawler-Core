@@ -18,7 +18,6 @@ import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
@@ -83,7 +82,7 @@ public class AlternateKeysAttributesTest {
                     "alternate_key",
                     List.of("remarks", "other remarks"),
                     Map.of(),
-                    Collections.emptyList()));
+                    List.of()));
     assertThat(exception.getMessage(), is("No columns provided"));
 
     exception =

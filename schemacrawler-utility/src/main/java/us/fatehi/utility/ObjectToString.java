@@ -60,7 +60,7 @@ public class ObjectToString {
   public static List<?> collectionOrArrayToList(final Object object) {
 
     if (!isCollectionOrArray(object)) {
-      return Collections.emptyList();
+      return List.of();
     }
 
     if (object instanceof List<?> list) {

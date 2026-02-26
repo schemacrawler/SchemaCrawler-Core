@@ -15,7 +15,6 @@ import java.io.Serial;
 import java.sql.DriverPropertyInfo;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import schemacrawler.schema.JdbcDriverProperty;
 import us.fatehi.utility.property.AbstractProperty;
@@ -38,7 +37,7 @@ final class ImmutableJdbcDriverProperty extends AbstractProperty implements Jdbc
     required = driverPropertyInfo.required;
 
     if (driverPropertyInfo.choices == null) {
-      choices = Collections.emptyList();
+      choices = List.of();
     } else {
       choices = Arrays.asList(driverPropertyInfo.choices);
       choices.sort(naturalOrder());
