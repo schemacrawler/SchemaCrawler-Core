@@ -16,7 +16,7 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
-public abstract class BaseCommand<P extends CommandOptions> implements Command<P> {
+public abstract class BaseCommand<P extends CommandOptions, R> implements Command<P, R> {
 
   protected final PropertyName command;
   protected P commandOptions;

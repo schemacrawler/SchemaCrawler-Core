@@ -16,7 +16,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.tools.options.OutputOptions;
 
 /** A SchemaCrawler tools executable unit. */
-public interface SchemaCrawlerCommand<P extends CommandOptions> extends Command<P> {
+public interface SchemaCrawlerCommand<P extends CommandOptions> extends ExecutableCommand<P, Void> {
 
   /**
    * Checks whether a command is available, and throws a runtime exception if it is not available.

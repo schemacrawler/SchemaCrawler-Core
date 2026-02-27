@@ -13,14 +13,16 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler executable unit. */
-public interface Command<P extends CommandOptions> {
-
-  void configure(P parameters);
+public interface Command<P extends CommandOptions, R> {
 
   /**
    * Executes command, after configuration and pre-checks. May throw runtime exceptions on errors.
+   *
+   * <p>R Return value
    */
-  void execute();
+  R call();
+
+  void configure(P parameters);
 
   Catalog getCatalog();
 
