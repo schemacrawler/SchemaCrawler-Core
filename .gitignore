@@ -1,4 +1,5 @@
 *.md
+.output.txt
 **/.flattened-pom.xml
 /schemacrawler-db2/*.jar
 /schemacrawler-distrib/*.bnd
