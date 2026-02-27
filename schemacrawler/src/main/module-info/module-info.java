@@ -52,9 +52,8 @@ module us.fatehi.schemacrawler.schemacrawler {
 
   // ServiceLoader providers
   uses java.sql.Driver;
-  uses schemacrawler.tools.catalogloader.CatalogLoader;
+  uses schemacrawler.tools.catalogloader.CatalogLoaderProvider;
   uses schemacrawler.tools.databaseconnector.DatabaseConnector;
-  uses schemacrawler.tools.executable.CommandProvider;
   uses schemacrawler.tools.executable.SchemaCrawlerCommandProvider;
 
   provides schemacrawler.tools.catalogloader.CatalogLoaderProvider with
