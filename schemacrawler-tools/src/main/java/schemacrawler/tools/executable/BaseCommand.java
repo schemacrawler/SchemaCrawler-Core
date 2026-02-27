@@ -8,76 +8,31 @@
 
 package schemacrawler.tools.executable;
 
-import static java.util.Objects.requireNonNull;
-
-import java.sql.Connection;
 import schemacrawler.schema.Catalog;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 
-/** A SchemaCrawler tools executable unit. */
-public abstract class BaseCommand<P extends CommandOptions, R> implements Command<P, R> {
+/** A SchemaCrawler executable unit. */
+public interface BaseCommand<P extends CommandOptions> {
 
-  protected final PropertyName command;
-  protected P commandOptions;
-  protected Catalog catalog;
-  private DatabaseConnectionSource connectionSource;
+  void configure(P parameters);
 
-  protected BaseCommand(final PropertyName command) {
-    this.command = requireNonNull(command, "No command specified");
-  }
+  Catalog getCatalog();
 
-  @Override
-  public void configure(final P commandOptions) {
-    this.commandOptions = requireNonNull(commandOptions, "No command options provided");
-  }
+  PropertyName getCommandName();
 
-  @Override
-  public final Catalog getCatalog() {
-    return catalog;
-  }
+  P getCommandOptions();
 
-  @Override
-  public final PropertyName getCommandName() {
-    return command;
-  }
+  DatabaseConnectionSource getConnectionSource();
 
-  /** {@inheritDoc} */
-  @Override
-  public final P getCommandOptions() {
-    return commandOptions;
-  }
+  /** Initializes the command for execution. */
+  void initialize();
 
-  public final Connection getConnection() {
-    if (usesConnection() && connectionSource != null) {
-      return connectionSource.get();
-    }
-    return null;
-  }
+  void setCatalog(Catalog catalog);
 
-  @Override
-  public final DatabaseConnectionSource getConnectionSource() {
-    return connectionSource;
-  }
+  void setConnectionSource(DatabaseConnectionSource connectionSource);
 
-  @Override
-  public void initialize() {
-    // Placeholder stub
-  }
-
-  @Override
-  public final void setCatalog(final Catalog catalog) {
-    this.catalog = requireNonNull(catalog, "No catalog provided");
-  }
-
-  @Override
-  public final void setConnectionSource(final DatabaseConnectionSource connectionSource) {
-    this.connectionSource = connectionSource;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public String toString() {
-    return command.toString();
+  default boolean usesConnection() {
+    return false;
   }
 }

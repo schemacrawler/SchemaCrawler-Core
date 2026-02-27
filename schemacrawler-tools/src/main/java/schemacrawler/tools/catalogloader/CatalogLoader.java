@@ -13,7 +13,7 @@ import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.tools.executable.CommandOptions;
 import schemacrawler.tools.executable.ExecutableCommand;
 
-public interface CatalogLoader<P extends CommandOptions> extends ExecutableCommand<P, Void> {
+public interface CatalogLoader<P extends CommandOptions> extends ExecutableCommand<P> {
 
   int getPriority();
 

@@ -9,12 +9,12 @@
 package schemacrawler.test.utility;
 
 import schemacrawler.test.utility.TestCatalogLoader.TestCatalogLoaderOptions;
-import schemacrawler.tools.catalogloader.BaseCatalogLoader;
+import schemacrawler.tools.catalogloader.AbstractCatalogLoader;
 import schemacrawler.tools.executable.CommandOptions;
 import us.fatehi.utility.SystemExitException;
 import us.fatehi.utility.property.PropertyName;
 
-class TestCatalogLoader extends BaseCatalogLoader<TestCatalogLoaderOptions> {
+class TestCatalogLoader extends AbstractCatalogLoader<TestCatalogLoaderOptions> {
 
   public static class TestCatalogLoaderOptions implements CommandOptions {}
 

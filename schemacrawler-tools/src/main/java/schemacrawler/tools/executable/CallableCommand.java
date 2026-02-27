@@ -9,12 +9,12 @@
 package schemacrawler.tools.executable;
 
 /** A SchemaCrawler executable unit. */
-public interface ExecutableCommand<P extends CommandOptions> extends BaseCommand<P> {
+public interface CallableCommand<P extends CommandOptions, R> extends BaseCommand<P> {
 
   /**
    * Executes command, after configuration and pre-checks. May throw runtime exceptions on errors.
    *
-   * <p>Nothing is returned.
+   * <p>R Return value
    */
-  void execute();
+  R call();
 }

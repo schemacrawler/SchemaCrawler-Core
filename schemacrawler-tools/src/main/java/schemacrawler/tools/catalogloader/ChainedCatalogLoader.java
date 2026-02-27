@@ -25,7 +25,7 @@ import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
 
-public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoaderOptions> {
+public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLoaderOptions> {
 
   static record ChainedCatalogLoaderOptions() implements CommandOptions {}
 

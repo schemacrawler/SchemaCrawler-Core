@@ -1,0 +1,83 @@
+/*
+ * SchemaCrawler
+ * http://www.schemacrawler.com
+ * Copyright (c) 2000-2026, Sualeh Fatehi <sualeh@hotmail.com>.
+ * All rights reserved.
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+package schemacrawler.tools.executable;
+
+import static java.util.Objects.requireNonNull;
+
+import java.sql.Connection;
+import schemacrawler.schema.Catalog;
+import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import us.fatehi.utility.property.PropertyName;
+
+/** A SchemaCrawler tools executable unit. */
+public abstract class AbstractCommand<P extends CommandOptions> implements BaseCommand<P> {
+
+  protected final PropertyName command;
+  protected P commandOptions;
+  protected Catalog catalog;
+  private DatabaseConnectionSource connectionSource;
+
+  protected AbstractCommand(final PropertyName command) {
+    this.command = requireNonNull(command, "No command specified");
+  }
+
+  @Override
+  public void configure(final P commandOptions) {
+    this.commandOptions = requireNonNull(commandOptions, "No command options provided");
+  }
+
+  @Override
+  public final Catalog getCatalog() {
+    return catalog;
+  }
+
+  @Override
+  public final PropertyName getCommandName() {
+    return command;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final P getCommandOptions() {
+    return commandOptions;
+  }
+
+  public final Connection getConnection() {
+    if (usesConnection() && connectionSource != null) {
+      return connectionSource.get();
+    }
+    return null;
+  }
+
+  @Override
+  public final DatabaseConnectionSource getConnectionSource() {
+    return connectionSource;
+  }
+
+  @Override
+  public void initialize() {
+    // Placeholder stub
+  }
+
+  @Override
+  public final void setCatalog(final Catalog catalog) {
+    this.catalog = requireNonNull(catalog, "No catalog provided");
+  }
+
+  @Override
+  public final void setConnectionSource(final DatabaseConnectionSource connectionSource) {
+    this.connectionSource = connectionSource;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return command.toString();
+  }
+}

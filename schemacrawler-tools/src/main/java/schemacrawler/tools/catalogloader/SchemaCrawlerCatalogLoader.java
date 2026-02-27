@@ -15,7 +15,7 @@ import schemacrawler.tools.executable.CommandOptions;
 import us.fatehi.utility.property.PropertyName;
 
 public class SchemaCrawlerCatalogLoader
-    extends BaseCatalogLoader<SchemaCrawlerCatalogLoaderOptions> {
+    extends AbstractCatalogLoader<SchemaCrawlerCatalogLoaderOptions> {
 
   static record SchemaCrawlerCatalogLoaderOptions() implements CommandOptions {}
 

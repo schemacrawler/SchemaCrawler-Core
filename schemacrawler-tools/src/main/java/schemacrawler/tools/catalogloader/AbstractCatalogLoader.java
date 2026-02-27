@@ -12,11 +12,11 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
-import schemacrawler.tools.executable.BaseCommand;
+import schemacrawler.tools.executable.AbstractCommand;
 import schemacrawler.tools.executable.CommandOptions;
 import us.fatehi.utility.property.PropertyName;
 
-public abstract class BaseCatalogLoader<P extends CommandOptions> extends BaseCommand<P, Void>
+public abstract class AbstractCatalogLoader<P extends CommandOptions> extends AbstractCommand<P>
     implements CatalogLoader<P> {
 
   private final int priority;
@@ -24,15 +24,9 @@ public abstract class BaseCatalogLoader<P extends CommandOptions> extends BaseCo
   private SchemaRetrievalOptions schemaRetrievalOptions;
   private SchemaCrawlerOptions schemaCrawlerOptions;
 
-  protected BaseCatalogLoader(final PropertyName catalogLoaderName, final int priority) {
+  protected AbstractCatalogLoader(final PropertyName catalogLoaderName, final int priority) {
     super(catalogLoaderName);
     this.priority = priority;
-  }
-
-  @Override
-  public final Void call() {
-    execute();
-    return null;
   }
 
   @Override
