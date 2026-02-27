@@ -20,7 +20,6 @@ import static schemacrawler.utility.MetaDataUtility.isView;
 
 import java.sql.Connection;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -116,7 +115,7 @@ public class TableExtRetrieverTest {
             .orElseThrow(IllegalAccessException::new);
     assertThat(idDataType == idDataTypeMain, is(true)); // assert same object reference
     assertThat(idDataType.isEnumerated(), is(false));
-    assertThat(idDataType.getEnumValues(), is(Collections.EMPTY_LIST));
+    assertThat(idDataType.getEnumValues(), is(empty()));
 
     // Globally enumerated data type
     final Column firstName =
@@ -142,7 +141,7 @@ public class TableExtRetrieverTest {
     assertThat(ageDataType.isEnumerated(), is(true));
     assertThat(ageDataType.getEnumValues(), is(List.of("1", "16", "29")));
     assertThat(ageDataTypeMain.isEnumerated(), is(false));
-    assertThat(ageDataTypeMain.getEnumValues(), is(Collections.EMPTY_LIST));
+    assertThat(ageDataTypeMain.getEnumValues(), is(empty()));
   }
 
   @BeforeAll

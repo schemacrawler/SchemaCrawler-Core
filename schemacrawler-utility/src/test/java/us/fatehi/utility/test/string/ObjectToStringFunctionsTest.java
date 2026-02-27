@@ -11,6 +11,8 @@ package us.fatehi.utility.test.string;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -22,7 +24,6 @@ import java.io.Writer;
 import java.nio.file.AccessMode;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,7 +53,7 @@ public class ObjectToStringFunctionsTest {
 
   @Test
   public void classHierarchy() throws IOException {
-    assertThat(ObjectToString.classHierarchy(null), is(Collections.EMPTY_LIST));
+    assertThat(ObjectToString.classHierarchy(null), is(empty()));
 
     assertThat(ObjectToString.classHierarchy(new Object()), is(List.of(Object.class)));
     assertThat(ObjectToString.classHierarchy("hello, world"), is(List.of(String.class)));
@@ -83,14 +84,14 @@ public class ObjectToStringFunctionsTest {
 
   @Test
   public void fields() throws IOException {
-    assertThat(ObjectToString.fields(null), is(Collections.EMPTY_LIST));
+    assertThat(ObjectToString.fields(null), is(empty()));
 
-    assertThat(ObjectToString.fields(new Object()), is(Collections.EMPTY_LIST));
-    assertThat(ObjectToString.fields("hello, world"), is(Collections.EMPTY_LIST));
+    assertThat(ObjectToString.fields(new Object()), is(empty()));
+    assertThat(ObjectToString.fields("hello, world"), is(empty()));
     assertThat(ObjectToString.fields(1), hasSize(1));
     assertThat(ObjectToString.fields(Integer.valueOf(1)), hasSize(1));
-    assertThat(ObjectToString.fields(new int[] {1, 2}), is(Collections.EMPTY_LIST));
-    assertThat(ObjectToString.fields(AccessMode.READ), is(Collections.EMPTY_LIST));
+    assertThat(ObjectToString.fields(new int[] {1, 2}), is(empty()));
+    assertThat(ObjectToString.fields(AccessMode.READ), is(empty()));
     assertThat(
         ObjectToString.fields(new FileWriter(Files.createTempFile("", "").toFile())), hasSize(3));
   }
@@ -153,15 +154,15 @@ public class ObjectToStringFunctionsTest {
 
   @Test
   public void objectMap() throws IOException {
-    assertThat(ObjectToString.objectMap(null), is(Collections.EMPTY_MAP));
+    assertThat(ObjectToString.objectMap(null), is(anEmptyMap()));
 
     assertThat(
         ObjectToString.objectMap(new Object()),
         is(TestObjectUtility.fakeObjectMapFor(Object.class)));
-    assertThat(ObjectToString.objectMap("hello, world"), is(Collections.EMPTY_MAP));
-    assertThat(ObjectToString.objectMap(1), is(Collections.EMPTY_MAP));
-    assertThat(ObjectToString.objectMap(Integer.valueOf(1)), is(Collections.EMPTY_MAP));
-    assertThat(ObjectToString.objectMap(new int[] {1, 2}), is(Collections.EMPTY_MAP));
+    assertThat(ObjectToString.objectMap("hello, world"), is(anEmptyMap()));
+    assertThat(ObjectToString.objectMap(1), is(anEmptyMap()));
+    assertThat(ObjectToString.objectMap(Integer.valueOf(1)), is(anEmptyMap()));
+    assertThat(ObjectToString.objectMap(new int[] {1, 2}), is(anEmptyMap()));
 
     final Map<Object, Object> map = new HashMap<>();
     map.put(AccessMode.READ, AccessMode.READ);
