@@ -43,33 +43,35 @@ public final class SchemaCrawlerUtility {
   /**
    * Crawls a database, and returns a catalog.
    *
-   * @param dataSource Database connection source.
+   * @param connectionSource Database connection source.
    * @param schemaCrawlerOptions Options.
    * @return Database catalog.
    */
   public static Catalog getCatalog(
-      final DatabaseConnectionSource dataSource, final SchemaCrawlerOptions schemaCrawlerOptions) {
-    final SchemaRetrievalOptions schemaRetrievalOptions = matchSchemaRetrievalOptions(dataSource);
+      final DatabaseConnectionSource connectionSource,
+      final SchemaCrawlerOptions schemaCrawlerOptions) {
+    final SchemaRetrievalOptions schemaRetrievalOptions =
+        matchSchemaRetrievalOptions(connectionSource);
     return getCatalog(
-        dataSource, schemaRetrievalOptions, schemaCrawlerOptions, ConfigUtility.newConfig());
+        connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, ConfigUtility.newConfig());
   }
 
   /**
    * Crawls a database, and returns a catalog.
    *
-   * @param dataSource Database connection source.
+   * @param connectionSource Database connection source.
    * @param schemaCrawlerOptions Options.
    * @return Database catalog.
    */
   public static Catalog getCatalog(
-      final DatabaseConnectionSource dataSource,
+      final DatabaseConnectionSource connectionSource,
       final SchemaRetrievalOptions schemaRetrievalOptions,
       final SchemaCrawlerOptions schemaCrawlerOptions,
       final Config additionalConfig) {
 
     LOGGER.log(Level.CONFIG, new ObjectToStringFormat(schemaCrawlerOptions));
 
-    updateConnectionDataSource(dataSource, schemaRetrievalOptions);
+    updateConnectionDataSource(connectionSource, schemaRetrievalOptions);
 
     final CatalogLoaderRegistry catalogLoaderRegistry =
         CatalogLoaderRegistry.getCatalogLoaderRegistry();
@@ -82,7 +84,7 @@ public final class SchemaCrawlerUtility {
 
     // Catalog is set during the execution process
 
-    catalogLoader.setDataSource(dataSource);
+    catalogLoader.setDataSource(connectionSource);
     catalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
 
     catalogLoader.execute();
@@ -116,8 +118,8 @@ public final class SchemaCrawlerUtility {
    * @return SchemaRetrievalOptions
    */
   public static SchemaRetrievalOptions matchSchemaRetrievalOptions(
-      final DatabaseConnectionSource dataSource) {
-    try (final Connection connection = dataSource.get()) {
+      final DatabaseConnectionSource connectionSource) {
+    try (final Connection connection = connectionSource.get()) {
       DatabaseUtility.checkConnection(connection);
       final DatabaseConnector dbConnector =
           DatabaseConnectorUtility.findDatabaseConnector(connection);
@@ -133,15 +135,15 @@ public final class SchemaCrawlerUtility {
   /**
    * Updates the connection data source by attaching a connection initializer.
    *
-   * @param dataSource Database connection source
+   * @param connectionSource Database connection source
    * @param schemaRetrievalOptions SchemaCrawler retrieval options to convey the connection
    *     initializer from the database plugin
    */
   public static void updateConnectionDataSource(
-      final DatabaseConnectionSource dataSource,
+      final DatabaseConnectionSource connectionSource,
       final SchemaRetrievalOptions schemaRetrievalOptions) {
 
-    if (dataSource == null) {
+    if (connectionSource == null) {
       LOGGER.log(Level.CONFIG, "No database connection source provided");
       return;
     }
@@ -150,7 +152,8 @@ public final class SchemaCrawlerUtility {
       return;
     }
 
-    dataSource.setFirstConnectionInitializer(schemaRetrievalOptions.getConnectionInitializer());
+    connectionSource.setFirstConnectionInitializer(
+        schemaRetrievalOptions.getConnectionInitializer());
   }
 
   private SchemaCrawlerUtility() {

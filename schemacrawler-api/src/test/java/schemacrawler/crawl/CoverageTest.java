@@ -55,13 +55,13 @@ public class CoverageTest {
   }
 
   @Test
-  public void retrieverConnectionClosed(final DatabaseConnectionSource dataSource) {
+  public void retrieverConnectionClosed(final DatabaseConnectionSource connectionSource) {
     assertThrows(
         NullPointerException.class,
         () -> {
-          final Connection connection = dataSource.get();
+          final Connection connection = connectionSource.get();
           connection.close();
-          new RetrieverConnection(dataSource, null);
+          new RetrieverConnection(connectionSource, null);
         });
   }
 }

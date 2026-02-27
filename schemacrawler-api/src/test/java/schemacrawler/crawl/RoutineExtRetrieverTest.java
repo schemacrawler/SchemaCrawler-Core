@@ -78,7 +78,8 @@ public class RoutineExtRetrieverTest {
   @Test
   @DisplayName("Retrieve procedures references")
   public void routineReferences(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
             .withSql(
@@ -108,7 +109,7 @@ public class RoutineExtRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

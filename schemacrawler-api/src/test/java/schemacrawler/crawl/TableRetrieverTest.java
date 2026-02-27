@@ -41,10 +41,10 @@ public class TableRetrieverTest extends AbstractRetrieverTest {
 
   @Test
   @DisplayName("Test with empty result set")
-  public void emptyResultSet(final DatabaseConnectionSource dataSource) throws Exception {
+  public void emptyResultSet(final DatabaseConnectionSource connectionSource) throws Exception {
     final RetrieverConnection retrieverConnection =
         createRetrieverConnection(
-            dataSource,
+            connectionSource,
             InformationSchemaKey.TABLES,
             "SELECT * FROM INFORMATION_SCHEMA.SYSTEM_TABLES WHERE 1=0",
             data_dictionary_all);
@@ -59,12 +59,15 @@ public class TableRetrieverTest extends AbstractRetrieverTest {
 
   @Test
   @DisplayName("Test handling of invalid SQL in table retrieval")
-  public void handlingOfInvalidSQLInTableRetrieval(final DatabaseConnectionSource dataSource)
+  public void handlingOfInvalidSQLInTableRetrieval(final DatabaseConnectionSource connectionSource)
       throws Exception {
     // Use invalid SQL that will cause a SQL exception
     final RetrieverConnection retrieverConnection =
         createRetrieverConnection(
-            dataSource, InformationSchemaKey.TABLES, "THIS IS NOT VALID SQL", data_dictionary_all);
+            connectionSource,
+            InformationSchemaKey.TABLES,
+            "THIS IS NOT VALID SQL",
+            data_dictionary_all);
 
     final TableRetriever tableRetriever =
         new TableRetriever(retrieverConnection, catalog, createOptions());
@@ -81,11 +84,11 @@ public class TableRetrieverTest extends AbstractRetrieverTest {
 
   @Test
   @DisplayName("Test with malformed data in result sets")
-  public void malformedDataInResultSets(final DatabaseConnectionSource dataSource)
+  public void malformedDataInResultSets(final DatabaseConnectionSource connectionSource)
       throws Exception {
     final RetrieverConnection retrieverConnection =
         createRetrieverConnection(
-            dataSource,
+            connectionSource,
             InformationSchemaKey.TABLES,
             """
             SELECT
@@ -118,10 +121,11 @@ public class TableRetrieverTest extends AbstractRetrieverTest {
   @Test
   @DisplayName("Retrieve tables from data dictionary")
   public void tablesFromDataDictionary(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
     final RetrieverConnection retrieverConnection =
         createRetrieverConnection(
-            dataSource,
+            connectionSource,
             InformationSchemaKey.TABLES,
             "SELECT * FROM INFORMATION_SCHEMA.SYSTEM_TABLES",
             data_dictionary_all);

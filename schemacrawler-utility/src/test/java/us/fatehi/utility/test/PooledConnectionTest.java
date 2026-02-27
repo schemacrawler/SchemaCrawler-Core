@@ -38,8 +38,7 @@ public class PooledConnectionTest {
 
   private Connection connection;
   private Map<String, Method> methodsMap;
-  private final DatabaseConnectionSource databaseConnectionSource =
-      mock(DatabaseConnectionSource.class);
+  private final DatabaseConnectionSource connectionSource = mock(DatabaseConnectionSource.class);
 
   @BeforeEach
   public void createDatabase() throws Exception {
@@ -61,7 +60,7 @@ public class PooledConnectionTest {
   @Test
   public void setSavepoint() throws SQLException {
     final Connection pooledConnection =
-        PooledConnectionUtility.newPooledConnection(connection, databaseConnectionSource);
+        PooledConnectionUtility.newPooledConnection(connection, connectionSource);
 
     final Method method = methodsMap.get("setSavepoint");
     assertThrows(
@@ -75,7 +74,7 @@ public class PooledConnectionTest {
   @Test
   public void testClosedPooledConnection() throws SQLException {
     final Connection pooledConnection =
-        PooledConnectionUtility.newPooledConnection(connection, databaseConnectionSource);
+        PooledConnectionUtility.newPooledConnection(connection, connectionSource);
     pooledConnection.close();
 
     for (final Method method : methodsMap.values()) {
@@ -94,7 +93,7 @@ public class PooledConnectionTest {
   @Test
   public void testPooledConnection() throws Exception {
     final Connection pooledConnection =
-        PooledConnectionUtility.newPooledConnection(connection, databaseConnectionSource);
+        PooledConnectionUtility.newPooledConnection(connection, connectionSource);
 
     for (final Method method : methodsMap.values()) {
       if (method.getParameterCount() == 0) {
@@ -110,7 +109,7 @@ public class PooledConnectionTest {
   @Test
   public void toStringTest() throws Exception {
     final Connection pooledConnection =
-        PooledConnectionUtility.newPooledConnection(connection, databaseConnectionSource);
+        PooledConnectionUtility.newPooledConnection(connection, connectionSource);
 
     final Method method = Object.class.getMethod("toString");
     final String returnValue = (String) method.invoke(pooledConnection);
@@ -120,7 +119,7 @@ public class PooledConnectionTest {
   @Test
   public void wrapper() throws Exception, InvocationTargetException {
     final Connection pooledConnection =
-        PooledConnectionUtility.newPooledConnection(connection, databaseConnectionSource);
+        PooledConnectionUtility.newPooledConnection(connection, connectionSource);
 
     boolean testedIsWrapperFor = false;
     boolean testedUnrwap = false;

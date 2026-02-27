@@ -30,7 +30,8 @@ public class SchemaCrawlerCatalogLoader
     }
 
     final SchemaCrawler schemaCrawler =
-        new SchemaCrawler(getDataSource(), getSchemaRetrievalOptions(), getSchemaCrawlerOptions());
+        new SchemaCrawler(
+            getConnectionSource(), getSchemaRetrievalOptions(), getSchemaCrawlerOptions());
     final Catalog catalog = schemaCrawler.crawl();
     setCatalog(catalog);
   }

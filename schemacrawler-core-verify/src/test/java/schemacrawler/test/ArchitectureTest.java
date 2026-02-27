@@ -23,16 +23,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
 import java.util.Optional;
 import java.util.regex.Pattern;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-
-import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
 
 @TestInstance(PER_CLASS)
 public class ArchitectureTest {
@@ -122,7 +120,8 @@ public class ArchitectureTest {
         .that(resideOutsideOfPackages("schemacrawler.testdb", "sf.util"))
         .should(THROW_GENERIC_EXCEPTIONS)
         .because(
-            "SchemaCrawler defines it own exceptions, and wraps SQL exceptions with additional information")
+            "SchemaCrawler defines it own exceptions, and wraps SQL exceptions with additional"
+                + " information")
         .check(classes);
   }
 }

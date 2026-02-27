@@ -53,10 +53,11 @@ public final class DatabaseTestUtility {
       final SchemaRetrievalOptions schemaRetrievalOptions,
       final SchemaCrawlerOptions schemaCrawlerOptions) {
 
-    final DatabaseConnectionSource dataSource = new ConnectionDatabaseConnectionSource(connection);
+    final DatabaseConnectionSource connectionSource =
+        new ConnectionDatabaseConnectionSource(connection);
 
     final SchemaCrawler schemaCrawler =
-        new SchemaCrawler(dataSource, schemaRetrievalOptions, schemaCrawlerOptions);
+        new SchemaCrawler(connectionSource, schemaRetrievalOptions, schemaCrawlerOptions);
     final Catalog catalog = schemaCrawler.crawl();
     return catalog;
   }

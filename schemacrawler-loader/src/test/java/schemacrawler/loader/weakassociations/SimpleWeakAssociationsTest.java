@@ -24,16 +24,18 @@ public class SimpleWeakAssociationsTest {
   @Test
   @WithTestDatabase(script = "/simple_weak_association_with_ids.sql")
   public void simpleWeakAssociationWithIds(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
-    weakAssociations(testContext, dataSource, false);
-    weakAssociations(testContext, dataSource, true);
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    weakAssociations(testContext, connectionSource, false);
+    weakAssociations(testContext, connectionSource, true);
   }
 
   @Test
   @WithTestDatabase(script = "/simple_weak_association_with_plurals.sql")
   public void simpleWeakAssociationWithPlurals(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
-    weakAssociations(testContext, dataSource, false);
-    weakAssociations(testContext, dataSource, true);
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    weakAssociations(testContext, connectionSource, false);
+    weakAssociations(testContext, connectionSource, true);
   }
 }

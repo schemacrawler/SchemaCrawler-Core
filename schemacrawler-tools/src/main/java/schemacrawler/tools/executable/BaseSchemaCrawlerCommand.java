@@ -124,7 +124,7 @@ public abstract class BaseSchemaCrawlerCommand<P extends CommandOptions> extends
   protected void checkCatalog() {
     requireNonNull(catalog, "No database catalog provided");
     if (usesConnection()) {
-      requireNonNull(getDataSource(), "No database connection source provided");
+      requireNonNull(getConnectionSource(), "No database connection source provided");
     }
   }
 

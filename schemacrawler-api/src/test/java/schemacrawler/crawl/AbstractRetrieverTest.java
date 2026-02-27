@@ -84,7 +84,7 @@ public abstract class AbstractRetrieverTest {
   /**
    * Creates a RetrieverConnection with custom information schema views.
    *
-   * @param dataSource Database connection source
+   * @param connectionSource Database connection source
    * @param informationSchemaKey Information schema key
    * @param sql SQL query for the information schema view
    * @param retrievalStrategy Metadata retrieval strategy
@@ -92,7 +92,7 @@ public abstract class AbstractRetrieverTest {
    * @throws SQLException If a database access error occurs
    */
   protected RetrieverConnection createRetrieverConnection(
-      final DatabaseConnectionSource dataSource,
+      final DatabaseConnectionSource connectionSource,
       final InformationSchemaKey informationSchemaKey,
       final String sql,
       final MetadataRetrievalStrategy retrievalStrategy)
@@ -114,19 +114,19 @@ public abstract class AbstractRetrieverTest {
 
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
 
-    return new RetrieverConnection(dataSource, schemaRetrievalOptions);
+    return new RetrieverConnection(connectionSource, schemaRetrievalOptions);
   }
 
   /**
    * Creates a RetrieverConnection with default schema retrieval options.
    *
-   * @param dataSource Database connection source
+   * @param connectionSource Database connection source
    * @return RetrieverConnection
    * @throws SQLException If a database access error occurs
    */
-  protected RetrieverConnection createRetrieverConnection(final DatabaseConnectionSource dataSource)
-      throws SQLException {
-    return new RetrieverConnection(dataSource, schemaRetrievalOptionsDefault);
+  protected RetrieverConnection createRetrieverConnection(
+      final DatabaseConnectionSource connectionSource) throws SQLException {
+    return new RetrieverConnection(connectionSource, schemaRetrievalOptionsDefault);
   }
 
   /**

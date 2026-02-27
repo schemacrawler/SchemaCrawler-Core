@@ -57,7 +57,8 @@ public class RoutineRetrieverFunctionsTest {
   @Test
   @DisplayName("Retrieve functions from data dictionary")
   public void functionsFromDataDictionary(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
             .withSql(
@@ -81,7 +82,7 @@ public class RoutineRetrieverFunctionsTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

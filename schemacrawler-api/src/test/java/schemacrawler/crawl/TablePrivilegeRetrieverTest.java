@@ -55,7 +55,7 @@ public class TablePrivilegeRetrieverTest {
   @Test
   @DisplayName("Retrieve column privileges without metadata retrieval strategy")
   public void columnPrivilegesBadMetadataRetrievalStrategy(
-      final DatabaseConnectionSource dataSource) throws Exception {
+      final DatabaseConnectionSource connectionSource) throws Exception {
 
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
@@ -68,7 +68,7 @@ public class TablePrivilegeRetrieverTest {
         .with(tableColumnPrivilegesRetrievalStrategy, none);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -86,14 +86,14 @@ public class TablePrivilegeRetrieverTest {
   @Test
   @DisplayName("Retrieve column privileges without query")
   public void columnPrivilegesFromDataDictionaryWithoutQuery(
-      final DatabaseConnectionSource dataSource) throws Exception {
+      final DatabaseConnectionSource connectionSource) throws Exception {
 
     final SchemaRetrievalOptionsBuilder schemaRetrievalOptionsBuilder =
         SchemaRetrievalOptionsBuilder.builder();
     schemaRetrievalOptionsBuilder.with(tableColumnPrivilegesRetrievalStrategy, data_dictionary_all);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -106,13 +106,13 @@ public class TablePrivilegeRetrieverTest {
 
   @Test
   @DisplayName("Retrieve column privileges from metadata")
-  public void columnPrivilegesFromMetadata(final DatabaseConnectionSource dataSource)
+  public void columnPrivilegesFromMetadata(final DatabaseConnectionSource connectionSource)
       throws Exception {
 
     final SchemaRetrievalOptions schemaRetrievalOptions =
         SchemaRetrievalOptionsBuilder.newSchemaRetrievalOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -130,8 +130,8 @@ public class TablePrivilegeRetrieverTest {
   }
 
   @BeforeAll
-  public void loadBaseCatalog(final DatabaseConnectionSource dataSource) throws Exception {
-    try (final Connection connection = dataSource.get(); ) {
+  public void loadBaseCatalog(final DatabaseConnectionSource connectionSource) throws Exception {
+    try (final Connection connection = connectionSource.get(); ) {
       catalog =
           (MutableCatalog)
               getCatalog(connection, SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions());
@@ -152,8 +152,8 @@ public class TablePrivilegeRetrieverTest {
 
   @Test
   @DisplayName("Retrieve table privileges without metadata retrieval strategy")
-  public void tablePrivilegesBadMetadataRetrievalStrategy(final DatabaseConnectionSource dataSource)
-      throws Exception {
+  public void tablePrivilegesBadMetadataRetrievalStrategy(
+      final DatabaseConnectionSource connectionSource) throws Exception {
 
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
@@ -166,7 +166,7 @@ public class TablePrivilegeRetrieverTest {
         .with(tablePrivilegesRetrievalStrategy, none);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -183,7 +183,7 @@ public class TablePrivilegeRetrieverTest {
 
   @Test
   @DisplayName("Retrieve table privileges from data dictionary")
-  public void tablePrivilegesFromDataDictionary(final DatabaseConnectionSource dataSource)
+  public void tablePrivilegesFromDataDictionary(final DatabaseConnectionSource connectionSource)
       throws Exception {
 
     final InformationSchemaViews informationSchemaViews =
@@ -210,7 +210,7 @@ public class TablePrivilegeRetrieverTest {
         .with(tablePrivilegesRetrievalStrategy, data_dictionary_all);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -228,14 +228,14 @@ public class TablePrivilegeRetrieverTest {
   @Test
   @DisplayName("Retrieve table privileges without query")
   public void tablePrivilegesFromDataDictionaryWithoutQuery(
-      final DatabaseConnectionSource dataSource) throws Exception {
+      final DatabaseConnectionSource connectionSource) throws Exception {
 
     final SchemaRetrievalOptionsBuilder schemaRetrievalOptionsBuilder =
         SchemaRetrievalOptionsBuilder.builder();
     schemaRetrievalOptionsBuilder.with(tablePrivilegesRetrievalStrategy, data_dictionary_all);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

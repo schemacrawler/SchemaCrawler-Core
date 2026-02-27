@@ -57,7 +57,8 @@ public class DatabaseInfoRetrieverTest {
   @Test
   @DisplayName("Retrieve additional database info")
   public void additionalDatabaseInfo(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
 
     assertThat(
         "Should not have database properties",
@@ -65,7 +66,8 @@ public class DatabaseInfoRetrieverTest {
         is(empty()));
 
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, SchemaRetrievalOptionsBuilder.builder().toOptions());
+        new RetrieverConnection(
+            connectionSource, SchemaRetrievalOptionsBuilder.builder().toOptions());
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -102,7 +104,8 @@ public class DatabaseInfoRetrieverTest {
   @Test
   @DisplayName("Retrieve additional JDBC driver info")
   public void additionalJdbcDriverInfo(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
 
     assertThat(catalog.getJdbcDriverInfo(), is(notNullValue()));
     assertThat(
@@ -111,7 +114,8 @@ public class DatabaseInfoRetrieverTest {
         is(empty()));
 
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, SchemaRetrievalOptionsBuilder.builder().toOptions());
+        new RetrieverConnection(
+            connectionSource, SchemaRetrievalOptionsBuilder.builder().toOptions());
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -145,7 +149,8 @@ public class DatabaseInfoRetrieverTest {
   @Test
   @DisplayName("Retrieve database users")
   public void databaseUsers(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
 
     assertThat(catalog.getDatabaseUsers(), is(empty()));
 
@@ -168,7 +173,7 @@ public class DatabaseInfoRetrieverTest {
         SchemaRetrievalOptionsBuilder.builder().withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -205,11 +210,12 @@ public class DatabaseInfoRetrieverTest {
     when(mockMetaData.isReadOnly()).thenThrow(SQLException.class);
     when(mockMetaData.getSchemas()).thenThrow(AbstractMethodError.class);
     when(mockMetaData.getCatalogs()).thenThrow(SQLException.class);
-    final DatabaseConnectionSource dataSource =
+    final DatabaseConnectionSource connectionSource =
         new ConnectionDatabaseConnectionSource(mockConnection);
 
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, SchemaRetrievalOptionsBuilder.builder().toOptions());
+        new RetrieverConnection(
+            connectionSource, SchemaRetrievalOptionsBuilder.builder().toOptions());
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -237,12 +243,14 @@ public class DatabaseInfoRetrieverTest {
   @Test
   @DisplayName("Test result set type properties retrieval")
   public void resultSetTypePropertiesRetrieval(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
 
     assertThat(catalog.getDatabaseInfo().getProperties(), is(empty()));
 
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, SchemaRetrievalOptionsBuilder.builder().toOptions());
+        new RetrieverConnection(
+            connectionSource, SchemaRetrievalOptionsBuilder.builder().toOptions());
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -281,7 +289,8 @@ public class DatabaseInfoRetrieverTest {
 
   @Test
   @DisplayName("Retrieve server info")
-  public void serverInfo(final TestContext testContext, final DatabaseConnectionSource dataSource)
+  public void serverInfo(
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
 
     assertThat(catalog.getDatabaseInfo().getServerInfo(), is(empty()));
@@ -308,7 +317,7 @@ public class DatabaseInfoRetrieverTest {
         SchemaRetrievalOptionsBuilder.builder().withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

@@ -108,8 +108,8 @@ public abstract class DatabaseConnector {
     }
 
     dbConnectionSourceBuilder.withUserCredentials(userCredentials);
-    final DatabaseConnectionSource databaseConnectionSource = dbConnectionSourceBuilder.build();
-    return databaseConnectionSource;
+    final DatabaseConnectionSource connectionSource = dbConnectionSourceBuilder.build();
+    return connectionSource;
   }
 
   public final boolean supportsUrl(final String url) {

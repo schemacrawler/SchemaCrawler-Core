@@ -79,8 +79,8 @@ public class TableConstraintRetrieverTest {
 
   @Test
   @DisplayName("Test retrieving table constraint definitions")
-  public void testRetrieveTableConstraintDefinitions(final DatabaseConnectionSource dataSource)
-      throws Exception {
+  public void testRetrieveTableConstraintDefinitions(
+      final DatabaseConnectionSource connectionSource) throws Exception {
     // Arrange - create a custom information schema view for check constraints
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
@@ -103,7 +103,7 @@ public class TableConstraintRetrieverTest {
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
 
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -120,8 +120,8 @@ public class TableConstraintRetrieverTest {
 
   @Test
   @DisplayName("Test retrieving table constraint information")
-  public void testRetrieveTableConstraintInformation(final DatabaseConnectionSource dataSource)
-      throws Exception {
+  public void testRetrieveTableConstraintInformation(
+      final DatabaseConnectionSource connectionSource) throws Exception {
     // Arrange - create a custom information schema view for table constraints
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
@@ -163,7 +163,7 @@ public class TableConstraintRetrieverTest {
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
 
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -180,11 +180,11 @@ public class TableConstraintRetrieverTest {
 
   @Test
   @DisplayName("Test retrieving table constraints")
-  public void testRetrieveTableConstraints(final DatabaseConnectionSource dataSource)
+  public void testRetrieveTableConstraints(final DatabaseConnectionSource connectionSource)
       throws Exception {
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsDefault;
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -230,8 +230,8 @@ public class TableConstraintRetrieverTest {
 
   @Test
   @DisplayName("Test retrieving table constraints with invalid SQL")
-  public void testRetrieveTableConstraintsWithInvalidSql(final DatabaseConnectionSource dataSource)
-      throws Exception {
+  public void testRetrieveTableConstraintsWithInvalidSql(
+      final DatabaseConnectionSource connectionSource) throws Exception {
     // Arrange - create a custom information schema view with invalid SQL
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
@@ -244,7 +244,7 @@ public class TableConstraintRetrieverTest {
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
 
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

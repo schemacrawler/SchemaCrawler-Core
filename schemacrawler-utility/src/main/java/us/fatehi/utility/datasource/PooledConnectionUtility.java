@@ -23,11 +23,11 @@ public class PooledConnectionUtility {
   private static class PooledConnectionInvocationHandler implements InvocationHandler {
 
     private final Connection connection;
-    private final DatabaseConnectionSource databaseConnectionSource;
+    private final DatabaseConnectionSource connectionSource;
     private boolean isClosed;
 
     PooledConnectionInvocationHandler(
-        final Connection connection, final DatabaseConnectionSource databaseConnectionSource) {
+        final Connection connection, final DatabaseConnectionSource connectionSource) {
       requireNonNull(connection, "No database connnection provided");
       if (connection instanceof DatabaseConnectionSourceConnection) {
         try {
@@ -38,8 +38,8 @@ public class PooledConnectionUtility {
       } else {
         this.connection = connection;
       }
-      this.databaseConnectionSource =
-          requireNonNull(databaseConnectionSource, "No database connection source provided");
+      this.connectionSource =
+          requireNonNull(connectionSource, "No database connection source provided");
       isClosed = false;
     }
 
@@ -52,7 +52,7 @@ public class PooledConnectionUtility {
       }
       switch (methodName) {
         case "close":
-          databaseConnectionSource.releaseConnection(connection);
+          connectionSource.releaseConnection(connection);
           isClosed = true;
           return null;
         case "isClosed":
@@ -82,13 +82,13 @@ public class PooledConnectionUtility {
   }
 
   public static Connection newPooledConnection(
-      final Connection connection, final DatabaseConnectionSource databaseConnectionSource) {
+      final Connection connection, final DatabaseConnectionSource connectionSource) {
 
     return (Connection)
         newProxyInstance(
             PooledConnectionUtility.class.getClassLoader(),
             new Class[] {Connection.class, DatabaseConnectionSourceConnection.class},
-            new PooledConnectionInvocationHandler(connection, databaseConnectionSource));
+            new PooledConnectionInvocationHandler(connection, connectionSource));
   }
 
   private PooledConnectionUtility() {

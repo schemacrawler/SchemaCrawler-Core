@@ -52,7 +52,7 @@ public class CatalogSerializationTest {
   }
 
   @Test
-  public void catalogSerializationWithJava(final DatabaseConnectionSource dataSource)
+  public void catalogSerializationWithJava(final DatabaseConnectionSource connectionSource)
       throws Exception {
 
     final Path testOutputFile = IOUtility.createTempFilePath("sc_ermodel_serialization", "ser");

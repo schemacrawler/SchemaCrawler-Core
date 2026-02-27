@@ -70,7 +70,7 @@ public abstract class BaseAdditionalDatabaseTest {
     }
   }
 
-  protected final DatabaseConnectionSource getDataSource() {
+  protected final DatabaseConnectionSource getConnectionSource() {
     return DatabaseConnectionSources.fromDataSource(dataSource);
   }
 

@@ -115,7 +115,8 @@ public class ForeignKeyRetrieverTest {
 
   @Test
   @DisplayName("Retrieve foreign keys from data dictionary")
-  public void fkFromDataDictionary(final DatabaseConnectionSource dataSource) throws Exception {
+  public void fkFromDataDictionary(final DatabaseConnectionSource connectionSource)
+      throws Exception {
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
             .withSql(
@@ -129,7 +130,7 @@ public class ForeignKeyRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

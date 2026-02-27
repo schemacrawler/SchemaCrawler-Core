@@ -95,16 +95,16 @@ public final class SchemaCrawler {
   /**
    * Constructs a SchemaCrawler object, from a database connection source.
    *
-   * @param dataSource A database connection source.
+   * @param connectionSource A database connection source.
    * @param schemaRetrievalOptions Database-specific schema retrieval overrides
    * @param options SchemaCrawler options
    */
   public SchemaCrawler(
-      final DatabaseConnectionSource dataSource,
+      final DatabaseConnectionSource connectionSource,
       final SchemaRetrievalOptions schemaRetrievalOptions,
       final SchemaCrawlerOptions options) {
     try {
-      retrieverConnection = new RetrieverConnection(dataSource, schemaRetrievalOptions);
+      retrieverConnection = new RetrieverConnection(connectionSource, schemaRetrievalOptions);
       this.options = requireNonNull(options, "No SchemaCrawler options provided");
 
       final LoadOptions loadOptions = options.loadOptions();

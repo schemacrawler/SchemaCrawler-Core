@@ -24,42 +24,48 @@ public class PrimaryKeyWeakAssociationsTest {
   @Test
   @WithTestDatabase(script = "/pk_test_1.sql")
   public void weakAssociations1(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
-    weakAssociations(testContext, dataSource, false);
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    weakAssociations(testContext, connectionSource, false);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_1.sql")
   public void weakAssociations1a(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
-    weakAssociations(testContext, dataSource, true);
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    weakAssociations(testContext, connectionSource, true);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_2.sql")
   public void weakAssociations2(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
-    weakAssociations(testContext, dataSource, false);
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    weakAssociations(testContext, connectionSource, false);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_2.sql")
   public void weakAssociations2a(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
-    weakAssociations(testContext, dataSource, true);
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    weakAssociations(testContext, connectionSource, true);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_3.sql")
   public void weakAssociations3(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
-    weakAssociations(testContext, dataSource, false);
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    weakAssociations(testContext, connectionSource, false);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_3.sql")
   public void weakAssociations3a(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
-    weakAssociations(testContext, dataSource, true);
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    weakAssociations(testContext, connectionSource, true);
   }
 }

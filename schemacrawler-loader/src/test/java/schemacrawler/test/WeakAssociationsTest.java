@@ -51,7 +51,7 @@ public class WeakAssociationsTest {
   private Catalog catalog;
 
   @BeforeAll
-  public void loadCatalog(final DatabaseConnectionSource dataSource) throws Exception {
+  public void loadCatalog(final DatabaseConnectionSource connectionSource) throws Exception {
 
     final SchemaRetrievalOptions schemaRetrievalOptions =
         DatabaseTestUtility.newSchemaRetrievalOptions();
@@ -73,7 +73,8 @@ public class WeakAssociationsTest {
     additionalConfig.put("weak-associations", true);
 
     catalog =
-        getCatalog(dataSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+        getCatalog(
+            connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
   }
 
   @Test
