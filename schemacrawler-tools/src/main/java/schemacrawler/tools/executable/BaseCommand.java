@@ -71,7 +71,7 @@ public abstract class BaseCommand<P extends CommandOptions> implements Command<P
   }
 
   @Override
-  public final void setDataSource(final DatabaseConnectionSource connectionSource) {
+  public final void setConnectionSource(final DatabaseConnectionSource connectionSource) {
     this.connectionSource = connectionSource;
   }
 

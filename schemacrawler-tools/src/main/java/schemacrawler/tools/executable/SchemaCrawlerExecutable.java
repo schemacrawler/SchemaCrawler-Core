@@ -107,7 +107,7 @@ public final class SchemaCrawlerExecutable {
       scCommand.setERModel(erModel);
 
       if (scCommand.usesConnection()) {
-        scCommand.setDataSource(connectionSource);
+        scCommand.setConnectionSource(connectionSource);
       }
 
       // Execute
@@ -151,7 +151,7 @@ public final class SchemaCrawlerExecutable {
     this.catalog = catalog;
   }
 
-  public void setDataSource(final DatabaseConnectionSource connectionSource) {
+  public void setConnectionSource(final DatabaseConnectionSource connectionSource) {
     this.connectionSource = requireNonNull(connectionSource, "No data source provided");
   }
 

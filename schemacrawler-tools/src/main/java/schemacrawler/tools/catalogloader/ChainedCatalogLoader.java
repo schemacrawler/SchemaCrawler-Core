@@ -62,7 +62,7 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
       }
 
       if (catalogLoader.usesConnection()) {
-        catalogLoader.setDataSource(connectionSource);
+        catalogLoader.setConnectionSource(connectionSource);
       }
       catalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
 

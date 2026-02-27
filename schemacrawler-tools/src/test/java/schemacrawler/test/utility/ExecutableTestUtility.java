@@ -51,7 +51,7 @@ public final class ExecutableTestUtility {
               .withOutputWriter(out);
 
       executable.setOutputOptions(outputOptionsBuilder.toOptions());
-      executable.setDataSource(connectionSource);
+      executable.setConnectionSource(connectionSource);
       executable.execute();
     }
     return testout.getFilePath();

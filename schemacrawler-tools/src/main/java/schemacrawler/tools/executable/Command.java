@@ -35,7 +35,7 @@ public interface Command<P extends CommandOptions> {
 
   void setCatalog(Catalog catalog);
 
-  void setDataSource(DatabaseConnectionSource connectionSource);
+  void setConnectionSource(DatabaseConnectionSource connectionSource);
 
   default boolean usesConnection() {
     return false;

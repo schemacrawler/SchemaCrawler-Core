@@ -35,7 +35,7 @@ public class SchemaCrawlerCatalogLoaderTest {
     final Connection connection = new TestDatabaseDriver().connect("jdbc:test-db:test", null);
     final DatabaseConnectionSource connectionSource =
         new ConnectionDatabaseConnectionSource(connection);
-    catalogLoader.setDataSource(connectionSource);
+    catalogLoader.setConnectionSource(connectionSource);
 
     assertThat(catalogLoader.getConnectionSource(), is(not(nullValue())));
 
