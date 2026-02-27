@@ -42,9 +42,10 @@ public class SchemaCrawlerUtilityTest {
   @Test
   @WithSystemProperty(key = "SC_WITHOUT_DATABASE_PLUGIN", value = "hsqldb")
   @CaptureLogs
-  public void getCatalog(final DatabaseConnectionSource dataSource, final CapturedLogs logs)
+  public void getCatalog(final DatabaseConnectionSource connectionSource, final CapturedLogs logs)
       throws Exception {
-    final Catalog catalog = SchemaCrawlerUtility.getCatalog(dataSource, newSchemaCrawlerOptions());
+    final Catalog catalog =
+        SchemaCrawlerUtility.getCatalog(connectionSource, newSchemaCrawlerOptions());
     assertThat(catalog, is(not(nullValue())));
     final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
     assertThat("Schema count does not match", schemas, arrayWithSize(6));
@@ -52,19 +53,21 @@ public class SchemaCrawlerUtilityTest {
 
   @Test
   public void getCatalogClosedConnection(final Connection connection) throws Exception {
-    final DatabaseConnectionSource dataSource = new ConnectionDatabaseConnectionSource(connection);
+    final DatabaseConnectionSource connectionSource =
+        new ConnectionDatabaseConnectionSource(connection);
     connection.close();
     assertThrows(
         DatabaseAccessException.class,
-        () -> SchemaCrawlerUtility.getCatalog(dataSource, newSchemaCrawlerOptions()));
+        () -> SchemaCrawlerUtility.getCatalog(connectionSource, newSchemaCrawlerOptions()));
   }
 
   @Test
-  public void getCatalogMissingPlugin(final DatabaseConnectionSource dataSource) throws Exception {
+  public void getCatalogMissingPlugin(final DatabaseConnectionSource connectionSource)
+      throws Exception {
     final InternalRuntimeException exception =
         assertThrows(
             InternalRuntimeException.class,
-            () -> SchemaCrawlerUtility.getCatalog(dataSource, newSchemaCrawlerOptions()));
+            () -> SchemaCrawlerUtility.getCatalog(connectionSource, newSchemaCrawlerOptions()));
     assertThat(exception.getMessage(), containsString("hsqldb"));
   }
 
@@ -78,8 +81,8 @@ public class SchemaCrawlerUtilityTest {
   }
 
   @Test
-  public void getResultsColumns(final DatabaseConnectionSource dataSource) throws Exception {
-    try (final Connection connection = dataSource.get();
+  public void getResultsColumns(final DatabaseConnectionSource connectionSource) throws Exception {
+    try (final Connection connection = connectionSource.get();
         final ResultSet results = connection.getMetaData().getCatalogs()) {
       final ResultsColumns resultsColumns = SchemaCrawlerUtility.getResultsColumns(results);
       assertThat(resultsColumns, is(not(nullValue())));
@@ -91,9 +94,9 @@ public class SchemaCrawlerUtilityTest {
   }
 
   @Test
-  public void getResultsColumnsClosedResults(final DatabaseConnectionSource dataSource)
+  public void getResultsColumnsClosedResults(final DatabaseConnectionSource connectionSource)
       throws Exception {
-    try (final Connection connection = dataSource.get(); ) {
+    try (final Connection connection = connectionSource.get(); ) {
       final ResultSet results = connection.getMetaData().getCatalogs();
       results.close();
 

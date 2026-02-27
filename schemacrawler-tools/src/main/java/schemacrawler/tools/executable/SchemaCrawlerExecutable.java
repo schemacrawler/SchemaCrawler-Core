@@ -47,7 +47,7 @@ public final class SchemaCrawlerExecutable {
   private Config additionalConfig;
   private Catalog catalog;
   private ERModel erModel;
-  private DatabaseConnectionSource dataSource;
+  private DatabaseConnectionSource connectionSource;
   private OutputOptions outputOptions;
   private SchemaCrawlerOptions schemaCrawlerOptions;
   private SchemaRetrievalOptions schemaRetrievalOptions;
@@ -62,11 +62,11 @@ public final class SchemaCrawlerExecutable {
 
   public void execute() {
 
-    if (dataSource == null && catalog == null) {
+    if (connectionSource == null && catalog == null) {
       throw new ExecutionRuntimeException("Cannot execute command");
     }
 
-    if (dataSource == null) {
+    if (connectionSource == null) {
       if (schemaRetrievalOptions == null) {
         schemaRetrievalOptions = SchemaRetrievalOptionsBuilder.newSchemaRetrievalOptions();
       }
@@ -74,9 +74,9 @@ public final class SchemaCrawlerExecutable {
       // Match schema retrieval options, and update data source before any connections
       // are used
       if (schemaRetrievalOptions == null) {
-        schemaRetrievalOptions = matchSchemaRetrievalOptions(dataSource);
+        schemaRetrievalOptions = matchSchemaRetrievalOptions(connectionSource);
       }
-      updateConnectionDataSource(dataSource, schemaRetrievalOptions);
+      updateConnectionDataSource(connectionSource, schemaRetrievalOptions);
     }
 
     try {
@@ -107,7 +107,7 @@ public final class SchemaCrawlerExecutable {
       scCommand.setERModel(erModel);
 
       if (scCommand.usesConnection()) {
-        scCommand.setDataSource(dataSource);
+        scCommand.setDataSource(connectionSource);
       }
 
       // Execute
@@ -151,8 +151,8 @@ public final class SchemaCrawlerExecutable {
     this.catalog = catalog;
   }
 
-  public void setDataSource(final DatabaseConnectionSource dataSource) {
-    this.dataSource = requireNonNull(dataSource, "No data source provided");
+  public void setDataSource(final DatabaseConnectionSource connectionSource) {
+    this.connectionSource = requireNonNull(connectionSource, "No data source provided");
   }
 
   public void setERModel(final ERModel erModel) {
@@ -188,7 +188,7 @@ public final class SchemaCrawlerExecutable {
   private void loadCatalog() {
     catalog =
         SchemaCrawlerUtility.getCatalog(
-            dataSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+            connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
     requireNonNull(catalog, "Catalog could not be retrieved");
   }
 

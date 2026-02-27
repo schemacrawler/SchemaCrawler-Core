@@ -43,7 +43,7 @@ public class ERModelJavaSerializationTest {
   private ERModel erModel;
 
   @Test
-  public void erModelSerializationWithJava(final DatabaseConnectionSource dataSource)
+  public void erModelSerializationWithJava(final DatabaseConnectionSource connectionSource)
       throws Exception {
 
     final Path testOutputFile = IOUtility.createTempFilePath("sc_ermodel_serialization", "ser");

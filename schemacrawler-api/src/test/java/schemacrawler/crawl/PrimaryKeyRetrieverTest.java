@@ -104,7 +104,7 @@ public class PrimaryKeyRetrieverTest {
 
   @Test
   @DisplayName("Retrieve primary keys from data dictionary")
-  public void primaryKeysFromDataDictionary(final DatabaseConnectionSource dataSource)
+  public void primaryKeysFromDataDictionary(final DatabaseConnectionSource connectionSource)
       throws Exception {
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
@@ -119,7 +119,7 @@ public class PrimaryKeyRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

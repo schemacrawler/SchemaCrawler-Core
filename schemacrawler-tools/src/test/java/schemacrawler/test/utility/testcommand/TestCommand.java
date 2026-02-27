@@ -31,7 +31,7 @@ public final class TestCommand extends BaseSchemaCrawlerCommand<TestOptions> {
   public void execute() {
 
     final boolean usesConnection = usesConnection();
-    final boolean hasConnection = getDataSource() != null;
+    final boolean hasConnection = getConnectionSource() != null;
     if (usesConnection != hasConnection) {
       throw new RuntimeException("Uses connection not honored");
     }

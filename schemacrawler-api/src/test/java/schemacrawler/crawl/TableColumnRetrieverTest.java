@@ -135,7 +135,8 @@ public class TableColumnRetrieverTest {
 
   @Test
   @DisplayName("Test with empty result set for columns")
-  public void emptyResultSetForColumns(final DatabaseConnectionSource dataSource) throws Exception {
+  public void emptyResultSetForColumns(final DatabaseConnectionSource connectionSource)
+      throws Exception {
 
     // Verify that the test catalog has tables but no columns
     assertThat(catalog.getTables(), hasSize(14));
@@ -156,7 +157,7 @@ public class TableColumnRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -206,7 +207,7 @@ public class TableColumnRetrieverTest {
 
   @Test
   @DisplayName("Retrieve hidden table columns from data dictionary")
-  public void hiddenTableColumns(final DatabaseConnectionSource dataSource) throws Exception {
+  public void hiddenTableColumns(final DatabaseConnectionSource connectionSource) throws Exception {
 
     final MutableTable couponsTable =
         catalog.lookupTable(new SchemaReference("PUBLIC", "BOOKS"), "COUPONS").get();
@@ -228,7 +229,7 @@ public class TableColumnRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final LimitOptionsBuilder limitOptionsBuilder =
         LimitOptionsBuilder.builder()
@@ -276,7 +277,7 @@ public class TableColumnRetrieverTest {
 
   @Test
   @DisplayName("Test with malformed data in column result sets")
-  public void malformedDataInColumnResultSets(final DatabaseConnectionSource dataSource)
+  public void malformedDataInColumnResultSets(final DatabaseConnectionSource connectionSource)
       throws Exception {
 
     final MutableTable authorsTable =
@@ -334,7 +335,7 @@ public class TableColumnRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -354,7 +355,7 @@ public class TableColumnRetrieverTest {
 
   @Test
   @DisplayName("Test with null column name")
-  public void nulColumnName(final DatabaseConnectionSource dataSource) throws Exception {
+  public void nulColumnName(final DatabaseConnectionSource connectionSource) throws Exception {
 
     final MutableTable authorsTable =
         catalog.lookupTable(new SchemaReference("PUBLIC", "BOOKS"), "AUTHORS").get();
@@ -407,7 +408,7 @@ public class TableColumnRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -426,7 +427,7 @@ public class TableColumnRetrieverTest {
 
   @Test
   @DisplayName("Test with null values in critical column fields")
-  public void nullValuesInCriticalColumnFields(final DatabaseConnectionSource dataSource)
+  public void nullValuesInCriticalColumnFields(final DatabaseConnectionSource connectionSource)
       throws Exception {
 
     final MutableTable authorsTable =
@@ -480,7 +481,7 @@ public class TableColumnRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -503,7 +504,7 @@ public class TableColumnRetrieverTest {
 
   @Test
   @DisplayName("Retrieve table columns from data dictionary")
-  public void tableColumnsFromDataDictionary(final DatabaseConnectionSource dataSource)
+  public void tableColumnsFromDataDictionary(final DatabaseConnectionSource connectionSource)
       throws Exception {
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
@@ -518,7 +519,7 @@ public class TableColumnRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

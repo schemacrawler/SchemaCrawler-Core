@@ -41,28 +41,31 @@ public class AttributesCatalogLoaderTest {
 
   @Test
   public void noRemarksForExternalColumn(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
     final String attributesFile = "/attributes-external-column.yaml";
-    showRemarks(testContext, dataSource, attributesFile);
+    showRemarks(testContext, connectionSource, attributesFile);
   }
 
   @Test
   public void noRemarksForExternalTable(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
     final String attributesFile = "/attributes-external-table.yaml";
-    showRemarks(testContext, dataSource, attributesFile);
+    showRemarks(testContext, connectionSource, attributesFile);
   }
 
   @Test
-  public void showRemarks(final TestContext testContext, final DatabaseConnectionSource dataSource)
+  public void showRemarks(
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
     final String attributesFile = "/attributes.yaml";
-    showRemarks(testContext, dataSource, attributesFile);
+    showRemarks(testContext, connectionSource, attributesFile);
   }
 
   private void showRemarks(
       final TestContext testContext,
-      final DatabaseConnectionSource dataSource,
+      final DatabaseConnectionSource connectionSource,
       final String attributesFile)
       throws IOException {
     final TestWriter testout = new TestWriter();
@@ -79,7 +82,7 @@ public class AttributesCatalogLoaderTest {
 
       final Catalog catalog =
           SchemaCrawlerUtility.getCatalog(
-              dataSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+              connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(6));
       for (final Schema schema : schemas) {

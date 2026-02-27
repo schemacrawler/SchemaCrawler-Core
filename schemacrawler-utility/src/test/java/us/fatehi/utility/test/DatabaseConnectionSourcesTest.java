@@ -31,10 +31,10 @@ public class DatabaseConnectionSourcesTest {
     final DataSource db = DataSourceTestUtility.newEmbeddedDatabase("/testdb.sql");
     final Connection wrappedConnection = db.getConnection();
 
-    final DatabaseConnectionSource databaseConnectionSource =
+    final DatabaseConnectionSource connectionSource =
         DatabaseConnectionSources.fromConnection(wrappedConnection);
 
-    assertConnection(databaseConnectionSource);
+    assertConnection(connectionSource);
   }
 
   @Test
@@ -42,10 +42,9 @@ public class DatabaseConnectionSourcesTest {
 
     final DataSource db = DataSourceTestUtility.newEmbeddedDatabase("/testdb.sql");
 
-    final DatabaseConnectionSource databaseConnectionSource =
-        DatabaseConnectionSources.fromDataSource(db);
+    final DatabaseConnectionSource connectionSource = DatabaseConnectionSources.fromDataSource(db);
 
-    assertConnection(databaseConnectionSource);
+    assertConnection(connectionSource);
   }
 
   @Test
@@ -58,16 +57,16 @@ public class DatabaseConnectionSourcesTest {
     final String userName = metaData.getUserName();
     final String password = "";
 
-    final DatabaseConnectionSource databaseConnectionSource =
+    final DatabaseConnectionSource connectionSource =
         DatabaseConnectionSources.newDatabaseConnectionSource(
             connectionUrl, new MultiUseUserCredentials(userName, password));
 
-    assertConnection(databaseConnectionSource);
+    assertConnection(connectionSource);
   }
 
-  private void assertConnection(final DatabaseConnectionSource databaseConnectionSource)
+  private void assertConnection(final DatabaseConnectionSource connectionSource)
       throws SQLException {
-    assertThat(databaseConnectionSource.get(), is(not(nullValue())));
-    assertThat(databaseConnectionSource.get().isClosed(), is(false));
+    assertThat(connectionSource.get(), is(not(nullValue())));
+    assertThat(connectionSource.get().isClosed(), is(false));
   }
 }

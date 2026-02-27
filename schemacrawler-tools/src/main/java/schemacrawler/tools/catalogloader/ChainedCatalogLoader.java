@@ -53,7 +53,7 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
 
   @Override
   public void execute() {
-    final DatabaseConnectionSource dataSource = getDataSource();
+    final DatabaseConnectionSource connectionSource = getConnectionSource();
     final SchemaRetrievalOptions schemaRetrievalOptions = getSchemaRetrievalOptions();
     for (final CatalogLoader<?> catalogLoader : catalogLoaders) {
       if (catalog != null) {
@@ -62,7 +62,7 @@ public class ChainedCatalogLoader extends BaseCatalogLoader<ChainedCatalogLoader
       }
 
       if (catalogLoader.usesConnection()) {
-        catalogLoader.setDataSource(dataSource);
+        catalogLoader.setDataSource(connectionSource);
       }
       catalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
 

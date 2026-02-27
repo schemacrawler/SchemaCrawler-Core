@@ -25,21 +25,21 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 public final class ExecutableTestUtility {
 
   public static Path executableExecution(
-      final DatabaseConnectionSource dataSource, final SchemaCrawlerExecutable executable)
+      final DatabaseConnectionSource connectionSource, final SchemaCrawlerExecutable executable)
       throws Exception {
-    return executableExecution(dataSource, executable, "text");
+    return executableExecution(connectionSource, executable, "text");
   }
 
   public static Path executableExecution(
-      final DatabaseConnectionSource dataSource,
+      final DatabaseConnectionSource connectionSource,
       final SchemaCrawlerExecutable executable,
       final OutputFormat outputFormat)
       throws Exception {
-    return executableExecution(dataSource, executable, outputFormat.getFormat());
+    return executableExecution(connectionSource, executable, outputFormat.getFormat());
   }
 
   public static Path executableExecution(
-      final DatabaseConnectionSource dataSource,
+      final DatabaseConnectionSource connectionSource,
       final SchemaCrawlerExecutable executable,
       final String outputFormatValue)
       throws Exception {
@@ -51,7 +51,7 @@ public final class ExecutableTestUtility {
               .withOutputWriter(out);
 
       executable.setOutputOptions(outputOptionsBuilder.toOptions());
-      executable.setDataSource(dataSource);
+      executable.setDataSource(connectionSource);
       executable.execute();
     }
     return testout.getFilePath();

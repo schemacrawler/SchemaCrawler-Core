@@ -16,8 +16,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.plugin.EnumDataTypeHelper;
-import schemacrawler.schema.TableTypes;
 import schemacrawler.schema.Identifiers;
+import schemacrawler.schema.TableTypes;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.MetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy;
@@ -31,16 +31,17 @@ final class RetrieverConnection {
 
   private static final Logger LOGGER = Logger.getLogger(RetrieverConnection.class.getName());
 
-  private final DatabaseConnectionSource dataSource;
+  private final DatabaseConnectionSource connectionSource;
   private final JavaSqlTypes javaSqlTypes;
   private final SchemaRetrievalOptions schemaRetrievalOptions;
 
   RetrieverConnection(
-      final DatabaseConnectionSource dataSource,
+      final DatabaseConnectionSource connectionSource,
       final SchemaRetrievalOptions schemaRetrievalOptions)
       throws SQLException {
 
-    this.dataSource = requireNonNull(dataSource, "Database connection source not provided");
+    this.connectionSource =
+        requireNonNull(connectionSource, "Database connection source not provided");
 
     this.schemaRetrievalOptions =
         requireNonNull(schemaRetrievalOptions, "No database specific overrides provided");
@@ -62,7 +63,7 @@ final class RetrieverConnection {
           }
           return "Getting database connnection";
         });
-    return dataSource.get();
+    return connectionSource.get();
   }
 
   EnumDataTypeHelper getEnumDataTypeHelper() {

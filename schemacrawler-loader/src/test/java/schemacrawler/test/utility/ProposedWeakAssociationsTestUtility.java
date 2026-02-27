@@ -37,7 +37,7 @@ public class ProposedWeakAssociationsTestUtility {
 
   public static void weakAssociations(
       final TestContext testContext,
-      final DatabaseConnectionSource dataSource,
+      final DatabaseConnectionSource connectionSource,
       final boolean inferExtensionTables)
       throws Exception {
 
@@ -62,7 +62,7 @@ public class ProposedWeakAssociationsTestUtility {
 
       final Catalog catalog =
           SchemaCrawlerUtility.getCatalog(
-              dataSource, schemaRetrievalOptions, schemaCrawlerOptions, config);
+              connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, config);
 
       final Schema schema = new SchemaReference("PUBLIC", "PUBLIC");
       final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);

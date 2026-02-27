@@ -88,7 +88,8 @@ public class IndexRetrieverTest {
   @Test
   @DisplayName("Test handling of edge cases in index retrieval")
   public void edgeCasesInIndexRetrieval(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
 
     assertThat("Should still have indexes after edge case test", countAllIndexes(), is(0));
 
@@ -98,7 +99,7 @@ public class IndexRetrieverTest {
     schemaRetrievalOptionsBuilder.with(indexesRetrievalStrategy, metadata);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -129,7 +130,7 @@ public class IndexRetrieverTest {
     edgeCaseOptionsBuilder.withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions edgeCaseOptions = edgeCaseOptionsBuilder.toOptions();
     final RetrieverConnection edgeCaseConnection =
-        new RetrieverConnection(dataSource, edgeCaseOptions);
+        new RetrieverConnection(connectionSource, edgeCaseOptions);
 
     final IndexRetriever edgeCaseRetriever =
         new IndexRetriever(edgeCaseConnection, catalog, options);
@@ -152,7 +153,8 @@ public class IndexRetrieverTest {
   @Test
   @DisplayName("Test error handling in retrieveIndexInformation")
   public void errorHandlingInRetrieveIndexInformation(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
 
     // Create a retriever connection with invalid SQL to simulate errors
     final InformationSchemaViews informationSchemaViews =
@@ -164,7 +166,7 @@ public class IndexRetrieverTest {
     schemaRetrievalOptionsBuilder.withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -177,7 +179,7 @@ public class IndexRetrieverTest {
 
   @Test
   @DisplayName("Retrieve indexes from data dictionary")
-  public void indexesFromDataDictionary(final DatabaseConnectionSource dataSource)
+  public void indexesFromDataDictionary(final DatabaseConnectionSource connectionSource)
       throws Exception {
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
@@ -191,7 +193,7 @@ public class IndexRetrieverTest {
         .withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -204,13 +206,14 @@ public class IndexRetrieverTest {
   @Test
   @DisplayName("Retrieve indexes from metadata")
   public void indexesFromMetadata(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
     final SchemaRetrievalOptionsBuilder schemaRetrievalOptionsBuilder =
         SchemaRetrievalOptionsBuilder.builder();
     schemaRetrievalOptionsBuilder.with(indexesRetrievalStrategy, metadata);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -233,7 +236,7 @@ public class IndexRetrieverTest {
 
   @Test
   @DisplayName("Retrieve index definitions from INFORMATION_SCHEMA")
-  public void indexInfo(final DatabaseConnectionSource dataSource) throws Exception {
+  public void indexInfo(final DatabaseConnectionSource connectionSource) throws Exception {
 
     final String remarks = "TEST Index remarks";
     final String definition = "TEST Index definition";
@@ -260,7 +263,7 @@ public class IndexRetrieverTest {
     schemaRetrievalOptionsBuilder.withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -301,7 +304,8 @@ public class IndexRetrieverTest {
   @Test
   @DisplayName("Test error handling in retrieveIndexInformation")
   public void missingExtIndexes(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
 
     // Create a retriever connection with invalid SQL to simulate errors
     // No EXT_INDEXES in InformationSchemaViews
@@ -312,7 +316,7 @@ public class IndexRetrieverTest {
     schemaRetrievalOptionsBuilder.withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

@@ -225,10 +225,11 @@ public class SchemaCrawlerCoverageTest {
 
     final Connection connection = mockConnection();
 
-    final DatabaseConnectionSource dataSource = new ConnectionDatabaseConnectionSource(connection);
+    final DatabaseConnectionSource connectionSource =
+        new ConnectionDatabaseConnectionSource(connection);
 
     final SchemaCrawler schemaCrawler =
-        new SchemaCrawler(dataSource, schemaRetrievalOptionsDefault, schemaCrawlerOptions);
+        new SchemaCrawler(connectionSource, schemaRetrievalOptionsDefault, schemaCrawlerOptions);
     final RuntimeException ex = assertThrows(RuntimeException.class, () -> schemaCrawler.crawl());
     assertThat(ex.getMessage(), endsWith("Cannot use null results"));
   }

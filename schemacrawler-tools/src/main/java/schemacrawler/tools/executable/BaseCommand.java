@@ -21,7 +21,7 @@ public abstract class BaseCommand<P extends CommandOptions> implements Command<P
   protected final PropertyName command;
   protected P commandOptions;
   protected Catalog catalog;
-  private DatabaseConnectionSource dataSource;
+  private DatabaseConnectionSource connectionSource;
 
   protected BaseCommand(final PropertyName command) {
     this.command = requireNonNull(command, "No command specified");
@@ -49,15 +49,15 @@ public abstract class BaseCommand<P extends CommandOptions> implements Command<P
   }
 
   public final Connection getConnection() {
-    if (usesConnection() && dataSource != null) {
-      return dataSource.get();
+    if (usesConnection() && connectionSource != null) {
+      return connectionSource.get();
     }
     return null;
   }
 
   @Override
-  public final DatabaseConnectionSource getDataSource() {
-    return dataSource;
+  public final DatabaseConnectionSource getConnectionSource() {
+    return connectionSource;
   }
 
   @Override
@@ -71,8 +71,8 @@ public abstract class BaseCommand<P extends CommandOptions> implements Command<P
   }
 
   @Override
-  public final void setDataSource(final DatabaseConnectionSource dataSource) {
-    this.dataSource = dataSource;
+  public final void setDataSource(final DatabaseConnectionSource connectionSource) {
+    this.connectionSource = connectionSource;
   }
 
   /** {@inheritDoc} */

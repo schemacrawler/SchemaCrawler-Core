@@ -28,14 +28,14 @@ public interface Command<P extends CommandOptions> {
 
   P getCommandOptions();
 
-  DatabaseConnectionSource getDataSource();
+  DatabaseConnectionSource getConnectionSource();
 
   /** Initializes the command for execution. */
   void initialize();
 
   void setCatalog(Catalog catalog);
 
-  void setDataSource(DatabaseConnectionSource dataSource);
+  void setDataSource(DatabaseConnectionSource connectionSource);
 
   default boolean usesConnection() {
     return false;

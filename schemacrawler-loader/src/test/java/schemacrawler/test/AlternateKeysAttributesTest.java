@@ -134,7 +134,7 @@ public class AlternateKeysAttributesTest {
   }
 
   @BeforeAll
-  public void loadCatalog(final DatabaseConnectionSource dataSource) throws Exception {
+  public void loadCatalog(final DatabaseConnectionSource connectionSource) throws Exception {
 
     final SchemaRetrievalOptions schemaRetrievalOptions =
         DatabaseTestUtility.newSchemaRetrievalOptions();
@@ -156,7 +156,8 @@ public class AlternateKeysAttributesTest {
     additionalConfig.put("attributes-file", "/attributes-alternate-keys.yaml");
 
     catalog =
-        getCatalog(dataSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+        getCatalog(
+            connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
   }
 
   private void printAlternateKeys(

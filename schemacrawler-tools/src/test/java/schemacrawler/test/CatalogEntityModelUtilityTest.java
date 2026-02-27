@@ -85,7 +85,7 @@ public class CatalogEntityModelUtilityTest {
   }
 
   @BeforeAll
-  public void loadCatalog(final DatabaseConnectionSource dataSource) throws Exception {
+  public void loadCatalog(final DatabaseConnectionSource connectionSource) throws Exception {
 
     final SchemaRetrievalOptions schemaRetrievalOptions =
         DatabaseTestUtility.newSchemaRetrievalOptions();
@@ -102,6 +102,9 @@ public class CatalogEntityModelUtilityTest {
 
     catalog =
         SchemaCrawlerUtility.getCatalog(
-            dataSource, schemaRetrievalOptions, schemaCrawlerOptions, ConfigUtility.newConfig());
+            connectionSource,
+            schemaRetrievalOptions,
+            schemaCrawlerOptions,
+            ConfigUtility.newConfig());
   }
 }

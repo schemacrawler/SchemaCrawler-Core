@@ -29,7 +29,7 @@ import us.fatehi.test.utility.DataSourceTestUtility;
 @TestInstance(Lifecycle.PER_CLASS)
 public class SimpleDatabaseConnectionSourceTest {
 
-  private DatabaseConnectionSource databaseConnectionSource;
+  private DatabaseConnectionSource connectionSource;
 
   @Test
   public void badConstructorArgs() throws Exception {
@@ -48,7 +48,7 @@ public class SimpleDatabaseConnectionSourceTest {
   @Test
   public void connectionTests() throws Exception {
 
-    final Connection connection = databaseConnectionSource.get();
+    final Connection connection = connectionSource.get();
     assertThat(connection, is(not(nullValue())));
     assertThat(connection.getClass().getName(), not(endsWith("JDBCConnection")));
     final Connection unwrappedConnection = connection.unwrap(Connection.class);
@@ -59,11 +59,11 @@ public class SimpleDatabaseConnectionSourceTest {
     assertThat(connection.isClosed(), is(true));
     assertThat(unwrappedConnection.isClosed(), is(false));
 
-    databaseConnectionSource.releaseConnection(connection);
+    connectionSource.releaseConnection(connection);
     assertThat(connection.isClosed(), is(true));
     assertThat(unwrappedConnection.isClosed(), is(false));
 
-    databaseConnectionSource.close();
+    connectionSource.close();
     assertThat(connection.isClosed(), is(true));
     assertThat(unwrappedConnection.isClosed(), is(true));
   }
@@ -77,7 +77,7 @@ public class SimpleDatabaseConnectionSourceTest {
     final String connectionUrl = metaData.getURL();
     final String userName = metaData.getUserName();
     final String password = "";
-    databaseConnectionSource =
+    connectionSource =
         new SimpleDatabaseConnectionSource(
             connectionUrl,
             Set.of(),

@@ -33,19 +33,20 @@ public final class TableRowCountsRetriever {
 
   private static final Logger LOGGER = Logger.getLogger(TableRowCountsRetriever.class.getName());
 
-  private final DatabaseConnectionSource dataSource;
+  private final DatabaseConnectionSource connectionSource;
   private final Catalog catalog;
 
-  public TableRowCountsRetriever(final DatabaseConnectionSource dataSource, final Catalog catalog)
-      throws SQLException {
-    this.dataSource = requireNonNull(dataSource, "No database connection source provided");
+  public TableRowCountsRetriever(
+      final DatabaseConnectionSource connectionSource, final Catalog catalog) throws SQLException {
+    this.connectionSource =
+        requireNonNull(connectionSource, "No database connection source provided");
     this.catalog = requireNonNull(catalog, "No catalog provided");
   }
 
   public void retrieveTableRowCounts() {
 
     Identifiers identifiers;
-    try (Connection connection = dataSource.get(); ) {
+    try (Connection connection = connectionSource.get(); ) {
       identifiers =
           IdentifiersBuilder.builder()
               .fromConnection(connection)
@@ -58,7 +59,7 @@ public final class TableRowCountsRetriever {
       return;
     }
 
-    try (Connection connection = dataSource.get(); ) {
+    try (Connection connection = connectionSource.get(); ) {
       final Query query =
           new Query("schemacrawler.table.row_counts", "SELECT COUNT(*) FROM ${table}");
       final List<Table> allTables = new ArrayList<>(catalog.getTables());

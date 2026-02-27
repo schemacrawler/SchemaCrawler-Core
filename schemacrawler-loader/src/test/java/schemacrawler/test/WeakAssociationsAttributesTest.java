@@ -56,7 +56,8 @@ public class WeakAssociationsAttributesTest {
   private Catalog catalog;
 
   @BeforeAll
-  public void loadCatalog(final TestContext testContext, final DatabaseConnectionSource dataSource)
+  public void loadCatalog(
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
 
     final SchemaRetrievalOptions schemaRetrievalOptions =
@@ -77,7 +78,8 @@ public class WeakAssociationsAttributesTest {
     additionalConfig.put("attributes-file", "/attributes-weakassociations.yaml");
 
     catalog =
-        getCatalog(dataSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+        getCatalog(
+            connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
   }
 
   /** Keep in sync with {@link SchemaCrawlerTest#weakAssociations() LabelName} */

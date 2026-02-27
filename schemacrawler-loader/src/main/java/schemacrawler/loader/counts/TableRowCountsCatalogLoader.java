@@ -44,7 +44,7 @@ public class TableRowCountsCatalogLoader
     try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadTableRowCounts", 1); ) {
       final Catalog catalog = getCatalog();
       final TableRowCountsRetriever rowCountsRetriever =
-          new TableRowCountsRetriever(getDataSource(), catalog);
+          new TableRowCountsRetriever(getConnectionSource(), catalog);
       final TableRowCountsCatalogLoaderOptions commandOptions = getCommandOptions();
 
       final boolean loadRowCounts = commandOptions.loadRowCounts();

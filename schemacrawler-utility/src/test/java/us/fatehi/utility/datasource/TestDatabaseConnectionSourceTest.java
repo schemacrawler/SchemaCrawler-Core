@@ -30,29 +30,29 @@ import us.fatehi.test.utility.DataSourceTestUtility;
 @TestInstance(Lifecycle.PER_CLASS)
 public class TestDatabaseConnectionSourceTest {
 
-  private DatabaseConnectionSource databaseConnectionSource;
+  private DatabaseConnectionSource connectionSource;
   private Connection wrappedConnection;
 
   @Disabled
   @Test
   public void connectionTests() throws Exception {
-    final Connection connection = databaseConnectionSource.get();
+    final Connection connection = connectionSource.get();
     assertThat(connection, is(not(nullValue())));
     assertThat(connection.getClass().getName(), endsWith("JDBCConnection"));
     final Connection unwrappedConnection = connection.unwrap(Connection.class);
     assertThat(unwrappedConnection.getClass().getName(), endsWith("JDBCConnection"));
     assertThat(connection.isClosed(), is(false));
-    assertThat(databaseConnectionSource.toString(), containsString("DataSourceConnectionSource"));
+    assertThat(connectionSource.toString(), containsString("DataSourceConnectionSource"));
 
     connection.close();
     assertThat(connection.isClosed(), is(true));
     assertThat(unwrappedConnection.isClosed(), is(false));
 
-    databaseConnectionSource.releaseConnection(connection);
+    connectionSource.releaseConnection(connection);
     assertThat(connection.isClosed(), is(true));
     assertThat(unwrappedConnection.isClosed(), is(false));
 
-    databaseConnectionSource.close();
+    connectionSource.close();
     assertThat(connection.isClosed(), is(true));
     assertThat(unwrappedConnection.isClosed(), is(true));
   }
@@ -65,7 +65,7 @@ public class TestDatabaseConnectionSourceTest {
     final String password = "";
     final HashMap<String, String> connectionProperties = new HashMap<>();
     connectionProperties.put("key", "value");
-    databaseConnectionSource =
+    connectionSource =
         new SingleDatabaseConnectionSource(
             connectionUrl,
             Set.of(),
@@ -73,7 +73,7 @@ public class TestDatabaseConnectionSourceTest {
             new MultiUseUserCredentials(userName, password),
             connection -> {});
 
-    final Connection connection = databaseConnectionSource.get();
+    final Connection connection = connectionSource.get();
     assertThat(connection, is(not(nullValue())));
 
     connection.close();
@@ -83,6 +83,6 @@ public class TestDatabaseConnectionSourceTest {
   public void createDatabase() throws Exception {
     final DataSource db = DataSourceTestUtility.newEmbeddedDatabase("/testdb.sql");
     wrappedConnection = db.getConnection();
-    databaseConnectionSource = DatabaseConnectionSources.fromDataSource(db);
+    connectionSource = DatabaseConnectionSources.fromDataSource(db);
   }
 }

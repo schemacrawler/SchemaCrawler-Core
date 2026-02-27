@@ -46,7 +46,8 @@ public class TableRowCountsTest {
 
   @Test
   public void noEmptyTables(
-      final TestContext testContext, final DatabaseConnectionSource dataSource) throws Exception {
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
 
@@ -62,7 +63,7 @@ public class TableRowCountsTest {
 
       final Catalog catalog =
           SchemaCrawlerUtility.getCatalog(
-              dataSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+              connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(6));
       for (final Schema schema : schemas) {
@@ -79,7 +80,8 @@ public class TableRowCountsTest {
   }
 
   @Test
-  public void rowCounts(final TestContext testContext, final DatabaseConnectionSource dataSource)
+  public void rowCounts(
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
@@ -102,7 +104,7 @@ public class TableRowCountsTest {
 
       final Catalog catalog =
           SchemaCrawlerUtility.getCatalog(
-              dataSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+              connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
 
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(5));

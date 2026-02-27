@@ -69,10 +69,10 @@ public class SchemaRetrieverTest {
         SchemaRetrievalOptionsBuilder.builder();
     schemaRetrievalOptionsBuilder.withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
-    final DatabaseConnectionSource dataSource =
+    final DatabaseConnectionSource connectionSource =
         new ConnectionDatabaseConnectionSource(spyConnection);
     final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(dataSource, schemaRetrievalOptions);
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 

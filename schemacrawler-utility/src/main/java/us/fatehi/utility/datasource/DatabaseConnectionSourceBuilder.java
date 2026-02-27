@@ -60,14 +60,14 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
   public DatabaseConnectionSource build() {
     final String connectionUrl = toURL();
     final Map<String, String> connectionUrlx = toUrlx();
-    final DatabaseConnectionSource databaseConnectionSource =
+    final DatabaseConnectionSource connectionSource =
         DatabaseConnectionSources.newDatabaseConnectionSource(
             connectionUrl,
             additionalDriverProperties,
             connectionUrlx,
             userCredentials,
             connectionInitializer);
-    return databaseConnectionSource;
+    return connectionSource;
   }
 
   public Consumer<Connection> getConnectionInitializer() {
