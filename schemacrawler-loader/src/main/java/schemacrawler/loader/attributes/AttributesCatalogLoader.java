@@ -30,7 +30,7 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.IORuntimeException;
-import schemacrawler.tools.catalogloader.BaseCatalogLoader;
+import schemacrawler.tools.catalogloader.AbstractCatalogLoader;
 import us.fatehi.utility.ioresource.InputResource;
 import us.fatehi.utility.ioresource.InputResourceUtility;
 import us.fatehi.utility.property.PropertyName;
@@ -39,7 +39,7 @@ import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 import us.fatehi.utility.string.StringFormat;
 
-public class AttributesCatalogLoader extends BaseCatalogLoader<AttributesCatalogLoaderOptions> {
+public class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoaderOptions> {
 
   private static final Logger LOGGER = Logger.getLogger(AttributesCatalogLoader.class.getName());
 

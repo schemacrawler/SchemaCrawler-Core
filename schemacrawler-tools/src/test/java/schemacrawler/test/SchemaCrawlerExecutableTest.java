@@ -59,7 +59,7 @@ public class SchemaCrawlerExecutableTest {
     executable.setSchemaCrawlerOptions(schemaCrawlerOptions);
     executable.setOutputOptions(outputOptions);
     executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
-    executable.setDataSource(connectionSource);
+    executable.setConnectionSource(connectionSource);
     executable.execute();
 
     assertThat(
@@ -85,14 +85,14 @@ public class SchemaCrawlerExecutableTest {
 
     final String command1 = "bad-command";
     final SchemaCrawlerExecutable executable1 = new SchemaCrawlerExecutable(command1);
-    executable1.setDataSource(connectionSource);
+    executable1.setConnectionSource(connectionSource);
     final ExecutionRuntimeException ex1 =
         assertThrows(ExecutionRuntimeException.class, () -> executable1.execute());
     assertThat(ex1.getMessage(), is("Unknown command <" + command1 + ">"));
 
     final String command2 = "test-command";
     final SchemaCrawlerExecutable executable2 = new SchemaCrawlerExecutable(command2);
-    executable2.setDataSource(connectionSource);
+    executable2.setConnectionSource(connectionSource);
     final Config config = ConfigUtility.newConfig();
     config.put("return-null", true);
     executable2.setAdditionalConfiguration(config);
@@ -171,7 +171,7 @@ public class SchemaCrawlerExecutableTest {
         ExecutableTestUtility.newOutputOptions("text", testOutputFile);
 
     executable.setOutputOptions(outputOptions);
-    executable.setDataSource(connectionSource);
+    executable.setConnectionSource(connectionSource);
     executable.setAdditionalConfiguration(config);
     executable.setCatalog(mockCatalog);
     executable.setSchemaRetrievalOptions(mockSchemaRetrievalOptions);

@@ -84,7 +84,7 @@ public final class SchemaCrawlerUtility {
 
     // Catalog is set during the execution process
 
-    catalogLoader.setDataSource(connectionSource);
+    catalogLoader.setConnectionSource(connectionSource);
     catalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
 
     catalogLoader.execute();

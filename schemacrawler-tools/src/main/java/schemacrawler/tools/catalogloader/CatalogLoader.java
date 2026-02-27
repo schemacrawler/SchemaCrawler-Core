@@ -10,10 +10,10 @@ package schemacrawler.tools.catalogloader;
 
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
-import schemacrawler.tools.executable.Command;
 import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.executable.ExecutableCommand;
 
-public interface CatalogLoader<P extends CommandOptions> extends Command<P> {
+public interface CatalogLoader<P extends CommandOptions> extends ExecutableCommand<P> {
 
   int getPriority();
 

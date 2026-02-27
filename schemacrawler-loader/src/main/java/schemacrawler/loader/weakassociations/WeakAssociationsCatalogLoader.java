@@ -20,7 +20,7 @@ import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
-import schemacrawler.tools.catalogloader.BaseCatalogLoader;
+import schemacrawler.tools.catalogloader.AbstractCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.scheduler.TaskDefinition;
@@ -37,7 +37,7 @@ import us.fatehi.utility.string.StringFormat;
  * involves analyzing naming patterns across all tables.
  */
 public final class WeakAssociationsCatalogLoader
-    extends BaseCatalogLoader<WeakAssociationsCatalogLoaderOptions> {
+    extends AbstractCatalogLoader<WeakAssociationsCatalogLoaderOptions> {
 
   private static final Logger LOGGER =
       Logger.getLogger(WeakAssociationsCatalogLoader.class.getName());

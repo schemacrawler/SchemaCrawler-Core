@@ -23,5 +23,5 @@ public interface CommandProvider {
 
   Collection<PropertyName> getSupportedCommands();
 
-  <C extends Command<P>, P extends CommandOptions> C newCommand(String command, Config config);
+  <C extends BaseCommand<P>, P extends CommandOptions> C newCommand(String command, Config config);
 }

@@ -15,14 +15,14 @@ import java.util.logging.Logger;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
-import schemacrawler.tools.catalogloader.BaseCatalogLoader;
+import schemacrawler.tools.catalogloader.AbstractCatalogLoader;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 
 public class TableRowCountsCatalogLoader
-    extends BaseCatalogLoader<TableRowCountsCatalogLoaderOptions> {
+    extends AbstractCatalogLoader<TableRowCountsCatalogLoaderOptions> {
 
   private static final Logger LOGGER =
       Logger.getLogger(TableRowCountsCatalogLoader.class.getName());
