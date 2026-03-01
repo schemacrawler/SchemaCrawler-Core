@@ -13,7 +13,7 @@ package us.fatehi.utility;
  *
  * @param <O> Options to be built
  * @see <a href=
- *     "https://stackoverflow.com/questions/17164375/subclassing-a-java-builder-class">Subclassing a
+ *     "https://stackoverflow.com/questions/17.7.075/subclassing-a-java-builder-class">Subclassing a
  *     Java Builder class</a>
  */
 public interface Builder<O> {

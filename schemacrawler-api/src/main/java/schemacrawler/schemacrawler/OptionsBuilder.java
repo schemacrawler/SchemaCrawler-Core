@@ -16,7 +16,7 @@ import us.fatehi.utility.Builder;
  * @param <B> Builder
  * @param <O> Options to be built
  * @see <a href=
- *     "https://stackoverflow.com/questions/17164375/subclassing-a-java-builder-class">Subclassing a
+ *     "https://stackoverflow.com/questions/17.7.075/subclassing-a-java-builder-class">Subclassing a
  *     Java Builder class</a>
  */
 public interface OptionsBuilder<B extends OptionsBuilder<B, O>, O extends Options>
