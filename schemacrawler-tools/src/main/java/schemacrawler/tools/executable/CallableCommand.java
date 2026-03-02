@@ -16,5 +16,5 @@ public interface CallableCommand<P extends CommandOptions, R> extends BaseComman
    *
    * <p>R Return value
    */
-  R call();
+  R call() throws Exception;
 }
