@@ -99,6 +99,12 @@
       <artifactId>mariadb-java-client</artifactId>
       <version>3.5.7</version>
     </dependency>
+    <dependency>
+      <groupId>com.dbeaver.jdbc</groupId>
+      <artifactId>com.dbeaver.jdbc.driver.libsql</artifactId>
+      <version>1.0.5</version>
+      <scope>compile</scope>
+    </dependency>
 
   </dependencies>
   <build>
