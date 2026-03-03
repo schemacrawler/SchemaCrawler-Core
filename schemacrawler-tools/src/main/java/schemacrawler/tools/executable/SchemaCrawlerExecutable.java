@@ -93,7 +93,6 @@ public final class SchemaCrawlerExecutable {
 
       // Initialize, and check if the command is available
       scCommand.initialize();
-      scCommand.checkAvailability();
 
       if (catalog == null) {
         loadCatalog();

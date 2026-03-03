@@ -17,11 +17,6 @@ import schemacrawler.tools.options.OutputOptions;
 /** A SchemaCrawler tools executable unit. */
 public interface SchemaCrawlerCommand<P extends CommandOptions> extends ExecutableCommand<P> {
 
-  /**
-   * Checks whether a command is available, and throws a runtime exception if it is not available.
-   */
-  void checkAvailability();
-
   ERModel getERModel();
 
   Identifiers getIdentifiers();
