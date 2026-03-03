@@ -38,10 +38,6 @@ public abstract class AbstractSchemaCrawlerCommand<P extends CommandOptions>
     outputOptions = OutputOptionsBuilder.newOutputOptions();
   }
 
-  /** Runtime exceptions will be thrown if the command is not available. */
-  @Override
-  public abstract void checkAvailability() throws RuntimeException;
-
   @Override
   public ERModel getERModel() {
     return erModel;
