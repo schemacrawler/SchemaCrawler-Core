@@ -19,6 +19,9 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
+import schemacrawler.tools.loader.catalog.CatalogLoader;
+import schemacrawler.tools.loader.catalog.PrimaryCatalogLoader;
+import schemacrawler.tools.loader.catalog.PrimaryCatalogLoaderProvider;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.test.utility.TestDatabaseDriver;
 import us.fatehi.utility.datasource.ConnectionDatabaseConnectionSource;
@@ -69,7 +72,7 @@ public class SchemaCrawlerCatalogLoaderTest {
         catalogLoader.getSchemaRetrievalOptions().equals(schemaRetrievalOptionsDefault), is(true));
   }
 
-  private SchemaCrawlerCatalogLoader newSchemaCrawlerCatalogLoader() {
-    return new SchemaCrawlerCatalogLoaderProvider().newCommand(ConfigUtility.newConfig());
+  private PrimaryCatalogLoader newSchemaCrawlerCatalogLoader() {
+    return new PrimaryCatalogLoaderProvider().newCommand(ConfigUtility.newConfig());
   }
 }

@@ -23,9 +23,9 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.test.utility.TestCatalogLoaderProvider;
-import schemacrawler.tools.catalogloader.CatalogLoaderRegistry;
-import schemacrawler.tools.catalogloader.ChainedCatalogLoader;
 import schemacrawler.tools.executable.commandline.PluginCommand;
+import schemacrawler.tools.loader.catalog.CatalogLoaderRegistry;
+import schemacrawler.tools.loader.catalog.ChainedCatalogLoader;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.property.PropertyName;
 
@@ -67,7 +67,7 @@ public class CatalogLoaderRegistryTest {
     assertThat(supportedCatalogLoaders, hasSize(2));
     final List<String> names =
         supportedCatalogLoaders.stream().map(PropertyName::getName).collect(toList());
-    assertThat(names, containsInAnyOrder("testloader", "schemacrawlerloader"));
+    assertThat(names, containsInAnyOrder("testloader", "primarycatalogloader"));
   }
 
   @Test

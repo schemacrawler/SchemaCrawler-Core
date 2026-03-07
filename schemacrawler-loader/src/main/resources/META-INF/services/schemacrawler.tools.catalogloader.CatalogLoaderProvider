@@ -1,3 +1,0 @@
-schemacrawler.loader.counts.TableRowCountsCatalogLoaderProvider
-schemacrawler.loader.attributes.AttributesCatalogLoaderProvider
-schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoaderProvider

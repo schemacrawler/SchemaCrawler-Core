@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import schemacrawler.tools.catalogloader.CatalogLoaderRegistry;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
 import schemacrawler.tools.executable.CommandRegistry;
+import schemacrawler.tools.loader.catalog.CatalogLoaderRegistry;
 import schemacrawler.tools.registry.JDBCDriverRegistry;
 import schemacrawler.tools.registry.PluginRegistry;
 import us.fatehi.test.utility.TestDatabaseDriver;
@@ -33,7 +33,7 @@ public class AvailableRegistryPluginsTest {
   public void availableCatalogLoaders() {
     assertThat(
         getRegisteredPlugins(CatalogLoaderRegistry.getCatalogLoaderRegistry()),
-        arrayContainingInAnyOrder("testloader", "schemacrawlerloader"));
+        arrayContainingInAnyOrder("testloader", "primarycatalogloader"));
   }
 
   @Test

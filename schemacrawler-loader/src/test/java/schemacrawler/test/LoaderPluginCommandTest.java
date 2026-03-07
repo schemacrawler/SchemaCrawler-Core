@@ -12,10 +12,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.loader.attributes.AttributesCatalogLoaderProvider;
-import schemacrawler.loader.counts.TableRowCountsCatalogLoaderProvider;
-import schemacrawler.loader.weakassociations.WeakAssociationsCatalogLoaderProvider;
 import schemacrawler.tools.executable.commandline.PluginCommand;
+import schemacrawler.tools.loader.catalog.attributes.AttributesCatalogLoaderProvider;
+import schemacrawler.tools.loader.catalog.counts.TableRowCountsCatalogLoaderProvider;
+import schemacrawler.tools.loader.catalog.weakassociations.WeakAssociationsCatalogLoaderProvider;
 
 public class LoaderPluginCommandTest {
 
