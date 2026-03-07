@@ -102,7 +102,7 @@
     <dependency>
       <groupId>com.dbeaver.jdbc</groupId>
       <artifactId>com.dbeaver.jdbc.driver.libsql</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.6</version>
       <scope>compile</scope>
     </dependency>
 
