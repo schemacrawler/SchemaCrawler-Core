@@ -8,7 +8,10 @@
 
 package schemacrawler.test.utility;
 
+import java.util.Collection;
+import java.util.List;
 import schemacrawler.tools.loader.ermodel.BaseERModelLoaderProvider;
+import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
 public class TestERModelLoaderProvider extends BaseERModelLoaderProvider {
@@ -21,12 +24,12 @@ public class TestERModelLoaderProvider extends BaseERModelLoaderProvider {
   }
 
   @Override
-  public PropertyName getLoaderName() {
-    return NAME;
+  public Collection<PropertyName> getSupportedCommands() {
+    return List.of(NAME);
   }
 
   @Override
-  public TestERModelLoader newLoader() {
+  public TestERModelLoader newCommand(final Config config) {
     forceLoadFailureIfConfigured();
     return new TestERModelLoader(NAME);
   }

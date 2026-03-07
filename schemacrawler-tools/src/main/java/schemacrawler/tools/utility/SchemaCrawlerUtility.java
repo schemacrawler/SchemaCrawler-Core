@@ -44,9 +44,13 @@ public final class SchemaCrawlerUtility {
   private static final Logger LOGGER = Logger.getLogger(SchemaCrawlerUtility.class.getName());
 
   public static ERModel buildERModel(final Catalog catalog) {
+    return buildERModel(catalog, ConfigUtility.newConfig());
+  }
+
+  public static ERModel buildERModel(final Catalog catalog, final Config additionalConfig) {
     requireNonNull(catalog, "No catalog provided");
     final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getERModelLoaderRegistry();
-    final ChainedERModelLoader chainedLoader = registry.newChainedERModelLoader();
+    final ChainedERModelLoader chainedLoader = registry.newChainedERModelLoader(additionalConfig);
     chainedLoader.setCatalog(catalog);
     chainedLoader.initialize();
     chainedLoader.execute();

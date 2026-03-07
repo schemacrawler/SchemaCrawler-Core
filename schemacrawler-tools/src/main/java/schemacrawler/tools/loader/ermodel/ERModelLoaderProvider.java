@@ -8,30 +8,16 @@
 
 package schemacrawler.tools.loader.ermodel;
 
-import java.util.Collection;
-import us.fatehi.utility.property.PropertyName;
+import schemacrawler.tools.executable.CommandProvider;
+import schemacrawler.tools.options.Config;
 
 /** Provider interface for creating ERModel loaders. */
-public interface ERModelLoaderProvider {
-
-  /**
-   * Returns the name of the loader provided.
-   *
-   * @return Loader name
-   */
-  PropertyName getLoaderName();
-
-  /**
-   * Returns the names of all loaders supported by this provider.
-   *
-   * @return Supported loader names
-   */
-  Collection<PropertyName> getSupportedLoaders();
+public interface ERModelLoaderProvider extends CommandProvider {
 
   /**
    * Creates a new ERModel loader.
    *
    * @return New ERModel loader instance
    */
-  ERModelLoader newLoader();
+  ERModelLoader<?> newCommand(Config config);
 }

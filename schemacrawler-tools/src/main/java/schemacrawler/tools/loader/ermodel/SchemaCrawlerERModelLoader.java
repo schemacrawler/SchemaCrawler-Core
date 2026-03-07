@@ -10,13 +10,18 @@ package schemacrawler.tools.loader.ermodel;
 
 import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.loader.ermodel.SchemaCrawlerERModelLoader.SchemaCrawlerERModelLoaderOptions;
 import us.fatehi.utility.property.PropertyName;
 
 /**
  * ERModel loader that builds the full ERModel from a catalog. This is the primary loader, analogous
  * to {@code SchemaCrawlerCatalogLoader}.
  */
-public class SchemaCrawlerERModelLoader extends AbstractERModelLoader {
+public class SchemaCrawlerERModelLoader
+    extends AbstractERModelLoader<SchemaCrawlerERModelLoaderOptions> {
+
+  static record SchemaCrawlerERModelLoaderOptions() implements CommandOptions {}
 
   SchemaCrawlerERModelLoader(final PropertyName loaderName) {
     super(loaderName, 0);
@@ -28,7 +33,7 @@ public class SchemaCrawlerERModelLoader extends AbstractERModelLoader {
       return;
     }
 
-    final ERModel builtERModel = new ERModelBuilder(catalog).build();
-    setERModel(builtERModel);
+    final ERModel eRModel = new ERModelBuilder(catalog).build();
+    setERModel(eRModel);
   }
 }

@@ -8,6 +8,12 @@
 
 package schemacrawler.tools.loader.ermodel;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.Collection;
+import java.util.List;
+import schemacrawler.tools.loader.ermodel.SchemaCrawlerERModelLoader.SchemaCrawlerERModelLoaderOptions;
+import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
 /** Provider for {@link SchemaCrawlerERModelLoader}. */
@@ -17,12 +23,15 @@ public class SchemaCrawlerERModelLoaderProvider extends BaseERModelLoaderProvide
       new PropertyName("schemacrawlerermodelloader", "Loader for SchemaCrawler ERModel");
 
   @Override
-  public PropertyName getLoaderName() {
-    return NAME;
+  public Collection<PropertyName> getSupportedCommands() {
+    return List.of(NAME);
   }
 
   @Override
-  public SchemaCrawlerERModelLoader newLoader() {
-    return new SchemaCrawlerERModelLoader(NAME);
+  public SchemaCrawlerERModelLoader newCommand(final Config config) {
+    requireNonNull(config, "No config provided");
+    final SchemaCrawlerERModelLoader loader = new SchemaCrawlerERModelLoader(NAME);
+    loader.configure(new SchemaCrawlerERModelLoaderOptions());
+    return loader;
   }
 }

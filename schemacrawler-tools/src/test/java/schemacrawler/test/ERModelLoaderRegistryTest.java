@@ -27,6 +27,7 @@ import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.test.utility.TestERModelLoaderProvider;
 import schemacrawler.tools.loader.ermodel.ChainedERModelLoader;
 import schemacrawler.tools.loader.ermodel.ERModelLoaderRegistry;
+import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.property.PropertyName;
 
 public class ERModelLoaderRegistryTest {
@@ -34,7 +35,8 @@ public class ERModelLoaderRegistryTest {
   @Test
   public void chainedERModelLoaders() {
     final ChainedERModelLoader chainedLoaders =
-        ERModelLoaderRegistry.getERModelLoaderRegistry().newChainedERModelLoader();
+        ERModelLoaderRegistry.getERModelLoaderRegistry()
+            .newChainedERModelLoader(ConfigUtility.newConfig());
     assertThat(chainedLoaders.size(), is(2));
   }
 

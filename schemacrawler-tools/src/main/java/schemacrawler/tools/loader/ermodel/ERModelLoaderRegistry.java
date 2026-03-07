@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
+import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.StringFormat;
 
@@ -97,7 +98,7 @@ public final class ERModelLoaderRegistry {
     final Collection<PropertyName> supportedLoaders = new HashSet<>();
     for (final ERModelLoaderProvider provider : erModelLoaderProviders) {
       if (provider != null) {
-        supportedLoaders.addAll(provider.getSupportedLoaders());
+        supportedLoaders.addAll(provider.getSupportedCommands());
       }
     }
     final List<PropertyName> orderedLoaders = new ArrayList<>(supportedLoaders);
@@ -123,16 +124,16 @@ public final class ERModelLoaderRegistry {
    *
    * @return ChainedERModelLoader composed of all registered loaders
    */
-  public ChainedERModelLoader newChainedERModelLoader() {
-    final List<ERModelLoader<?>> loaders = buildERModelLoaders();
+  public ChainedERModelLoader newChainedERModelLoader(final Config additionalConfig) {
+    final List<ERModelLoader<?>> loaders = configureERModelLoaders(additionalConfig);
     return new ChainedERModelLoader(loaders);
   }
 
-  private List<ERModelLoader<?>> buildERModelLoaders() {
+  private List<ERModelLoader<?>> configureERModelLoaders(final Config additionalConfig) {
     final List<ERModelLoader<?>> erModelLoaders = new ArrayList<>();
     for (final ERModelLoaderProvider provider : erModelLoaderProviders) {
       try {
-        final ERModelLoader<?> erModelLoader = provider.newLoader();
+        final ERModelLoader<?> erModelLoader = provider.newCommand(additionalConfig);
         if (erModelLoader == null) {
           LOGGER.log(
               Level.WARNING, new StringFormat("ERModel loader <%s> not instantiated", provider));
