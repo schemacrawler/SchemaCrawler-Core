@@ -29,6 +29,7 @@ public class ImplicitAssociationsERModelLoaderProvider extends BaseERModelLoader
           "implicitassociationsmodelloader", "Loader for implicit associations in ER Model");
 
   private static final String OPTION_IMPLICIT_ASSOCIATIONS = "implicit-associations";
+  @Override
   public Collection<PropertyName> getSupportedCommands() {
     return List.of(NAME);
   }

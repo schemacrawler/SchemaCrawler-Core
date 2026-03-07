@@ -25,9 +25,7 @@ import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.schema.Table;
 import schemacrawler.test.utility.crawl.LightTable;
-import schemacrawler.test.utility.crawl.LightTableReference;
 
 public class ImplicitAssociationBuilderTest {
 
@@ -152,17 +150,4 @@ public class ImplicitAssociationBuilderTest {
     return columnReference;
   }
 
-  /**
-   * Creates a mock table with given name and key.
-   *
-   * @param name Table name
-   * @return Mocked table
-   */
-  private Table mockTable(final String name) {
-    final Table table = mock(Table.class, name);
-    when(table.getName()).thenReturn(name);
-    when(table.getFullName()).thenReturn(name);
-    when(table.key()).thenReturn(new NamedObjectKey(name));
-    return table;
-  }
 }

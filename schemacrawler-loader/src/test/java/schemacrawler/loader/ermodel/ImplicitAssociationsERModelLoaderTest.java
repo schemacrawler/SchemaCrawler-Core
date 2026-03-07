@@ -13,16 +13,14 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
-import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
 
 import java.sql.Connection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
@@ -72,7 +70,7 @@ public class ImplicitAssociationsERModelLoaderTest {
     // ERModel not set - loader should skip gracefully, leaving ERModel null
     loader.execute();
 
-    assertThat(loader.getERModel(), is(org.hamcrest.core.IsNull.nullValue()));
+    assertThat(loader.getERModel(), is(nullValue()));
   }
 
   @Test
