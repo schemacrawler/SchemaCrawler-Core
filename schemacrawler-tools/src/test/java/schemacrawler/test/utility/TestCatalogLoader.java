@@ -9,8 +9,8 @@
 package schemacrawler.test.utility;
 
 import schemacrawler.test.utility.TestCatalogLoader.TestCatalogLoaderOptions;
-import schemacrawler.tools.catalogloader.AbstractCatalogLoader;
 import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.loader.catalog.AbstractCatalogLoader;
 import us.fatehi.utility.SystemExitException;
 import us.fatehi.utility.property.PropertyName;
 
