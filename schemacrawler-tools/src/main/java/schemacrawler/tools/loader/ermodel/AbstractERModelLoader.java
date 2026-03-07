@@ -8,38 +8,28 @@
 
 package schemacrawler.tools.loader.ermodel;
 
-import static java.util.Objects.requireNonNull;
-
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
+import schemacrawler.tools.executable.AbstractCommand;
+import schemacrawler.tools.executable.CommandOptions;
 import us.fatehi.utility.property.PropertyName;
 
 /** Abstract base class for ERModel loaders. */
-public abstract class AbstractERModelLoader implements ERModelLoader {
+public abstract class AbstractERModelLoader<P extends CommandOptions> extends AbstractCommand<P>
+    implements ERModelLoader<P> {
 
-  protected final PropertyName loaderName;
   protected final int priority;
   protected Catalog catalog;
   protected ERModel erModel;
 
   protected AbstractERModelLoader(final PropertyName loaderName, final int priority) {
-    this.loaderName = requireNonNull(loaderName, "No loader name provided");
+    super(loaderName);
     this.priority = priority;
-  }
-
-  @Override
-  public final Catalog getCatalog() {
-    return catalog;
   }
 
   @Override
   public final ERModel getERModel() {
     return erModel;
-  }
-
-  @Override
-  public final PropertyName getLoaderName() {
-    return loaderName;
   }
 
   @Override
@@ -53,18 +43,13 @@ public abstract class AbstractERModelLoader implements ERModelLoader {
   }
 
   @Override
-  public final void setCatalog(final Catalog catalog) {
-    this.catalog = requireNonNull(catalog, "No catalog provided");
-  }
-
-  @Override
   public final void setERModel(final ERModel erModel) {
     this.erModel = erModel;
   }
 
   @Override
   public String toString() {
-    return loaderName.toString();
+    return getCommandName().toString();
   }
 
   /** Returns whether an ERModel has already been loaded. */

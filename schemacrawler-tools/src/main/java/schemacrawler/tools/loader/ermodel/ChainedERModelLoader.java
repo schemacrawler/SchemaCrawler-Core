@@ -28,9 +28,9 @@ public class ChainedERModelLoader extends AbstractERModelLoader {
 
   private static final Logger LOGGER = Logger.getLogger(ChainedERModelLoader.class.getName());
 
-  private final List<ERModelLoader> erModelLoaders;
+  private final List<ERModelLoader<?>> erModelLoaders;
 
-  ChainedERModelLoader(final List<ERModelLoader> erModelLoaders) {
+  ChainedERModelLoader(final List<ERModelLoader<?>> erModelLoaders) {
     super(
         new PropertyName(
             "ermodelchainloader", "Chain of all ERModel loaders, called in turn by priority"),
@@ -41,7 +41,7 @@ public class ChainedERModelLoader extends AbstractERModelLoader {
 
   @Override
   public void execute() {
-    for (final ERModelLoader erModelLoader : erModelLoaders) {
+    for (final ERModelLoader<?> erModelLoader : erModelLoaders) {
       erModelLoader.setCatalog(catalog);
       if (erModel != null) {
         // Pass enriched ERModel to the next loader
@@ -61,7 +61,7 @@ public class ChainedERModelLoader extends AbstractERModelLoader {
   @Override
   public void initialize() {
     super.initialize();
-    for (final ERModelLoader erModelLoader : erModelLoaders) {
+    for (final ERModelLoader<?> erModelLoader : erModelLoaders) {
       erModelLoader.initialize();
     }
   }

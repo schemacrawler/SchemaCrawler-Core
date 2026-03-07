@@ -30,9 +30,9 @@ public final class ERModelLoaderRegistry {
 
   private static final Logger LOGGER = Logger.getLogger(ERModelLoaderRegistry.class.getName());
 
-  private static final Comparator<ERModelLoader> erModelLoaderComparator =
-      nullsLast(comparingInt(ERModelLoader::getPriority))
-          .thenComparing(loader -> loader.getLoaderName().getName());
+  private static final Comparator<ERModelLoader<?>> erModelLoaderComparator =
+      nullsLast(comparingInt(ERModelLoader<?>::getPriority))
+          .thenComparing(loader -> loader.getCommandName().getName());
 
   private static ERModelLoaderRegistry erModelLoaderRegistrySingleton;
 
@@ -124,15 +124,15 @@ public final class ERModelLoaderRegistry {
    * @return ChainedERModelLoader composed of all registered loaders
    */
   public ChainedERModelLoader newChainedERModelLoader() {
-    final List<ERModelLoader> loaders = buildERModelLoaders();
+    final List<ERModelLoader<?>> loaders = buildERModelLoaders();
     return new ChainedERModelLoader(loaders);
   }
 
-  private List<ERModelLoader> buildERModelLoaders() {
-    final List<ERModelLoader> erModelLoaders = new ArrayList<>();
+  private List<ERModelLoader<?>> buildERModelLoaders() {
+    final List<ERModelLoader<?>> erModelLoaders = new ArrayList<>();
     for (final ERModelLoaderProvider provider : erModelLoaderProviders) {
       try {
-        final ERModelLoader erModelLoader = provider.newLoader();
+        final ERModelLoader<?> erModelLoader = provider.newLoader();
         if (erModelLoader == null) {
           LOGGER.log(
               Level.WARNING, new StringFormat("ERModel loader <%s> not instantiated", provider));
