@@ -49,9 +49,10 @@ import static java.sql.Types.VARCHAR;
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
-import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.implementation.MutableERModel;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
+import schemacrawler.ermodel.loader.ChainedERModelLoader;
+import schemacrawler.ermodel.loader.ERModelLoaderRegistry;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityAttributeType;
 import schemacrawler.ermodel.model.EntityType;
@@ -73,7 +74,12 @@ public class EntityModelUtility {
 
   public static ERModel buildERModel(final Catalog catalog) {
     requireNonNull(catalog, "No catalog provided");
-    return new ERModelBuilder(catalog).build();
+    final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getERModelLoaderRegistry();
+    final ChainedERModelLoader chainedLoader = registry.newChainedERModelLoader();
+    chainedLoader.setCatalog(catalog);
+    chainedLoader.initialize();
+    chainedLoader.execute();
+    return chainedLoader.getERModel();
   }
 
   /**
