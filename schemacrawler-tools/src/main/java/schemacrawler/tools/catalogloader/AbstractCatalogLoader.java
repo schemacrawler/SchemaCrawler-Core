@@ -60,6 +60,11 @@ public abstract class AbstractCatalogLoader<P extends CommandOptions> extends Ab
     this.schemaRetrievalOptions = schemaRetrievalOptions;
   }
 
+  @Override
+  public String toString() {
+    return getCommandName().toString();
+  }
+
   protected final boolean isLoaded() {
     return catalog != null;
   }
