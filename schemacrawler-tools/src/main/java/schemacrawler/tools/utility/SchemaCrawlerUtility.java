@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.ResultsCrawler;
+import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ResultsColumns;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -26,6 +27,8 @@ import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.tools.catalogloader.CatalogLoader;
 import schemacrawler.tools.catalogloader.CatalogLoaderRegistry;
 import schemacrawler.tools.databaseconnector.DatabaseConnector;
+import schemacrawler.tools.loader.ermodel.ChainedERModelLoader;
+import schemacrawler.tools.loader.ermodel.ERModelLoaderRegistry;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.UtilityMarker;
@@ -39,6 +42,16 @@ import us.fatehi.utility.string.StringFormat;
 public final class SchemaCrawlerUtility {
 
   private static final Logger LOGGER = Logger.getLogger(SchemaCrawlerUtility.class.getName());
+
+  public static ERModel buildERModel(final Catalog catalog) {
+    requireNonNull(catalog, "No catalog provided");
+    final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getERModelLoaderRegistry();
+    final ChainedERModelLoader chainedLoader = registry.newChainedERModelLoader();
+    chainedLoader.setCatalog(catalog);
+    chainedLoader.initialize();
+    chainedLoader.execute();
+    return chainedLoader.getERModel();
+  }
 
   /**
    * Crawls a database, and returns a catalog.
