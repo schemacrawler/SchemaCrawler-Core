@@ -12,15 +12,15 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import java.util.List;
-import schemacrawler.tools.loader.ermodel.SchemaCrawlerERModelLoader.SchemaCrawlerERModelLoaderOptions;
+import schemacrawler.tools.loader.ermodel.PrimaryERModelLoader.PrimaryERModelLoaderLoaderOptions;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
-/** Provider for {@link SchemaCrawlerERModelLoader}. */
-public class SchemaCrawlerERModelLoaderProvider extends BaseERModelLoaderProvider {
+/** Provider for {@link PrimaryERModelLoader}. */
+public class PrimaryERModelLoaderProvider extends BaseERModelLoaderProvider {
 
   private static final PropertyName NAME =
-      new PropertyName("schemacrawlerermodelloader", "Loader for SchemaCrawler ERModel");
+      new PropertyName("primarymodelloader", "Loader for ER Model");
 
   @Override
   public Collection<PropertyName> getSupportedCommands() {
@@ -28,10 +28,10 @@ public class SchemaCrawlerERModelLoaderProvider extends BaseERModelLoaderProvide
   }
 
   @Override
-  public SchemaCrawlerERModelLoader newCommand(final Config config) {
+  public PrimaryERModelLoader newCommand(final Config config) {
     requireNonNull(config, "No config provided");
-    final SchemaCrawlerERModelLoader loader = new SchemaCrawlerERModelLoader(NAME);
-    loader.configure(new SchemaCrawlerERModelLoaderOptions());
+    final PrimaryERModelLoader loader = new PrimaryERModelLoader(NAME);
+    loader.configure(new PrimaryERModelLoaderLoaderOptions());
     return loader;
   }
 }

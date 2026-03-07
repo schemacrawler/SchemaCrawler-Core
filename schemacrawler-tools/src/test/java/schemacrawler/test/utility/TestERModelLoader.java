@@ -8,11 +8,15 @@
 
 package schemacrawler.test.utility;
 
+import schemacrawler.test.utility.TestERModelLoader.TestERModelLoaderOptions;
+import schemacrawler.tools.executable.CommandOptions;
 import schemacrawler.tools.loader.ermodel.AbstractERModelLoader;
 import us.fatehi.utility.SystemExitException;
 import us.fatehi.utility.property.PropertyName;
 
-class TestERModelLoader extends AbstractERModelLoader {
+class TestERModelLoader extends AbstractERModelLoader<TestERModelLoaderOptions> {
+
+  static record TestERModelLoaderOptions() implements CommandOptions {}
 
   TestERModelLoader(final PropertyName loaderName) {
     super(loaderName, 3);

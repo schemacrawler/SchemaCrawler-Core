@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.loader.ermodel.ChainedERModelLoader.ChainedERModelLoaderOptions;
+import schemacrawler.tools.options.Config;
+import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.StringFormat;
 
@@ -24,19 +28,30 @@ import us.fatehi.utility.string.StringFormat;
  * <p>Each loader in the chain receives the ERModel produced by the previous loader, allowing
  * successive loaders to enrich the model.
  */
-public class ChainedERModelLoader extends AbstractERModelLoader {
+public class ChainedERModelLoader extends AbstractERModelLoader<ChainedERModelLoaderOptions> {
+
+  static record ChainedERModelLoaderOptions() implements CommandOptions {}
 
   private static final Logger LOGGER = Logger.getLogger(ChainedERModelLoader.class.getName());
 
   private final List<ERModelLoader<?>> erModelLoaders;
+  private final Config additionalConfig;
 
-  ChainedERModelLoader(final List<ERModelLoader<?>> erModelLoaders) {
+  ChainedERModelLoader(final List<ERModelLoader<?>> erModelLoaders, final Config additionalConfig) {
     super(
         new PropertyName(
             "ermodelchainloader", "Chain of all ERModel loaders, called in turn by priority"),
         Integer.MIN_VALUE);
     requireNonNull(erModelLoaders, "No ERModel loaders provided");
     this.erModelLoaders = new ArrayList<>(erModelLoaders);
+
+    if (additionalConfig == null) {
+      this.additionalConfig = ConfigUtility.newConfig();
+    } else {
+      this.additionalConfig = additionalConfig;
+    }
+
+    configure(new ChainedERModelLoaderOptions());
   }
 
   @Override

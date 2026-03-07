@@ -47,13 +47,13 @@ public class ERModelLoaderRegistryTest {
     assertThat(supportedLoaders, hasSize(2));
     final List<String> names =
         supportedLoaders.stream().map(PropertyName::getName).collect(toList());
-    assertThat(names, containsInAnyOrder("schemacrawlerermodelloader", "testermodelloader"));
+    assertThat(names, containsInAnyOrder("primarymodelloader", "testmodelloader"));
   }
 
   @Test
   public void name() {
     final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getERModelLoaderRegistry();
-    assertThat(registry.getName(), is("SchemaCrawler ERModel Loaders"));
+    assertThat(registry.getName(), is("ER Model Loaders"));
   }
 
   @Test

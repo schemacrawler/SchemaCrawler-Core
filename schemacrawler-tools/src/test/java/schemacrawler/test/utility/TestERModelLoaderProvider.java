@@ -17,7 +17,7 @@ import us.fatehi.utility.property.PropertyName;
 public class TestERModelLoaderProvider extends BaseERModelLoaderProvider {
 
   private static final PropertyName NAME =
-      new PropertyName("testermodelloader", "Loader for testing ERModel");
+      new PropertyName("testmodelloader", "Loader for testing ERModel");
 
   public TestERModelLoaderProvider() {
     forceInstantiationFailureIfConfigured();

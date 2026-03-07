@@ -76,7 +76,7 @@ public final class ERModelLoaderRegistry {
   private final String registryName;
 
   private ERModelLoaderRegistry() {
-    registryName = "SchemaCrawler ERModel Loaders";
+    registryName = "ER Model Loaders";
     erModelLoaderProviders = loadERModelLoaderRegistry();
   }
 
@@ -126,7 +126,7 @@ public final class ERModelLoaderRegistry {
    */
   public ChainedERModelLoader newChainedERModelLoader(final Config additionalConfig) {
     final List<ERModelLoader<?>> loaders = configureERModelLoaders(additionalConfig);
-    return new ChainedERModelLoader(loaders);
+    return new ChainedERModelLoader(loaders, additionalConfig);
   }
 
   private List<ERModelLoader<?>> configureERModelLoaders(final Config additionalConfig) {

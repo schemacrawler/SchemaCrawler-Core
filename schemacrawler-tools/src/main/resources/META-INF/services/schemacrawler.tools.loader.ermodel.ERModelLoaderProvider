@@ -1,1 +1,1 @@
-schemacrawler.tools.loader.ermodel.SchemaCrawlerERModelLoaderProvider
+schemacrawler.tools.loader.ermodel.PrimaryERModelLoaderProvider
