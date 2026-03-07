@@ -22,6 +22,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.associations.ImplicitColumnReference;
+import schemacrawler.ermodel.implementation.ImplicitAssociationBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityAttribute;
@@ -133,6 +137,19 @@ public class ERModelTest {
     validateSchema(catalog);
 
     erModel = EntityModelUtility.buildERModel(catalog);
+
+    // Add implicit associations using ImplicitAssociationBuilder
+    final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer =
+        ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
+            .withIdMatcher()
+            .withExtensionTableMatcher()
+            .build();
+    final ImplicitAssociationBuilder implicitAssociationBuilder =
+        ImplicitAssociationBuilder.builder(erModel);
+    for (final ImplicitColumnReference implicitColumnReference :
+        implicitAssociationsAnalyzer.analyzeTables()) {
+      implicitAssociationBuilder.addImplicitAssociation(implicitColumnReference);
+    }
   }
 
   @Test
