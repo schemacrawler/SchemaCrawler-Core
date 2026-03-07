@@ -9,7 +9,6 @@
 package schemacrawler.tools.loader.ermodel;
 
 import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.schema.Catalog;
 import schemacrawler.tools.executable.AbstractCommand;
 import schemacrawler.tools.executable.CommandOptions;
 import us.fatehi.utility.property.PropertyName;
@@ -19,7 +18,6 @@ public abstract class AbstractERModelLoader<P extends CommandOptions> extends Ab
     implements ERModelLoader<P> {
 
   protected final int priority;
-  protected Catalog catalog;
   protected ERModel erModel;
 
   protected AbstractERModelLoader(final PropertyName loaderName, final int priority) {
