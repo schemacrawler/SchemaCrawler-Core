@@ -15,7 +15,7 @@ import org.testcontainers.utility.DockerImageName;
 public final class MariaDBTestUtility {
 
   public static JdbcDatabaseContainer<?> newMariaDBContainer() {
-    return newMariaDBContainer("11.6.2-noble");
+    return newMariaDBContainer("11.8.5-noble");
   }
 
   @SuppressWarnings("resource")
