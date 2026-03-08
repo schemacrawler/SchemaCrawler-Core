@@ -10,6 +10,7 @@ import schemacrawler.ermodel.model.TableBacked;
 import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
+import schemacrawler.schema.PartialDatabaseObject;
 
 class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
     implements EntityAttribute {
@@ -17,6 +18,7 @@ class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
   @Serial private static final long serialVersionUID = 7349443487412594755L;
 
   private final TableBacked parent;
+  private final boolean isPartial;
   private final EntityAttributeType type;
   private final List<String> enumValues;
 
@@ -28,10 +30,14 @@ class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
     final ColumnDataType columnDataType = column.getColumnDataType();
     type = EntityModelUtility.inferEntityAttributeType(columnDataType);
     enumValues = columnDataType.getEnumValues();
+    isPartial = column instanceof PartialDatabaseObject;
   }
 
   @Override
   public String getDefaultValue() {
+    if (isPartial) {
+      return null;
+    }
     return getDatabaseObject().getDefaultValue();
   }
 
@@ -52,11 +58,14 @@ class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
 
   @Override
   public boolean hasDefaultValue() {
-    return getDatabaseObject().hasDefaultValue();
+    return getDefaultValue() != null;
   }
 
   @Override
   public boolean isRequired() {
+    if (isPartial) {
+      return false;
+    }
     return !getDatabaseObject().isNullable();
   }
 }

@@ -16,7 +16,6 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -98,7 +97,7 @@ public final class SchemaCrawlerExecutable {
         loadCatalog();
       }
       if (erModel == null) {
-        erModel = EntityModelUtility.buildEmptyERModel();
+        buildERModel();
       }
 
       // Prepare to execute
@@ -182,6 +181,11 @@ public final class SchemaCrawlerExecutable {
   @Override
   public String toString() {
     return command;
+  }
+
+  private void buildERModel() {
+    erModel = SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
+    requireNonNull(erModel, "ER model could not be built");
   }
 
   private void loadCatalog() {

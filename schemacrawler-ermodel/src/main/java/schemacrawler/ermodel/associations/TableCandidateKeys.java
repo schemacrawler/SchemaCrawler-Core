@@ -12,9 +12,9 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.HashSet;
 import java.util.Set;
-import schemacrawler.schema.Column;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
+import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
@@ -30,19 +30,19 @@ import schemacrawler.schema.TableConstraintColumn;
  *   <li>Single-column unique indexes are included.
  * </ul>
  */
-final class TableColumns {
+final class TableCandidateKeys {
 
   private final Table table;
-  private final Set<Column> candidateKeys;
+  private final Set<KeyColumn> candidateKeys;
 
-  TableColumns(final Table table) {
+  TableCandidateKeys(final Table table) {
     this.table = requireNonNull(table, "No table provided");
 
     candidateKeys = new HashSet<>();
     buildLookups();
   }
 
-  public Set<Column> getCandidateKeys() {
+  public Set<KeyColumn> getCandidateKeys() {
     return Set.copyOf(candidateKeys);
   }
 

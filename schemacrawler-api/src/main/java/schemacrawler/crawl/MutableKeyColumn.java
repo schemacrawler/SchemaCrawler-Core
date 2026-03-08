@@ -13,20 +13,24 @@ import java.util.Collection;
 import java.util.Optional;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
+import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.NamedObject;
+import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Table;
 
-class MutableKeyColumn extends AbstractDependantObject<Table> implements Column {
+class MutableKeyColumn extends AbstractDependantObject<Table> implements KeyColumn {
 
   @Serial private static final long serialVersionUID = 6988029161945610279L;
 
   private final Column column;
+  private final boolean isPartial;
   private int keyOrdinalPosition;
 
   MutableKeyColumn(final Column column) {
     super(new TablePointer(column.getParent()), column.getName());
     this.column = column;
+    isPartial = column instanceof PartialDatabaseObject;
   }
 
   /**
@@ -136,6 +140,10 @@ class MutableKeyColumn extends AbstractDependantObject<Table> implements Column 
   @Override
   public boolean isNullable() {
     return column.isNullable();
+  }
+
+  public final boolean isPartial() {
+    return isPartial;
   }
 
   /** {@inheritDoc} */

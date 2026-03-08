@@ -8,7 +8,7 @@
 
 package schemacrawler.schema;
 
-public interface TableConstraintColumn extends Column {
+public interface TableConstraintColumn extends KeyColumn {
 
   /**
    * Gets the table constraint this column belongs to.

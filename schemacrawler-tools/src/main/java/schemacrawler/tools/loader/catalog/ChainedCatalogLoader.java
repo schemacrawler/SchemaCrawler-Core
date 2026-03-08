@@ -58,7 +58,9 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
     for (final CatalogLoader<?> catalogLoader : catalogLoaders) {
       if (catalog != null) {
         // Initially catalog will be null until it is first loaded
+        // Pass enriched catalog to the next loader
         catalogLoader.setCatalog(catalog);
+        // NOTE: Catalog loaders do not build ER models, so the ER model is not set here
       }
 
       if (catalogLoader.usesConnection()) {
