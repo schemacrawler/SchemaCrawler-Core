@@ -11,7 +11,7 @@
   </parent>
   <artifactId>schemacrawler-loader</artifactId>
   <packaging>jar</packaging>
-  <name>SchemaCrawler Catalog Loaders</name>
+  <name>SchemaCrawler Catalog and ER Model Loaders</name>
   <dependencies>
     <dependency>
       <groupId>us.fatehi</groupId>

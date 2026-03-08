@@ -8,13 +8,16 @@
 
 package schemacrawler.tools.executable;
 
-import static java.util.Objects.requireNonNull;
 import static schemacrawler.tools.utility.SchemaCrawlerUtility.matchSchemaRetrievalOptions;
 import static schemacrawler.tools.utility.SchemaCrawlerUtility.updateConnectionDataSource;
-import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.Objects.requireNonNull;
+
+import static us.fatehi.utility.Utility.requireNotBlank;
+
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -27,6 +30,8 @@ import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.tools.options.OutputOptions;
 import schemacrawler.tools.options.OutputOptionsBuilder;
+import schemacrawler.tools.state.AbstractExecutionState;
+import schemacrawler.tools.state.ExecutionState;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.string.ObjectToStringFormat;
@@ -38,15 +43,13 @@ import us.fatehi.utility.string.StringFormat;
  * SchemaCrawlerExecutable will check if it is a query configured in the properties. If not, it will
  * assume that a query is specified on the command-line, and execute that.
  */
-public final class SchemaCrawlerExecutable {
+public final class SchemaCrawlerExecutable extends AbstractExecutionState
+    implements ExecutionState {
 
   private static final Logger LOGGER = Logger.getLogger(SchemaCrawlerExecutable.class.getName());
 
   private final String command;
   private Config additionalConfig;
-  private Catalog catalog;
-  private ERModel erModel;
-  private DatabaseConnectionSource connectionSource;
   private OutputOptions outputOptions;
   private SchemaCrawlerOptions schemaCrawlerOptions;
   private SchemaRetrievalOptions schemaRetrievalOptions;
@@ -61,17 +64,18 @@ public final class SchemaCrawlerExecutable {
 
   public void execute() {
 
-    if (connectionSource == null && catalog == null) {
+    if (!hasConnectionSource() && !hasCatalog()) {
       throw new ExecutionRuntimeException("Cannot execute command");
     }
 
-    if (connectionSource == null) {
+    if (!hasConnectionSource()) {
       if (schemaRetrievalOptions == null) {
         schemaRetrievalOptions = SchemaRetrievalOptionsBuilder.newSchemaRetrievalOptions();
       }
     } else {
       // Match schema retrieval options, and update data source before any connections
       // are used
+      DatabaseConnectionSource connectionSource = getConnectionSource();
       if (schemaRetrievalOptions == null) {
         schemaRetrievalOptions = matchSchemaRetrievalOptions(connectionSource);
       }
@@ -93,19 +97,21 @@ public final class SchemaCrawlerExecutable {
       // Initialize, and check if the command is available
       scCommand.initialize();
 
-      if (catalog == null) {
+      if (!hasCatalog()) {
         loadCatalog();
       }
-      if (erModel == null) {
+      if (!hasERModel()) {
         buildERModel();
       }
 
       // Prepare to execute
-      scCommand.setCatalog(catalog);
-      scCommand.setERModel(erModel);
+      scCommand.setCatalog(getCatalog());
+      if (hasERModel()) {
+		scCommand.setERModel(getERModel());
+	  }
 
       if (scCommand.usesConnection()) {
-        scCommand.setConnectionSource(connectionSource);
+        scCommand.setConnectionSource(getConnectionSource());
       }
 
       // Execute
@@ -118,14 +124,6 @@ public final class SchemaCrawlerExecutable {
     } catch (final Exception e) {
       throw new ExecutionRuntimeException(e);
     }
-  }
-
-  public Catalog getCatalog() {
-    return catalog;
-  }
-
-  public ERModel getERModel() {
-    return erModel;
   }
 
   public OutputOptions getOutputOptions() {
@@ -143,18 +141,6 @@ public final class SchemaCrawlerExecutable {
   public void setAdditionalConfiguration(final Config additionalConfig) {
     // Make a defensive copy
     this.additionalConfig = ConfigUtility.fromConfig(additionalConfig);
-  }
-
-  public void setCatalog(final Catalog catalog) {
-    this.catalog = catalog;
-  }
-
-  public void setConnectionSource(final DatabaseConnectionSource connectionSource) {
-    this.connectionSource = requireNonNull(connectionSource, "No data source provided");
-  }
-
-  public void setERModel(final ERModel erModel) {
-    this.erModel = erModel;
   }
 
   public void setOutputOptions(final OutputOptions outputOptions) {
@@ -184,15 +170,17 @@ public final class SchemaCrawlerExecutable {
   }
 
   private void buildERModel() {
-    erModel = SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
+    final ERModel erModel = SchemaCrawlerUtility.buildERModel(getCatalog(), additionalConfig);
     requireNonNull(erModel, "ER model could not be built");
+    setERModel(erModel);
   }
 
   private void loadCatalog() {
-    catalog =
+    final Catalog catalog =
         SchemaCrawlerUtility.getCatalog(
-            connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+            getConnectionSource(), schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
     requireNonNull(catalog, "Catalog could not be retrieved");
+    setCatalog(catalog);
   }
 
   private SchemaCrawlerCommand<?> loadCommand() {

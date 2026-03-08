@@ -51,7 +51,7 @@ public class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCat
 
   @Override
   public void execute() {
-    if (!isLoaded()) {
+    if (!hasCatalog()) {
       return;
     }
 

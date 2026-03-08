@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.schema.Catalog;
 import schemacrawler.tools.executable.CommandOptions;
 import schemacrawler.tools.loader.ermodel.ChainedERModelLoader.ChainedERModelLoaderOptions;
 import schemacrawler.tools.options.Config;
@@ -56,19 +56,19 @@ public class ChainedERModelLoader extends AbstractERModelLoader<ChainedERModelLo
 
   @Override
   public void execute() {
+    final Catalog catalog = getCatalog();
     for (final ERModelLoader<?> erModelLoader : erModelLoaders) {
       erModelLoader.setCatalog(catalog);
-      if (erModel != null) {
+      if (hasERModel()) {
         // Pass enriched ERModel to the next loader
-        erModelLoader.setERModel(erModel);
+        erModelLoader.setERModel(getERModel());
       }
 
       LOGGER.log(Level.INFO, new StringFormat("Executing ERModel loader <%s>", erModelLoader));
       erModelLoader.execute();
 
-      final ERModel loadedERModel = erModelLoader.getERModel();
-      if (loadedERModel != null) {
-        erModel = loadedERModel;
+      if (erModelLoader.hasERModel()) {
+        setERModel(erModelLoader.getERModel());
       }
     }
   }

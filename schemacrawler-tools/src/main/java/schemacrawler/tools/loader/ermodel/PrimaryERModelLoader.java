@@ -10,6 +10,7 @@ package schemacrawler.tools.loader.ermodel;
 
 import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.schema.Catalog;
 import schemacrawler.tools.executable.CommandOptions;
 import schemacrawler.tools.loader.ermodel.PrimaryERModelLoader.PrimaryERModelLoaderLoaderOptions;
 import us.fatehi.utility.property.PropertyName;
@@ -28,10 +29,11 @@ public class PrimaryERModelLoader extends AbstractERModelLoader<PrimaryERModelLo
 
   @Override
   public void execute() {
-    if (isLoaded()) {
+    if (hasERModel()) {
       return;
     }
 
+    final Catalog catalog = getCatalog();
     final ERModel eRModel = new ERModelBuilder(catalog).build();
     setERModel(eRModel);
   }

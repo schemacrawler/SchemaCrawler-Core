@@ -11,17 +11,15 @@ package schemacrawler.tools.executable;
 import static java.util.Objects.requireNonNull;
 
 import java.sql.Connection;
-import schemacrawler.schema.Catalog;
-import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import schemacrawler.tools.state.AbstractExecutionState;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler tools executable unit. */
-public abstract class AbstractCommand<P extends CommandOptions> implements BaseCommand<P> {
+public abstract class AbstractCommand<P extends CommandOptions> extends AbstractExecutionState
+    implements BaseCommand<P> {
 
   protected final PropertyName command;
   protected P commandOptions;
-  protected Catalog catalog;
-  private DatabaseConnectionSource connectionSource;
 
   protected AbstractCommand(final PropertyName command) {
     this.command = requireNonNull(command, "No command specified");
@@ -30,11 +28,6 @@ public abstract class AbstractCommand<P extends CommandOptions> implements BaseC
   @Override
   public void configure(final P commandOptions) {
     this.commandOptions = requireNonNull(commandOptions, "No command options provided");
-  }
-
-  @Override
-  public final Catalog getCatalog() {
-    return catalog;
   }
 
   @Override
@@ -49,30 +42,15 @@ public abstract class AbstractCommand<P extends CommandOptions> implements BaseC
   }
 
   public final Connection getConnection() {
-    if (usesConnection() && connectionSource != null) {
-      return connectionSource.get();
+    if (usesConnection() && hasConnectionSource()) {
+      return getConnectionSource().get();
     }
     return null;
   }
 
   @Override
-  public final DatabaseConnectionSource getConnectionSource() {
-    return connectionSource;
-  }
-
-  @Override
   public void initialize() {
     // Placeholder stub
-  }
-
-  @Override
-  public final void setCatalog(final Catalog catalog) {
-    this.catalog = requireNonNull(catalog, "No catalog provided");
-  }
-
-  @Override
-  public final void setConnectionSource(final DatabaseConnectionSource connectionSource) {
-    this.connectionSource = connectionSource;
   }
 
   /** {@inheritDoc} */

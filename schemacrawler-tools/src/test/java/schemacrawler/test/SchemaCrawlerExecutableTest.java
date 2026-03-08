@@ -149,9 +149,7 @@ public class SchemaCrawlerExecutableTest {
     executable.setCatalog(catalog);
     assertThat(executable.getCatalog(), is(sameInstance(catalog)));
 
-    executable.setCatalog(null);
-    assertThat(executable.getCatalog(), is(nullValue()));
-    assertThat(executable.getCatalog(), is(not(sameInstance(catalog))));
+    assertThrows(NullPointerException.class, () -> executable.setCatalog(null));
   }
 
   @Test

@@ -56,10 +56,10 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
     final DatabaseConnectionSource connectionSource = getConnectionSource();
     final SchemaRetrievalOptions schemaRetrievalOptions = getSchemaRetrievalOptions();
     for (final CatalogLoader<?> catalogLoader : catalogLoaders) {
-      if (catalog != null) {
+      if (hasCatalog()) {
         // Initially catalog will be null until it is first loaded
         // Pass enriched catalog to the next loader
-        catalogLoader.setCatalog(catalog);
+        catalogLoader.setCatalog(getCatalog());
         // NOTE: Catalog loaders do not build ER models, so the ER model is not set here
       }
 
@@ -73,9 +73,11 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
       LOGGER.log(Level.CONFIG, new ObjectToStringFormat(catalogLoader.getCommandOptions()));
       catalogLoader.execute();
 
-      catalog = catalogLoader.getCatalog();
+      if (catalogLoader.hasCatalog()) {
+        setCatalog(catalogLoader.getCatalog());
+      }
     }
-    MetaDataUtility.logCatalogSummary(catalog, Level.INFO);
+    MetaDataUtility.logCatalogSummary(getCatalog(), Level.INFO);
   }
 
   @Override
