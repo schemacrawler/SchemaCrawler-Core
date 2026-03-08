@@ -68,19 +68,19 @@ public final class ImplicitAssociationsAnalyzer {
       LOGGER.log(Level.FINER, new StringFormat("Table match keys <%s>", tableMatchKeys));
     }
     for (final Table table : tables) {
-      final TableColumns pkTableColumns = new TableColumns(table);
-      LOGGER.log(Level.FINER, new StringFormat("Table candidate keys <%s>", pkTableColumns));
-      for (final KeyColumn pkColumn : pkTableColumns.getCandidateKeys()) {
+      final TableCandidateKeys candidateKeys = new TableCandidateKeys(table);
+      LOGGER.log(Level.FINER, new StringFormat("Table candidate keys <%s>", candidateKeys));
+      for (final KeyColumn candidateKey : candidateKeys.getCandidateKeys()) {
         final Set<String> fkColumnMatchKeys = new HashSet<>();
         // Look for all columns matching this table match key
-        if (!pkColumn.isPartial()
-            && pkColumn.isPartOfPrimaryKey()
+        if (!candidateKey.isPartial()
+            && candidateKey.isPartOfPrimaryKey()
             && tableMatchKeys.containsKey(table)) {
           fkColumnMatchKeys.addAll(tableMatchKeys.get(table));
         }
         // Look for all columns matching this column match key
-        if (columnMatchKeys.containsKey(pkColumn)) {
-          fkColumnMatchKeys.addAll(columnMatchKeys.get(pkColumn));
+        if (columnMatchKeys.containsKey(candidateKey)) {
+          fkColumnMatchKeys.addAll(columnMatchKeys.get(candidateKey));
         }
 
         final Set<Column> fkColumns = new HashSet<>();
@@ -95,7 +95,7 @@ public final class ImplicitAssociationsAnalyzer {
             continue;
           }
           final ImplicitColumnReference proposedAssociation =
-              new ImplicitColumnReference(fkColumn, pkColumn);
+              new ImplicitColumnReference(fkColumn, candidateKey);
           if (proposedAssociation.isValid() && implicitAssociationRule.test(proposedAssociation)) {
             LOGGER.log(
                 Level.FINE,

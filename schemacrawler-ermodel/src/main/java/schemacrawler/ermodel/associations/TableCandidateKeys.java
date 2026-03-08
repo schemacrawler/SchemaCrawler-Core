@@ -30,12 +30,12 @@ import schemacrawler.schema.TableConstraintColumn;
  *   <li>Single-column unique indexes are included.
  * </ul>
  */
-final class TableColumns {
+final class TableCandidateKeys {
 
   private final Table table;
   private final Set<KeyColumn> candidateKeys;
 
-  TableColumns(final Table table) {
+  TableCandidateKeys(final Table table) {
     this.table = requireNonNull(table, "No table provided");
 
     candidateKeys = new HashSet<>();
