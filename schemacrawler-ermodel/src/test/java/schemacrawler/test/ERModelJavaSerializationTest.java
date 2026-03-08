@@ -28,10 +28,10 @@ import java.sql.Connection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.ermodel.utility.SerializedERModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.test.utility.TestERModelUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 import us.fatehi.utility.IOUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
@@ -66,6 +66,6 @@ public class ERModelJavaSerializationTest {
     }
     validateSchema(catalog);
 
-    erModel = EntityModelUtility.buildERModel(catalog);
+    erModel = TestERModelUtility.buildERModel(catalog);
   }
 }
