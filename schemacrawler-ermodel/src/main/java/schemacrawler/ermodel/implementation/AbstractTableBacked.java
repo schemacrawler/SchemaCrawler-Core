@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import schemacrawler.ermodel.model.EntityAttribute;
 import schemacrawler.ermodel.model.TableBacked;
+import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 
 public class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
@@ -28,7 +29,10 @@ public class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
 
     entityAttributes =
         getDatabaseObject().getColumns().stream()
-            .filter(column -> !column.isPartOfPrimaryKey() && !column.isPartOfForeignKey())
+            .filter(
+                column ->
+                    column instanceof PartialDatabaseObject
+                        || (!column.isPartOfPrimaryKey() && !column.isPartOfForeignKey()))
             .map(column -> new MutableEntityAttribute(this, column))
             .collect(Collectors.toList());
   }
