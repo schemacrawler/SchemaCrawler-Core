@@ -46,17 +46,14 @@ import static java.sql.Types.TIME_WITH_TIMEZONE;
 import static java.sql.Types.TINYINT;
 import static java.sql.Types.VARBINARY;
 import static java.sql.Types.VARCHAR;
-import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
-import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.implementation.MutableERModel;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityAttributeType;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
-import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
@@ -69,11 +66,6 @@ public class EntityModelUtility {
 
   public static ERModel buildEmptyERModel() {
     return new MutableERModel();
-  }
-
-  public static ERModel buildERModel(final Catalog catalog) {
-    requireNonNull(catalog, "No catalog provided");
-    return new ERModelBuilder(catalog).build();
   }
 
   /**

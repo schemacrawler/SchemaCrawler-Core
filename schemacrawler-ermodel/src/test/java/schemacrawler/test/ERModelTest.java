@@ -8,7 +8,11 @@
 
 package schemacrawler.test;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
@@ -18,10 +22,13 @@ import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
 import java.sql.Connection;
-import org.junit.jupiter.api.BeforeAll;
+import java.util.Collection;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.associations.ImplicitColumnReference;
+import schemacrawler.ermodel.implementation.ImplicitAssociationBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityAttribute;
@@ -29,10 +36,10 @@ import schemacrawler.ermodel.model.EntitySubtype;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.ManyToManyRelationship;
 import schemacrawler.ermodel.model.Relationship;
-import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.test.utility.TestERModelUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
@@ -40,7 +47,6 @@ import us.fatehi.test.utility.extensions.TestContext;
 
 @WithTestDatabase
 @ResolveTestContext
-@TestInstance(Lifecycle.PER_CLASS)
 public class ERModelTest {
 
   private Catalog catalog;
@@ -90,6 +96,9 @@ public class ERModelTest {
 
   @Test
   public void implicitRelationships(final TestContext testContext) {
+
+    inferImplicitAssociations();
+
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
       out.println("# Implicit relationships:");
@@ -106,6 +115,9 @@ public class ERModelTest {
 
   @Test
   public void implicitRelationshipsByEntity(final TestContext testContext) {
+
+    inferImplicitAssociations();
+
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
       out.println("# Implicit relationships by Entity:");
@@ -121,7 +133,14 @@ public class ERModelTest {
         hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
   }
 
-  @BeforeAll
+  @Test
+  public void implicitRelationshipsNegative(final TestContext testContext) {
+    Collection<Relationship> implicitRelationships = erModel.getImplicitRelationships();
+    assertThat(implicitRelationships, is(not(nullValue())));
+    assertThat(implicitRelationships, hasSize(0));
+  }
+
+  @BeforeEach
   public void loadCatalog(final Connection connection) {
     final SchemaCrawlerOptions schemaCrawlerOptions =
         schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
@@ -132,7 +151,7 @@ public class ERModelTest {
     }
     validateSchema(catalog);
 
-    erModel = EntityModelUtility.buildERModel(catalog);
+    erModel = TestERModelUtility.buildERModel(catalog);
   }
 
   @Test
@@ -180,5 +199,20 @@ public class ERModelTest {
     assertThat(
         outputOf(testout),
         hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
+  }
+
+  private void inferImplicitAssociations() {
+    // Add implicit associations using ImplicitAssociationBuilder
+    final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer =
+        ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
+            .withIdMatcher()
+            .withExtensionTableMatcher()
+            .build();
+    final ImplicitAssociationBuilder implicitAssociationBuilder =
+        ImplicitAssociationBuilder.builder(erModel);
+    for (final ImplicitColumnReference implicitColumnReference :
+        implicitAssociationsAnalyzer.analyzeTables()) {
+      implicitAssociationBuilder.addImplicitAssociation(implicitColumnReference);
+    }
   }
 }

@@ -12,16 +12,11 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.ermodel.associations.ImplicitAssociation;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
-import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
@@ -41,7 +36,6 @@ public class ERModelBuilder implements Builder<ERModel> {
   final MutableERModel erModel;
   final Map<NamedObjectKey, TableEntityModelInferrer> inferrerMap;
   final Map<NamedObjectKey, MutableEntity> entityMap;
-  final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer;
 
   public ERModelBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
@@ -51,12 +45,6 @@ public class ERModelBuilder implements Builder<ERModel> {
     entityMap = new HashMap<>();
 
     erModel = new MutableERModel();
-
-    implicitAssociationsAnalyzer =
-        ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
-            .withIdMatcher()
-            .withExtensionTableMatcher()
-            .build();
   }
 
   @Override
@@ -93,14 +81,6 @@ public class ERModelBuilder implements Builder<ERModel> {
           erModel.addRelationship(rel);
         }
       }
-    }
-
-    final Collection<ImplicitColumnReference> implicitReferences =
-        implicitAssociationsAnalyzer.analyzeTables();
-    for (final ImplicitColumnReference implicitReference : implicitReferences) {
-      final ImplicitAssociation implicitAssociation = new ImplicitAssociation(implicitReference);
-      final MutableTableReferenceRelationship rel = createRelationship(implicitAssociation);
-      erModel.addImplicitRelationship(rel);
     }
 
     return erModel;
