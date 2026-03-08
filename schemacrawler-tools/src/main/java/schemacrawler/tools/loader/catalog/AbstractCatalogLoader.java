@@ -20,7 +20,6 @@ public abstract class AbstractCatalogLoader<P extends CommandOptions> extends Ab
     implements CatalogLoader<P> {
 
   private final int priority;
-
   private SchemaRetrievalOptions schemaRetrievalOptions;
   private SchemaCrawlerOptions schemaCrawlerOptions;
 
@@ -63,9 +62,5 @@ public abstract class AbstractCatalogLoader<P extends CommandOptions> extends Ab
   @Override
   public String toString() {
     return getCommandName().toString();
-  }
-
-  protected final boolean isLoaded() {
-    return catalog != null;
   }
 }

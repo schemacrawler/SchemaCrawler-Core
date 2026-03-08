@@ -15,7 +15,7 @@ import schemacrawler.schema.Catalog;
 import us.fatehi.utility.Nullable;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
-public abstract class AbstractExecutableState implements ExecutableState {
+public abstract class AbstractExecutionState implements ExecutionState {
 
   private Catalog catalog;
   private ERModel erModel;
@@ -53,7 +53,7 @@ public abstract class AbstractExecutableState implements ExecutableState {
 
   @Override
   public final void setCatalog(@Nullable final Catalog catalog) {
-    this.catalog = catalog;
+    this.catalog = requireNonNull(catalog, "No catalog provided");
   }
 
   @Override
@@ -63,7 +63,7 @@ public abstract class AbstractExecutableState implements ExecutableState {
 
   @Override
   public final void setERModel(@Nullable final ERModel erModel) {
-    this.erModel = erModel;
+    this.erModel = requireNonNull(erModel, "No ER model provided");
   }
 
   protected final void clear() {

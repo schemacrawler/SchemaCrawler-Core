@@ -24,7 +24,7 @@ public class PrimaryCatalogLoader extends AbstractCatalogLoader<PrimaryCatalogLo
 
   @Override
   public void execute() {
-    if (isLoaded()) {
+    if (hasCatalog()) {
       return;
     }
 

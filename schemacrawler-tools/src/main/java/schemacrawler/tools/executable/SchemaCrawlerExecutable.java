@@ -8,13 +8,16 @@
 
 package schemacrawler.tools.executable;
 
-import static java.util.Objects.requireNonNull;
 import static schemacrawler.tools.utility.SchemaCrawlerUtility.matchSchemaRetrievalOptions;
 import static schemacrawler.tools.utility.SchemaCrawlerUtility.updateConnectionDataSource;
-import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.Objects.requireNonNull;
+
+import static us.fatehi.utility.Utility.requireNotBlank;
+
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -27,8 +30,8 @@ import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.tools.options.OutputOptions;
 import schemacrawler.tools.options.OutputOptionsBuilder;
-import schemacrawler.tools.state.AbstractExecutableState;
-import schemacrawler.tools.state.ExecutableState;
+import schemacrawler.tools.state.AbstractExecutionState;
+import schemacrawler.tools.state.ExecutionState;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.string.ObjectToStringFormat;
@@ -40,8 +43,8 @@ import us.fatehi.utility.string.StringFormat;
  * SchemaCrawlerExecutable will check if it is a query configured in the properties. If not, it will
  * assume that a query is specified on the command-line, and execute that.
  */
-public final class SchemaCrawlerExecutable extends AbstractExecutableState
-    implements ExecutableState {
+public final class SchemaCrawlerExecutable extends AbstractExecutionState
+    implements ExecutionState {
 
   private static final Logger LOGGER = Logger.getLogger(SchemaCrawlerExecutable.class.getName());
 
@@ -103,7 +106,9 @@ public final class SchemaCrawlerExecutable extends AbstractExecutableState
 
       // Prepare to execute
       scCommand.setCatalog(getCatalog());
-      scCommand.setERModel(getERModel());
+      if (hasERModel()) {
+		scCommand.setERModel(getERModel());
+	  }
 
       if (scCommand.usesConnection()) {
         scCommand.setConnectionSource(getConnectionSource());

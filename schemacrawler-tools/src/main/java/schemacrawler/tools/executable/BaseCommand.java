@@ -8,29 +8,20 @@
 
 package schemacrawler.tools.executable;
 
-import schemacrawler.schema.Catalog;
-import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import schemacrawler.tools.state.ExecutionState;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler executable unit. */
-public interface BaseCommand<P extends CommandOptions> {
+public interface BaseCommand<P extends CommandOptions> extends ExecutionState {
 
   void configure(P parameters);
-
-  Catalog getCatalog();
 
   PropertyName getCommandName();
 
   P getCommandOptions();
 
-  DatabaseConnectionSource getConnectionSource();
-
   /** Initializes the command for execution. */
   void initialize();
-
-  void setCatalog(Catalog catalog);
-
-  void setConnectionSource(DatabaseConnectionSource connectionSource);
 
   default boolean usesConnection() {
     return false;

@@ -10,13 +10,13 @@ package schemacrawler.tools.executable;
 
 import static java.util.Objects.requireNonNull;
 
-import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
+import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.options.OutputOptions;
 import schemacrawler.tools.options.OutputOptionsBuilder;
 import us.fatehi.utility.property.PropertyName;
@@ -25,7 +25,6 @@ import us.fatehi.utility.property.PropertyName;
 public abstract class AbstractSchemaCrawlerCommand<P extends CommandOptions>
     extends AbstractCommand<P> implements SchemaCrawlerCommand<P> {
 
-  protected ERModel erModel;
   protected Identifiers identifiers;
   protected InformationSchemaViews informationSchemaViews;
   protected OutputOptions outputOptions;
@@ -36,11 +35,6 @@ public abstract class AbstractSchemaCrawlerCommand<P extends CommandOptions>
 
     schemaCrawlerOptions = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
     outputOptions = OutputOptionsBuilder.newOutputOptions();
-  }
-
-  @Override
-  public ERModel getERModel() {
-    return erModel;
   }
 
   /** {@inheritDoc} */
@@ -75,14 +69,9 @@ public abstract class AbstractSchemaCrawlerCommand<P extends CommandOptions>
   public void initialize() {
     super.initialize();
     checkOptions();
-    if (erModel == null) {
-      erModel = EntityModelUtility.buildEmptyERModel();
+    if (!hasERModel()) {
+      setERModel(EntityModelUtility.buildEmptyERModel());
     }
-  }
-
-  @Override
-  public void setERModel(final ERModel erModel) {
-    this.erModel = requireNonNull(erModel, "No ER model provided");
   }
 
   /** {@inheritDoc} */
@@ -118,9 +107,11 @@ public abstract class AbstractSchemaCrawlerCommand<P extends CommandOptions>
   }
 
   protected void checkCatalog() {
-    requireNonNull(catalog, "No database catalog provided");
-    if (usesConnection()) {
-      requireNonNull(getConnectionSource(), "No database connection source provided");
+    if (!hasCatalog()) {
+      throw new ExecutionRuntimeException("No database catalog provided");
+    }
+    if (usesConnection() && !hasConnectionSource()) {
+      throw new ExecutionRuntimeException("No database connection source provided");
     }
   }
 

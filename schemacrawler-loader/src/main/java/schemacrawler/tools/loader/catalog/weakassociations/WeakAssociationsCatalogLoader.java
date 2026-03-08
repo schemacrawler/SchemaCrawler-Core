@@ -51,7 +51,7 @@ public final class WeakAssociationsCatalogLoader
 
   @Override
   public void execute() {
-    if (!isLoaded()) {
+    if (!hasCatalog()) {
       return;
     }
 

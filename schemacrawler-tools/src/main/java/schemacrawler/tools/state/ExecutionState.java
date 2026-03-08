@@ -12,7 +12,7 @@ import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
-public interface ExecutableState {
+public interface ExecutionState {
 
   Catalog getCatalog();
 

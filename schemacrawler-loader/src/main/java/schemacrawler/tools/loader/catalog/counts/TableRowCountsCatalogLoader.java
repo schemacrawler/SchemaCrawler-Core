@@ -36,7 +36,7 @@ public class TableRowCountsCatalogLoader
 
   @Override
   public void execute() {
-    if (!isLoaded()) {
+    if (!hasCatalog()) {
       return;
     }
 
