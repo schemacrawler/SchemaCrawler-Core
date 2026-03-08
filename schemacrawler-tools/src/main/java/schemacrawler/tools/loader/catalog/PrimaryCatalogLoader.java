@@ -33,6 +33,7 @@ public class PrimaryCatalogLoader extends AbstractCatalogLoader<PrimaryCatalogLo
             getConnectionSource(), getSchemaRetrievalOptions(), getSchemaCrawlerOptions());
     final Catalog catalog = schemaCrawler.crawl();
     setCatalog(catalog);
+    // NOTE: Catalog loaders do not build ER models, so the ER model is not set here
   }
 
   @Override
