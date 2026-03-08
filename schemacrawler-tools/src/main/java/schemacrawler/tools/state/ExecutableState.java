@@ -14,8 +14,6 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
 public interface ExecutableState {
 
-  void clearConnectionSource();
-
   Catalog getCatalog();
 
   DatabaseConnectionSource getConnectionSource();

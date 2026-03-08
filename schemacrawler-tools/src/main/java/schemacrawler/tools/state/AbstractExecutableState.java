@@ -21,17 +21,6 @@ public abstract class AbstractExecutableState implements ExecutableState {
   private ERModel erModel;
   private DatabaseConnectionSource connectionSource;
 
-  public final void clear() {
-    catalog = null;
-    connectionSource = null;
-    erModel = null;
-  }
-
-  @Override
-  public final void clearConnectionSource() {
-    connectionSource = null;
-  }
-
   @Override
   public final Catalog getCatalog() {
     return catalog;
@@ -75,5 +64,15 @@ public abstract class AbstractExecutableState implements ExecutableState {
   @Override
   public final void setERModel(@Nullable final ERModel erModel) {
     this.erModel = erModel;
+  }
+
+  protected final void clear() {
+    catalog = null;
+    connectionSource = null;
+    erModel = null;
+  }
+
+  protected final void clearConnectionSource() {
+    connectionSource = null;
   }
 }
