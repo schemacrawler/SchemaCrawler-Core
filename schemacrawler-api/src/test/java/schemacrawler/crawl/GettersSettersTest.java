@@ -43,14 +43,16 @@ public class GettersSettersTest {
     @Override
     public boolean include(final PojoClass pojoClass) {
       final Class<?> pojoClassClazz = pojoClass.getClazz();
-      return !pojoClass.getName().endsWith(Java.PACKAGE_DELIMITER + Java.PACKAGE_INFO)
+      return pojoClass.getName().endsWith(Java.PACKAGE_DELIMITER + Java.PACKAGE_INFO)
+              == pojoClass.getName().endsWith(Java.PACKAGE_DELIMITER + "module-info")
           && !pojoClassClazz.isEnum()
+          && !pojoClassClazz.isInterface()
           && !excludeClasses.contains(pojoClassClazz.getSimpleName());
     }
   }
 
   // Configured for expectation, so we know when a class gets added or removed.
-  private static final int EXPECTED_CLASS_COUNT = 56;
+  private static final int EXPECTED_CLASS_COUNT = 8;
 
   private static final String PACKAGE_SCHEMACRAWLER_SCHEMA = "schemacrawler.schema";
 

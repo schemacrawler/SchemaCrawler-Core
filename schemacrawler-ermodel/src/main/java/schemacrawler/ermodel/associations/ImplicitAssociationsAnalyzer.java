@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
+import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.string.StringFormat;
 
@@ -69,10 +70,12 @@ public final class ImplicitAssociationsAnalyzer {
     for (final Table table : tables) {
       final TableColumns pkTableColumns = new TableColumns(table);
       LOGGER.log(Level.FINER, new StringFormat("Table candidate keys <%s>", pkTableColumns));
-      for (final Column pkColumn : pkTableColumns.getCandidateKeys()) {
+      for (final KeyColumn pkColumn : pkTableColumns.getCandidateKeys()) {
         final Set<String> fkColumnMatchKeys = new HashSet<>();
         // Look for all columns matching this table match key
-        if (pkColumn.isPartOfPrimaryKey() && tableMatchKeys.containsKey(table)) {
+        if (!pkColumn.isPartial()
+            && pkColumn.isPartOfPrimaryKey()
+            && tableMatchKeys.containsKey(table)) {
           fkColumnMatchKeys.addAll(tableMatchKeys.get(table));
         }
         // Look for all columns matching this column match key

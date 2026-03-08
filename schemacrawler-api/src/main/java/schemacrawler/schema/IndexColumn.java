@@ -8,7 +8,7 @@
 
 package schemacrawler.schema;
 
-public interface IndexColumn extends Column {
+public interface IndexColumn extends KeyColumn {
 
   /**
    * Gets the index this column belongs to.
