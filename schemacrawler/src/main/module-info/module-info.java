@@ -34,25 +34,30 @@ module us.fatehi.schemacrawler.schemacrawler {
   // Do NOT export schemacrawler.crawl - this is an internal implementation package
 
   // Export public API packages from schemacrawler-ermodel
+  exports schemacrawler.ermodel.associations;
   exports schemacrawler.ermodel.model;
   exports schemacrawler.ermodel.utility;
   // Do NOT export schemacrawler.ermodel.implementation - this is an internal package
 
   // Export public API packages from schemacrawler-tools
-  exports schemacrawler.tools.catalogloader;
   exports schemacrawler.tools.databaseconnector;
   exports schemacrawler.tools.executable;
   exports schemacrawler.tools.executable.commandline;
+  exports schemacrawler.tools.loader.catalog;
+  exports schemacrawler.tools.loader.ermodel;
   exports schemacrawler.tools.options;
   exports schemacrawler.tools.registry;
+  exports schemacrawler.tools.state;
   exports schemacrawler.tools.utility;
 
   // Export public API packages from schemacrawler-loader
   exports schemacrawler.loader.utility;
+  exports schemacrawler.tools.loader.catalog.model;
 
   // ServiceLoader providers
   uses java.sql.Driver;
-  uses schemacrawler.tools.catalogloader.CatalogLoaderProvider;
+  uses schemacrawler.tools.loader.catalog.CatalogLoaderProvider;
+  uses schemacrawler.tools.loader.ermodel.ERModelLoaderProvider;
   uses schemacrawler.tools.databaseconnector.DatabaseConnector;
   uses schemacrawler.tools.executable.SchemaCrawlerCommandProvider;
 
@@ -60,7 +65,7 @@ module us.fatehi.schemacrawler.schemacrawler {
       schemacrawler.tools.loader.catalog.attributes.AttributesCatalogLoaderProvider,
       schemacrawler.tools.loader.catalog.counts.TableRowCountsCatalogLoaderProvider,
       schemacrawler.tools.loader.catalog.weakassociations.WeakAssociationsCatalogLoaderProvider,
-      schemacrawler.tools.loader.catalog.catalogloader.PrimaryCatalogLoaderProvider;
+      schemacrawler.tools.loader.catalog.PrimaryCatalogLoaderProvider;
   provides schemacrawler.tools.loader.ermodel.ERModelLoaderProvider with
       schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsERModelLoaderProvider,
       schemacrawler.tools.loader.ermodel.PrimaryERModelLoaderProvider;
