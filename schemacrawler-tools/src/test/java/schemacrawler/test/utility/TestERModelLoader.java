@@ -9,7 +9,7 @@
 package schemacrawler.test.utility;
 
 import schemacrawler.test.utility.TestERModelLoader.TestERModelLoaderOptions;
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.loader.ermodel.AbstractERModelLoader;
 import us.fatehi.utility.SystemExitException;
 import us.fatehi.utility.property.PropertyName;

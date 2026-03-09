@@ -11,7 +11,7 @@ package schemacrawler.tools.loader.ermodel;
 import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.loader.ermodel.PrimaryERModelLoader.PrimaryERModelLoaderLoaderOptions;
 import us.fatehi.utility.property.PropertyName;
 

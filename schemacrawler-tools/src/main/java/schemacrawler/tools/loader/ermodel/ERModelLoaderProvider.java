@@ -8,7 +8,7 @@
 
 package schemacrawler.tools.loader.ermodel;
 
-import schemacrawler.tools.executable.CommandProvider;
+import schemacrawler.tools.command.CommandProvider;
 import schemacrawler.tools.options.Config;
 
 /** Provider interface for creating ERModel loaders. */

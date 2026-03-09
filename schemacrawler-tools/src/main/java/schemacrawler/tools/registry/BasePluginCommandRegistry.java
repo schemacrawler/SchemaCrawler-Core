@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import schemacrawler.tools.executable.CommandProvider;
+import schemacrawler.tools.command.CommandProvider;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import us.fatehi.utility.property.PropertyName;
 

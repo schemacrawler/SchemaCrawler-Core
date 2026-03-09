@@ -10,7 +10,7 @@ package schemacrawler.tools.loader.catalog;
 
 import schemacrawler.crawl.SchemaCrawler;
 import schemacrawler.schema.Catalog;
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.loader.catalog.PrimaryCatalogLoader.PrimaryCatalogLoaderOptions;
 import us.fatehi.utility.property.PropertyName;
 

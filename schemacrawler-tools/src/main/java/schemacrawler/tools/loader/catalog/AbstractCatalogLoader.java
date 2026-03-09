@@ -12,8 +12,8 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
-import schemacrawler.tools.executable.AbstractCommand;
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.AbstractCommand;
+import schemacrawler.tools.command.CommandOptions;
 import us.fatehi.utility.property.PropertyName;
 
 public abstract class AbstractCatalogLoader<P extends CommandOptions> extends AbstractCommand<P>

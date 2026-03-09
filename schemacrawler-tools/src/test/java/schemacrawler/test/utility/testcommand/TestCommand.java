@@ -9,7 +9,7 @@
 package schemacrawler.test.utility.testcommand;
 
 import java.io.PrintWriter;
-import schemacrawler.tools.executable.AbstractSchemaCrawlerCommand;
+import schemacrawler.tools.command.AbstractSchemaCrawlerCommand;
 import us.fatehi.utility.property.PropertyName;
 
 public final class TestCommand extends AbstractSchemaCrawlerCommand<TestOptions> {

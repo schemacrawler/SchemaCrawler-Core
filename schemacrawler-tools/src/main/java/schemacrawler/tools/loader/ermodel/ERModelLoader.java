@@ -9,8 +9,8 @@
 package schemacrawler.tools.loader.ermodel;
 
 import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.tools.executable.CommandOptions;
-import schemacrawler.tools.executable.ExecutableCommand;
+import schemacrawler.tools.command.CommandOptions;
+import schemacrawler.tools.command.ExecutableCommand;
 
 /** A loader that builds or enriches an ERModel from a catalog. */
 public interface ERModelLoader<P extends CommandOptions> extends ExecutableCommand<P> {

@@ -8,7 +8,7 @@
 
 package schemacrawler.tools.loader.catalog.counts;
 
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.CommandOptions;
 
 public record TableRowCountsCatalogLoaderOptions(boolean loadRowCounts, boolean noEmptyTables)
     implements CommandOptions {}

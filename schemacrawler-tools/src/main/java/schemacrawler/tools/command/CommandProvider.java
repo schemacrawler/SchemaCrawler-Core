@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.executable;
+package schemacrawler.tools.command;
 
 import java.util.Collection;
 import schemacrawler.tools.executable.commandline.PluginCommand;

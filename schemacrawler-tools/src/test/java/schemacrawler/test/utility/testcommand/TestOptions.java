@@ -8,7 +8,7 @@
 
 package schemacrawler.test.utility.testcommand;
 
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.CommandOptions;
 
 public class TestOptions implements CommandOptions {
 

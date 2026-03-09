@@ -6,15 +6,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.executable;
+package schemacrawler.tools.command;
 
 /** A SchemaCrawler executable unit. */
-public interface CallableCommand<P extends CommandOptions, R> extends BaseCommand<P> {
+public interface ExecutableCommand<P extends CommandOptions> extends BaseCommand<P> {
 
   /**
    * Executes command, after configuration and pre-checks. May throw runtime exceptions on errors.
    *
-   * <p>R Return value
+   * <p>Nothing is returned.
    */
-  R call() throws Exception;
+  void execute();
 }

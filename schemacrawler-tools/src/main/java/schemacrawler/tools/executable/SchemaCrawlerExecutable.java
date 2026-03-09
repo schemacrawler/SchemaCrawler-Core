@@ -8,16 +8,13 @@
 
 package schemacrawler.tools.executable;
 
+import static java.util.Objects.requireNonNull;
 import static schemacrawler.tools.utility.SchemaCrawlerUtility.matchSchemaRetrievalOptions;
 import static schemacrawler.tools.utility.SchemaCrawlerUtility.updateConnectionDataSource;
+import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static java.util.Objects.requireNonNull;
-
-import static us.fatehi.utility.Utility.requireNotBlank;
-
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -26,6 +23,8 @@ import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.SchemaCrawlerException;
+import schemacrawler.tools.command.CommandRegistry;
+import schemacrawler.tools.command.SchemaCrawlerCommand;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.tools.options.OutputOptions;
@@ -107,8 +106,8 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState
       // Prepare to execute
       scCommand.setCatalog(getCatalog());
       if (hasERModel()) {
-		scCommand.setERModel(getERModel());
-	  }
+        scCommand.setERModel(getERModel());
+      }
 
       if (scCommand.usesConnection()) {
         scCommand.setConnectionSource(getConnectionSource());

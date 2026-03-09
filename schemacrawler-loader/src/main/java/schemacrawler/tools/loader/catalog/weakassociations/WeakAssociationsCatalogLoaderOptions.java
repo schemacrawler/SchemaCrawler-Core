@@ -8,7 +8,7 @@
 
 package schemacrawler.tools.loader.catalog.weakassociations;
 
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.CommandOptions;
 
 public record WeakAssociationsCatalogLoaderOptions(
     boolean findWeakAssociations, boolean inferExtensionTables) implements CommandOptions {}

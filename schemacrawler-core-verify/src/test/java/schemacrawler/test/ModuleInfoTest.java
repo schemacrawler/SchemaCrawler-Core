@@ -15,8 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.tools.command.CommandRegistry;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
-import schemacrawler.tools.executable.CommandRegistry;
 import schemacrawler.tools.loader.catalog.CatalogLoaderRegistry;
 
 public class ModuleInfoTest {

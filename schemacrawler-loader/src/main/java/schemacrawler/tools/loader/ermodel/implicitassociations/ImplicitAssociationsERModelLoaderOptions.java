@@ -8,7 +8,7 @@
 
 package schemacrawler.tools.loader.ermodel.implicitassociations;
 
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.CommandOptions;
 
 /**
  * Options for the implicit associations ER model loader.

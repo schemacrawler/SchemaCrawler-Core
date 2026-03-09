@@ -10,7 +10,7 @@ package schemacrawler.tools.loader.catalog.attributes;
 
 import static us.fatehi.utility.Utility.isBlank;
 
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.CommandOptions;
 
 public record AttributesCatalogLoaderOptions(String catalogAttributesFile)
     implements CommandOptions {

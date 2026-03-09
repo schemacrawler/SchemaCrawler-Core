@@ -8,7 +8,7 @@
 
 package schemacrawler.tools.loader.catalog;
 
-import schemacrawler.tools.executable.CommandProvider;
+import schemacrawler.tools.command.CommandProvider;
 import schemacrawler.tools.options.Config;
 
 public interface CatalogLoaderProvider extends CommandProvider {

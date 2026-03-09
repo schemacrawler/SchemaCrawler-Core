@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.executable;
+package schemacrawler.tools.command;
 
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
@@ -20,14 +20,14 @@ import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
 import us.fatehi.utility.property.PropertyName;
 
-public abstract class BaseCommandProvider implements SchemaCrawlerCommandProvider {
+public abstract class AbstractSchemaCrawlerCommandProvider implements SchemaCrawlerCommandProvider {
   private final Collection<PropertyName> supportedCommands;
 
-  public BaseCommandProvider(final Collection<PropertyName> supportedCommands) {
+  public AbstractSchemaCrawlerCommandProvider(final Collection<PropertyName> supportedCommands) {
     this.supportedCommands = requireNonNull(supportedCommands, "No supported commands provided");
   }
 
-  public BaseCommandProvider(final PropertyName command) {
+  public AbstractSchemaCrawlerCommandProvider(final PropertyName command) {
     this(List.of(requireNonNull(command, "No command provided")));
   }
 

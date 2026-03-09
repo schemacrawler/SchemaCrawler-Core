@@ -8,8 +8,8 @@
 
 package schemacrawler.tools.loader.ermodel;
 
-import schemacrawler.tools.executable.AbstractCommand;
-import schemacrawler.tools.executable.CommandOptions;
+import schemacrawler.tools.command.AbstractCommand;
+import schemacrawler.tools.command.CommandOptions;
 import us.fatehi.utility.property.PropertyName;
 
 /** Abstract base class for ERModel loaders. */

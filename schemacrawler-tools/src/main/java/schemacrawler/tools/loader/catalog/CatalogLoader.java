@@ -10,8 +10,8 @@ package schemacrawler.tools.loader.catalog;
 
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
-import schemacrawler.tools.executable.CommandOptions;
-import schemacrawler.tools.executable.ExecutableCommand;
+import schemacrawler.tools.command.CommandOptions;
+import schemacrawler.tools.command.ExecutableCommand;
 
 public interface CatalogLoader<P extends CommandOptions> extends ExecutableCommand<P> {
 

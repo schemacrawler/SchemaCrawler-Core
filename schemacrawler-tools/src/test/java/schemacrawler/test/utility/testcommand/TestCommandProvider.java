@@ -11,12 +11,12 @@ package schemacrawler.test.utility.testcommand;
 import static schemacrawler.test.utility.testcommand.TestCommand.COMMAND;
 import static schemacrawler.tools.executable.commandline.PluginCommand.newPluginCommand;
 
-import schemacrawler.tools.executable.BaseCommandProvider;
+import schemacrawler.tools.command.AbstractSchemaCrawlerCommandProvider;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
 
-public class TestCommandProvider extends BaseCommandProvider {
+public class TestCommandProvider extends AbstractSchemaCrawlerCommandProvider {
 
   public TestCommandProvider() {
     super(COMMAND);

@@ -17,17 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.test.utility.testcommand.TestCommandProvider;
-import schemacrawler.tools.executable.BaseCommandProvider;
-import schemacrawler.tools.executable.CommandRegistry;
-import schemacrawler.tools.executable.SchemaCrawlerCommand;
-import schemacrawler.tools.executable.SchemaCrawlerCommandProvider;
+import schemacrawler.tools.command.AbstractSchemaCrawlerCommandProvider;
+import schemacrawler.tools.command.CommandRegistry;
+import schemacrawler.tools.command.SchemaCrawlerCommand;
+import schemacrawler.tools.command.SchemaCrawlerCommandProvider;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
 import us.fatehi.utility.property.PropertyName;
 
 public class CommandProviderSortTest {
 
-  private final class OperationCommandProvider extends BaseCommandProvider {
+  private final class OperationCommandProvider extends AbstractSchemaCrawlerCommandProvider {
     private OperationCommandProvider() {
       super(List.of(new PropertyName("OperationCommandProvider", "OperationCommandProvider")));
     }
@@ -47,7 +47,7 @@ public class CommandProviderSortTest {
   private final SchemaCrawlerCommandProvider fallbackCommandProvider =
       new OperationCommandProvider();
   private final SchemaCrawlerCommandProvider otherCommandProvider =
-      new BaseCommandProvider(
+      new AbstractSchemaCrawlerCommandProvider(
           List.of(new PropertyName("OtherCommandProvider", "OtherCommandProvider"))) {
 
         @Override
