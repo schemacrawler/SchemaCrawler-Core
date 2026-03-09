@@ -8,17 +8,25 @@
 
 package schemacrawler.utility;
 
+import static java.nio.file.Files.newInputStream;
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 import schemacrawler.schema.Catalog;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
 public final class SerializedCatalogUtility {
+
+  private static final Logger LOGGER = Logger.getLogger(SerializedCatalogUtility.class.getName());
 
   private static final List<Pattern> CATALOG_CLASS_PATTERNS =
       List.of(
@@ -43,5 +51,15 @@ public final class SerializedCatalogUtility {
 
   private SerializedCatalogUtility() {
     // Prevent instantiation
+  }
+
+  public static Catalog deserializeCatalog(final Path offlineDatabasePath) throws IOException {
+    final Catalog catalog;
+    try (final InputStream inputFileStream =
+        new GZIPInputStream(newInputStream(offlineDatabasePath)); ) {
+      catalog = readCatalog(inputFileStream);
+      LOGGER.log(Level.INFO, () -> MetaDataUtility.summarizeCatalog(catalog));
+    }
+    return catalog;
   }
 }

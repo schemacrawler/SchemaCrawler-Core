@@ -110,7 +110,7 @@ public class DatabaseUtilityTest {
   @Test
   public void getAvailableJdbcDrivers() throws SQLException {
     final Collection<Driver> drivers = DatabaseUtility.getAvailableJdbcDrivers();
-    assertThat(drivers, hasSize(JDBC_DRIVER_COUNT));
+    assertThat(drivers, hasSize(JDBC_DRIVER_COUNT - 1 /* Offline driver is in tools */));
     assertThat(
         drivers,
         everyItem(is(anyOf(instanceOf(Driver.class), instanceOf(TestDatabaseDriver.class)))));
