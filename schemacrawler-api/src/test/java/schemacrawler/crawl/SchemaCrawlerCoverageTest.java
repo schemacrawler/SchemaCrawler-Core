@@ -59,8 +59,8 @@ import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
-import us.fatehi.utility.datasource.ConnectionDatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import us.fatehi.utility.datasource.DatabaseConnectionSources;
 
 @WithTestDatabase
 @ResolveTestContext
@@ -226,7 +226,7 @@ public class SchemaCrawlerCoverageTest {
     final Connection connection = mockConnection();
 
     final DatabaseConnectionSource connectionSource =
-        new ConnectionDatabaseConnectionSource(connection);
+        DatabaseConnectionSources.fromConnection(connection);
 
     final SchemaCrawler schemaCrawler =
         new SchemaCrawler(connectionSource, schemaRetrievalOptionsDefault, schemaCrawlerOptions);

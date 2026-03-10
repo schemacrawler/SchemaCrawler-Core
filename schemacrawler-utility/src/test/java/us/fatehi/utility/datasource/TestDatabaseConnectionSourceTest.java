@@ -70,8 +70,7 @@ public class TestDatabaseConnectionSourceTest {
             connectionUrl,
             Set.of(),
             connectionProperties,
-            new MultiUseUserCredentials(userName, password),
-            connection -> {});
+            new MultiUseUserCredentials(userName, password));
 
     final Connection connection = connectionSource.get();
     assertThat(connection, is(not(nullValue())));

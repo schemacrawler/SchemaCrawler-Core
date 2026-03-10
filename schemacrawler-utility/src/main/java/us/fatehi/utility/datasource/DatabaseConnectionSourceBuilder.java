@@ -62,11 +62,8 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
     final Map<String, String> connectionUrlx = toUrlx();
     final DatabaseConnectionSource connectionSource =
         DatabaseConnectionSources.newDatabaseConnectionSource(
-            connectionUrl,
-            additionalDriverProperties,
-            connectionUrlx,
-            userCredentials,
-            connectionInitializer);
+            connectionUrl, additionalDriverProperties, connectionUrlx, userCredentials);
+    connectionSource.setFirstConnectionInitializer(connectionInitializer);
     return connectionSource;
   }
 

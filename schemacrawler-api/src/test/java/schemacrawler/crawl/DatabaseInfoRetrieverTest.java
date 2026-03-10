@@ -44,8 +44,8 @@ import schemacrawler.test.utility.WithTestDatabase;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.test.utility.extensions.TestContext;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
-import us.fatehi.utility.datasource.ConnectionDatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import us.fatehi.utility.datasource.DatabaseConnectionSources;
 import us.fatehi.utility.property.Property;
 
 @WithTestDatabase
@@ -211,7 +211,7 @@ public class DatabaseInfoRetrieverTest {
     when(mockMetaData.getSchemas()).thenThrow(AbstractMethodError.class);
     when(mockMetaData.getCatalogs()).thenThrow(SQLException.class);
     final DatabaseConnectionSource connectionSource =
-        new ConnectionDatabaseConnectionSource(mockConnection);
+        DatabaseConnectionSources.fromConnection(mockConnection);
 
     final RetrieverConnection retrieverConnection =
         new RetrieverConnection(

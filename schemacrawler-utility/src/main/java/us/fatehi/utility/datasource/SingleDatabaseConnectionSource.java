@@ -12,28 +12,30 @@ import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import us.fatehi.utility.string.StringFormat;
+import us.fatehi.utility.SQLRuntimeException;
+import us.fatehi.utility.database.DatabaseUtility;
 
 final class SingleDatabaseConnectionSource extends AbstractDatabaseConnectionSource {
 
-  private static final Logger LOGGER =
-      Logger.getLogger(SingleDatabaseConnectionSource.class.getName());
-
   private final Connection connection;
+
+  public SingleDatabaseConnectionSource(final Connection connection) {
+    try {
+      this.connection = DatabaseUtility.checkConnection(connection);
+    } catch (final SQLException e) {
+      throw new SQLRuntimeException(e);
+    }
+  }
 
   SingleDatabaseConnectionSource(
       final String connectionUrl,
       final Set<String> additionalDriverProperties,
       final Map<String, String> connectionProperties,
-      final UserCredentials userCredentials,
-      final Consumer<Connection> connectionInitializer) {
-    super(connectionInitializer);
+      final UserCredentials userCredentials) {
     requireNotBlank(connectionUrl, "No database connection URL provided");
     requireNonNull(userCredentials, "No user credentials provided");
 
@@ -52,12 +54,13 @@ final class SingleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
 
   @Override
   public Connection get() {
-    connectionInitializer.accept(connection);
-    LOGGER.log(
-        Level.FINE,
-        new StringFormat(
-            "Initialized database connection <%s> with <%s>", connection, connectionInitializer));
-
+    initializeConnection(connection);
     return PooledConnectionUtility.newPooledConnection(connection, this);
+  }
+
+  @Override
+  public boolean releaseConnection(final Connection connection) {
+    // Do nothing, since connections are not closed
+    return true;
   }
 }

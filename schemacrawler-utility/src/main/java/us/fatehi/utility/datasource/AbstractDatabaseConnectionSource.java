@@ -8,7 +8,6 @@
 
 package us.fatehi.utility.datasource;
 
-import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
@@ -160,11 +159,10 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     return logProperties;
   }
 
-  protected Consumer<Connection> connectionInitializer;
+  private Consumer<Connection> connectionInitializer;
 
-  public AbstractDatabaseConnectionSource(final Consumer<Connection> connectionInitializer) {
-    this.connectionInitializer =
-        requireNonNull(connectionInitializer, "No connection initializer provided");
+  public AbstractDatabaseConnectionSource() {
+    connectionInitializer = connection -> {};
   }
 
   @Override
@@ -172,5 +170,22 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     if (connectionInitializer != null) {
       this.connectionInitializer = connectionInitializer.andThen(this.connectionInitializer);
     }
+  }
+
+  /**
+   * Since connection initializers can be set later on, always initialize when a connection is
+   * handed out
+   *
+   * @param connection Connection to initialize
+   */
+  protected final void initializeConnection(final Connection connection) {
+    if (connection == null) {
+      return;
+    }
+    connectionInitializer.accept(connection);
+    LOGGER.log(
+        Level.FINE,
+        new StringFormat(
+            "Initialized database connection <%s> with <%s>", connection, connectionInitializer));
   }
 }

@@ -25,13 +25,12 @@ final class DataSourceConnectionSource extends AbstractDatabaseConnectionSource 
   private final DataSource dataSource;
 
   DataSourceConnectionSource(final DataSource dataSource) {
-    super(connection -> {});
     this.dataSource = requireNonNull(dataSource, "Data source not provided");
   }
 
   @Override
   public void close() throws Exception {
-    if (dataSource instanceof Closeable closeable) {
+    if (dataSource instanceof final Closeable closeable) {
       closeable.close();
     }
   }
@@ -40,7 +39,7 @@ final class DataSourceConnectionSource extends AbstractDatabaseConnectionSource 
   public Connection get() {
     try {
       final Connection connection = dataSource.getConnection();
-      connectionInitializer.accept(connection);
+      initializeConnection(connection);
       return connection;
     } catch (final SQLException e) {
       throw new SQLRuntimeException(e);
