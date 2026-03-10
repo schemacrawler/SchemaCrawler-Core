@@ -41,6 +41,7 @@ module us.fatehi.schemacrawler.schemacrawler {
 
   // Export public API packages from schemacrawler-tools
   exports schemacrawler.tools.databaseconnector;
+  exports schemacrawler.tools.command;
   exports schemacrawler.tools.executable;
   exports schemacrawler.tools.executable.commandline;
   exports schemacrawler.tools.loader.catalog;
@@ -59,7 +60,7 @@ module us.fatehi.schemacrawler.schemacrawler {
   uses schemacrawler.tools.loader.catalog.CatalogLoaderProvider;
   uses schemacrawler.tools.loader.ermodel.ERModelLoaderProvider;
   uses schemacrawler.tools.databaseconnector.DatabaseConnector;
-  uses schemacrawler.tools.executable.SchemaCrawlerCommandProvider;
+  uses schemacrawler.tools.command.SchemaCrawlerCommandProvider;
 
   provides schemacrawler.tools.loader.catalog.CatalogLoaderProvider with
       schemacrawler.tools.loader.catalog.attributes.AttributesCatalogLoaderProvider,
