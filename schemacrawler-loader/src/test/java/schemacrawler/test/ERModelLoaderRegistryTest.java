@@ -12,16 +12,13 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
+import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.loader.ermodel.ChainedERModelLoader;
 import schemacrawler.tools.loader.ermodel.ERModelLoaderRegistry;
 import schemacrawler.tools.options.ConfigUtility;
@@ -32,11 +29,37 @@ public class ERModelLoaderRegistryTest {
   private static final int NUM_LOADERS = 2;
 
   @Test
-  public void chainedERModelLoaders() {
+  public void chainedLoaders() {
     final ChainedERModelLoader chainedLoaders =
         ERModelLoaderRegistry.getERModelLoaderRegistry()
             .newChainedERModelLoader(ConfigUtility.newConfig());
+
     assertThat(chainedLoaders.size(), is(NUM_LOADERS));
+  }
+
+  @Test
+  public void commandLineCommands() throws Exception {
+    final Collection<PluginCommand> commandLineCommands =
+        ERModelLoaderRegistry.getERModelLoaderRegistry().getCommandLineCommands();
+    assertThat(String.valueOf(commandLineCommands), commandLineCommands.size(), is(greaterThan(0)));
+    final List<String> names =
+        commandLineCommands.stream().map(PluginCommand::getName).collect(toList());
+    assertThat(names, containsInAnyOrder("loader:implicitassociationsloader"));
+  }
+
+  @Test
+  public void helpCommands() throws Exception {
+    final Collection<PluginCommand> helpCommands =
+        ERModelLoaderRegistry.getERModelLoaderRegistry().getHelpCommands();
+    assertThat(String.valueOf(helpCommands), helpCommands.size(), is(greaterThan(0)));
+    final List<String> names = helpCommands.stream().map(PluginCommand::getName).collect(toList());
+    assertThat(names, containsInAnyOrder("loader:implicitassociationsloader"));
+  }
+
+  @Test
+  public void name() {
+    final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getERModelLoaderRegistry();
+    assertThat(registry.getName(), is("ER Model Loaders"));
   }
 
   @Test
@@ -47,39 +70,5 @@ public class ERModelLoaderRegistryTest {
     final List<String> names =
         supportedLoaders.stream().map(PropertyName::getName).collect(toList());
     assertThat(names, containsInAnyOrder("primarymodelloader", "implicitassociationsloader"));
-  }
-
-  @Test
-  public void name() {
-    final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getERModelLoaderRegistry();
-    assertThat(registry.getName(), is("ER Model Loaders"));
-  }
-
-  /** Reloads the ERModelLoaderRegistry by resetting the singleton and recreating it. */
-  private static void reloadRegistry() {
-    try {
-      // Reset the singleton field
-      final Field singletonField =
-          ERModelLoaderRegistry.class.getDeclaredField("erModelLoaderRegistrySingleton");
-      singletonField.setAccessible(true);
-      singletonField.set(null, null);
-
-      // Instantiate a new instance to trigger loading
-      final Constructor<ERModelLoaderRegistry> constructor =
-          ERModelLoaderRegistry.class.getDeclaredConstructor();
-      constructor.setAccessible(true);
-      constructor.newInstance();
-    } catch (final NoSuchFieldException
-        | NoSuchMethodException
-        | SecurityException
-        | InstantiationException
-        | IllegalAccessException e) {
-      fail(e);
-    } catch (final InvocationTargetException e) {
-      if (e.getCause() instanceof InternalRuntimeException internalEx) {
-        throw internalEx;
-      }
-      fail(e);
-    }
   }
 }

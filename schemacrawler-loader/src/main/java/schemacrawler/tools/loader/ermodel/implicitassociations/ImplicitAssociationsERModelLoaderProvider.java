@@ -12,7 +12,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import java.util.List;
-import schemacrawler.tools.loader.ermodel.BaseERModelLoaderProvider;
+import schemacrawler.tools.executable.commandline.PluginCommand;
+import schemacrawler.tools.loader.ermodel.AbstractERModelLoaderProvider;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
@@ -22,13 +23,26 @@ import us.fatehi.utility.property.PropertyName;
  * <p>This provider registers the implicit associations ER model loader, which enriches an existing
  * ER model with implicit relationships discovered from table and column naming patterns.
  */
-public class ImplicitAssociationsERModelLoaderProvider extends BaseERModelLoaderProvider {
+public class ImplicitAssociationsERModelLoaderProvider extends AbstractERModelLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName(
           "implicitassociationsloader", "Loader for implicit associations in ER Model");
 
   private static final String OPTION_IMPLICIT_ASSOCIATIONS = "implicit-associations";
+
+  @Override
+  public PluginCommand getCommandLineCommand() {
+    final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(NAME);
+    pluginCommand.addOption(
+        OPTION_IMPLICIT_ASSOCIATIONS,
+        Boolean.class,
+        "Analyzes the schema to find implicit associations between entities, based on naming"
+            + " patterns",
+        "This can be a time consuming operation",
+        "Optional, defaults to false");
+    return pluginCommand;
+  }
 
   @Override
   public Collection<PropertyName> getSupportedCommands() {

@@ -17,7 +17,7 @@ import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
 /** Provider for {@link PrimaryERModelLoader}. */
-public class PrimaryERModelLoaderProvider extends BaseERModelLoaderProvider {
+public class PrimaryERModelLoaderProvider extends AbstractERModelLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName("primarymodelloader", "Loader for ER Model");

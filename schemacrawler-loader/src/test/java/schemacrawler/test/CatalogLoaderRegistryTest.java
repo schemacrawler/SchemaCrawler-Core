@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 
 import java.util.Collection;
@@ -26,56 +27,56 @@ import us.fatehi.utility.property.PropertyName;
 
 public class CatalogLoaderRegistryTest {
 
-  private static final int NUM_CATALOG_LOADERS = 5;
+  private static final int NUM_LOADERS = 5;
+
+  @Test
+  public void chainedLoaders() {
+    final ChainedCatalogLoader chainedLoaders =
+        CatalogLoaderRegistry.getCatalogLoaderRegistry()
+            .newChainedCatalogLoader(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions(), ConfigUtility.newConfig());
+
+    assertThat(chainedLoaders.size(), is(NUM_LOADERS));
+  }
 
   @Test
   public void commandLineCommands() throws Exception {
     final Collection<PluginCommand> commandLineCommands =
         CatalogLoaderRegistry.getCatalogLoaderRegistry().getCommandLineCommands();
-    assertThat(commandLineCommands, hasSize(NUM_CATALOG_LOADERS - 1));
+    assertThat(String.valueOf(commandLineCommands), commandLineCommands.size(), is(greaterThan(0)));
     final List<String> names =
         commandLineCommands.stream().map(PluginCommand::getName).collect(toList());
     assertThat(
         names,
         containsInAnyOrder(
-            "loader:weakassociationsloader",
-            "loader:attributesloader",
-            "loader:countsloader",
-            "unknown:unknown"));
+            "loader:weakassociationsloader", "loader:attributesloader", "loader:countsloader"));
   }
 
   @Test
   public void helpCommands() throws Exception {
     final Collection<PluginCommand> helpCommands =
         CatalogLoaderRegistry.getCatalogLoaderRegistry().getHelpCommands();
-    assertThat(String.valueOf(helpCommands), helpCommands, hasSize(NUM_CATALOG_LOADERS - 1));
+    assertThat(String.valueOf(helpCommands), helpCommands.size(), is(greaterThan(0)));
     final List<String> names = helpCommands.stream().map(PluginCommand::getName).collect(toList());
     assertThat(
         names,
         containsInAnyOrder(
-            "loader:weakassociationsloader",
-            "loader:attributesloader",
-            "loader:countsloader",
-            "unknown:unknown"));
+            "loader:weakassociationsloader", "loader:attributesloader", "loader:countsloader"));
   }
 
   @Test
-  public void chainedCatalogLoaders() {
-    final ChainedCatalogLoader chainedCatalogLoaders =
-        CatalogLoaderRegistry.getCatalogLoaderRegistry()
-            .newChainedCatalogLoader(
-                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions(), ConfigUtility.newConfig());
-
-    assertThat(chainedCatalogLoaders.size(), is(NUM_CATALOG_LOADERS));
+  public void name() throws Exception {
+    final CatalogLoaderRegistry registry = CatalogLoaderRegistry.getCatalogLoaderRegistry();
+    assertThat(registry.getName(), is("SchemaCrawler Catalog Loaders"));
   }
 
   @Test
   public void registeredPlugins() throws Exception {
-    final Collection<PropertyName> supportedCatalogLoaders =
+    final Collection<PropertyName> supportedLoaders =
         CatalogLoaderRegistry.getCatalogLoaderRegistry().getRegisteredPlugins();
-    assertThat(supportedCatalogLoaders, hasSize(NUM_CATALOG_LOADERS));
+    assertThat(supportedLoaders, hasSize(NUM_LOADERS));
     final List<String> names =
-        supportedCatalogLoaders.stream().map(PropertyName::getName).collect(toList());
+        supportedLoaders.stream().map(PropertyName::getName).collect(toList());
     assertThat(
         names,
         containsInAnyOrder(
@@ -84,12 +85,5 @@ public class CatalogLoaderRegistryTest {
             "offlineloader",
             "primarycatalogloader",
             "weakassociationsloader"));
-  }
-
-  @Test
-  public void name() throws Exception {
-    final CatalogLoaderRegistry catalogLoaderRegistry =
-        CatalogLoaderRegistry.getCatalogLoaderRegistry();
-    assertThat(catalogLoaderRegistry.getName(), is("SchemaCrawler Catalog Loaders"));
   }
 }

@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.loader.ermodel;
+package schemacrawler.tools.loader.catalog;
 
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.requireNotBlank;
@@ -14,8 +14,7 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
 
-/** Abstract base class for ERModel loader providers. */
-public abstract class BaseERModelLoaderProvider implements ERModelLoaderProvider {
+public abstract class AbstractCatalogLoaderProvider implements CatalogLoaderProvider {
 
   @Override
   public PluginCommand getCommandLineCommand() {
@@ -23,7 +22,7 @@ public abstract class BaseERModelLoaderProvider implements ERModelLoaderProvider
   }
 
   @Override
-  public final ERModelLoader<?> newCommand(final String command, final Config config) {
+  public final CatalogLoader<?> newCommand(final String command, final Config config) {
     requireNonNull(config, "No config provided");
     requireNotBlank(command, "No command provided");
     // Note that no check is done to ensure that the command matches the provider
