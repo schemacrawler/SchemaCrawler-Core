@@ -11,7 +11,6 @@ package us.fatehi.utility.datasource;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -22,7 +21,7 @@ public class DatabaseConnectionSources {
   private static final Logger LOGGER = Logger.getLogger(DatabaseConnectionSources.class.getName());
 
   public static DatabaseConnectionSource fromConnection(final Connection connection) {
-    return new ConnectionDatabaseConnectionSource(connection);
+    return new SingleDatabaseConnectionSource(connection);
   }
 
   public static DatabaseConnectionSource fromDataSource(final DataSource dataSource) {
@@ -33,33 +32,23 @@ public class DatabaseConnectionSources {
       final String connectionUrl,
       final Set<String> additionalDriverProperties,
       final Map<String, String> connectionProperties,
-      final UserCredentials userCredentials,
-      final Consumer<Connection> connectionInitializer) {
+      final UserCredentials userCredentials) {
 
     final boolean isSingleThreaded =
         new SystemPropertiesConfig().getBooleanValue("SC_SINGLE_THREADED");
     if (isSingleThreaded) {
       LOGGER.log(Level.CONFIG, "Loading database schema in the main thread");
       return new SingleDatabaseConnectionSource(
-          connectionUrl,
-          additionalDriverProperties,
-          connectionProperties,
-          userCredentials,
-          connectionInitializer);
+          connectionUrl, additionalDriverProperties, connectionProperties, userCredentials);
     }
     LOGGER.log(Level.CONFIG, "Loading database schema using multiple threads");
     return new SimpleDatabaseConnectionSource(
-        connectionUrl,
-        additionalDriverProperties,
-        connectionProperties,
-        userCredentials,
-        connectionInitializer);
+        connectionUrl, additionalDriverProperties, connectionProperties, userCredentials);
   }
 
   public static DatabaseConnectionSource newDatabaseConnectionSource(
       final String connectionUrl, final UserCredentials userCredentials) {
-    return newDatabaseConnectionSource(
-        connectionUrl, null, null, userCredentials, connection -> {});
+    return newDatabaseConnectionSource(connectionUrl, null, null, userCredentials);
   }
 
   private DatabaseConnectionSources() {

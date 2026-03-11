@@ -68,11 +68,11 @@ public class PooledConnectionUtility {
         default:
           try {
             return method.invoke(connection, args);
-          } catch (IllegalAccessException
+          } catch (final IllegalAccessException
               | IllegalArgumentException
               | InvocationTargetException e) {
             final Throwable cause = e.getCause();
-            if (cause instanceof Exception exception) {
+            if (cause instanceof final Exception exception) {
               throw exception;
             }
             throw new SQLException("Could not delegate method <%s>".formatted(method), e);

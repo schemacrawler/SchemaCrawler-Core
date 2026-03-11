@@ -46,7 +46,7 @@ public final class TableRowCountsRetriever {
   public void retrieveTableRowCounts() {
 
     Identifiers identifiers;
-    try (Connection connection = connectionSource.get(); ) {
+    try (final Connection connection = connectionSource.get(); ) {
       identifiers =
           IdentifiersBuilder.builder()
               .fromConnection(connection)
@@ -59,7 +59,7 @@ public final class TableRowCountsRetriever {
       return;
     }
 
-    try (Connection connection = connectionSource.get(); ) {
+    try (final Connection connection = connectionSource.get(); ) {
       final Query query =
           new Query("schemacrawler.table.row_counts", "SELECT COUNT(*) FROM ${table}");
       final List<Table> allTables = new ArrayList<>(catalog.getTables());

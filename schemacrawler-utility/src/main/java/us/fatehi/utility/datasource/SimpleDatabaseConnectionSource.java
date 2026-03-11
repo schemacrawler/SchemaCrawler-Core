@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.database.DatabaseUtility;
@@ -41,10 +40,8 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
       final String connectionUrl,
       final Set<String> additionalDriverProperties,
       final Map<String, String> connectionProperties,
-      final UserCredentials userCredentials,
-      final Consumer<Connection> connectionInitializer) {
+      final UserCredentials userCredentials) {
 
-    super(connectionInitializer);
     this.connectionUrl = requireNotBlank(connectionUrl, "No database connection URL provided");
     requireNonNull(userCredentials, "No user credentials provided");
 
@@ -68,8 +65,7 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
   @Override
   public void close() throws Exception {
 
-    final List<Connection> connections = new ArrayList<>();
-    connections.addAll(connectionPool);
+    final List<Connection> connections = new ArrayList<>(connectionPool);
     connections.addAll(usedConnections);
 
     for (final Connection connection : connections) {
@@ -101,12 +97,7 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
     final Connection connection = connectionPool.removeFirst();
     usedConnections.add(connection);
 
-    connectionInitializer.accept(connection);
-    LOGGER.log(
-        Level.FINE,
-        new StringFormat(
-            "Initialized database connection <%s> with <%s>", connection, connectionInitializer));
-
+    initializeConnection(connection);
     return PooledConnectionUtility.newPooledConnection(connection, this);
   }
 

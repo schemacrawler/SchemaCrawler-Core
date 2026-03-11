@@ -9,6 +9,7 @@
 package us.fatehi.utility.database;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
@@ -31,16 +32,12 @@ public final class DatabaseUtility {
 
   private static final Logger LOGGER = Logger.getLogger(DatabaseUtility.class.getName());
 
-  public static Connection checkConnection(final Connection connection) throws SQLException {
-    try {
-      requireNonNull(connection, "No database connection provided");
-      if (connection.isClosed()) {
-        throw new SQLException("Connection is closed");
-      }
-    } catch (final NullPointerException e) {
-      throw new SQLException(e);
-    }
+  private static final int VALIDATION_TIMEOUT = (int) SECONDS.toSeconds(5);
 
+  public static Connection checkConnection(final Connection connection) throws SQLException {
+    if (connection == null || !connection.isValid(VALIDATION_TIMEOUT)) {
+      throw new SQLException("Connection is not valid");
+    }
     return connection;
   }
 

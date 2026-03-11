@@ -43,6 +43,8 @@ public class TestDatabaseDriver implements Driver {
                 case "setAutoCommit":
                   // Do nothing
                   return null;
+                case "isClosed":
+                  return false;
                 case "isWrapperFor":
                   return false;
                 case "isValid":

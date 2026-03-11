@@ -38,11 +38,7 @@ public class SimpleDatabaseConnectionSourceTest {
         RuntimeException.class,
         () ->
             new SimpleDatabaseConnectionSource(
-                "<bad-url>",
-                Set.of(),
-                null,
-                new MultiUseUserCredentials("user", "!"),
-                connection -> {}));
+                "<bad-url>", Set.of(), null, new MultiUseUserCredentials("user", "!")));
   }
 
   @Test
@@ -82,7 +78,6 @@ public class SimpleDatabaseConnectionSourceTest {
             connectionUrl,
             Set.of(),
             new HashMap<>(),
-            new MultiUseUserCredentials(userName, password),
-            connection -> {});
+            new MultiUseUserCredentials(userName, password));
   }
 }

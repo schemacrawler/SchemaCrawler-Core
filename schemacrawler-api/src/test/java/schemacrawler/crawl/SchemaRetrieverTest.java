@@ -36,8 +36,8 @@ import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
-import us.fatehi.utility.datasource.ConnectionDatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import us.fatehi.utility.datasource.DatabaseConnectionSources;
 
 @WithTestDatabase
 @ResolveTestContext
@@ -70,7 +70,7 @@ public class SchemaRetrieverTest {
     schemaRetrievalOptionsBuilder.withInformationSchemaViews(informationSchemaViews);
     final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.toOptions();
     final DatabaseConnectionSource connectionSource =
-        new ConnectionDatabaseConnectionSource(spyConnection);
+        DatabaseConnectionSources.fromConnection(spyConnection);
     final RetrieverConnection retrieverConnection =
         new RetrieverConnection(connectionSource, schemaRetrievalOptions);
 

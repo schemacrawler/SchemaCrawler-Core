@@ -44,8 +44,10 @@ public class OfflineConnectionUtility {
         case "setAutoCommit":
           // Do nothing
           return null;
-        case "getOfflineDatabasePath":
-          return offlineDatabasePath;
+        case "isClosed":
+          return isClosed;
+        case "isValid":
+          return !isClosed;
         case "isWrapperFor":
           if (args[0] == null) {
             return false;
@@ -54,28 +56,25 @@ public class OfflineConnectionUtility {
           return clazz.isAssignableFrom(Connection.class);
         case "unwrap":
           return proxy;
-        case "isValid":
-          return !isClosed;
-        case "isClosed":
-          return isClosed;
         case "getTypeMap":
           return Map.of();
+        case "getOfflineDatabasePath":
+          return offlineDatabasePath;
         case "hashCode":
           return offlineDatabasePath.hashCode();
         case "toString":
-          return "schemacrawler.tools.offline.jdbc.OfflineConnection@%s"
-              .formatted(offlineDatabasePath.hashCode());
+          return "%s@%d"
+              .formatted(OfflineConnection.class.getName(), offlineDatabasePath.hashCode());
         case "equals":
           if (args != null
               && args.length > 0
-              && args[0] instanceof OfflineConnection otherOfflineConnection) {
+              && args[0] instanceof final OfflineConnection otherOfflineConnection) {
             return otherOfflineConnection.hashCode() == offlineDatabasePath.hashCode();
           }
         // Fall through
         default:
           throw new SQLFeatureNotSupportedException(
-              "Offline catalog snapshot connection does not support method <%s>"
-                  .formatted(methodName),
+              "Offline catalog snapshot connection does not support <%s>".formatted(method),
               "HYC00");
       }
     }
@@ -94,8 +93,7 @@ public class OfflineConnectionUtility {
             newProxyInstance(
                 OfflineConnectionUtility.class.getClassLoader(),
                 new Class[] {OfflineConnection.class},
-                new OfflineConnectionUtility.OfflineConnectionInvocationHandler(
-                    absoluteOfflineDatabasePath));
+                new OfflineConnectionInvocationHandler(absoluteOfflineDatabasePath));
     return offlineConnection;
   }
 

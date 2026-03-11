@@ -11,6 +11,7 @@ package us.fatehi.test.utility;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -212,6 +213,7 @@ public class TestObjectUtility {
       lenient().when(mockConnection.toString()).thenReturn("Connection: Mocked Connection");
       lenient().when(mockConnection.getMetaData()).thenReturn(mockDbMetaData);
       lenient().when(mockConnection.isClosed()).thenReturn(false);
+      lenient().when(mockConnection.isValid(anyInt())).thenReturn(true);
 
       final Statement mockStatement = mockStatement();
       lenient().when(mockConnection.createStatement()).thenReturn(mockStatement);

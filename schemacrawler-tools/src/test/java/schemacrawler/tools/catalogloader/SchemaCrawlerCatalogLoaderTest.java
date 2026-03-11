@@ -24,8 +24,8 @@ import schemacrawler.tools.loader.catalog.PrimaryCatalogLoader;
 import schemacrawler.tools.loader.catalog.PrimaryCatalogLoaderProvider;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.test.utility.TestDatabaseDriver;
-import us.fatehi.utility.datasource.ConnectionDatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import us.fatehi.utility.datasource.DatabaseConnectionSources;
 
 public class SchemaCrawlerCatalogLoaderTest {
 
@@ -37,7 +37,7 @@ public class SchemaCrawlerCatalogLoaderTest {
 
     final Connection connection = new TestDatabaseDriver().connect("jdbc:test-db:test", null);
     final DatabaseConnectionSource connectionSource =
-        new ConnectionDatabaseConnectionSource(connection);
+        DatabaseConnectionSources.fromConnection(connection);
     catalogLoader.setConnectionSource(connectionSource);
 
     assertThat(catalogLoader.getConnectionSource(), is(not(nullValue())));

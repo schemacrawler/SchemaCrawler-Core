@@ -8,7 +8,6 @@
 
 package us.fatehi.utility.datasource;
 
-import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
@@ -25,6 +24,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.SQLRuntimeException;
+import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.string.StringFormat;
 
 abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSource {
@@ -148,7 +148,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     if (additionalDriverProperties != null) {
       additionalDriverProperties.stream()
           .filter(property -> !isBlank(property))
-          .map(property -> property.toLowerCase())
+          .map(String::toLowerCase)
           .forEach(jdbcDriverProperties::add);
     }
     return jdbcDriverProperties;
@@ -160,11 +160,10 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     return logProperties;
   }
 
-  protected Consumer<Connection> connectionInitializer;
+  private Consumer<Connection> connectionInitializer;
 
-  public AbstractDatabaseConnectionSource(final Consumer<Connection> connectionInitializer) {
-    this.connectionInitializer =
-        requireNonNull(connectionInitializer, "No connection initializer provided");
+  public AbstractDatabaseConnectionSource() {
+    connectionInitializer = connection -> {};
   }
 
   @Override
@@ -172,5 +171,25 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     if (connectionInitializer != null) {
       this.connectionInitializer = connectionInitializer.andThen(this.connectionInitializer);
     }
+  }
+
+  /**
+   * Since connection initializers can be set later on, always initialize when a connection is
+   * handed out
+   *
+   * @param connection Connection to initialize
+   * @throws SQLException
+   */
+  protected final void initializeConnection(final Connection connection) {
+    try {
+      DatabaseUtility.checkConnection(connection);
+    } catch (final SQLException e) {
+      throw new SQLRuntimeException(e);
+    }
+    connectionInitializer.accept(connection);
+    LOGGER.log(
+        Level.FINE,
+        new StringFormat(
+            "Initialized database connection <%s> with <%s>", connection, connectionInitializer));
   }
 }

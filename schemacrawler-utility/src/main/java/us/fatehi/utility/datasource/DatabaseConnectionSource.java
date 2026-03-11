@@ -14,12 +14,7 @@ import java.util.function.Supplier;
 
 public interface DatabaseConnectionSource extends AutoCloseable, Supplier<Connection> {
 
-  default boolean releaseConnection(Connection connection) {
-    // No-op
-    return true;
-  }
+  boolean releaseConnection(Connection connection);
 
-  default void setFirstConnectionInitializer(Consumer<Connection> connectionInitializer) {
-    // No-op
-  }
+  void setFirstConnectionInitializer(Consumer<Connection> connectionInitializer);
 }
