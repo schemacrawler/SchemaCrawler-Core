@@ -72,7 +72,7 @@ public class DatabaseUtilityTest {
 
     final SQLException exception1 =
         assertThrows(SQLException.class, () -> DatabaseUtility.checkConnection(null));
-    assertThat(exception1.getMessage(), endsWith("No database connection provided"));
+    assertThat(exception1.getMessage(), endsWith("Connection is not valid"));
 
     final Connection mockConnection = TestObjectUtility.mockConnection();
     when(mockConnection.isValid(anyInt())).thenReturn(false);
