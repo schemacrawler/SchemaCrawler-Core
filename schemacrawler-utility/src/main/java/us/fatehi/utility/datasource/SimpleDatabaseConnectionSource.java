@@ -65,8 +65,7 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
   @Override
   public void close() throws Exception {
 
-    final List<Connection> connections = new ArrayList<>();
-    connections.addAll(connectionPool);
+    final List<Connection> connections = new ArrayList<>(connectionPool);
     connections.addAll(usedConnections);
 
     for (final Connection connection : connections) {
@@ -99,7 +98,6 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
     usedConnections.add(connection);
 
     initializeConnection(connection);
-
     return PooledConnectionUtility.newPooledConnection(connection, this);
   }
 

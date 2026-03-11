@@ -35,15 +35,9 @@ public final class DatabaseUtility {
   private static final int VALIDATION_TIMEOUT = (int) SECONDS.toSeconds(5);
 
   public static Connection checkConnection(final Connection connection) throws SQLException {
-    try {
-      requireNonNull(connection, "No database connection provided");
-      if (!connection.isValid(VALIDATION_TIMEOUT)) {
-        throw new SQLException("Connection is not valid");
-      }
-    } catch (final NullPointerException e) {
-      throw new SQLException(e);
+    if (connection == null || !connection.isValid(VALIDATION_TIMEOUT)) {
+      throw new SQLException("Connection is not valid");
     }
-
     return connection;
   }
 
