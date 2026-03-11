@@ -15,11 +15,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ServiceLoader;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
+import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsERModelLoaderProvider;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
@@ -48,30 +47,11 @@ public final class ERModelLoaderRegistry extends BasePluginCommandRegistry<ERMod
     return erModelLoaderRegistrySingleton;
   }
 
-  private static List<ERModelLoaderProvider> loadERModelLoaderRegistry() {
-    // Use thread-safe list
-    final List<ERModelLoaderProvider> erModelLoaderRegistry = new CopyOnWriteArrayList<>();
-
-    try {
-      final ServiceLoader<ERModelLoaderProvider> serviceLoader =
-          ServiceLoader.load(
-              ERModelLoaderProvider.class, ERModelLoaderRegistry.class.getClassLoader());
-      for (final ERModelLoaderProvider erModelLoaderProvider : serviceLoader) {
-        LOGGER.log(
-            Level.CONFIG,
-            new StringFormat(
-                "Loading ERModel loader, %s", erModelLoaderProvider.getClass().getName()));
-        erModelLoaderRegistry.add(erModelLoaderProvider);
-      }
-    } catch (final Throwable e) {
-      throw new InternalRuntimeException("Could not load ERModel loader registry", e);
-    }
-
-    return erModelLoaderRegistry;
-  }
-
   private ERModelLoaderRegistry() {
-    super("ER Model Loaders", loadERModelLoaderRegistry());
+    super(
+        "ER Model Loaders",
+        List.of(
+            new PrimaryERModelLoaderProvider(), new ImplicitAssociationsERModelLoaderProvider()));
   }
 
   /**
