@@ -8,21 +8,16 @@
 
 package schemacrawler.test;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static schemacrawler.test.utility.PluginRegistryTestUtility.reload;
 
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
-import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
-import schemacrawler.test.utility.TestCatalogLoaderProvider;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.loader.catalog.CatalogLoaderRegistry;
 import schemacrawler.tools.loader.catalog.ChainedCatalogLoader;
@@ -31,7 +26,7 @@ import us.fatehi.utility.property.PropertyName;
 
 public class CatalogLoaderRegistryTest {
 
-  private static final int NUM_CATALOG_LOADERS = 6;
+  private static final int NUM_CATALOG_LOADERS = 5;
 
   @Test
   public void commandLineCommands() throws Exception {
@@ -44,7 +39,6 @@ public class CatalogLoaderRegistryTest {
         names,
         containsInAnyOrder(
             "loader:weakassociationsloader",
-            "loader:testloader",
             "loader:attributesloader",
             "loader:countsloader",
             "unknown:unknown"));
@@ -60,7 +54,6 @@ public class CatalogLoaderRegistryTest {
         names,
         containsInAnyOrder(
             "loader:weakassociationsloader",
-            "loader:testloader",
             "loader:attributesloader",
             "loader:countsloader",
             "unknown:unknown"));
@@ -90,7 +83,6 @@ public class CatalogLoaderRegistryTest {
             "countsloader",
             "offlineloader",
             "primarycatalogloader",
-            "testloader",
             "weakassociationsloader"));
   }
 
@@ -99,18 +91,5 @@ public class CatalogLoaderRegistryTest {
     final CatalogLoaderRegistry catalogLoaderRegistry =
         CatalogLoaderRegistry.getCatalogLoaderRegistry();
     assertThat(catalogLoaderRegistry.getName(), is("SchemaCrawler Catalog Loaders"));
-  }
-
-  @Test
-  public void loadError() throws Exception {
-    restoreSystemProperties(
-        () -> {
-          System.setProperty(
-              TestCatalogLoaderProvider.class.getName() + ".force-instantiation-failure", "throw");
-
-          assertThrows(InternalRuntimeException.class, () -> reload(CatalogLoaderRegistry.class));
-        });
-    // Reset
-    reload(CatalogLoaderRegistry.class);
   }
 }

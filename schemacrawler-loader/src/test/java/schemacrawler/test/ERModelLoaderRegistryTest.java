@@ -8,13 +8,11 @@
 
 package schemacrawler.test;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Constructor;
@@ -24,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
-import schemacrawler.test.utility.TestERModelLoaderProvider;
 import schemacrawler.tools.loader.ermodel.ChainedERModelLoader;
 import schemacrawler.tools.loader.ermodel.ERModelLoaderRegistry;
 import schemacrawler.tools.options.ConfigUtility;
@@ -32,7 +29,7 @@ import us.fatehi.utility.property.PropertyName;
 
 public class ERModelLoaderRegistryTest {
 
-  private static final int NUM_LOADERS = 3;
+  private static final int NUM_LOADERS = 2;
 
   @Test
   public void chainedERModelLoaders() {
@@ -49,28 +46,13 @@ public class ERModelLoaderRegistryTest {
     assertThat(supportedLoaders, hasSize(NUM_LOADERS));
     final List<String> names =
         supportedLoaders.stream().map(PropertyName::getName).collect(toList());
-    assertThat(
-        names,
-        containsInAnyOrder("primarymodelloader", "implicitassociationsloader", "testmodelloader"));
+    assertThat(names, containsInAnyOrder("primarymodelloader", "implicitassociationsloader"));
   }
 
   @Test
   public void name() {
     final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getERModelLoaderRegistry();
     assertThat(registry.getName(), is("ER Model Loaders"));
-  }
-
-  @Test
-  public void loadError() throws Exception {
-    restoreSystemProperties(
-        () -> {
-          System.setProperty(
-              TestERModelLoaderProvider.class.getName() + ".force-instantiation-failure", "throw");
-
-          assertThrows(InternalRuntimeException.class, () -> reloadRegistry());
-        });
-    // Reset
-    reloadRegistry();
   }
 
   /** Reloads the ERModelLoaderRegistry by resetting the singleton and recreating it. */

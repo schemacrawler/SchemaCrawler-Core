@@ -31,7 +31,6 @@ public class AvailableLoaderRegistryTest {
             "countsloader",
             "offlineloader",
             "primarycatalogloader",
-            "testloader",
             "weakassociationsloader"));
   }
 
@@ -39,8 +38,7 @@ public class AvailableLoaderRegistryTest {
   public void availableERModelLoaders() {
     assertThat(
         getRegisteredPlugins(ERModelLoaderRegistry.getERModelLoaderRegistry()),
-        arrayContainingInAnyOrder(
-            "implicitassociationsloader", "primarymodelloader", "testmodelloader"));
+        arrayContainingInAnyOrder("implicitassociationsloader", "primarymodelloader"));
   }
 
   private String[] getRegisteredPlugins(final PluginRegistry registry) {
