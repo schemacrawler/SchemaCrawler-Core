@@ -12,10 +12,8 @@ import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.nullsLast;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,11 +21,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.tools.options.Config;
-import us.fatehi.utility.property.PropertyName;
+import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
 
 /** Registry for registered ERModel loaders, in order of priority. */
-public final class ERModelLoaderRegistry {
+public final class ERModelLoaderRegistry extends BasePluginCommandRegistry<ERModelLoaderProvider> {
 
   private static final Logger LOGGER = Logger.getLogger(ERModelLoaderRegistry.class.getName());
 
@@ -72,51 +70,8 @@ public final class ERModelLoaderRegistry {
     return erModelLoaderRegistry;
   }
 
-  private final List<ERModelLoaderProvider> erModelLoaderProviders;
-  private final String registryName;
-
   private ERModelLoaderRegistry() {
-    registryName = "ER Model Loaders";
-    erModelLoaderProviders = loadERModelLoaderRegistry();
-  }
-
-  /**
-   * Returns the name of this registry.
-   *
-   * @return Registry name
-   */
-  public String getName() {
-    return registryName;
-  }
-
-  /**
-   * Returns the names of all registered ERModel loaders.
-   *
-   * @return Registered ERModel loader names
-   */
-  public Collection<PropertyName> getRegisteredPlugins() {
-    final Collection<PropertyName> supportedLoaders = new HashSet<>();
-    for (final ERModelLoaderProvider provider : erModelLoaderProviders) {
-      if (provider != null) {
-        supportedLoaders.addAll(provider.getSupportedCommands());
-      }
-    }
-    final List<PropertyName> orderedLoaders = new ArrayList<>(supportedLoaders);
-    Collections.sort(orderedLoaders);
-    return Collections.unmodifiableList(orderedLoaders);
-  }
-
-  /** Logs the registered ERModel loaders at CONFIG level. */
-  public void log() {
-    if (!LOGGER.isLoggable(Level.CONFIG)) {
-      return;
-    }
-    final StringBuilder sb = new StringBuilder();
-    sb.append("Registered ").append(registryName).append(":\n");
-    for (final PropertyName name : getRegisteredPlugins()) {
-      sb.append("  ").append(name).append("\n");
-    }
-    LOGGER.log(Level.CONFIG, sb.toString());
+    super("ER Model Loaders", loadERModelLoaderRegistry());
   }
 
   /**
@@ -131,7 +86,7 @@ public final class ERModelLoaderRegistry {
 
   private List<ERModelLoader<?>> configureERModelLoaders(final Config additionalConfig) {
     final List<ERModelLoader<?>> erModelLoaders = new ArrayList<>();
-    for (final ERModelLoaderProvider provider : erModelLoaderProviders) {
+    for (final ERModelLoaderProvider provider : getCommandProviders()) {
       try {
         final ERModelLoader<?> erModelLoader = provider.newCommand(additionalConfig);
         if (erModelLoader == null) {

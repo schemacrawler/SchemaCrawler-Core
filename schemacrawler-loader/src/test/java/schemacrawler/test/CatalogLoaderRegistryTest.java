@@ -31,23 +31,39 @@ import us.fatehi.utility.property.PropertyName;
 
 public class CatalogLoaderRegistryTest {
 
+  private static final int NUM_CATALOG_LOADERS = 6;
+
   @Test
   public void commandLineCommands() throws Exception {
     final Collection<PluginCommand> commandLineCommands =
         CatalogLoaderRegistry.getCatalogLoaderRegistry().getCommandLineCommands();
-    assertThat(commandLineCommands, hasSize(2));
+    assertThat(commandLineCommands, hasSize(NUM_CATALOG_LOADERS - 1));
     final List<String> names =
         commandLineCommands.stream().map(PluginCommand::getName).collect(toList());
-    assertThat(names, containsInAnyOrder("loader:testloader", "unknown:unknown"));
+    assertThat(
+        names,
+        containsInAnyOrder(
+            "loader:weakassociationsloader",
+            "loader:testloader",
+            "loader:attributesloader",
+            "loader:countsloader",
+            "unknown:unknown"));
   }
 
   @Test
   public void helpCommands() throws Exception {
     final Collection<PluginCommand> helpCommands =
         CatalogLoaderRegistry.getCatalogLoaderRegistry().getHelpCommands();
-    assertThat(String.valueOf(helpCommands), helpCommands, hasSize(2));
+    assertThat(String.valueOf(helpCommands), helpCommands, hasSize(NUM_CATALOG_LOADERS - 1));
     final List<String> names = helpCommands.stream().map(PluginCommand::getName).collect(toList());
-    assertThat(names, containsInAnyOrder("loader:testloader", "unknown:unknown"));
+    assertThat(
+        names,
+        containsInAnyOrder(
+            "loader:weakassociationsloader",
+            "loader:testloader",
+            "loader:attributesloader",
+            "loader:countsloader",
+            "unknown:unknown"));
   }
 
   @Test
@@ -57,17 +73,25 @@ public class CatalogLoaderRegistryTest {
             .newChainedCatalogLoader(
                 SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions(), ConfigUtility.newConfig());
 
-    assertThat(chainedCatalogLoaders.size(), is(2));
+    assertThat(chainedCatalogLoaders.size(), is(NUM_CATALOG_LOADERS));
   }
 
   @Test
   public void registeredPlugins() throws Exception {
     final Collection<PropertyName> supportedCatalogLoaders =
         CatalogLoaderRegistry.getCatalogLoaderRegistry().getRegisteredPlugins();
-    assertThat(supportedCatalogLoaders, hasSize(2));
+    assertThat(supportedCatalogLoaders, hasSize(NUM_CATALOG_LOADERS));
     final List<String> names =
         supportedCatalogLoaders.stream().map(PropertyName::getName).collect(toList());
-    assertThat(names, containsInAnyOrder("testloader", "primarycatalogloader"));
+    assertThat(
+        names,
+        containsInAnyOrder(
+            "attributesloader",
+            "countsloader",
+            "offlineloader",
+            "primarycatalogloader",
+            "testloader",
+            "weakassociationsloader"));
   }
 
   @Test

@@ -21,20 +21,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.tools.command.CommandRegistry;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
-import schemacrawler.tools.loader.catalog.CatalogLoaderRegistry;
 import schemacrawler.tools.registry.JDBCDriverRegistry;
 import schemacrawler.tools.registry.PluginRegistry;
 import us.fatehi.test.utility.TestDatabaseDriver;
 import us.fatehi.utility.property.PropertyName;
 
 public class AvailableRegistryPluginsTest {
-
-  @Test
-  public void availableCatalogLoaders() {
-    assertThat(
-        getRegisteredPlugins(CatalogLoaderRegistry.getCatalogLoaderRegistry()),
-        arrayContainingInAnyOrder("testloader", "primarycatalogloader"));
-  }
 
   @Test
   public void availableCommands() {

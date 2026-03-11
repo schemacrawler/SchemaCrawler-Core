@@ -50,7 +50,8 @@ public abstract class BasePluginCommandRegistry<R extends CommandProvider>
     final Collection<PluginCommand> commandLineCommands = new HashSet<>();
     for (final R commandProvider : commandProviders) {
       if (commandProvider != null) {
-        commandLineCommands.add(commandProvider.getHelpCommand());
+        final PluginCommand helpCommand = commandProvider.getHelpCommand();
+        commandLineCommands.add(helpCommand);
       }
     }
     return commandLineCommands;

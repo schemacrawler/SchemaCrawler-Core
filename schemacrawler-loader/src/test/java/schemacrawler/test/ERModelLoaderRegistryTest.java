@@ -32,22 +32,26 @@ import us.fatehi.utility.property.PropertyName;
 
 public class ERModelLoaderRegistryTest {
 
+  private static final int NUM_LOADERS = 3;
+
   @Test
   public void chainedERModelLoaders() {
     final ChainedERModelLoader chainedLoaders =
         ERModelLoaderRegistry.getERModelLoaderRegistry()
             .newChainedERModelLoader(ConfigUtility.newConfig());
-    assertThat(chainedLoaders.size(), is(2));
+    assertThat(chainedLoaders.size(), is(NUM_LOADERS));
   }
 
   @Test
   public void registeredPlugins() {
     final Collection<PropertyName> supportedLoaders =
         ERModelLoaderRegistry.getERModelLoaderRegistry().getRegisteredPlugins();
-    assertThat(supportedLoaders, hasSize(2));
+    assertThat(supportedLoaders, hasSize(NUM_LOADERS));
     final List<String> names =
         supportedLoaders.stream().map(PropertyName::getName).collect(toList());
-    assertThat(names, containsInAnyOrder("primarymodelloader", "testmodelloader"));
+    assertThat(
+        names,
+        containsInAnyOrder("primarymodelloader", "implicitassociationsloader", "testmodelloader"));
   }
 
   @Test

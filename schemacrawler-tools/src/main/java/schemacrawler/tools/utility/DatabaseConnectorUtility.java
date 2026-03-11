@@ -18,11 +18,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import schemacrawler.schemacrawler.SchemaRetrievalOptions;
+import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.tools.databaseconnector.DatabaseConnector;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
 import schemacrawler.tools.databaseconnector.UnknownDatabaseConnector;
 import us.fatehi.utility.UtilityMarker;
+import us.fatehi.utility.database.DatabaseUtility;
+import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseServerType;
 import us.fatehi.utility.readconfig.SystemPropertiesConfig;
 
@@ -140,5 +144,48 @@ public final class DatabaseConnectorUtility {
 
   private DatabaseConnectorUtility() {
     // Prevent instantiation
+  }
+
+  /**
+   * Returns database specific options using an existing SchemaCrawler database plugin.
+   *
+   * @return SchemaRetrievalOptions
+   */
+  public static SchemaRetrievalOptions matchSchemaRetrievalOptions(
+      final DatabaseConnectionSource connectionSource) {
+    try (final Connection connection = connectionSource.get()) {
+      DatabaseUtility.checkConnection(connection);
+      final DatabaseConnector dbConnector = findDatabaseConnector(connection);
+      final SchemaRetrievalOptionsBuilder schemaRetrievalOptionsBuilder =
+          dbConnector.getSchemaRetrievalOptionsBuilder(connection);
+      final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.build();
+      return schemaRetrievalOptions;
+    } catch (final SQLException e) {
+      throw new InternalRuntimeException("Could not obtain schema retrieval options", e);
+    }
+  }
+
+  /**
+   * Updates the connection data source by attaching a connection initializer.
+   *
+   * @param connectionSource Database connection source
+   * @param schemaRetrievalOptions SchemaCrawler retrieval options to convey the connection
+   *     initializer from the database plugin
+   */
+  public static void updateConnectionDataSource(
+      final DatabaseConnectionSource connectionSource,
+      final SchemaRetrievalOptions schemaRetrievalOptions) {
+
+    if (connectionSource == null) {
+      LOGGER.log(Level.CONFIG, "No database connection source provided");
+      return;
+    }
+    if (schemaRetrievalOptions == null) {
+      LOGGER.log(Level.CONFIG, "No schema retrieval options provided");
+      return;
+    }
+
+    connectionSource.setFirstConnectionInitializer(
+        schemaRetrievalOptions.getConnectionInitializer());
   }
 }
