@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -69,20 +70,16 @@ public class DatabaseUtilityTest {
 
     assertThat(DatabaseUtility.checkConnection(connection), is(connection));
 
-    final Connection mockConnection = TestObjectUtility.mockConnection();
-    when(mockConnection.isClosed()).thenReturn(true);
-
     final SQLException exception1 =
-        assertThrows(
-            SQLException.class,
-            () -> assertThat(DatabaseUtility.checkConnection(null), is(nullValue())));
+        assertThrows(SQLException.class, () -> DatabaseUtility.checkConnection(null));
     assertThat(exception1.getMessage(), endsWith("No database connection provided"));
 
+    final Connection mockConnection = TestObjectUtility.mockConnection();
+    when(mockConnection.isValid(anyInt())).thenReturn(false);
+
     final SQLException exception2 =
-        assertThrows(
-            SQLException.class,
-            () -> assertThat(DatabaseUtility.checkConnection(mockConnection), is(nullValue())));
-    assertThat(exception2.getMessage(), endsWith("Connection is closed"));
+        assertThrows(SQLException.class, () -> DatabaseUtility.checkConnection(mockConnection));
+    assertThat(exception2.getMessage(), endsWith("Connection is not valid"));
   }
 
   @Test

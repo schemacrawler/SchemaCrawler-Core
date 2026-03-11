@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.SQLRuntimeException;
+import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.string.StringFormat;
 
 abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSource {
@@ -147,7 +148,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     if (additionalDriverProperties != null) {
       additionalDriverProperties.stream()
           .filter(property -> !isBlank(property))
-          .map(property -> property.toLowerCase())
+          .map(String::toLowerCase)
           .forEach(jdbcDriverProperties::add);
     }
     return jdbcDriverProperties;
@@ -177,10 +178,13 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
    * handed out
    *
    * @param connection Connection to initialize
+   * @throws SQLException
    */
   protected final void initializeConnection(final Connection connection) {
-    if (connection == null) {
-      return;
+    try {
+      DatabaseUtility.checkConnection(connection);
+    } catch (final SQLException e) {
+      throw new SQLRuntimeException(e);
     }
     connectionInitializer.accept(connection);
     LOGGER.log(

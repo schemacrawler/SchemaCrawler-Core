@@ -33,6 +33,7 @@ import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.test.utility.extensions.CaptureLogs;
 import us.fatehi.test.utility.extensions.CapturedLogs;
 import us.fatehi.test.utility.extensions.WithSystemProperty;
+import us.fatehi.utility.SQLRuntimeException;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSources;
 
@@ -57,7 +58,7 @@ public class SchemaCrawlerUtilityTest {
         DatabaseConnectionSources.fromConnection(connection);
     connection.close();
     assertThrows(
-        DatabaseAccessException.class,
+        SQLRuntimeException.class,
         () -> SchemaCrawlerUtility.getCatalog(connectionSource, newSchemaCrawlerOptions()));
   }
 
