@@ -43,8 +43,8 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
     super(
         "SchemaCrawler Catalog Loaders",
         List.of(
-            new PrimaryCatalogLoaderProvider(),
             new OfflineCatalogLoaderProvider(),
+            new PrimaryCatalogLoaderProvider(),
             new AttributesCatalogLoaderProvider(),
             new TableRowCountsCatalogLoaderProvider(),
             new WeakAssociationsCatalogLoaderProvider()));
