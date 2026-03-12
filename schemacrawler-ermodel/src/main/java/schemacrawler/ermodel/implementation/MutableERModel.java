@@ -13,12 +13,12 @@ import static java.util.function.Predicate.not;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntitySubtype;
@@ -44,10 +44,10 @@ public class MutableERModel implements ERModel {
   private final Multimap<NamedObjectKey, Relationship> erImplicitMap;
 
   public MutableERModel() {
-    tablesMap = new HashMap<>();
-    entitiesMap = new HashMap<>();
-    relationshipsMap = new HashMap<>();
-    implicitRelationshipsMap = new HashMap<>();
+    tablesMap = new ConcurrentHashMap<>();
+    entitiesMap = new ConcurrentHashMap<>();
+    relationshipsMap = new ConcurrentHashMap<>();
+    implicitRelationshipsMap = new ConcurrentHashMap<>();
     erImplicitMap = new Multimap<>();
   }
 
