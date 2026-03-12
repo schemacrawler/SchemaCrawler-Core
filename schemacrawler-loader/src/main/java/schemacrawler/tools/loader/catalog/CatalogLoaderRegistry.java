@@ -8,12 +8,7 @@
 
 package schemacrawler.tools.loader.catalog;
 
-import static java.util.Comparator.comparingInt;
-import static java.util.Comparator.nullsLast;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,10 +28,6 @@ import us.fatehi.utility.string.StringFormat;
 public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<CatalogLoaderProvider> {
 
   private static final Logger LOGGER = Logger.getLogger(CatalogLoaderRegistry.class.getName());
-
-  private static Comparator<CatalogLoader<?>> catalogLoaderComparator =
-      nullsLast(comparingInt(CatalogLoader<?>::getPriority))
-          .thenComparing(loader -> loader.getCommandName().getName());
 
   private static CatalogLoaderRegistry catalogLoaderRegistrySingleton;
 
@@ -95,7 +86,6 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
       }
     }
 
-    Collections.sort(catalogLoaders, catalogLoaderComparator);
     return catalogLoaders;
   }
 }

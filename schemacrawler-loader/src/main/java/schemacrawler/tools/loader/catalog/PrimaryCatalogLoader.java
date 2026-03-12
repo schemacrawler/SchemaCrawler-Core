@@ -19,7 +19,7 @@ public class PrimaryCatalogLoader extends AbstractCatalogLoader<PrimaryCatalogLo
   static record PrimaryCatalogLoaderOptions() implements CommandOptions {}
 
   PrimaryCatalogLoader(final PropertyName catalogLoaderName) {
-    super(catalogLoaderName, 0);
+    super(catalogLoaderName);
   }
 
   @Override

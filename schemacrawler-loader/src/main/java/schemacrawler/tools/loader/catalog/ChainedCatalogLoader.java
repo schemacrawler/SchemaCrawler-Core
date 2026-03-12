@@ -37,8 +37,8 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
   public ChainedCatalogLoader(
       final List<CatalogLoader<?>> catalogLoaders, final Config additionalConfig) {
     super(
-        new PropertyName("chainloader", "Chain of all catalog loaders, called in turn by priority"),
-        Integer.MIN_VALUE);
+        new PropertyName(
+            "chainloader", "Chain of all catalog loaders, called in turn by priority"));
     requireNonNull(catalogLoaders);
     this.catalogLoaders = new ArrayList<>(catalogLoaders);
 

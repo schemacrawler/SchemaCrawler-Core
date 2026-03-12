@@ -46,7 +46,7 @@ public final class WeakAssociationsCatalogLoader
   static final String OPTION_INFER_EXTENSION_TABLES = "infer-extension-tables";
 
   public WeakAssociationsCatalogLoader(final PropertyName catalogLoaderName) {
-    super(catalogLoaderName, 3);
+    super(catalogLoaderName);
   }
 
   @Override

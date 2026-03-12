@@ -15,8 +15,6 @@ import schemacrawler.tools.command.ExecutableCommand;
 
 public interface CatalogLoader<P extends CommandOptions> extends ExecutableCommand<P> {
 
-  int getPriority();
-
   SchemaCrawlerOptions getSchemaCrawlerOptions();
 
   SchemaRetrievalOptions getSchemaRetrievalOptions();

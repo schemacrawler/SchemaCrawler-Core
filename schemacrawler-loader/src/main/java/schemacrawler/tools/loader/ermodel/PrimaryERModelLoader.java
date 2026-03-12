@@ -24,7 +24,7 @@ public class PrimaryERModelLoader extends AbstractERModelLoader<PrimaryERModelLo
   static record PrimaryERModelLoaderLoaderOptions() implements CommandOptions {}
 
   PrimaryERModelLoader(final PropertyName loaderName) {
-    super(loaderName, 0);
+    super(loaderName);
   }
 
   @Override

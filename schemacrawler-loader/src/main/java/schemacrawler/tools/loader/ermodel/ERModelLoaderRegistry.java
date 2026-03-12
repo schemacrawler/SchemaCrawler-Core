@@ -8,12 +8,7 @@
 
 package schemacrawler.tools.loader.ermodel;
 
-import static java.util.Comparator.comparingInt;
-import static java.util.Comparator.nullsLast;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,10 +22,6 @@ import us.fatehi.utility.string.StringFormat;
 public final class ERModelLoaderRegistry extends BasePluginCommandRegistry<ERModelLoaderProvider> {
 
   private static final Logger LOGGER = Logger.getLogger(ERModelLoaderRegistry.class.getName());
-
-  private static final Comparator<ERModelLoader<?>> erModelLoaderComparator =
-      nullsLast(comparingInt(ERModelLoader<?>::getPriority))
-          .thenComparing(loader -> loader.getCommandName().getName());
 
   private static ERModelLoaderRegistry erModelLoaderRegistrySingleton;
 
@@ -84,7 +75,6 @@ public final class ERModelLoaderRegistry extends BasePluginCommandRegistry<ERMod
       }
     }
 
-    Collections.sort(erModelLoaders, erModelLoaderComparator);
     return erModelLoaders;
   }
 }

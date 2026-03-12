@@ -19,18 +19,11 @@ import us.fatehi.utility.property.PropertyName;
 public abstract class AbstractCatalogLoader<P extends CommandOptions> extends AbstractCommand<P>
     implements CatalogLoader<P> {
 
-  private final int priority;
   private SchemaRetrievalOptions schemaRetrievalOptions;
   private SchemaCrawlerOptions schemaCrawlerOptions;
 
-  protected AbstractCatalogLoader(final PropertyName catalogLoaderName, final int priority) {
+  protected AbstractCatalogLoader(final PropertyName catalogLoaderName) {
     super(catalogLoaderName);
-    this.priority = priority;
-  }
-
-  @Override
-  public final int getPriority() {
-    return priority;
   }
 
   @Override
