@@ -9,8 +9,6 @@
 package schemacrawler.tools.executable;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.tools.utility.SchemaCrawlerUtility.matchSchemaRetrievalOptions;
-import static schemacrawler.tools.utility.SchemaCrawlerUtility.updateConnectionDataSource;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.logging.Level;
@@ -31,6 +29,7 @@ import schemacrawler.tools.options.OutputOptions;
 import schemacrawler.tools.options.OutputOptionsBuilder;
 import schemacrawler.tools.state.AbstractExecutionState;
 import schemacrawler.tools.state.ExecutionState;
+import schemacrawler.tools.utility.DatabaseConnectorUtility;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.string.ObjectToStringFormat;
@@ -76,9 +75,10 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState
       // are used
       DatabaseConnectionSource connectionSource = getConnectionSource();
       if (schemaRetrievalOptions == null) {
-        schemaRetrievalOptions = matchSchemaRetrievalOptions(connectionSource);
+        schemaRetrievalOptions =
+            DatabaseConnectorUtility.matchSchemaRetrievalOptions(connectionSource);
       }
-      updateConnectionDataSource(connectionSource, schemaRetrievalOptions);
+      DatabaseConnectorUtility.updateConnectionDataSource(connectionSource, schemaRetrievalOptions);
     }
 
     try {

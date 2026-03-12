@@ -20,19 +20,14 @@ public interface ERModelLoader<P extends CommandOptions> extends ExecutableComma
    *
    * @return ERModel, or null if not yet loaded
    */
+  @Override
   ERModel getERModel();
-
-  /**
-   * Returns the priority of this loader. Lower values run first.
-   *
-   * @return Priority
-   */
-  int getPriority();
 
   /**
    * Sets an existing ERModel to be enriched. If null, a new ERModel will be built.
    *
    * @param erModel Existing ERModel to enrich, or null
    */
+  @Override
   void setERModel(ERModel erModel);
 }

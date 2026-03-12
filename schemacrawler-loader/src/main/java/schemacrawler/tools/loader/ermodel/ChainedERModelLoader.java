@@ -40,8 +40,7 @@ public class ChainedERModelLoader extends AbstractERModelLoader<ChainedERModelLo
   ChainedERModelLoader(final List<ERModelLoader<?>> erModelLoaders, final Config additionalConfig) {
     super(
         new PropertyName(
-            "ermodelchainloader", "Chain of all ERModel loaders, called in turn by priority"),
-        Integer.MIN_VALUE);
+            "ermodelchainloader", "Chain of all ERModel loaders, called in turn by priority"));
     requireNonNull(erModelLoaders, "No ERModel loaders provided");
     this.erModelLoaders = new ArrayList<>(erModelLoaders);
 

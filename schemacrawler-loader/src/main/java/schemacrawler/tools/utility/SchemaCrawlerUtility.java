@@ -10,7 +10,6 @@ package schemacrawler.tools.utility;
 
 import static java.util.Objects.requireNonNull;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -21,10 +20,7 @@ import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ResultsColumns;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
-import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.DatabaseAccessException;
-import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
-import schemacrawler.tools.databaseconnector.DatabaseConnector;
 import schemacrawler.tools.loader.catalog.CatalogLoader;
 import schemacrawler.tools.loader.catalog.CatalogLoaderRegistry;
 import schemacrawler.tools.loader.ermodel.ChainedERModelLoader;
@@ -68,7 +64,7 @@ public final class SchemaCrawlerUtility {
       final DatabaseConnectionSource connectionSource,
       final SchemaCrawlerOptions schemaCrawlerOptions) {
     final SchemaRetrievalOptions schemaRetrievalOptions =
-        matchSchemaRetrievalOptions(connectionSource);
+        DatabaseConnectorUtility.matchSchemaRetrievalOptions(connectionSource);
     return getCatalog(
         connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, ConfigUtility.newConfig());
   }
@@ -88,7 +84,7 @@ public final class SchemaCrawlerUtility {
 
     LOGGER.log(Level.CONFIG, new ObjectToStringFormat(schemaCrawlerOptions));
 
-    updateConnectionDataSource(connectionSource, schemaRetrievalOptions);
+    DatabaseConnectorUtility.updateConnectionDataSource(connectionSource, schemaRetrievalOptions);
 
     final CatalogLoaderRegistry catalogLoaderRegistry =
         CatalogLoaderRegistry.getCatalogLoaderRegistry();
@@ -127,50 +123,6 @@ public final class SchemaCrawlerUtility {
     } catch (final SQLException e) {
       throw new DatabaseAccessException("Could not retrieve result-set metadata", e);
     }
-  }
-
-  /**
-   * Returns database specific options using an existing SchemaCrawler database plugin.
-   *
-   * @return SchemaRetrievalOptions
-   */
-  public static SchemaRetrievalOptions matchSchemaRetrievalOptions(
-      final DatabaseConnectionSource connectionSource) {
-    try (final Connection connection = connectionSource.get()) {
-      DatabaseUtility.checkConnection(connection);
-      final DatabaseConnector dbConnector =
-          DatabaseConnectorUtility.findDatabaseConnector(connection);
-      final SchemaRetrievalOptionsBuilder schemaRetrievalOptionsBuilder =
-          dbConnector.getSchemaRetrievalOptionsBuilder(connection);
-      final SchemaRetrievalOptions schemaRetrievalOptions = schemaRetrievalOptionsBuilder.build();
-      return schemaRetrievalOptions;
-    } catch (final SQLException e) {
-      throw new InternalRuntimeException("Could not obtain schema retrieval options", e);
-    }
-  }
-
-  /**
-   * Updates the connection data source by attaching a connection initializer.
-   *
-   * @param connectionSource Database connection source
-   * @param schemaRetrievalOptions SchemaCrawler retrieval options to convey the connection
-   *     initializer from the database plugin
-   */
-  public static void updateConnectionDataSource(
-      final DatabaseConnectionSource connectionSource,
-      final SchemaRetrievalOptions schemaRetrievalOptions) {
-
-    if (connectionSource == null) {
-      LOGGER.log(Level.CONFIG, "No database connection source provided");
-      return;
-    }
-    if (schemaRetrievalOptions == null) {
-      LOGGER.log(Level.CONFIG, "No schema retrieval options provided");
-      return;
-    }
-
-    connectionSource.setFirstConnectionInitializer(
-        schemaRetrievalOptions.getConnectionInitializer());
   }
 
   private SchemaCrawlerUtility() {

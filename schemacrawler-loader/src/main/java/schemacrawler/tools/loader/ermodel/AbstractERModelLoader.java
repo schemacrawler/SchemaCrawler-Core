@@ -16,16 +16,8 @@ import us.fatehi.utility.property.PropertyName;
 public abstract class AbstractERModelLoader<P extends CommandOptions> extends AbstractCommand<P>
     implements ERModelLoader<P> {
 
-  protected final int priority;
-
-  protected AbstractERModelLoader(final PropertyName loaderName, final int priority) {
+  protected AbstractERModelLoader(final PropertyName loaderName) {
     super(loaderName);
-    this.priority = priority;
-  }
-
-  @Override
-  public final int getPriority() {
-    return priority;
   }
 
   @Override

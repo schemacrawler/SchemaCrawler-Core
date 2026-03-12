@@ -16,7 +16,7 @@ import schemacrawler.tools.loader.catalog.PrimaryCatalogLoader.PrimaryCatalogLoa
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
-public class PrimaryCatalogLoaderProvider extends BaseCatalogLoaderProvider {
+public class PrimaryCatalogLoaderProvider extends AbstractCatalogLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName("primarycatalogloader", "Loader for SchemaCrawler metadata catalog");

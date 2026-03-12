@@ -8,21 +8,18 @@
 
 package schemacrawler.tools.loader.catalog;
 
-import static java.util.Comparator.comparingInt;
-import static java.util.Comparator.nullsLast;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.ServiceLoader;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.schemacrawler.exceptions.SchemaCrawlerException;
+import schemacrawler.tools.loader.catalog.attributes.AttributesCatalogLoaderProvider;
+import schemacrawler.tools.loader.catalog.counts.TableRowCountsCatalogLoaderProvider;
+import schemacrawler.tools.loader.catalog.offline.OfflineCatalogLoaderProvider;
+import schemacrawler.tools.loader.catalog.weakassociations.WeakAssociationsCatalogLoaderProvider;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
@@ -31,10 +28,6 @@ import us.fatehi.utility.string.StringFormat;
 public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<CatalogLoaderProvider> {
 
   private static final Logger LOGGER = Logger.getLogger(CatalogLoaderRegistry.class.getName());
-
-  private static Comparator<CatalogLoader<?>> catalogLoaderComparator =
-      nullsLast(comparingInt(CatalogLoader<?>::getPriority))
-          .thenComparing(loader -> loader.getCommandName().getName());
 
   private static CatalogLoaderRegistry catalogLoaderRegistrySingleton;
 
@@ -46,31 +39,15 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
     return catalogLoaderRegistrySingleton;
   }
 
-  private static List<CatalogLoaderProvider> loadCatalogLoaderRegistry() {
-
-    // Use thread-safe list
-    final List<CatalogLoaderProvider> catalogLoaderRegistry = new CopyOnWriteArrayList<>();
-
-    try {
-      final ServiceLoader<CatalogLoaderProvider> serviceLoader =
-          ServiceLoader.load(
-              CatalogLoaderProvider.class, CatalogLoaderRegistry.class.getClassLoader());
-      for (final CatalogLoaderProvider catalogLoader : serviceLoader) {
-        LOGGER.log(
-            Level.CONFIG,
-            new StringFormat("Loading catalog loader, %s", catalogLoader.getClass().getName()));
-
-        catalogLoaderRegistry.add(catalogLoader);
-      }
-    } catch (final Throwable e) {
-      throw new InternalRuntimeException("Could not load catalog loader registry", e);
-    }
-
-    return catalogLoaderRegistry;
-  }
-
   private CatalogLoaderRegistry() {
-    super("SchemaCrawler Catalog Loaders", loadCatalogLoaderRegistry());
+    super(
+        "SchemaCrawler Catalog Loaders",
+        List.of(
+            new PrimaryCatalogLoaderProvider(),
+            new OfflineCatalogLoaderProvider(),
+            new AttributesCatalogLoaderProvider(),
+            new TableRowCountsCatalogLoaderProvider(),
+            new WeakAssociationsCatalogLoaderProvider()));
   }
 
   public ChainedCatalogLoader newChainedCatalogLoader(
@@ -109,7 +86,6 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
       }
     }
 
-    Collections.sort(catalogLoaders, catalogLoaderComparator);
     return catalogLoaders;
   }
 }

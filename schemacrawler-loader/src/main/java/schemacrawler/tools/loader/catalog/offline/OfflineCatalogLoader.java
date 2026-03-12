@@ -34,7 +34,7 @@ public final class OfflineCatalogLoader extends AbstractCatalogLoader<OfflineCat
   private static final Logger LOGGER = Logger.getLogger(OfflineCatalogLoader.class.getName());
 
   OfflineCatalogLoader(final PropertyName name) {
-    super(name, -1);
+    super(name);
   }
 
   @Override

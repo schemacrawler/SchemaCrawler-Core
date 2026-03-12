@@ -46,7 +46,7 @@ public class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCat
   static final String OPTION_ATTRIBUTES_FILE = "attributes-file";
 
   AttributesCatalogLoader(final PropertyName catalogLoaderName) {
-    super(catalogLoaderName, 2);
+    super(catalogLoaderName);
   }
 
   @Override

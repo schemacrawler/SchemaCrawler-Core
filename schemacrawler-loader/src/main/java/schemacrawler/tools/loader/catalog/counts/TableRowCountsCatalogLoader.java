@@ -31,7 +31,7 @@ public class TableRowCountsCatalogLoader
   static final String OPTION_LOAD_ROW_COUNTS = "load-row-counts";
 
   TableRowCountsCatalogLoader(final PropertyName catalogLoaderName) {
-    super(catalogLoaderName, 2);
+    super(catalogLoaderName);
   }
 
   @Override

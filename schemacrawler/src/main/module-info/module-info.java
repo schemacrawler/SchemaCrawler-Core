@@ -57,19 +57,8 @@ module us.fatehi.schemacrawler.schemacrawler {
 
   // ServiceLoader providers
   uses java.sql.Driver;
-  uses schemacrawler.tools.loader.catalog.CatalogLoaderProvider;
-  uses schemacrawler.tools.loader.ermodel.ERModelLoaderProvider;
   uses schemacrawler.tools.databaseconnector.DatabaseConnector;
   uses schemacrawler.tools.command.SchemaCrawlerCommandProvider;
-
-  provides schemacrawler.tools.loader.catalog.CatalogLoaderProvider with
-      schemacrawler.tools.loader.catalog.attributes.AttributesCatalogLoaderProvider,
-      schemacrawler.tools.loader.catalog.counts.TableRowCountsCatalogLoaderProvider,
-      schemacrawler.tools.loader.catalog.weakassociations.WeakAssociationsCatalogLoaderProvider,
-      schemacrawler.tools.loader.catalog.PrimaryCatalogLoaderProvider;
-  provides schemacrawler.tools.loader.ermodel.ERModelLoaderProvider with
-      schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsERModelLoaderProvider,
-      schemacrawler.tools.loader.ermodel.PrimaryERModelLoaderProvider;
 
   // Allow reflection of schema model
   opens schemacrawler.schema to

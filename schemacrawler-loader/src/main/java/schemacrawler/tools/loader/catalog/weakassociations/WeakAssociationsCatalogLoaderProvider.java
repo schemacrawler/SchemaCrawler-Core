@@ -13,11 +13,11 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import java.util.List;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.loader.catalog.BaseCatalogLoaderProvider;
+import schemacrawler.tools.loader.catalog.AbstractCatalogLoaderProvider;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
-public class WeakAssociationsCatalogLoaderProvider extends BaseCatalogLoaderProvider {
+public class WeakAssociationsCatalogLoaderProvider extends AbstractCatalogLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName("weakassociationsloader", "Loader for weak associations");

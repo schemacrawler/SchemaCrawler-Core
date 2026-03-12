@@ -41,7 +41,7 @@ public final class ImplicitAssociationsERModelLoader
   static final String OPTION_IMPLICIT_ASSOCIATIONS = "implicit-associations";
 
   ImplicitAssociationsERModelLoader(final PropertyName loaderName) {
-    super(loaderName, 3);
+    super(loaderName);
   }
 
   @Override

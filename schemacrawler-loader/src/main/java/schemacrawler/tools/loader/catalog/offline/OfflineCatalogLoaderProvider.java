@@ -12,12 +12,12 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import java.util.List;
-import schemacrawler.tools.loader.catalog.BaseCatalogLoaderProvider;
+import schemacrawler.tools.loader.catalog.AbstractCatalogLoaderProvider;
 import schemacrawler.tools.loader.catalog.offline.OfflineCatalogLoader.OfflineCatalogLoaderOptions;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
-public class OfflineCatalogLoaderProvider extends BaseCatalogLoaderProvider {
+public class OfflineCatalogLoaderProvider extends AbstractCatalogLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName("offlineloader", "Loader for offline databases");
