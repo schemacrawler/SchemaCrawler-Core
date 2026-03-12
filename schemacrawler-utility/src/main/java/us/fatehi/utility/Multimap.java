@@ -9,25 +9,28 @@
 package us.fatehi.utility;
 
 import java.io.Serial;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Multimap<K, V> extends HashMap<K, List<V>> {
+public class Multimap<K, V> extends ConcurrentHashMap<K, List<V>> {
 
   @Serial private static final long serialVersionUID = 1470713639458689002L;
 
   public V add(final K key, final V value) {
-    List<V> values = null;
-    if (containsKey(key)) {
-      values = get(key);
+    if (key == null) {
+      return null;
     }
-    if (values == null) {
-      values = new ArrayList<>();
-    }
-    put(key, values);
-
+    final List<V> values = computeIfAbsent(key, k -> new CopyOnWriteArrayList<>());
     values.add(value);
     return value;
+  }
+
+  @Override
+  public List<V> get(final Object key) {
+    if (key == null) {
+      return null;
+    }
+    return super.get(key);
   }
 }
