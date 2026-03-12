@@ -8,7 +8,6 @@
 
 package schemacrawler.tools.command;
 
-import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -17,8 +16,6 @@ import schemacrawler.tools.options.OutputOptions;
 /** A SchemaCrawler tools executable unit. */
 public interface SchemaCrawlerCommand<P extends CommandOptions> extends ExecutableCommand<P> {
 
-  ERModel getERModel();
-
   Identifiers getIdentifiers();
 
   InformationSchemaViews getInformationSchemaViews();
@@ -26,8 +23,6 @@ public interface SchemaCrawlerCommand<P extends CommandOptions> extends Executab
   OutputOptions getOutputOptions();
 
   SchemaCrawlerOptions getSchemaCrawlerOptions();
-
-  void setERModel(ERModel erModel);
 
   void setIdentifiers(Identifiers identifiers);
 
