@@ -30,6 +30,7 @@ import schemacrawler.tools.options.OutputOptionsBuilder;
 import schemacrawler.tools.state.AbstractExecutionState;
 import schemacrawler.tools.state.ExecutionState;
 import schemacrawler.tools.utility.DatabaseConnectorUtility;
+import schemacrawler.tools.utility.ExecutionStateUtility;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.string.ObjectToStringFormat;
@@ -104,14 +105,7 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState
       }
 
       // Prepare to execute
-      scCommand.setCatalog(getCatalog());
-      if (hasERModel()) {
-        scCommand.setERModel(getERModel());
-      }
-
-      if (scCommand.usesConnection()) {
-        scCommand.setConnectionSource(getConnectionSource());
-      }
+      ExecutionStateUtility.transferState(this, scCommand);
 
       // Execute
       LOGGER.log(Level.INFO, new StringFormat("Executing SchemaCrawler command <%s>", command));
