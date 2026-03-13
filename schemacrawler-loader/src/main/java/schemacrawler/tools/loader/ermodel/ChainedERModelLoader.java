@@ -14,12 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.schema.Catalog;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.loader.ermodel.ChainedERModelLoader.ChainedERModelLoaderOptions;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
-import schemacrawler.tools.state.ExecutionStateUtility;
+import schemacrawler.tools.utility.ExecutionStateUtility;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.StringFormat;
 
@@ -56,16 +55,13 @@ public class ChainedERModelLoader extends AbstractERModelLoader<ChainedERModelLo
 
   @Override
   public void execute() {
-    final Catalog catalog = getCatalog();
     for (final ERModelLoader<?> erModelLoader : erModelLoaders) {
       ExecutionStateUtility.transferState(this, erModelLoader);
 
       LOGGER.log(Level.INFO, new StringFormat("Executing ERModel loader <%s>", erModelLoader));
       erModelLoader.execute();
 
-      if (erModelLoader.hasERModel()) {
-        setERModel(erModelLoader.getERModel());
-      }
+      ExecutionStateUtility.transferState(erModelLoader, this);
     }
   }
 

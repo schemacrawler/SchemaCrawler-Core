@@ -19,8 +19,8 @@ import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.loader.catalog.ChainedCatalogLoader.ChainedCatalogLoaderOptions;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
+import schemacrawler.tools.utility.ExecutionStateUtility;
 import schemacrawler.utility.MetaDataUtility;
-import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
@@ -53,19 +53,9 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
 
   @Override
   public void execute() {
-    final DatabaseConnectionSource connectionSource = getConnectionSource();
     final SchemaRetrievalOptions schemaRetrievalOptions = getSchemaRetrievalOptions();
     for (final CatalogLoader<?> catalogLoader : catalogLoaders) {
-      if (hasCatalog()) {
-        // Initially catalog will be null until it is first loaded
-        // Pass enriched catalog to the next loader
-        catalogLoader.setCatalog(getCatalog());
-        // NOTE: Catalog loaders do not build ER models, so the ER model is not set here
-      }
-
-      if (catalogLoader.usesConnection()) {
-        catalogLoader.setConnectionSource(connectionSource);
-      }
+      ExecutionStateUtility.transferState(this, catalogLoader);
       catalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
 
       // Execute
@@ -73,9 +63,7 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
       LOGGER.log(Level.CONFIG, new ObjectToStringFormat(catalogLoader.getCommandOptions()));
       catalogLoader.execute();
 
-      if (catalogLoader.hasCatalog()) {
-        setCatalog(catalogLoader.getCatalog());
-      }
+      ExecutionStateUtility.transferState(catalogLoader, this);
     }
     MetaDataUtility.logCatalogSummary(getCatalog(), Level.INFO);
   }

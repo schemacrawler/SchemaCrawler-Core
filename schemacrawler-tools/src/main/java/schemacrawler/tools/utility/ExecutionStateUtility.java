@@ -6,9 +6,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.state;
+package schemacrawler.tools.utility;
 
 import schemacrawler.tools.command.BaseCommand;
+import schemacrawler.tools.state.ExecutionState;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker

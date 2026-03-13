@@ -10,7 +10,6 @@ package schemacrawler.tools.command;
 
 import static java.util.Objects.requireNonNull;
 
-import schemacrawler.ermodel.utility.EntityModelUtility;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
@@ -69,9 +68,6 @@ public abstract class AbstractSchemaCrawlerCommand<P extends CommandOptions>
   public void initialize() {
     super.initialize();
     checkOptions();
-    if (!hasERModel()) {
-      setERModel(EntityModelUtility.buildEmptyERModel());
-    }
   }
 
   /** {@inheritDoc} */
