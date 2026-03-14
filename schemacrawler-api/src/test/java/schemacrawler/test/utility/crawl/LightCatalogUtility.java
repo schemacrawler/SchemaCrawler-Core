@@ -8,7 +8,6 @@
 
 package schemacrawler.test.utility.crawl;
 
-import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 import static us.fatehi.test.utility.TestObjectUtility.returnEmpty;
 
 import java.lang.reflect.InvocationHandler;
@@ -24,7 +23,6 @@ import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.Version;
 import us.fatehi.test.utility.TestObjectUtility;
 import us.fatehi.utility.UtilityMarker;
-import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.BaseProductVersion;
 import us.fatehi.utility.property.ProductVersion;
 
@@ -79,24 +77,6 @@ public class LightCatalogUtility {
     return (CrawlInfo)
         Proxy.newProxyInstance(
             LightCatalogUtility.class.getClassLoader(), new Class<?>[] {clazz}, handler);
-  }
-
-  public static DatabaseConnectionSource lightDatabaseConnectionSource() {
-
-    final InvocationHandler handler =
-        (proxy, method, args) ->
-            switch (method.getName()) {
-              case "get" -> mockConnection();
-              case "releaseConnection" -> true;
-              case "toString" -> "light-database-connection-source";
-              default -> returnEmpty(method);
-            };
-
-    return (DatabaseConnectionSource)
-        Proxy.newProxyInstance(
-            DatabaseConnectionSource.class.getClassLoader(),
-            new Class<?>[] {DatabaseConnectionSource.class},
-            handler);
   }
 
   public static DatabaseInfo lightDatabaseInfo() {
