@@ -13,10 +13,13 @@ import static us.fatehi.test.utility.TestObjectUtility.returnEmpty;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.util.List;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schema.JdbcDriverInfo;
+import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.Version;
 import us.fatehi.test.utility.TestObjectUtility;
 import us.fatehi.utility.UtilityMarker;
@@ -28,17 +31,30 @@ import us.fatehi.utility.property.ProductVersion;
 public class LightCatalogUtility {
 
   public static Catalog lightCatalog() {
+    return lightCatalog(new Table[0]);
+  }
+
+  public static Catalog lightCatalog(final Table... tables) {
+    final List<Table> tablesList;
+    if (tables == null) {
+      tablesList = List.of();
+    } else {
+      tablesList = List.of(tables);
+    }
+
     final InvocationHandler handler =
         (proxy, method, args) -> {
           final String methodName = method.getName();
 
           return switch (methodName) {
+            case "key" -> new NamedObjectKey("light-catalog");
             case "getName", "getFullName", "toString" -> "light-catalog";
             case "equals" -> proxy == args[0];
             case "hashCode" -> System.identityHashCode(proxy);
             case "getCrawlInfo" -> lightCrawlInfo();
             case "getJdbcDriverInfo" -> TestObjectUtility.makeTestObject(JdbcDriverInfo.class);
             case "getDatabaseInfo" -> lightDatabaseInfo();
+            case "getTables" -> tablesList;
             default -> returnEmpty(method);
           };
         };

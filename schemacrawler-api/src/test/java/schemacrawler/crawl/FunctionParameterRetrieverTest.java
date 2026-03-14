@@ -36,6 +36,7 @@ import schemacrawler.schemacrawler.MetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.DisableLogging;
+import us.fatehi.test.utility.TestObjectUtility.Results;
 
 @DisableLogging
 public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTest {
@@ -207,6 +208,6 @@ public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTe
     };
 
     final String resultSetDescription = "Function parameters for <%s>".formatted(routineName);
-    return mockResultSet(resultSetDescription, columnNames, data);
+    return mockResultSet(new Results(resultSetDescription, columnNames, data));
   }
 }

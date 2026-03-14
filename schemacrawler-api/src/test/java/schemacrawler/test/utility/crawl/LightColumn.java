@@ -29,22 +29,32 @@ public final class LightColumn extends AbstractLightDatabaseObject implements Co
 
   @Serial private static final long serialVersionUID = -1931193814458050468L;
 
-  public static LightColumn newColumn(final Table parent, final String name) {
+  protected static LightColumn newColumn(final Table parent, final String name) {
     return new LightColumn(
         parent, name, columnDataType("INTEGER"), /* isHidden */ false, /* isGenerated */ false);
   }
 
-  public static LightColumn newEnumeratedColumn(final Table parent, final String name) {
+  protected static LightColumn newDataColumn(
+      final Table parent, final String name, final String columnDataTypeName) {
+    return new LightColumn(
+        parent,
+        name,
+        columnDataType(columnDataTypeName), /* isHidden */
+        false,
+        /* isGenerated */ false);
+  }
+
+  protected static LightColumn newEnumeratedColumn(final Table parent, final String name) {
     return new LightColumn(
         parent, name, enumColumnDataType(), /* isHidden */ false, /* isGenerated */ false);
   }
 
-  public static LightColumn newGeneratedColumn(final Table parent, final String name) {
+  protected static LightColumn newGeneratedColumn(final Table parent, final String name) {
     return new LightColumn(
         parent, name, columnDataType("DATA_TYPE"), /* isHidden */ false, /* isGenerated */ true);
   }
 
-  public static LightColumn newHiddenColumn(final Table parent, final String name) {
+  protected static LightColumn newHiddenColumn(final Table parent, final String name) {
     return new LightColumn(
         parent, name, columnDataType("DATA_TYPE"), /* isHidden */ true, /* isGenerated */ false);
   }
@@ -89,7 +99,7 @@ public final class LightColumn extends AbstractLightDatabaseObject implements Co
 
   @Override
   public String getFullName() {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append(parent.getFullName()).append(".").append(getName());
     return buffer.toString();
   }

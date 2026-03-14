@@ -57,6 +57,12 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
     return column;
   }
 
+  public LightColumn addDataColumn(final String name, final String columnDataTypeName) {
+    final LightColumn column = LightColumn.newDataColumn(this, name, columnDataTypeName);
+    columns.add(column);
+    return column;
+  }
+
   public LightColumn addEnumeratedColumn(final String name) {
     final LightColumn column = LightColumn.newEnumeratedColumn(this, name);
     columns.add(column);

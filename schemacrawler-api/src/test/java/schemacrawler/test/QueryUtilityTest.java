@@ -13,11 +13,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static schemacrawler.test.utility.crawl.LightColumnDataTypeUtility.columnDataType;
 import static schemacrawler.utility.MetaDataUtility.inclusionRuleString;
-import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 import static us.fatehi.test.utility.TestObjectUtility.mockStatement;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
@@ -49,9 +47,7 @@ public class QueryUtilityTest {
   @Test
   public void executeAgainstColumnDataType() throws Exception {
 
-    final Connection mockConnection = mockConnection();
     final Statement mockStatement = mockStatement();
-    lenient().when(mockConnection.createStatement()).thenReturn(mockStatement);
     final ColumnDataType testColumnDataType = columnDataType("INTEGER");
 
     final Query query =
@@ -59,9 +55,8 @@ public class QueryUtilityTest {
             "SQL with column data type",
             "SELECT * FROM SOME_TABLE WHERE SOME_COLUMN_HAS = '${column-data-type}')");
 
-    final Statement statement = mockConnection.createStatement();
     final ResultSet results =
-        QueryUtility.executeAgainstColumnDataType(query, statement, testColumnDataType);
+        QueryUtility.executeAgainstColumnDataType(query, mockStatement, testColumnDataType);
 
     final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockStatement).execute(captor.capture());

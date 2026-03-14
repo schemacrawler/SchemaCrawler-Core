@@ -17,7 +17,7 @@ import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.SchemaReference;
-import schemacrawler.test.utility.crawl.LightTableReference;
+import schemacrawler.test.utility.crawl.LightForeignKey;
 import us.fatehi.utility.OptionalBoolean;
 
 public class EntityIdentifierTest {
@@ -117,7 +117,7 @@ public class EntityIdentifierTest {
     final SchemaReference schema = new SchemaReference("catalog", "schema");
     final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL_1");
     final TablePartial table2 = new TablePartial(schema, "TABLE_PARTIAL_2");
-    final TableReference ref = new LightTableReference("REF", table, table2);
+    final TableReference ref = new LightForeignKey("REF", table, table2);
 
     final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
     assertThat(modelInferrer.inferBridgeTable(), is(false));
@@ -202,7 +202,7 @@ public class EntityIdentifierTest {
     final TablePartial table = new TablePartial(schema, "TABLE_PARTIAL");
     final TablePartial tableUnrelated1 = new TablePartial(schema, "TABLE_UNRELATED_1");
     final TablePartial tableUnrelated2 = new TablePartial(schema, "TABLE_UNRELATED_2");
-    final TableReference ref = new LightTableReference("REF", tableUnrelated1, tableUnrelated2);
+    final TableReference ref = new LightForeignKey("REF", tableUnrelated1, tableUnrelated2);
 
     final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
     assertThat(modelInferrer.inferBridgeTable(), is(false));
