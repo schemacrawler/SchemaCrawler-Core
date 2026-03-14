@@ -50,16 +50,9 @@ public class LightColumnDataTypeUtility {
         case "getJavaSqlType" -> new JavaSqlTypes().getFromJavaSqlTypeName(name);
         case "isEnumerated" -> isEnumerated;
         case "getEnumValues" -> enumValues;
-        case "equals" -> proxy == args[0];
-        case "hashCode" -> System.identityHashCode(proxy);
-        case "compareTo" -> {
-          final Object other = args[0];
-          if (other == null) {
-            yield 1; // non-null > null
-          }
-          final String otherName = ((ColumnDataType) other).getName();
-          yield name.compareTo(otherName);
-        }
+        case "equals" -> invokeEquals(args[0]);
+        case "hashCode" -> System.identityHashCode(name);
+        case "compareTo" -> invokeCompareTo(args[0]);
         case "toString" -> toString();
         default -> returnEmpty(method);
       };
@@ -71,6 +64,22 @@ public class LightColumnDataTypeUtility {
         return "%s %s".formatted(name, enumValues);
       }
       return name;
+    }
+
+    private Object invokeCompareTo(final Object other) {
+      if (other == null) {
+        return 1;
+      }
+      final String otherName = ((ColumnDataType) other).getName();
+      return name.compareTo(otherName);
+    }
+
+    private Object invokeEquals(final Object other) {
+      if (other == null) {
+        return false;
+      }
+      final String otherName = ((ColumnDataType) other).getName();
+      return name.equals(otherName);
     }
   }
 

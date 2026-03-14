@@ -9,11 +9,16 @@
 package schemacrawler.test.utility.crawl;
 
 import static us.fatehi.test.utility.TestObjectUtility.returnEmpty;
+import static us.fatehi.utility.Utility.requireNotBlank;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schema.JdbcDriverInfo;
@@ -28,6 +33,47 @@ import us.fatehi.utility.property.ProductVersion;
 
 @UtilityMarker
 public class LightCatalogUtility {
+
+  private static final class NamedObjectInvocationHandler
+      implements InvocationHandler, Serializable {
+    @Serial private static final long serialVersionUID = 1L;
+
+    private final String name;
+
+    NamedObjectInvocationHandler(final String name) {
+      this.name = requireNotBlank(name, "No name provided");
+    }
+
+    @Override
+    public Object invoke(final Object proxy, final Method method, final Object[] args)
+        throws Throwable {
+      final String methodName = method.getName();
+      return switch (methodName) {
+        case "getName", "getFullName", "toString" -> name;
+        case "key" -> new NamedObjectKey(name);
+        case "equals" -> invokeEquals(args[0]);
+        case "hashCode" -> System.identityHashCode(name);
+        case "compareTo" -> invokeCompareTo(args[0]);
+        default -> returnEmpty(method);
+      };
+    }
+
+    private Object invokeCompareTo(final Object other) {
+      if (other == null) {
+        return 1;
+      }
+      final String otherName = ((ColumnDataType) other).getName();
+      return name.compareTo(otherName);
+    }
+
+    private Object invokeEquals(final Object other) {
+      if (other == null) {
+        return false;
+      }
+      final String otherName = ((ColumnDataType) other).getName();
+      return name.equals(otherName);
+    }
+  }
 
   public static Catalog lightCatalog() {
     return lightCatalog(new Table[0]);
@@ -108,18 +154,10 @@ public class LightCatalogUtility {
 
   public static <T extends NamedObject> T lightNamedObject(
       final Class<T> clazz, final String name) {
-
-    final InvocationHandler handler =
-        (proxy, method, args) ->
-            switch (method.getName()) {
-              case "key" -> new NamedObjectKey(name);
-              case "getName", "getFullName", "toString" -> name;
-              case "equals" -> proxy == args[0];
-              case "hashCode" -> System.identityHashCode(proxy);
-              default -> returnEmpty(method);
-            };
-
     return (T)
-        Proxy.newProxyInstance(NamedObject.class.getClassLoader(), new Class<?>[] {clazz}, handler);
+        Proxy.newProxyInstance(
+            NamedObject.class.getClassLoader(),
+            new Class<?>[] {clazz},
+            new NamedObjectInvocationHandler(name));
   }
 }
