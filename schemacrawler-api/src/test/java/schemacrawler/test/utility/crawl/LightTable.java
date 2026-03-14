@@ -51,6 +51,13 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
     this(new SchemaReference(), name);
   }
 
+  public Column addColumn(final Column column) {
+    if (column != null) {
+      columns.add(column);
+    }
+    return column;
+  }
+
   public LightColumn addColumn(final String name) {
     final LightColumn column = LightColumn.newColumn(this, name);
     columns.add(column);
