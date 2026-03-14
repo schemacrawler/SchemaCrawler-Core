@@ -8,19 +8,21 @@
 
 package schemacrawler.test.utility.crawl;
 
-import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 import static us.fatehi.test.utility.TestObjectUtility.returnEmpty;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.util.List;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schema.JdbcDriverInfo;
+import schemacrawler.schema.NamedObject;
+import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.Version;
 import us.fatehi.test.utility.TestObjectUtility;
 import us.fatehi.utility.UtilityMarker;
-import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.property.BaseProductVersion;
 import us.fatehi.utility.property.ProductVersion;
 
@@ -28,17 +30,30 @@ import us.fatehi.utility.property.ProductVersion;
 public class LightCatalogUtility {
 
   public static Catalog lightCatalog() {
+    return lightCatalog(new Table[0]);
+  }
+
+  public static Catalog lightCatalog(final Table... tables) {
+    final List<Table> tablesList;
+    if (tables == null) {
+      tablesList = List.of();
+    } else {
+      tablesList = List.of(tables);
+    }
+
     final InvocationHandler handler =
         (proxy, method, args) -> {
           final String methodName = method.getName();
 
           return switch (methodName) {
+            case "key" -> new NamedObjectKey("light-catalog");
             case "getName", "getFullName", "toString" -> "light-catalog";
             case "equals" -> proxy == args[0];
             case "hashCode" -> System.identityHashCode(proxy);
             case "getCrawlInfo" -> lightCrawlInfo();
             case "getJdbcDriverInfo" -> TestObjectUtility.makeTestObject(JdbcDriverInfo.class);
             case "getDatabaseInfo" -> lightDatabaseInfo();
+            case "getTables" -> tablesList;
             default -> returnEmpty(method);
           };
         };
@@ -62,24 +77,6 @@ public class LightCatalogUtility {
     return (CrawlInfo)
         Proxy.newProxyInstance(
             LightCatalogUtility.class.getClassLoader(), new Class<?>[] {clazz}, handler);
-  }
-
-  public static DatabaseConnectionSource lightDatabaseConnectionSource() {
-
-    final InvocationHandler handler =
-        (proxy, method, args) ->
-            switch (method.getName()) {
-              case "get" -> mockConnection();
-              case "releaseConnection" -> true;
-              case "toString" -> "light-database-connection-source";
-              default -> returnEmpty(method);
-            };
-
-    return (DatabaseConnectionSource)
-        Proxy.newProxyInstance(
-            DatabaseConnectionSource.class.getClassLoader(),
-            new Class<?>[] {DatabaseConnectionSource.class},
-            handler);
   }
 
   public static DatabaseInfo lightDatabaseInfo() {
@@ -107,5 +104,22 @@ public class LightCatalogUtility {
     return (DatabaseInfo)
         Proxy.newProxyInstance(
             LightCatalogUtility.class.getClassLoader(), new Class<?>[] {clazz}, handler);
+  }
+
+  public static <T extends NamedObject> T lightNamedObject(
+      final Class<T> clazz, final String name) {
+
+    final InvocationHandler handler =
+        (proxy, method, args) ->
+            switch (method.getName()) {
+              case "key" -> new NamedObjectKey(name);
+              case "getName", "getFullName", "toString" -> name;
+              case "equals" -> proxy == args[0];
+              case "hashCode" -> System.identityHashCode(proxy);
+              default -> returnEmpty(method);
+            };
+
+    return (T)
+        Proxy.newProxyInstance(NamedObject.class.getClassLoader(), new Class<?>[] {clazz}, handler);
   }
 }

@@ -10,8 +10,8 @@ import static schemacrawler.ermodel.model.EntityType.strong_entity;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Table;
+import schemacrawler.test.utility.crawl.LightForeignKey;
 import schemacrawler.test.utility.crawl.LightTable;
-import schemacrawler.test.utility.crawl.LightTableReference;
 
 public class ERModelImplementationTest {
 
@@ -86,7 +86,7 @@ public class ERModelImplementationTest {
   public void testMutableTableReferenceRelationship() {
     final LightTable pkTable = new LightTable("PK_TABLE");
     final LightTable fkTable = new LightTable("FK_TABLE");
-    final LightTableReference tableRef = new LightTableReference("FK_PK", fkTable, pkTable);
+    final LightForeignKey tableRef = new LightForeignKey("FK_PK", fkTable, pkTable);
     tableRef.setRemarks("Relationship remarks");
     tableRef.setAttribute("attr1", "value1");
 
@@ -122,7 +122,7 @@ public class ERModelImplementationTest {
     assertThat(rel.hasAttribute("attr1"), is(false));
 
     // NamedObject methods (compareTo, equals, hashCode)
-    final LightTableReference tableRef2 = new LightTableReference("FK_PK2", fkTable, pkTable);
+    final LightForeignKey tableRef2 = new LightForeignKey("FK_PK2", fkTable, pkTable);
     final MutableTableReferenceRelationship rel2 = new MutableTableReferenceRelationship(tableRef2);
 
     // compareTo

@@ -29,6 +29,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,22 +38,21 @@ import tools.jackson.databind.ObjectMapper;
 
 public class TestObjectUtility {
 
+  public record Results(String[] columnNames, Object[][] data) {
+    public Results {
+      columnNames = requireNonNull(columnNames, "No column names provided");
+    }
+  }
+
   private static final class ResultSetInvocationHandler implements InvocationHandler {
 
-    private final String resultSetDescription;
-    private final Object[][] data;
-    private final String[] columnNames;
+    private final Results results;
     private int rowIndex;
     private boolean wasNull;
     private final ResultSetMetaData rsmd;
 
-    private ResultSetInvocationHandler(
-        final String resultSetDescription, final Object[][] data, final String[] columnNames)
-        throws SQLException {
-      this.resultSetDescription =
-          requireNonNull(resultSetDescription, "No result set description provided");
-      this.data = data;
-      this.columnNames = requireNonNull(columnNames, "No column names provided");
+    private ResultSetInvocationHandler(final Results results) throws SQLException {
+      this.results = requireNonNull(results);
       rsmd = createResultSetMetaData();
       rowIndex = -1;
     }
@@ -69,15 +69,15 @@ public class TestObjectUtility {
           return rsmd;
         case "next":
           wasNull = false;
-          if (data == null) {
+          if (results.data == null) {
             return false;
           }
           rowIndex = rowIndex + 1;
-          return rowIndex < data.length;
+          return rowIndex < results.data.length;
         case "getColumnName":
         case "getColumnLabel":
           if (args[0] instanceof final Integer index) {
-            return columnNames[index];
+            return results.columnNames[index];
           }
           return "columnName";
         case "getCatalogName":
@@ -96,13 +96,13 @@ public class TestObjectUtility {
             index = integer - 1;
           }
           if (args[0] instanceof final String columnName) {
-            index = Arrays.asList(columnNames).indexOf(columnName);
+            index = List.of(results.columnNames).indexOf(columnName);
           }
           Object columnData;
-          if (data == null || rowIndex < 0 || index < 0) {
+          if (results.data == null || rowIndex < 0 || index < 0) {
             columnData = null;
           } else {
-            columnData = data[rowIndex][index];
+            columnData = results.data[rowIndex][index];
           }
           if (columnData == null) {
             wasNull = true;
@@ -130,7 +130,7 @@ public class TestObjectUtility {
         case "wasNull":
           return wasNull;
         case "toString":
-          return "ResultSet: " + resultSetDescription;
+          return "Mocked results for " + Arrays.toString(results.columnNames);
         default:
           fail("%s(%s)".formatted(method, args));
           return null;
@@ -139,12 +139,12 @@ public class TestObjectUtility {
 
     private ResultSetMetaData createResultSetMetaData() throws SQLException {
       final ResultSetMetaData rsmd = mock(ResultSetMetaData.class);
-      lenient().when(rsmd.getColumnCount()).thenReturn(columnNames.length);
-      for (int i = 0; i < columnNames.length; i++) {
-        lenient().when(rsmd.getColumnName(i + 1)).thenReturn(columnNames[i]);
-        lenient().when(rsmd.getColumnLabel(i + 1)).thenReturn(columnNames[i]);
+      lenient().when(rsmd.getColumnCount()).thenReturn(results.columnNames.length);
+      for (int i = 0; i < results.columnNames.length; i++) {
+        lenient().when(rsmd.getColumnName(i + 1)).thenReturn(results.columnNames[i]);
+        lenient().when(rsmd.getColumnLabel(i + 1)).thenReturn(results.columnNames[i]);
       }
-      lenient().when(rsmd.toString()).thenReturn("ResultSetMetaData: " + resultSetDescription);
+      lenient().when(rsmd.toString()).thenReturn(results.toString());
       return rsmd;
     }
   }
@@ -206,6 +206,10 @@ public class TestObjectUtility {
   }
 
   public static Connection mockConnection() {
+    return mockConnection(new Results(new String[] {"col1"}, null));
+  }
+
+  public static Connection mockConnection(final Results results) {
     try {
       final DatabaseMetaData mockDbMetaData = mockDatabaseMetaData();
 
@@ -215,12 +219,8 @@ public class TestObjectUtility {
       lenient().when(mockConnection.isClosed()).thenReturn(false);
       lenient().when(mockConnection.isValid(anyInt())).thenReturn(true);
 
-      final Statement mockStatement = mockStatement();
+      final Statement mockStatement = mockStatement(results);
       lenient().when(mockConnection.createStatement()).thenReturn(mockStatement);
-
-      final ResultSet mockResultSet =
-          mockResultSet("Mocked connection", new String[] {"col1"}, null);
-      lenient().when(mockStatement.getResultSet()).thenReturn(mockResultSet);
 
       return mockConnection;
     } catch (final SQLException e) {
@@ -245,21 +245,24 @@ public class TestObjectUtility {
     }
   }
 
-  public static ResultSet mockResultSet(
-      final String resultSetDescription, final String[] columnNames, final Object[][] data)
-      throws SQLException {
+  public static ResultSet mockResultSet(final Results results) throws SQLException {
     return (ResultSet)
         newProxyInstance(
             ResultSet.class.getClassLoader(),
             new Class[] {ResultSet.class},
-            new ResultSetInvocationHandler(resultSetDescription, data, columnNames));
+            new ResultSetInvocationHandler(results));
   }
 
   public static Statement mockStatement() {
+    return mockStatement(new Results(new String[] {"col1"}, null));
+  }
+
+  public static Statement mockStatement(final Results results) {
     try {
+      final ResultSet mockResultSet = mockResultSet(results);
       final Statement mockStatement = mock(Statement.class);
       lenient().when(mockStatement.execute(anyString())).thenReturn(true);
-      lenient().when(mockStatement.getResultSet()).thenReturn(mock(ResultSet.class));
+      lenient().when(mockStatement.getResultSet()).thenReturn(mockResultSet);
       lenient().when(mockStatement.getUpdateCount()).thenReturn(0);
       lenient().when(mockStatement.execute(anyString())).thenReturn(true);
       return mockStatement;
@@ -284,6 +287,62 @@ public class TestObjectUtility {
     if (Collection.class.isAssignableFrom(returnType)) {
       return List.of();
     }
+    if (Iterator.class.isAssignableFrom(returnType)) {
+      return List.of().iterator();
+    }
+
+    // Handle primitives
+    if (returnType == boolean.class) {
+      return false;
+    }
+    if (returnType == int.class) {
+      return 0;
+    }
+    if (returnType == long.class) {
+      return 0L;
+    }
+    if (returnType == double.class) {
+      return 0.0d;
+    }
+    if (returnType == float.class) {
+      return 0.0f;
+    }
+    if (returnType == byte.class) {
+      return (byte) 0;
+    }
+    if (returnType == short.class) {
+      return (short) 0;
+    }
+    if (returnType == char.class) {
+      return '\0';
+    }
+
+    // Handle primitive wrappers
+    if (returnType == Boolean.class) {
+      return Boolean.FALSE;
+    }
+    if (returnType == Integer.class) {
+      return Integer.valueOf(0);
+    }
+    if (returnType == Long.class) {
+      return Long.valueOf(0L);
+    }
+    if (returnType == Double.class) {
+      return Double.valueOf(0.0d);
+    }
+    if (returnType == Float.class) {
+      return Float.valueOf(0.0f);
+    }
+    if (returnType == Byte.class) {
+      return Byte.valueOf((byte) 0);
+    }
+    if (returnType == Short.class) {
+      return Short.valueOf((short) 0);
+    }
+    if (returnType == Character.class) {
+      return Character.valueOf('\0');
+    }
+
     throw new UnsupportedOperationException(method.toString());
   }
 

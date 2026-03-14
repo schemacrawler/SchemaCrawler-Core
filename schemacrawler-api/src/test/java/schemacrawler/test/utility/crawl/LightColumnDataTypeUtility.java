@@ -52,6 +52,14 @@ public class LightColumnDataTypeUtility {
         case "getEnumValues" -> enumValues;
         case "equals" -> proxy == args[0];
         case "hashCode" -> System.identityHashCode(proxy);
+        case "compareTo" -> {
+          final Object other = args[0];
+          if (other == null) {
+            yield 1; // non-null > null
+          }
+          final String otherName = ((ColumnDataType) other).getName();
+          yield name.compareTo(otherName);
+        }
         case "toString" -> toString();
         default -> returnEmpty(method);
       };

@@ -8,30 +8,43 @@
 
 package schemacrawler.test.utility.crawl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.Serial;
 import java.util.Iterator;
 import java.util.List;
+import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
+import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.ForeignKeyDeferrability;
+import schemacrawler.schema.ForeignKeyUpdateRule;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableConstraintType;
-import schemacrawler.schema.TableReference;
 
-public final class LightTableReference extends AbstractLightDatabaseObject
-    implements TableReference {
+public final class LightForeignKey extends AbstractLightDatabaseObject implements ForeignKey {
 
   @Serial private static final long serialVersionUID = -5359990477303202179L;
 
   private final Table fkTable;
   private final Table pkTable;
+  private final ColumnReference columnReference;
 
-  public LightTableReference(final String name, final Table fkTable, final Table pkTable) {
+  public LightForeignKey(final String name, final Column fkColumn, final Column pkColumn) {
+    super(requireNonNull(fkColumn, "No foreign key column provided").getSchema(), name);
+    fkTable = fkColumn.getParent();
+    pkTable = pkColumn.getParent();
+    columnReference = new LightColumnReference(fkColumn, pkColumn);
+  }
+
+  public LightForeignKey(final String name, final Table fkTable, final Table pkTable) {
     super(fkTable.getSchema(), name);
     this.fkTable = fkTable;
     this.pkTable = pkTable;
+    columnReference = null;
   }
 
   @Override
@@ -41,7 +54,10 @@ public final class LightTableReference extends AbstractLightDatabaseObject
 
   @Override
   public List<ColumnReference> getColumnReferences() {
-    return List.of();
+    if (columnReference == null) {
+      return List.of();
+    }
+    return List.of(columnReference);
   }
 
   @Override
@@ -50,8 +66,18 @@ public final class LightTableReference extends AbstractLightDatabaseObject
   }
 
   @Override
+  public ForeignKeyDeferrability getDeferrability() {
+    return ForeignKeyDeferrability.unknown;
+  }
+
+  @Override
   public String getDefinition() {
     return null;
+  }
+
+  @Override
+  public ForeignKeyUpdateRule getDeleteRule() {
+    return ForeignKeyUpdateRule.unknown;
   }
 
   @Override
@@ -82,6 +108,11 @@ public final class LightTableReference extends AbstractLightDatabaseObject
   @Override
   public TableConstraintType getType() {
     return TableConstraintType.foreign_key;
+  }
+
+  @Override
+  public ForeignKeyUpdateRule getUpdateRule() {
+    return ForeignKeyUpdateRule.unknown;
   }
 
   @Override

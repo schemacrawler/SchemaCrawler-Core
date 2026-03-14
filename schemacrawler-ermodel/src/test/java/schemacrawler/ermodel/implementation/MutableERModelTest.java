@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
+import schemacrawler.test.utility.crawl.LightForeignKey;
 import schemacrawler.test.utility.crawl.LightTable;
-import schemacrawler.test.utility.crawl.LightTableReference;
 
 public class MutableERModelTest {
 
@@ -107,7 +107,7 @@ public class MutableERModelTest {
 
     final LightTable pkTable = new LightTable("PK_TABLE");
     final LightTable fkTable = new LightTable("FK_TABLE");
-    final LightTableReference tableRef = new LightTableReference("FK_PK", fkTable, pkTable);
+    final LightForeignKey tableRef = new LightForeignKey("FK_PK", fkTable, pkTable);
     final MutableTableReferenceRelationship rel = new MutableTableReferenceRelationship(tableRef);
 
     model.addRelationship(rel);
@@ -129,7 +129,7 @@ public class MutableERModelTest {
     final LightTable fkTable = new LightTable("FK_TABLE");
     fkTable.addColumn("PK_ID");
 
-    final LightTableReference mockRef = new LightTableReference("FK_PK", fkTable, pkTable);
+    final LightForeignKey mockRef = new LightForeignKey("FK_PK", fkTable, pkTable);
 
     final MutableTableReferenceRelationship rel = new MutableTableReferenceRelationship(mockRef);
 

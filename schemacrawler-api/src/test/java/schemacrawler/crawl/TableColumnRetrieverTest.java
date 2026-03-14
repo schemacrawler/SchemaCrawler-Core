@@ -19,12 +19,11 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static schemacrawler.schemacrawler.MetadataRetrievalStrategy.data_dictionary_all;
 import static schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy.tableColumnsRetrievalStrategy;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
-import static schemacrawler.test.utility.crawl.LightCatalogUtility.lightDatabaseConnectionSource;
 import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
@@ -178,7 +177,7 @@ public class TableColumnRetrieverTest {
   @DisplayName("Test exception handling when column retrieval operations fail")
   public void exceptionHandlingWhenColumnRetrievalFails() throws Exception {
     // Create a mock connection source that throws an exception
-    final DatabaseConnectionSource testDataSource = spy(lightDatabaseConnectionSource());
+    final DatabaseConnectionSource testDataSource = mock(DatabaseConnectionSource.class);
     final Connection mockConnection = mockConnection();
     when(testDataSource.get()).thenReturn(mockConnection);
     when(mockConnection.getMetaData()).thenThrow(new SQLException("Test exception"));
