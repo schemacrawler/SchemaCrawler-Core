@@ -18,6 +18,7 @@ import schemacrawler.schema.Catalog;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schema.JdbcDriverInfo;
+import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.Version;
@@ -123,5 +124,22 @@ public class LightCatalogUtility {
     return (DatabaseInfo)
         Proxy.newProxyInstance(
             LightCatalogUtility.class.getClassLoader(), new Class<?>[] {clazz}, handler);
+  }
+
+  public static <T extends NamedObject> T lightNamedObject(
+      final Class<T> clazz, final String name) {
+
+    final InvocationHandler handler =
+        (proxy, method, args) ->
+            switch (method.getName()) {
+              case "key" -> new NamedObjectKey(name);
+              case "getName", "getFullName", "toString" -> name;
+              case "equals" -> proxy == args[0];
+              case "hashCode" -> System.identityHashCode(proxy);
+              default -> returnEmpty(method);
+            };
+
+    return (T)
+        Proxy.newProxyInstance(NamedObject.class.getClassLoader(), new Class<?>[] {clazz}, handler);
   }
 }

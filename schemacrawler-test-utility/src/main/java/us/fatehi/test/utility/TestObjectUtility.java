@@ -29,6 +29,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -285,6 +286,9 @@ public class TestObjectUtility {
     }
     if (Collection.class.isAssignableFrom(returnType)) {
       return List.of();
+    }
+    if (Iterator.class.isAssignableFrom(returnType)) {
+      return List.of().iterator();
     }
 
     // Handle primitives
