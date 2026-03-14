@@ -215,7 +215,6 @@ public class ProcedureParameterRetrieverTest extends AbstractParameterRetrieverT
       }
     };
 
-    final String resultSetDescription = "Procedure parameters for <%s>".formatted(routineName);
-    return mockResultSet(new Results(resultSetDescription, columnNames, data));
+    return mockResultSet(new Results(columnNames, data));
   }
 }

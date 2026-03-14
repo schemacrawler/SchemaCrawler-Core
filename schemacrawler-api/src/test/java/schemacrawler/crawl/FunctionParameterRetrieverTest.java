@@ -207,7 +207,6 @@ public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTe
       }
     };
 
-    final String resultSetDescription = "Function parameters for <%s>".formatted(routineName);
-    return mockResultSet(new Results(resultSetDescription, columnNames, data));
+    return mockResultSet(new Results(columnNames, data));
   }
 }

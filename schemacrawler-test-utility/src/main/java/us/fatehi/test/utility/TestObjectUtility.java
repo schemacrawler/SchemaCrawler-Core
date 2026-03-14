@@ -26,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -36,10 +37,8 @@ import tools.jackson.databind.ObjectMapper;
 
 public class TestObjectUtility {
 
-  public record Results(String resultSetDescription, String[] columnNames, Object[][] data) {
+  public record Results(String[] columnNames, Object[][] data) {
     public Results {
-      resultSetDescription =
-          requireNonNull(resultSetDescription, "No result set description provided");
       columnNames = requireNonNull(columnNames, "No column names provided");
     }
   }
@@ -130,7 +129,7 @@ public class TestObjectUtility {
         case "wasNull":
           return wasNull;
         case "toString":
-          return "ResultSet: " + results.resultSetDescription;
+          return "Mocked results for " + Arrays.toString(results.columnNames);
         default:
           fail("%s(%s)".formatted(method, args));
           return null;
@@ -144,9 +143,7 @@ public class TestObjectUtility {
         lenient().when(rsmd.getColumnName(i + 1)).thenReturn(results.columnNames[i]);
         lenient().when(rsmd.getColumnLabel(i + 1)).thenReturn(results.columnNames[i]);
       }
-      lenient()
-          .when(rsmd.toString())
-          .thenReturn("ResultSetMetaData: " + results.resultSetDescription);
+      lenient().when(rsmd.toString()).thenReturn(results.toString());
       return rsmd;
     }
   }
@@ -208,7 +205,7 @@ public class TestObjectUtility {
   }
 
   public static Connection mockConnection() {
-    return mockConnection(new Results("MOCKED RESULTS", new String[] {"col1"}, null));
+    return mockConnection(new Results(new String[] {"col1"}, null));
   }
 
   public static Connection mockConnection(final Results results) {
@@ -256,7 +253,7 @@ public class TestObjectUtility {
   }
 
   public static Statement mockStatement() {
-    return mockStatement(new Results("MOCKED RESULTS", new String[] {"col1"}, null));
+    return mockStatement(new Results(new String[] {"col1"}, null));
   }
 
   public static Statement mockStatement(final Results results) {
