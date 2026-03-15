@@ -8,13 +8,17 @@
 
 package schemacrawler.tools.loader.catalog;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import schemacrawler.crawl.SchemaCrawler;
 import schemacrawler.schema.Catalog;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.loader.catalog.PrimaryCatalogLoader.PrimaryCatalogLoaderOptions;
 import us.fatehi.utility.property.PropertyName;
 
-public class PrimaryCatalogLoader extends AbstractCatalogLoader<PrimaryCatalogLoaderOptions> {
+class PrimaryCatalogLoader extends AbstractCatalogLoader<PrimaryCatalogLoaderOptions> {
+
+  private static final Logger LOGGER = Logger.getLogger(PrimaryCatalogLoader.class.getName());
 
   static record PrimaryCatalogLoaderOptions() implements CommandOptions {}
 
@@ -25,8 +29,11 @@ public class PrimaryCatalogLoader extends AbstractCatalogLoader<PrimaryCatalogLo
   @Override
   public void execute() {
     if (hasCatalog()) {
+      LOGGER.log(Level.INFO, "Catalog has already been retrieved; skipping retrieval");
       return;
     }
+
+    LOGGER.log(Level.INFO, "Retrieving catalog");
 
     final SchemaCrawler schemaCrawler =
         new SchemaCrawler(

@@ -16,22 +16,23 @@ import static schemacrawler.test.utility.DatabaseTestUtility.schemaRetrievalOpti
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.tools.loader.catalog.CatalogLoader;
-import schemacrawler.tools.loader.catalog.PrimaryCatalogLoader;
 import schemacrawler.tools.loader.catalog.PrimaryCatalogLoaderProvider;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.test.utility.TestDatabaseDriver;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSources;
 
-public class SchemaCrawlerCatalogLoaderTest {
+public class PrimaryCatalogLoaderTest {
+
+  private CatalogLoader<?> catalogLoader;
 
   @Test
   public void connection() throws SQLException {
-    final CatalogLoader catalogLoader = newSchemaCrawlerCatalogLoader();
 
     assertThat(catalogLoader.getConnectionSource(), is(nullValue()));
 
@@ -45,9 +46,13 @@ public class SchemaCrawlerCatalogLoaderTest {
     connection.close();
   }
 
+  @BeforeEach
+  public void newPrimaryCatalogLoader() {
+    catalogLoader = new PrimaryCatalogLoaderProvider().newCommand(ConfigUtility.newConfig());
+  }
+
   @Test
   public void schemaCrawlerOptions() {
-    final CatalogLoader catalogLoader = newSchemaCrawlerCatalogLoader();
 
     assertThat(catalogLoader.getSchemaCrawlerOptions(), is(not(nullValue())));
 
@@ -61,7 +66,6 @@ public class SchemaCrawlerCatalogLoaderTest {
 
   @Test
   public void schemaRetrievalOptions() {
-    final CatalogLoader catalogLoader = newSchemaCrawlerCatalogLoader();
 
     assertThat(catalogLoader.getSchemaRetrievalOptions(), is(not(nullValue())));
 
@@ -70,9 +74,5 @@ public class SchemaCrawlerCatalogLoaderTest {
     assertThat(catalogLoader.getSchemaRetrievalOptions(), is(not(nullValue())));
     assertThat(
         catalogLoader.getSchemaRetrievalOptions().equals(schemaRetrievalOptionsDefault), is(true));
-  }
-
-  private PrimaryCatalogLoader newSchemaCrawlerCatalogLoader() {
-    return new PrimaryCatalogLoaderProvider().newCommand(ConfigUtility.newConfig());
   }
 }
