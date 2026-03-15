@@ -30,7 +30,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsERModelLoader;
+import schemacrawler.tools.loader.ermodel.ERModelLoader;
 import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsERModelLoaderOptions;
 import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsERModelLoaderProvider;
 import schemacrawler.tools.options.Config;
@@ -66,7 +66,7 @@ public class ImplicitAssociationsERModelLoaderTest {
     config.put("implicit-associations", true);
     final ImplicitAssociationsERModelLoaderProvider provider =
         new ImplicitAssociationsERModelLoaderProvider();
-    final ImplicitAssociationsERModelLoader loader = provider.newCommand(config);
+    final ERModelLoader<?> loader = provider.newCommand(config);
     loader.setCatalog(catalog);
     loader.setERModel(erModel);
     loader.execute();
@@ -80,7 +80,7 @@ public class ImplicitAssociationsERModelLoaderTest {
 
     final ImplicitAssociationsERModelLoaderProvider provider =
         new ImplicitAssociationsERModelLoaderProvider();
-    final ImplicitAssociationsERModelLoader loader = provider.newCommand(ConfigUtility.newConfig());
+    final ERModelLoader<?> loader = provider.newCommand(ConfigUtility.newConfig());
     loader.setCatalog(catalog);
     loader.setERModel(erModel);
     loader.execute();
@@ -92,7 +92,7 @@ public class ImplicitAssociationsERModelLoaderTest {
   public void loaderDoesNothingWhenERModelNotLoaded() {
     final ImplicitAssociationsERModelLoaderProvider provider =
         new ImplicitAssociationsERModelLoaderProvider();
-    final ImplicitAssociationsERModelLoader loader = provider.newCommand(ConfigUtility.newConfig());
+    final ERModelLoader<?> loader = provider.newCommand(ConfigUtility.newConfig());
     loader.setCatalog(catalog);
 
     // ERModel not set - loader should skip gracefully, leaving ERModel null
@@ -124,7 +124,7 @@ public class ImplicitAssociationsERModelLoaderTest {
     config.put("implicit-associations", false);
     final ImplicitAssociationsERModelLoaderProvider provider =
         new ImplicitAssociationsERModelLoaderProvider();
-    final ImplicitAssociationsERModelLoader loader = provider.newCommand(config);
+    final ERModelLoader<?> loader = provider.newCommand(config);
     loader.setCatalog(catalog);
     loader.setERModel(erModel);
     loader.execute();

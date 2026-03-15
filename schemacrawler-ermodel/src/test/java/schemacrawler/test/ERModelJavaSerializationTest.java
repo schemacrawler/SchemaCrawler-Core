@@ -28,6 +28,7 @@ import static us.fatehi.utility.IOUtility.isFileReadable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.ERModel;
@@ -79,5 +80,10 @@ public class ERModelJavaSerializationTest {
     assertThat(erModel, is(not(nullValue())));
     assertThat(erModel.getEntities(), hasSize(12));
     assertThat(erModel.getRelationships(), hasSize(15));
+    // Calculate total implicit relationships
+    final int numImplicitRelationships =
+        erModel.getEntities().stream()
+            .collect(Collectors.summingInt(entity -> entity.getImplicitRelationships().size()));
+    assertThat(numImplicitRelationships, is(0));
   }
 }

@@ -32,7 +32,7 @@ import us.fatehi.utility.string.StringFormat;
  * <p>This loader runs after the primary ER model has been built and enriches it with implicit
  * relationships inferred from naming patterns across all tables.
  */
-public final class ImplicitAssociationsERModelLoader
+final class ImplicitAssociationsERModelLoader
     extends AbstractERModelLoader<ImplicitAssociationsERModelLoaderOptions> {
 
   private static final Logger LOGGER =
