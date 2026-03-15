@@ -16,7 +16,7 @@ final class MutableManyToManyRelationship extends AbstractTableBacked
   private Entity leftEntity;
   private Entity rightEntity;
 
-  public MutableManyToManyRelationship(final Table table) {
+  MutableManyToManyRelationship(final Table table) {
     super(table);
   }
 

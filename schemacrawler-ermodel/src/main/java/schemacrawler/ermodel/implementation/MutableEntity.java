@@ -29,7 +29,7 @@ class MutableEntity extends AbstractTableBacked implements Entity {
   private final SortedSet<Relationship> relationships;
   private final SortedSet<Relationship> implicitRelationships;
 
-  public MutableEntity(final Table table, final EntityType entityType) {
+  MutableEntity(final Table table, final EntityType entityType) {
     super(table);
 
     // No checks done about setting entity type for unknown or non entities

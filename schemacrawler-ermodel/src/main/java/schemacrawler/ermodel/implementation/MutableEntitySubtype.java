@@ -14,7 +14,7 @@ final class MutableEntitySubtype extends MutableEntity implements EntitySubtype 
 
   private Entity supertype;
 
-  public MutableEntitySubtype(final Table table) {
+  MutableEntitySubtype(final Table table) {
     super(table, subtype);
   }
 

@@ -15,6 +15,9 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
@@ -52,7 +55,9 @@ public class ERModelJavaSerializationTest {
     assertThat("ERModel was not serialized", isFileReadable(testOutputFile), is(true));
     assertThat(fileHeaderOf(testOutputFile), is("ACED"));
 
-    SerializedERModelUtility.readERModel(newInputStream(testOutputFile, READ));
+    final ERModel erModelDeser =
+        SerializedERModelUtility.readERModel(newInputStream(testOutputFile, READ));
+    validateERModel(erModelDeser);
   }
 
   @BeforeEach
@@ -67,5 +72,12 @@ public class ERModelJavaSerializationTest {
     validateSchema(catalog);
 
     erModel = TestERModelUtility.buildERModel(catalog);
+    validateERModel(erModel);
+  }
+
+  private void validateERModel(final ERModel erModel) {
+    assertThat(erModel, is(not(nullValue())));
+    assertThat(erModel.getEntities(), hasSize(12));
+    assertThat(erModel.getRelationships(), hasSize(15));
   }
 }

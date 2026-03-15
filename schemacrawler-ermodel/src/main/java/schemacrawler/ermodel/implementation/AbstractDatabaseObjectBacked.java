@@ -10,9 +10,12 @@ package schemacrawler.ermodel.implementation;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serial;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 import schemacrawler.ermodel.model.DatabaseObjectBacked;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
@@ -23,7 +26,7 @@ abstract class AbstractDatabaseObjectBacked<DO extends DatabaseObject>
 
   @Serial private static final long serialVersionUID = -1252099222675350939L;
 
-  private final DO dbObject;
+  @NonNull private final DO dbObject;
 
   public AbstractDatabaseObjectBacked(final DO dbObject) {
     this.dbObject = requireNonNull(dbObject, "No database object provided");
@@ -123,5 +126,17 @@ abstract class AbstractDatabaseObjectBacked<DO extends DatabaseObject>
   @Override
   public String toString() {
     return dbObject.toString();
+  }
+
+  /**
+   * IMPORTANT: Concurrent collections de-serialization may bypass the constructor's null-check for
+   * fields. Re-impose the field-level null checks when de-serializing.
+   *
+   * @param ois Object input stream
+   * @throws IOException Object input stream read exception
+   * @throws ClassNotFoundException Unknown class encountered
+   */
+  private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
+    ois.defaultReadObject();
   }
 }
