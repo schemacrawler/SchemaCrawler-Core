@@ -13,8 +13,8 @@ import static java.util.Objects.requireNonNull;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.Relationship;
@@ -26,7 +26,8 @@ class MutableEntity extends AbstractTableBacked implements Entity {
   @Serial private static final long serialVersionUID = 3946422106166202467L;
 
   private final EntityType entityType;
-  private final Set<Relationship> relationships;
+  private final SortedSet<Relationship> relationships;
+  private final SortedSet<Relationship> implicitRelationships;
 
   public MutableEntity(final Table table, final EntityType entityType) {
     super(table);
@@ -36,7 +37,14 @@ class MutableEntity extends AbstractTableBacked implements Entity {
 
     // No checks for partial table - exceptions will be thrown while calling
     // unsupported methods
-    relationships = new TreeSet<>();
+
+    relationships = new ConcurrentSkipListSet<>();
+    implicitRelationships = new ConcurrentSkipListSet<>();
+  }
+
+  @Override
+  public Collection<Relationship> getImplicitRelationships() {
+    return List.copyOf(implicitRelationships);
   }
 
   @Override
@@ -47,6 +55,12 @@ class MutableEntity extends AbstractTableBacked implements Entity {
   @Override
   public EntityType getType() {
     return entityType;
+  }
+
+  void addImplicitRelationship(final Relationship relationship) {
+    if (relationship != null) {
+      implicitRelationships.add(relationship);
+    }
   }
 
   void addRelationship(final Relationship relationship) {

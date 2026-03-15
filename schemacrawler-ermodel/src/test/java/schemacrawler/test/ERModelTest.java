@@ -123,7 +123,7 @@ public class ERModelTest {
       out.println("# Implicit relationships by Entity:");
       for (final Entity entity : erModel.getEntities()) {
         out.println("- %s [%s]".formatted(entity, entity.getType()));
-        for (final Relationship relationship : erModel.getImplicitRelationshipsByEntity(entity)) {
+        for (final Relationship relationship : entity.getImplicitRelationships()) {
           out.println("  - %s".formatted(relationship.getName()));
         }
       }
