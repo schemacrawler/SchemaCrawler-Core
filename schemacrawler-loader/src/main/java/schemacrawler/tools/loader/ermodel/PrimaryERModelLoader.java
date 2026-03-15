@@ -41,7 +41,7 @@ class PrimaryERModelLoader extends AbstractERModelLoader<PrimaryERModelLoaderLoa
     LOGGER.log(Level.INFO, "Building ER model");
 
     final Catalog catalog = getCatalog();
-    final ERModel eRModel = new ERModelBuilder(catalog).build();
+    final ERModel eRModel = ERModelBuilder.builder(catalog).build();
     setERModel(eRModel);
   }
 }

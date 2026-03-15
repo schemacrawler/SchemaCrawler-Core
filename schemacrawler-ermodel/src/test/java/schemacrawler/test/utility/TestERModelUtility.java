@@ -22,8 +22,8 @@ public class TestERModelUtility {
 
   public static ERModel buildERModel(final Catalog catalog) {
     requireNonNull(catalog, "No catalog provided");
-    final ERModel erModel = new ERModelBuilder(catalog).build();
-    ImplicitAssociationBuilder.builder(erModel);
+    final ERModel erModel = ERModelBuilder.builder(catalog).build();
+    ImplicitAssociationBuilder.builder(erModel).build();
     return erModel;
   }
 

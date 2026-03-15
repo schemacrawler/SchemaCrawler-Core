@@ -84,6 +84,6 @@ public class ERModelJavaSerializationTest {
     final int numImplicitRelationships =
         erModel.getEntities().stream()
             .collect(Collectors.summingInt(entity -> entity.getImplicitRelationships().size()));
-    assertThat(numImplicitRelationships, is(0));
+    assertThat(numImplicitRelationships, is(3));
   }
 }

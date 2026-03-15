@@ -28,16 +28,21 @@ import schemacrawler.schema.TableReference;
 import us.fatehi.utility.Builder;
 import us.fatehi.utility.string.StringFormat;
 
-public class ERModelBuilder implements Builder<ERModel> {
+public final class ERModelBuilder implements Builder<ERModel> {
 
   private static final Logger LOGGER = Logger.getLogger(ERModelBuilder.class.getName());
+
+  public static ERModelBuilder builder(final Catalog catalog) {
+    return new ERModelBuilder(catalog);
+  }
 
   private final Catalog catalog;
   final MutableERModel erModel;
   final Map<NamedObjectKey, TableEntityModelInferrer> inferrerMap;
+
   final Map<NamedObjectKey, MutableEntity> entityMap;
 
-  public ERModelBuilder(final Catalog catalog) {
+  private ERModelBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
 
     inferrerMap = new HashMap<>();
