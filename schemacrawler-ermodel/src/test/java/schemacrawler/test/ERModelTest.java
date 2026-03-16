@@ -25,10 +25,6 @@ import java.sql.Connection;
 import java.util.Collection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
-import schemacrawler.ermodel.associations.ImplicitColumnReference;
-import schemacrawler.ermodel.implementation.ImplicitAssociationBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityAttribute;
@@ -96,9 +92,6 @@ public class ERModelTest {
 
   @Test
   public void implicitRelationships(final TestContext testContext) {
-
-    inferImplicitAssociations();
-
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
       out.println("# Implicit relationships:");
@@ -115,15 +108,12 @@ public class ERModelTest {
 
   @Test
   public void implicitRelationshipsByEntity(final TestContext testContext) {
-
-    inferImplicitAssociations();
-
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
       out.println("# Implicit relationships by Entity:");
       for (final Entity entity : erModel.getEntities()) {
         out.println("- %s [%s]".formatted(entity, entity.getType()));
-        for (final Relationship relationship : erModel.getImplicitRelationshipsByEntity(entity)) {
+        for (final Relationship relationship : entity.getImplicitRelationships()) {
           out.println("  - %s".formatted(relationship.getName()));
         }
       }
@@ -137,7 +127,7 @@ public class ERModelTest {
   public void implicitRelationshipsNegative(final TestContext testContext) {
     Collection<Relationship> implicitRelationships = erModel.getImplicitRelationships();
     assertThat(implicitRelationships, is(not(nullValue())));
-    assertThat(implicitRelationships, hasSize(0));
+    assertThat(implicitRelationships, hasSize(2));
   }
 
   @BeforeEach
@@ -199,20 +189,5 @@ public class ERModelTest {
     assertThat(
         outputOf(testout),
         hasSameContentAs(classpathResource(testContext.testMethodFullName() + ".txt")));
-  }
-
-  private void inferImplicitAssociations() {
-    // Add implicit associations using ImplicitAssociationBuilder
-    final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer =
-        ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
-            .withIdMatcher()
-            .withExtensionTableMatcher()
-            .build();
-    final ImplicitAssociationBuilder implicitAssociationBuilder =
-        ImplicitAssociationBuilder.builder(erModel);
-    for (final ImplicitColumnReference implicitColumnReference :
-        implicitAssociationsAnalyzer.analyzeTables()) {
-      implicitAssociationBuilder.addImplicitAssociation(implicitColumnReference);
-    }
   }
 }

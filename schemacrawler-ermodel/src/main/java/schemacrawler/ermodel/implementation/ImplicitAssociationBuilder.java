@@ -10,18 +10,22 @@ package schemacrawler.ermodel.implementation;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.ermodel.associations.ImplicitAssociation;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
 import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.Table;
+import us.fatehi.utility.Builder;
 import us.fatehi.utility.string.StringFormat;
 
 /** Builder for adding implicit associations to an ER model. */
-public final class ImplicitAssociationBuilder {
+public final class ImplicitAssociationBuilder implements Builder<ERModel> {
 
   private static final Logger LOGGER = Logger.getLogger(ImplicitAssociationBuilder.class.getName());
 
@@ -40,9 +44,37 @@ public final class ImplicitAssociationBuilder {
   }
 
   private final MutableERModel erModel;
+  private ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer;
 
   private ImplicitAssociationBuilder(final MutableERModel erModel) {
     this.erModel = erModel;
+    implicitAssociationsAnalyzer = buildDefaultImplicitAssociationAnalyzer();
+  }
+
+  @Override
+  public ERModel build() {
+    final Collection<ImplicitColumnReference> implicitAssociations =
+        implicitAssociationsAnalyzer.analyzeTables();
+    if (implicitAssociations == null || implicitAssociations.isEmpty()) {
+      return erModel;
+    }
+
+    for (final ImplicitColumnReference implicitAssociation : implicitAssociations) {
+      LOGGER.log(
+          Level.INFO,
+          new StringFormat("Adding implicit association <%s> to ER model", implicitAssociation));
+      addImplicitAssociation(implicitAssociation);
+    }
+
+    return erModel;
+  }
+
+  public ImplicitAssociationBuilder withImplicitAssociationsAnalyzer(
+      final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer) {
+    if (implicitAssociationsAnalyzer != null) {
+      this.implicitAssociationsAnalyzer = implicitAssociationsAnalyzer;
+    }
+    return this;
   }
 
   /**
@@ -53,7 +85,7 @@ public final class ImplicitAssociationBuilder {
    *
    * @param columnReference Implicit column reference describing the association
    */
-  public void addImplicitAssociation(final ImplicitColumnReference columnReference) {
+  private void addImplicitAssociation(final ImplicitColumnReference columnReference) {
     if (columnReference == null) {
       return;
     }
@@ -91,5 +123,12 @@ public final class ImplicitAssociationBuilder {
     rel.setEntities(leftEntity, rightEntity);
 
     erModel.addImplicitRelationship(rel);
+  }
+
+  private ImplicitAssociationsAnalyzer buildDefaultImplicitAssociationAnalyzer() {
+    return ImplicitAssociationsAnalyzerBuilder.builder(erModel.getTables())
+        .withIdMatcher()
+        .withExtensionTableMatcher()
+        .build();
   }
 }

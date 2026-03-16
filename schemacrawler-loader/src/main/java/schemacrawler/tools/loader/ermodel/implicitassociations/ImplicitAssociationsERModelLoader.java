@@ -8,22 +8,16 @@
 
 package schemacrawler.tools.loader.ermodel.implicitassociations;
 
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
-import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.ermodel.implementation.ImplicitAssociationBuilder;
 import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.loader.ermodel.AbstractERModelLoader;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
-import us.fatehi.utility.string.StringFormat;
 
 /**
  * ER model loader that discovers implicit associations between tables and adds them to the ER
@@ -32,7 +26,7 @@ import us.fatehi.utility.string.StringFormat;
  * <p>This loader runs after the primary ER model has been built and enriches it with implicit
  * relationships inferred from naming patterns across all tables.
  */
-public final class ImplicitAssociationsERModelLoader
+final class ImplicitAssociationsERModelLoader
     extends AbstractERModelLoader<ImplicitAssociationsERModelLoaderOptions> {
 
   private static final Logger LOGGER =
@@ -72,25 +66,10 @@ public final class ImplicitAssociationsERModelLoader
   }
 
   private void loadImplicitAssociations() {
-    final Catalog catalog = getCatalog();
     final ERModel erModel = getERModel();
-    final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer =
-        ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
-            .withIdMatcher()
-            .withExtensionTableMatcher()
-            .build();
-    final Collection<ImplicitColumnReference> implicitAssociations =
-        implicitAssociationsAnalyzer.analyzeTables();
-    if (implicitAssociations == null || implicitAssociations.isEmpty()) {
-      return;
-    }
-
     final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(erModel);
-    for (final ImplicitColumnReference implicitAssociation : implicitAssociations) {
-      LOGGER.log(
-          Level.INFO,
-          new StringFormat("Adding implicit association <%s> to ER model", implicitAssociation));
-      builder.addImplicitAssociation(implicitAssociation);
-    }
+    builder.build();
+    // The ER model is enhanced with implicit associations, so no need to set it back into the
+    // execution state
   }
 }

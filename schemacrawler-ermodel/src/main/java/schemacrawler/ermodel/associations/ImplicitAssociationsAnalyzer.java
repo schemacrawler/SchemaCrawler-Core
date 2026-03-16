@@ -45,7 +45,7 @@ public final class ImplicitAssociationsAnalyzer {
   private final TableMatchKeys tableMatchKeys;
   private final Predicate<ColumnReference> implicitAssociationRule;
 
-  public ImplicitAssociationsAnalyzer(
+  ImplicitAssociationsAnalyzer(
       final TableMatchKeys matchKeys, final Predicate<ColumnReference> implicitAssociationRule) {
     tableMatchKeys = requireNonNull(matchKeys, "No table match keys provided");
     this.implicitAssociationRule = requireNonNull(implicitAssociationRule, "No rules provided");

@@ -19,7 +19,10 @@ import static org.mockito.Mockito.when;
 import static schemacrawler.ermodel.model.EntityType.strong_entity;
 import static schemacrawler.ermodel.model.EntityType.weak_entity;
 
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
 import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
@@ -30,73 +33,19 @@ import schemacrawler.test.utility.crawl.LightTable;
 public class ImplicitAssociationBuilderTest {
 
   @Test
-  public void builderRejectsNullERModel() {
-    assertThrows(NullPointerException.class, () -> ImplicitAssociationBuilder.builder(null));
-  }
-
-  @Test
-  public void builderRejectsNonMutableERModel() {
-    final ERModel nonMutableERModel = mock(ERModel.class);
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> ImplicitAssociationBuilder.builder(nonMutableERModel));
-  }
-
-  @Test
-  public void builderReturnsNonNullForMutableERModel() {
-    final MutableERModel mutableERModel = new MutableERModel();
-    final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(mutableERModel);
-    assertThat(builder, is(notNullValue()));
-  }
-
-  @Test
-  public void addNullImplicitAssociationIsNoOp() {
-    final MutableERModel mutableERModel = new MutableERModel();
-    final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(mutableERModel);
-
-    // Should not throw
-    builder.addImplicitAssociation(null);
-
-    assertThat(mutableERModel.getImplicitRelationships(), is(empty()));
-  }
-
-  @Test
-  public void addImplicitAssociationWithMissingEntity() {
-    // Tables with no entities in the model
-    final LightTable pkTable = new LightTable("PK_TABLE");
-    pkTable.addColumn("ID");
-    final LightTable fkTable = new LightTable("FK_TABLE");
-    fkTable.addColumn("PK_TABLE_ID");
-
+  public void addEmptyImplicitAssociationIsNoOp() {
     final MutableERModel mutableERModel = new MutableERModel();
     // No entities added
 
-    final ImplicitColumnReference columnReference = mockColumnReference(fkTable, pkTable);
-    final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(mutableERModel);
-    builder.addImplicitAssociation(columnReference);
+    final ImplicitAssociationsAnalyzer analyzer = mock(ImplicitAssociationsAnalyzer.class);
+    when(analyzer.analyzeTables()).thenReturn(null);
 
-    // Should be skipped because entities don't exist
+    // Build implicit associations
+    ImplicitAssociationBuilder.builder(mutableERModel)
+        .withImplicitAssociationsAnalyzer(analyzer)
+        .build();
+
     assertThat(mutableERModel.getImplicitRelationships(), is(empty()));
-  }
-
-  @Test
-  public void addImplicitAssociationWithBothEntitiesPresent() {
-    final LightTable pkTable = new LightTable("PK_TABLE");
-    pkTable.addColumn("ID");
-    final LightTable fkTable = new LightTable("FK_TABLE");
-    fkTable.addColumn("PK_TABLE_ID");
-
-    final MutableERModel mutableERModel = new MutableERModel();
-    final MutableEntity pkEntity = new MutableEntity(pkTable, strong_entity);
-    final MutableEntity fkEntity = new MutableEntity(fkTable, weak_entity);
-    mutableERModel.addEntity(pkEntity);
-    mutableERModel.addEntity(fkEntity);
-
-    final ImplicitColumnReference columnReference = mockColumnReference(fkTable, pkTable);
-    final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(mutableERModel);
-    builder.addImplicitAssociation(columnReference);
-
-    assertThat(mutableERModel.getImplicitRelationships(), hasSize(1));
   }
 
   @Test
@@ -113,12 +62,78 @@ public class ImplicitAssociationBuilderTest {
     mutableERModel.addEntity(fkEntity);
 
     final ImplicitColumnReference columnReference = mockColumnReference(fkTable, pkTable);
-    final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(mutableERModel);
-    builder.addImplicitAssociation(columnReference);
+    final ImplicitAssociationsAnalyzer analyzer = mock(ImplicitAssociationsAnalyzer.class);
+    when(analyzer.analyzeTables()).thenReturn(List.of(columnReference));
 
+    // Build implicit associations
+    ImplicitAssociationBuilder.builder(mutableERModel)
+        .withImplicitAssociationsAnalyzer(analyzer)
+        .build();
+
+    assertThat(mutableERModel.getImplicitRelationships(), hasSize(1));
     final Entity relationship =
         mutableERModel.getImplicitRelationships().iterator().next().getLeftEntity();
     assertThat(relationship, is(fkEntity));
+  }
+
+  @Test
+  public void addImplicitAssociationWithMissingEntity() {
+    // Tables with no entities in the model
+    final LightTable pkTable = new LightTable("PK_TABLE");
+    pkTable.addColumn("ID");
+    final LightTable fkTable = new LightTable("FK_TABLE");
+    fkTable.addColumn("PK_TABLE_ID");
+
+    final MutableERModel mutableERModel = new MutableERModel();
+    // No entities added
+
+    final ImplicitColumnReference columnReference = mockColumnReference(fkTable, pkTable);
+    final ImplicitAssociationsAnalyzer analyzer = mock(ImplicitAssociationsAnalyzer.class);
+    when(analyzer.analyzeTables()).thenReturn(List.of(columnReference));
+
+    // Build implicit associations
+    ImplicitAssociationBuilder.builder(mutableERModel)
+        .withImplicitAssociationsAnalyzer(analyzer)
+        .build();
+
+    // Should be skipped because entities don't exist
+    assertThat(mutableERModel.getImplicitRelationships(), is(empty()));
+  }
+
+  @Test
+  public void addNullImplicitAssociationIsNoOp() {
+    final MutableERModel mutableERModel = new MutableERModel();
+    // No entities added
+
+    final ImplicitAssociationsAnalyzer analyzer = mock(ImplicitAssociationsAnalyzer.class);
+    when(analyzer.analyzeTables()).thenReturn(Collections.singletonList(null));
+
+    // Build implicit associations
+    ImplicitAssociationBuilder.builder(mutableERModel)
+        .withImplicitAssociationsAnalyzer(analyzer)
+        .build();
+
+    assertThat(mutableERModel.getImplicitRelationships(), is(empty()));
+  }
+
+  @Test
+  public void builderRejectsNonMutableERModel() {
+    final ERModel nonMutableERModel = mock(ERModel.class);
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> ImplicitAssociationBuilder.builder(nonMutableERModel));
+  }
+
+  @Test
+  public void builderRejectsNullERModel() {
+    assertThrows(NullPointerException.class, () -> ImplicitAssociationBuilder.builder(null));
+  }
+
+  @Test
+  public void builderReturnsNonNullForMutableERModel() {
+    final MutableERModel mutableERModel = new MutableERModel();
+    final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(mutableERModel);
+    assertThat(builder, is(notNullValue()));
   }
 
   /** Creates a mock ImplicitColumnReference linking fkTable.fkCol -> pkTable.pkCol. */

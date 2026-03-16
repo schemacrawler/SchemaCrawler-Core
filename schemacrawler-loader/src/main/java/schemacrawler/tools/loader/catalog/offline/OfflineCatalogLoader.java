@@ -27,7 +27,7 @@ import schemacrawler.tools.offline.jdbc.OfflineConnection;
 import schemacrawler.utility.SerializedCatalogUtility;
 import us.fatehi.utility.property.PropertyName;
 
-public final class OfflineCatalogLoader extends AbstractCatalogLoader<OfflineCatalogLoaderOptions> {
+final class OfflineCatalogLoader extends AbstractCatalogLoader<OfflineCatalogLoaderOptions> {
 
   static record OfflineCatalogLoaderOptions() implements CommandOptions {}
 

@@ -26,7 +26,7 @@ final class MutableTableReferenceRelationship extends AbstractDatabaseObjectBack
   private Entity leftEntity;
   private Entity rightEntity;
 
-  public MutableTableReferenceRelationship(final TableReference tableReference) {
+  MutableTableReferenceRelationship(final TableReference tableReference) {
     super(tableReference);
     cardinality = RelationshipCardinality.unknown;
   }

@@ -17,7 +17,7 @@ import schemacrawler.ermodel.model.TableBacked;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 
-public class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
+abstract class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
     implements TableBacked {
 
   @Serial private static final long serialVersionUID = 7423406592008806690L;

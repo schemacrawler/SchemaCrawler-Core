@@ -39,7 +39,7 @@ import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 import us.fatehi.utility.string.StringFormat;
 
-public class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoaderOptions> {
+class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoaderOptions> {
 
   private static final Logger LOGGER = Logger.getLogger(AttributesCatalogLoader.class.getName());
 

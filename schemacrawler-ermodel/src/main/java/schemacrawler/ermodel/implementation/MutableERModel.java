@@ -16,8 +16,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
@@ -28,7 +26,6 @@ import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
-import us.fatehi.utility.Multimap;
 
 public class MutableERModel implements ERModel {
 
@@ -41,14 +38,12 @@ public class MutableERModel implements ERModel {
   private final Map<NamedObjectKey, Entity> entitiesMap;
   private final Map<NamedObjectKey, Relationship> relationshipsMap;
   private final Map<NamedObjectKey, Relationship> implicitRelationshipsMap;
-  private final Multimap<NamedObjectKey, Relationship> erImplicitMap;
 
   public MutableERModel() {
     tablesMap = new ConcurrentHashMap<>();
     entitiesMap = new ConcurrentHashMap<>();
     relationshipsMap = new ConcurrentHashMap<>();
     implicitRelationshipsMap = new ConcurrentHashMap<>();
-    erImplicitMap = new Multimap<>();
   }
 
   @Override
@@ -75,18 +70,6 @@ public class MutableERModel implements ERModel {
   @Override
   public Collection<Relationship> getImplicitRelationships() {
     return List.copyOf(implicitRelationshipsMap.values().stream().sorted().toList());
-  }
-
-  @Override
-  public Collection<Relationship> getImplicitRelationshipsByEntity(final Entity entity) {
-    if (entity == null) {
-      return List.of();
-    }
-    if (erImplicitMap.containsKey(entity.key())) {
-      final Set<Relationship> relationships = new TreeSet<>(erImplicitMap.get(entity.key()));
-      return List.copyOf(relationships);
-    }
-    return List.of();
   }
 
   @Override
@@ -201,14 +184,20 @@ public class MutableERModel implements ERModel {
   }
 
   void addImplicitRelationship(final Relationship relationship) {
-    if (relationship != null) {
-      implicitRelationshipsMap.put(relationship.key(), relationship);
-      if (relationship.getLeftEntity() != null) {
-        erImplicitMap.add(relationship.getLeftEntity().key(), relationship);
-      }
-      if (relationship.getRightEntity() != null) {
-        erImplicitMap.add(relationship.getRightEntity().key(), relationship);
-      }
+    if (relationship == null) {
+      return;
+    }
+
+    implicitRelationshipsMap.put(relationship.key(), relationship);
+
+    final MutableEntity leftEntity = (MutableEntity) relationship.getLeftEntity();
+    if (leftEntity != null) {
+      leftEntity.addImplicitRelationship(relationship);
+    }
+
+    final MutableEntity rightEntity = (MutableEntity) relationship.getRightEntity();
+    if (rightEntity != null) {
+      rightEntity.addImplicitRelationship(relationship);
     }
   }
 
@@ -218,6 +207,7 @@ public class MutableERModel implements ERModel {
     }
 
     relationshipsMap.put(relationship.key(), relationship);
+
     final MutableEntity leftEntity = (MutableEntity) relationship.getLeftEntity();
     if (leftEntity != null) {
       leftEntity.addRelationship(relationship);

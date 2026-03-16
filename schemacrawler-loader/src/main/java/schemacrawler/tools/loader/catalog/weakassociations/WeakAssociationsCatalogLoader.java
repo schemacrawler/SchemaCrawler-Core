@@ -36,7 +36,7 @@ import us.fatehi.utility.string.StringFormat;
  * Enabling these options can have a significant performance impact on schema loading, as it
  * involves analyzing naming patterns across all tables.
  */
-public final class WeakAssociationsCatalogLoader
+final class WeakAssociationsCatalogLoader
     extends AbstractCatalogLoader<WeakAssociationsCatalogLoaderOptions> {
 
   private static final Logger LOGGER =
@@ -45,7 +45,7 @@ public final class WeakAssociationsCatalogLoader
   static final String OPTION_WEAK_ASSOCIATIONS = "weak-associations";
   static final String OPTION_INFER_EXTENSION_TABLES = "infer-extension-tables";
 
-  public WeakAssociationsCatalogLoader(final PropertyName catalogLoaderName) {
+  WeakAssociationsCatalogLoader(final PropertyName catalogLoaderName) {
     super(catalogLoaderName);
   }
 

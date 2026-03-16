@@ -59,7 +59,7 @@ public class ERModelBuilderTest {
     final Catalog catalog = mock(Catalog.class);
     when(catalog.getTables()).thenReturn(Arrays.asList(subTable, superTable));
 
-    final ERModelBuilder builder = new ERModelBuilder(catalog);
+    final ERModelBuilder builder = ERModelBuilder.builder(catalog);
     final ERModel erModel = assertDoesNotThrow(() -> builder.build());
     assertNotNull(erModel);
   }

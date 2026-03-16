@@ -40,7 +40,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.tools.loader.catalog.offline.OfflineCatalogLoader;
+import schemacrawler.tools.loader.catalog.CatalogLoader;
 import schemacrawler.tools.loader.catalog.offline.OfflineCatalogLoaderProvider;
 import schemacrawler.tools.offline.jdbc.OfflineConnection;
 import schemacrawler.tools.offline.jdbc.OfflineConnectionUtility;
@@ -58,10 +58,8 @@ public class OfflineCatalogLoaderTest {
 
   @Test
   public void connection() throws SQLException {
-    final OfflineCatalogLoader catalogLoader =
-        (OfflineCatalogLoader)
-            new OfflineCatalogLoaderProvider()
-                .newCommand("offlineloader", ConfigUtility.newConfig());
+    final CatalogLoader<?> catalogLoader =
+        new OfflineCatalogLoaderProvider().newCommand("offlineloader", ConfigUtility.newConfig());
 
     assertThat(catalogLoader.getConnectionSource(), is(nullValue()));
 

@@ -8,6 +8,8 @@
 
 package schemacrawler.tools.loader.ermodel;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
@@ -19,7 +21,9 @@ import us.fatehi.utility.property.PropertyName;
  * ERModel loader that builds the full ERModel from a catalog. This is the primary loader, analogous
  * to {@code SchemaCrawlerCatalogLoader}.
  */
-public class PrimaryERModelLoader extends AbstractERModelLoader<PrimaryERModelLoaderLoaderOptions> {
+class PrimaryERModelLoader extends AbstractERModelLoader<PrimaryERModelLoaderLoaderOptions> {
+
+  private static final Logger LOGGER = Logger.getLogger(PrimaryERModelLoader.class.getName());
 
   static record PrimaryERModelLoaderLoaderOptions() implements CommandOptions {}
 
@@ -30,11 +34,14 @@ public class PrimaryERModelLoader extends AbstractERModelLoader<PrimaryERModelLo
   @Override
   public void execute() {
     if (hasERModel()) {
+      LOGGER.log(Level.INFO, "ER model has already been built; skipping build");
       return;
     }
 
+    LOGGER.log(Level.INFO, "Building ER model");
+
     final Catalog catalog = getCatalog();
-    final ERModel eRModel = new ERModelBuilder(catalog).build();
+    final ERModel eRModel = ERModelBuilder.builder(catalog).build();
     setERModel(eRModel);
   }
 }

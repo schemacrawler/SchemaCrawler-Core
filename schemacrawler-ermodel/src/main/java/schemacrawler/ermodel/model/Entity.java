@@ -14,5 +14,7 @@ import schemacrawler.schema.TypedObject;
 /** Conceptual entity backed by a SchemaCrawler table. */
 public interface Entity extends TableBacked, TypedObject<EntityType> {
 
+  Collection<Relationship> getImplicitRelationships();
+
   Collection<Relationship> getRelationships();
 }
