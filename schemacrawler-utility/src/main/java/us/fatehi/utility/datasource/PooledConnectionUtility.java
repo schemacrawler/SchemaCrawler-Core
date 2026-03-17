@@ -17,7 +17,6 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PooledConnectionUtility {
 
@@ -25,7 +24,7 @@ public class PooledConnectionUtility {
 
     private final Connection connection;
     private final DatabaseConnectionSource connectionSource;
-    private final AtomicBoolean isClosed;
+    private volatile boolean isClosed;
 
     PooledConnectionInvocationHandler(
         final Connection connection, final DatabaseConnectionSource connectionSource) {
@@ -42,39 +41,38 @@ public class PooledConnectionUtility {
       this.connectionSource =
           requireNonNull(connectionSource, "No database connection source provided");
 
-      isClosed = new AtomicBoolean(false);
+      isClosed = false;
     }
 
     @Override
     public Object invoke(final Object proxy, final Method method, final Object[] args)
         throws Exception {
       final String methodName = method.getName();
-      if (!List.of("isClosed", "unwrap").contains(methodName) && isClosed.get()) {
+      if (!List.of("isClosed", "unwrap").contains(methodName) && isClosed) {
         throw new SQLException("Cannot call <%s> since connection is closed".formatted(method));
       }
       switch (methodName) {
         case "close":
-          if (!isClosed.get()) {
-            connectionSource.releaseConnection(connection);
+          synchronized (this) {
+            if (!isClosed) {
+              connectionSource.releaseConnection(connection);
+            }
+            isClosed = true;
+            return null;
           }
-          isClosed.compareAndSet(false, true);
-          return null;
         case "isClosed":
-          return isClosed.get();
+          return isClosed;
         case "isWrapperFor":
           final Class<?> clazz = (Class<?>) args[0];
           return clazz.isAssignableFrom(connection.getClass());
         case "unwrap":
-          if (isClosed.get()) {
-            throw new SQLException("Connection is closed");
-          }
           return connection;
         case "toString":
           return "Pooled connection <%s@%d> for <%s>"
               .formatted(proxy.getClass().getName(), proxy.hashCode(), connection);
         default:
           try {
-            if (isClosed.get()) {
+            if (isClosed) {
               throw new IllegalAccessException("Connection is closed");
             }
             return method.invoke(connection, args);
