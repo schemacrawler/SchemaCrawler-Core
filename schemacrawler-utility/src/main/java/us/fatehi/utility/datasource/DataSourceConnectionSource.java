@@ -29,7 +29,7 @@ final class DataSourceConnectionSource extends AbstractDatabaseConnectionSource 
   }
 
   @Override
-  public void close() throws Exception {
+  public synchronized void close() throws Exception {
     if (dataSource instanceof final Closeable closeable) {
       closeable.close();
     }

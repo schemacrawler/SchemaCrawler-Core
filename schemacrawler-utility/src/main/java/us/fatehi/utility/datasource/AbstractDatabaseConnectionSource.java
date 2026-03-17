@@ -160,14 +160,15 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     return logProperties;
   }
 
-  private Consumer<Connection> connectionInitializer;
+  private volatile Consumer<Connection> connectionInitializer;
 
   public AbstractDatabaseConnectionSource() {
     connectionInitializer = connection -> {};
   }
 
   @Override
-  public void setFirstConnectionInitializer(final Consumer<Connection> connectionInitializer) {
+  public synchronized void setFirstConnectionInitializer(
+      final Consumer<Connection> connectionInitializer) {
     if (connectionInitializer != null) {
       this.connectionInitializer = connectionInitializer.andThen(this.connectionInitializer);
     }
