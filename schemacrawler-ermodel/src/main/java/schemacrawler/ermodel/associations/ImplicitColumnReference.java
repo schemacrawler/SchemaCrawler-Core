@@ -16,7 +16,6 @@ import java.util.Objects;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
-import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 
 /**
  * Implicit association between a foreign-key-like column and a primary key column.
@@ -39,11 +38,6 @@ final class ImplicitColumnReference implements ColumnReference {
   ImplicitColumnReference(final Column foreignKeyColumn, final Column primaryKeyColumn) {
     this.foreignKeyColumn = requireNonNull(foreignKeyColumn, "No foreign key column provided");
     this.primaryKeyColumn = requireNonNull(primaryKeyColumn, "No primary key column provided");
-    if (foreignKeyColumn.equals(primaryKeyColumn)) {
-      throw new InternalRuntimeException(
-          "Self-referencing implicit association %s -> %s"
-              .formatted(foreignKeyColumn, primaryKeyColumn));
-    }
   }
 
   /**
