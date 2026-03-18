@@ -9,12 +9,10 @@
 package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.Serial;
 import java.util.Objects;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 
 /**
@@ -108,33 +106,6 @@ final class ImplicitColumnReference implements ColumnReference {
   @Override
   public boolean isSelfReferencing() {
     return false;
-  }
-
-  /**
-   * Validates a proposed association based on identity, partiality, and standard data type
-   * compatibility.
-   *
-   * @return true if the association should be considered for matching rules
-   */
-  public boolean isValid() {
-
-    if (primaryKeyColumn.equals(foreignKeyColumn) || foreignKeyColumn.isPartOfForeignKey()) {
-      return false;
-    }
-
-    final boolean isPkColumnPartial = isPartial(primaryKeyColumn);
-    final boolean isFkColumnPartial = isPartial(foreignKeyColumn);
-    if (isFkColumnPartial && isPkColumnPartial
-        || !primaryKeyColumn.isColumnDataTypeKnown()
-        || !foreignKeyColumn.isColumnDataTypeKnown()) {
-      return false;
-    }
-
-    final ColumnDataType fkColumnType = foreignKeyColumn.getColumnDataType();
-    final ColumnDataType pkColumnType = primaryKeyColumn.getColumnDataType();
-    final boolean isValid =
-        fkColumnType.getStandardTypeName().equals(pkColumnType.getStandardTypeName());
-    return isValid;
   }
 
   @Override

@@ -9,6 +9,7 @@
 package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.Column;
+import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.Table;
@@ -91,12 +93,12 @@ public final class ImplicitAssociationsAnalyzer {
         }
 
         for (final Column fkColumn : fkColumns) {
-          if (fkColumn.isPartOfForeignKey()) {
+          if (!isValid(fkColumn, candidateKey)) {
             continue;
           }
           final ImplicitColumnReference proposedAssociation =
               new ImplicitColumnReference(fkColumn, candidateKey);
-          if (proposedAssociation.isValid() && implicitAssociationRule.test(proposedAssociation)) {
+          if (implicitAssociationRule.test(proposedAssociation)) {
             LOGGER.log(
                 Level.FINE,
                 new StringFormat("Found implicit association <%s>", proposedAssociation));
@@ -108,5 +110,35 @@ public final class ImplicitAssociationsAnalyzer {
 
     Collections.sort(implicitAssociations);
     return implicitAssociations;
+  }
+
+  /**
+   * Validates a proposed association based on identity, partiality, and standard data type
+   * compatibility.
+   *
+   * @return true if the association should be considered for matching rules
+   */
+  private boolean isValid(final Column fkColumn, final Column pkColumn) {
+
+    if (fkColumn == null
+        || pkColumn == null
+        || pkColumn.equals(fkColumn)
+        || fkColumn.isPartOfForeignKey()) {
+      return false;
+    }
+
+    final boolean isPkColumnPartial = isPartial(pkColumn);
+    final boolean isFkColumnPartial = isPartial(fkColumn);
+    if (isFkColumnPartial && isPkColumnPartial
+        || !pkColumn.isColumnDataTypeKnown()
+        || !fkColumn.isColumnDataTypeKnown()) {
+      return false;
+    }
+
+    final ColumnDataType fkColumnType = fkColumn.getColumnDataType();
+    final ColumnDataType pkColumnType = pkColumn.getColumnDataType();
+    final boolean isValid =
+        fkColumnType.getStandardTypeName().equals(pkColumnType.getStandardTypeName());
+    return isValid;
   }
 }
