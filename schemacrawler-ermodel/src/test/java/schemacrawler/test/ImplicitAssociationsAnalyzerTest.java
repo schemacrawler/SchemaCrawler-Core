@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
-import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
@@ -71,7 +70,7 @@ public class ImplicitAssociationsAnalyzerTest {
               .withExtensionTableMatcher();
 
       final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer = builder.build();
-      final Collection<ImplicitColumnReference> proposedAssociations =
+      final Collection<ColumnReference> proposedAssociations =
           implicitAssociationsAnalyzer.analyzeTables();
       assertThat(
           "Proposed implicit association count does not match",

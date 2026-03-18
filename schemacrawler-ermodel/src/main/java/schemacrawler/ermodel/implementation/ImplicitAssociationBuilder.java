@@ -16,10 +16,10 @@ import java.util.logging.Logger;
 import schemacrawler.ermodel.associations.ImplicitAssociation;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
-import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.Builder;
 import us.fatehi.utility.string.StringFormat;
@@ -53,17 +53,18 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
 
   @Override
   public ERModel build() {
-    final Collection<ImplicitColumnReference> implicitAssociations =
+    final Collection<ColumnReference> implicitColumnReferences =
         implicitAssociationsAnalyzer.analyzeTables();
-    if (implicitAssociations == null || implicitAssociations.isEmpty()) {
+    if (implicitColumnReferences == null || implicitColumnReferences.isEmpty()) {
       return erModel;
     }
 
-    for (final ImplicitColumnReference implicitAssociation : implicitAssociations) {
+    for (final ColumnReference implicitColumnReference : implicitColumnReferences) {
       LOGGER.log(
           Level.INFO,
-          new StringFormat("Adding implicit association <%s> to ER model", implicitAssociation));
-      addImplicitAssociation(implicitAssociation);
+          new StringFormat(
+              "Adding implicit association <%s> to ER model", implicitColumnReference));
+      addImplicitColumnReference(implicitColumnReference);
     }
 
     return erModel;
@@ -85,7 +86,7 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
    *
    * @param columnReference Implicit column reference describing the association
    */
-  private void addImplicitAssociation(final ImplicitColumnReference columnReference) {
+  private void addImplicitColumnReference(final ColumnReference columnReference) {
     if (columnReference == null) {
       return;
     }

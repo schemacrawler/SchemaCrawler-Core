@@ -51,14 +51,14 @@ public final class ImplicitAssociationsAnalyzer {
     this.implicitAssociationRule = requireNonNull(implicitAssociationRule, "No rules provided");
   }
 
-  public Collection<ImplicitColumnReference> analyzeTables() {
+  public Collection<ColumnReference> analyzeTables() {
     if (tableMatchKeys.getTables().size() < 2) {
       return List.of();
     }
 
     LOGGER.log(Level.INFO, "Finding implicit associations");
 
-    final List<ImplicitColumnReference> implicitAssociations = new ArrayList<>();
+    final List<ColumnReference> implicitAssociations = new ArrayList<>();
 
     final List<Table> tables = tableMatchKeys.getTables();
     final ColumnMatchKeys columnMatchKeys = new ColumnMatchKeys(tables);
