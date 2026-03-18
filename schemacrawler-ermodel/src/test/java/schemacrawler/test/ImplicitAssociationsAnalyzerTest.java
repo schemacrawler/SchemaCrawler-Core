@@ -25,6 +25,7 @@ import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -42,6 +43,34 @@ public class ImplicitAssociationsAnalyzerTest {
 
   private Catalog catalog;
 
+  @Test
+  public void implicitAssociations(final TestContext testContext, final Connection connection)
+      throws Exception {
+
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      final ImplicitAssociationsAnalyzerBuilder builder =
+          ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
+              .withIdMatcher()
+              .withExtensionTableMatcher();
+
+      final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer = builder.build();
+      final Collection<TableReference> proposedAssociations =
+          implicitAssociationsAnalyzer.analyzeTables();
+      assertThat(
+          "Proposed implicit association count does not match",
+          proposedAssociations.size(),
+          greaterThan(0));
+      for (final TableReference proposedAssociation : proposedAssociations) {
+        final ColumnReference columnReference = proposedAssociation.getColumnReferences().get(0);
+        out.println("implicit association: %s".formatted(columnReference));
+      }
+    }
+
+    assertThat(
+        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+  }
+
   @BeforeAll
   public void loadCatalog(final Connection connection) throws Exception {
     final SchemaRetrievalOptions schemaRetrievalOptions =
@@ -56,32 +85,5 @@ public class ImplicitAssociationsAnalyzerTest {
 
     catalog =
         DatabaseTestUtility.getCatalog(connection, schemaRetrievalOptions, schemaCrawlerOptions);
-  }
-
-  @Test
-  public void implicitAssociations(final TestContext testContext, final Connection connection)
-      throws Exception {
-
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
-      final ImplicitAssociationsAnalyzerBuilder builder =
-          ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
-              .withIdMatcher()
-              .withExtensionTableMatcher();
-
-      final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer = builder.build();
-      final Collection<ColumnReference> proposedAssociations =
-          implicitAssociationsAnalyzer.analyzeTables();
-      assertThat(
-          "Proposed implicit association count does not match",
-          proposedAssociations.size(),
-          greaterThan(0));
-      for (final ColumnReference proposedAssociation : proposedAssociations) {
-        out.println("implicit association: %s".formatted(proposedAssociation));
-      }
-    }
-
-    assertThat(
-        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
   }
 }

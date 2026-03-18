@@ -13,14 +13,13 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.ermodel.associations.ImplicitAssociation;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.RelationshipCardinality;
-import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 import us.fatehi.utility.Builder;
 import us.fatehi.utility.string.StringFormat;
 
@@ -53,18 +52,17 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
 
   @Override
   public ERModel build() {
-    final Collection<ColumnReference> implicitColumnReferences =
+    final Collection<TableReference> implicitAssociations =
         implicitAssociationsAnalyzer.analyzeTables();
-    if (implicitColumnReferences == null || implicitColumnReferences.isEmpty()) {
+    if (implicitAssociations == null || implicitAssociations.isEmpty()) {
       return erModel;
     }
 
-    for (final ColumnReference implicitColumnReference : implicitColumnReferences) {
+    for (final TableReference implicitAssociation : implicitAssociations) {
       LOGGER.log(
           Level.INFO,
-          new StringFormat(
-              "Adding implicit association <%s> to ER model", implicitColumnReference));
-      addImplicitColumnReference(implicitColumnReference);
+          new StringFormat("Adding implicit association <%s> to ER model", implicitAssociation));
+      addImplicitTableReference(implicitAssociation);
     }
 
     return erModel;
@@ -86,12 +84,10 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
    *
    * @param columnReference Implicit column reference describing the association
    */
-  private void addImplicitColumnReference(final ColumnReference columnReference) {
-    if (columnReference == null) {
+  private void addImplicitTableReference(final TableReference implicitAssociation) {
+    if (implicitAssociation == null) {
       return;
     }
-
-    final ImplicitAssociation implicitAssociation = new ImplicitAssociation(columnReference);
 
     final Table leftTable = implicitAssociation.getForeignKeyTable();
     final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(leftTable);

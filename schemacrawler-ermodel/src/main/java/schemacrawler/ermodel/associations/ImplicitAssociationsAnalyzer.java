@@ -25,6 +25,7 @@ import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 import us.fatehi.utility.string.StringFormat;
 
 /**
@@ -53,14 +54,14 @@ public final class ImplicitAssociationsAnalyzer {
     this.implicitAssociationRule = requireNonNull(implicitAssociationRule, "No rules provided");
   }
 
-  public Collection<ColumnReference> analyzeTables() {
+  public Collection<TableReference> analyzeTables() {
     if (tableMatchKeys.getTables().size() < 2) {
       return List.of();
     }
 
     LOGGER.log(Level.INFO, "Finding implicit associations");
 
-    final List<ColumnReference> implicitAssociations = new ArrayList<>();
+    final List<ColumnReference> implicitColumnReferences = new ArrayList<>();
 
     final List<Table> tables = tableMatchKeys.getTables();
     final ColumnMatchKeys columnMatchKeys = new ColumnMatchKeys(tables);
@@ -102,13 +103,19 @@ public final class ImplicitAssociationsAnalyzer {
             LOGGER.log(
                 Level.FINE,
                 new StringFormat("Found implicit association <%s>", proposedAssociation));
-            implicitAssociations.add(proposedAssociation);
+            implicitColumnReferences.add(proposedAssociation);
           }
         }
       }
     }
 
-    Collections.sort(implicitAssociations);
+    Collections.sort(implicitColumnReferences);
+
+    final List<TableReference> implicitAssociations = new ArrayList<>();
+    for (final ColumnReference implicitColumnReference : implicitColumnReferences) {
+      implicitAssociations.add(new ImplicitAssociation(implicitColumnReference));
+    }
+
     return implicitAssociations;
   }
 

@@ -28,6 +28,8 @@ import schemacrawler.ermodel.model.Entity;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.TableReference;
+import schemacrawler.test.utility.crawl.LightForeignKey;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class ImplicitAssociationBuilderTest {
@@ -61,9 +63,10 @@ public class ImplicitAssociationBuilderTest {
     mutableERModel.addEntity(pkEntity);
     mutableERModel.addEntity(fkEntity);
 
-    final ColumnReference columnReference = mockColumnReference(fkTable, pkTable);
+    final TableReference implicitAssociation =
+        new LightForeignKey("with_entities", fkTable, pkTable);
     final ImplicitAssociationsAnalyzer analyzer = mock(ImplicitAssociationsAnalyzer.class);
-    when(analyzer.analyzeTables()).thenReturn(List.of(columnReference));
+    when(analyzer.analyzeTables()).thenReturn(List.of(implicitAssociation));
 
     // Build implicit associations
     ImplicitAssociationBuilder.builder(mutableERModel)
@@ -87,9 +90,10 @@ public class ImplicitAssociationBuilderTest {
     final MutableERModel mutableERModel = new MutableERModel();
     // No entities added
 
-    final ColumnReference columnReference = mockColumnReference(fkTable, pkTable);
+    final TableReference implicitAssociation =
+        new LightForeignKey("without_entities", fkTable, pkTable);
     final ImplicitAssociationsAnalyzer analyzer = mock(ImplicitAssociationsAnalyzer.class);
-    when(analyzer.analyzeTables()).thenReturn(List.of(columnReference));
+    when(analyzer.analyzeTables()).thenReturn(List.of(implicitAssociation));
 
     // Build implicit associations
     ImplicitAssociationBuilder.builder(mutableERModel)
