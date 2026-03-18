@@ -63,7 +63,7 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
       LOGGER.log(
           Level.INFO,
           new StringFormat("Adding implicit association <%s> to ER model", implicitAssociation));
-      addImplicitTableReference(implicitAssociation);
+      addImplicitAssociation(implicitAssociation);
     }
 
     return erModel;
@@ -85,7 +85,7 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
    *
    * @param columnReference Implicit column reference describing the association
    */
-  private void addImplicitTableReference(final TableReference implicitAssociation) {
+  private void addImplicitAssociation(final TableReference implicitAssociation) {
     if (implicitAssociation == null) {
       return;
     }
