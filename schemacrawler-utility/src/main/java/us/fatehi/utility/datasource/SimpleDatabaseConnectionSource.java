@@ -35,6 +35,7 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
   private final Properties jdbcConnectionProperties;
   private final Deque<Connection> connectionPool;
   private final Deque<Connection> usedConnections;
+  private volatile boolean isClosed;
 
   SimpleDatabaseConnectionSource(
       final String connectionUrl,
@@ -60,10 +61,18 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
 
     connectionPool = new LinkedBlockingDeque<>();
     usedConnections = new LinkedBlockingDeque<>();
+
+    // Explicitly set closed flag
+    isClosed = false;
   }
 
   @Override
-  public void close() throws Exception {
+  public synchronized void close() throws Exception {
+
+    if (isClosed) {
+      LOGGER.log(Level.INFO, "Database connection source is already closed");
+      return;
+    }
 
     final List<Connection> connections = new ArrayList<>(connectionPool);
     connections.addAll(usedConnections);
@@ -83,10 +92,16 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
 
     connectionPool.clear();
     usedConnections.clear();
+
+    isClosed = true;
   }
 
   @Override
   public synchronized Connection get() {
+    if (isClosed) {
+      throw new IllegalStateException("Database connection source is already closed");
+    }
+
     // Create a connection if needed
     if (connectionPool.isEmpty()) {
       final Connection connection = getConnection(connectionUrl, jdbcConnectionProperties);
@@ -97,12 +112,16 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
     final Connection connection = connectionPool.removeFirst();
     usedConnections.add(connection);
 
+    // (Connection is checked during the initialization process)
     initializeConnection(connection);
     return PooledConnectionUtility.newPooledConnection(connection, this);
   }
 
   @Override
   public synchronized boolean releaseConnection(final Connection connection) {
+    if (isClosed) {
+      throw new IllegalStateException("Database connection source is already closed");
+    }
 
     final boolean removed = usedConnections.remove(connection);
 
@@ -114,9 +133,13 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
           Level.WARNING,
           "Cannot check connection before returning to the pool - " + e.getMessage());
       LOGGER.log(Level.FINE, "Cannot check connection before returning to the pool - ", e);
+      // Do not add an invalid connection back to the pool
+      return removed;
     }
 
-    connectionPool.add(connection);
+    if (removed) {
+      connectionPool.add(connection);
+    }
 
     return removed;
   }

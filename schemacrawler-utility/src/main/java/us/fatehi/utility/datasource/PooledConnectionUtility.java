@@ -24,7 +24,7 @@ public class PooledConnectionUtility {
 
     private final Connection connection;
     private final DatabaseConnectionSource connectionSource;
-    private boolean isClosed;
+    private volatile boolean isClosed;
 
     PooledConnectionInvocationHandler(
         final Connection connection, final DatabaseConnectionSource connectionSource) {
@@ -40,6 +40,7 @@ public class PooledConnectionUtility {
       }
       this.connectionSource =
           requireNonNull(connectionSource, "No database connection source provided");
+
       isClosed = false;
     }
 
@@ -52,9 +53,13 @@ public class PooledConnectionUtility {
       }
       switch (methodName) {
         case "close":
-          connectionSource.releaseConnection(connection);
-          isClosed = true;
-          return null;
+          synchronized (this) {
+            if (!isClosed) {
+              connectionSource.releaseConnection(connection);
+            }
+            isClosed = true;
+            return null;
+          }
         case "isClosed":
           return isClosed;
         case "isWrapperFor":
@@ -67,6 +72,9 @@ public class PooledConnectionUtility {
               .formatted(proxy.getClass().getName(), proxy.hashCode(), connection);
         default:
           try {
+            if (isClosed) {
+              throw new IllegalAccessException("Connection is closed");
+            }
             return method.invoke(connection, args);
           } catch (final IllegalAccessException
               | IllegalArgumentException
