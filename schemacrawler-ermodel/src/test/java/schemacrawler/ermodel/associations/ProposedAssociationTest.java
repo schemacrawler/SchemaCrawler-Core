@@ -36,8 +36,5 @@ public class ProposedAssociationTest {
     assertThat(proposedAssociation.getPrimaryKeyColumn(), is(col2));
     assertThat(proposedAssociation.getForeignKeyColumn(), is(col1));
     assertThat(proposedAssociation.toString(), is("Table1.Id ~~> Table1.ColA"));
-    assertThat(proposedAssociation.isValid(), is(true));
-
-    assertThat(new ImplicitColumnReference(col1, col1).isValid(), is(false));
   }
 }

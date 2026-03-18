@@ -23,11 +23,13 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
-import schemacrawler.ermodel.associations.ImplicitColumnReference;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.schema.Column;
+import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.TableReference;
+import schemacrawler.test.utility.crawl.LightForeignKey;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class ImplicitAssociationBuilderTest {
@@ -61,9 +63,10 @@ public class ImplicitAssociationBuilderTest {
     mutableERModel.addEntity(pkEntity);
     mutableERModel.addEntity(fkEntity);
 
-    final ImplicitColumnReference columnReference = mockColumnReference(fkTable, pkTable);
+    final TableReference implicitAssociation =
+        new LightForeignKey("with_entities", fkTable, pkTable);
     final ImplicitAssociationsAnalyzer analyzer = mock(ImplicitAssociationsAnalyzer.class);
-    when(analyzer.analyzeTables()).thenReturn(List.of(columnReference));
+    when(analyzer.analyzeTables()).thenReturn(List.of(implicitAssociation));
 
     // Build implicit associations
     ImplicitAssociationBuilder.builder(mutableERModel)
@@ -87,9 +90,10 @@ public class ImplicitAssociationBuilderTest {
     final MutableERModel mutableERModel = new MutableERModel();
     // No entities added
 
-    final ImplicitColumnReference columnReference = mockColumnReference(fkTable, pkTable);
+    final TableReference implicitAssociation =
+        new LightForeignKey("without_entities", fkTable, pkTable);
     final ImplicitAssociationsAnalyzer analyzer = mock(ImplicitAssociationsAnalyzer.class);
-    when(analyzer.analyzeTables()).thenReturn(List.of(columnReference));
+    when(analyzer.analyzeTables()).thenReturn(List.of(implicitAssociation));
 
     // Build implicit associations
     ImplicitAssociationBuilder.builder(mutableERModel)
@@ -137,8 +141,7 @@ public class ImplicitAssociationBuilderTest {
   }
 
   /** Creates a mock ImplicitColumnReference linking fkTable.fkCol -> pkTable.pkCol. */
-  private ImplicitColumnReference mockColumnReference(
-      final LightTable fkTable, final LightTable pkTable) {
+  private ColumnReference mockColumnReference(final LightTable fkTable, final LightTable pkTable) {
     final Column fkColumn = mock(Column.class);
     when(fkColumn.getParent()).thenReturn(fkTable);
     when(fkColumn.getName()).thenReturn(pkTable.getName() + "_ID");
@@ -158,7 +161,7 @@ public class ImplicitAssociationBuilderTest {
     final NamedObjectKey pkColKey = new NamedObjectKey(null, null, pkTable.getName()).with("ID");
     when(pkColumn.key()).thenReturn(pkColKey);
 
-    final ImplicitColumnReference columnReference = mock(ImplicitColumnReference.class);
+    final ColumnReference columnReference = mock(ColumnReference.class);
     when(columnReference.getForeignKeyColumn()).thenReturn(fkColumn);
     when(columnReference.getPrimaryKeyColumn()).thenReturn(pkColumn);
 

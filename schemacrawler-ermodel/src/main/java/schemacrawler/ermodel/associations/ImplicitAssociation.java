@@ -32,7 +32,7 @@ import schemacrawler.schema.TableReference;
 import us.fatehi.utility.CollectionsUtility;
 
 /** Represents a implicit association between two tables. */
-public final class ImplicitAssociation implements TableReference {
+final class ImplicitAssociation implements TableReference {
 
   @Serial private static final long serialVersionUID = -246830743604473724L;
 
@@ -45,14 +45,14 @@ public final class ImplicitAssociation implements TableReference {
 
   private final Table fkTable;
   private final Table pkTable;
-  private final ImplicitColumnReference columnReference;
+  private final ColumnReference columnReference;
   private final TableConstraintColumn tableConstraintColumn;
   private final boolean isSelfReferencing;
   private final boolean isOptional;
 
   private final Map<String, Object> attributeMap;
 
-  public ImplicitAssociation(final ImplicitColumnReference columnReference) {
+  ImplicitAssociation(final ColumnReference columnReference) {
 
     this.columnReference = requireNonNull(columnReference, "No column reference provided");
 

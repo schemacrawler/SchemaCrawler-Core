@@ -17,6 +17,7 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
+import schemacrawler.schema.TableReference;
 
 public class ImplicitAssociationsAnalyzerFkTest {
 
@@ -39,7 +40,7 @@ public class ImplicitAssociationsAnalyzerFkTest {
         new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<ImplicitColumnReference> implicitAssociations = analyzer.analyzeTables();
+    final Collection<TableReference> implicitAssociations = analyzer.analyzeTables();
 
     // Verify
     assertThat("Should have one implicit association", implicitAssociations, hasSize(1));
@@ -72,7 +73,7 @@ public class ImplicitAssociationsAnalyzerFkTest {
         new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
-    final Collection<ImplicitColumnReference> implicitAssociations = analyzer.analyzeTables();
+    final Collection<TableReference> implicitAssociations = analyzer.analyzeTables();
 
     // Verify
     assertThat(
