@@ -28,6 +28,13 @@ public class ImplicitAssociationsAnalyzerBuilder implements Builder<ImplicitAsso
     return new ImplicitAssociationsAnalyzerBuilder(List.copyOf(tables));
   }
 
+  public static ImplicitAssociationsAnalyzerBuilder completeBuilder(
+      final Collection<Table> allTables) {
+    return ImplicitAssociationsAnalyzerBuilder.builder(allTables)
+        .withIdMatcher()
+        .withExtensionTableMatcher();
+  }
+
   private final TableMatchKeys tableMatchKeys;
   private Predicate<ColumnReference> implicitAssociationsRule;
 

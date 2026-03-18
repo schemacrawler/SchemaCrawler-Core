@@ -47,7 +47,8 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
 
   private ImplicitAssociationBuilder(final MutableERModel erModel) {
     this.erModel = erModel;
-    implicitAssociationsAnalyzer = buildDefaultImplicitAssociationAnalyzer();
+    implicitAssociationsAnalyzer =
+        ImplicitAssociationsAnalyzerBuilder.completeBuilder(erModel.getTables()).build();
   }
 
   @Override
@@ -120,12 +121,5 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
     rel.setEntities(leftEntity, rightEntity);
 
     erModel.addImplicitRelationship(rel);
-  }
-
-  private ImplicitAssociationsAnalyzer buildDefaultImplicitAssociationAnalyzer() {
-    return ImplicitAssociationsAnalyzerBuilder.builder(erModel.getTables())
-        .withIdMatcher()
-        .withExtensionTableMatcher()
-        .build();
   }
 }
