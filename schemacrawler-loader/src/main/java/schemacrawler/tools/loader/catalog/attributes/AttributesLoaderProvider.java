@@ -13,11 +13,11 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import java.util.List;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.loader.catalog.AbstractCatalogLoaderProvider;
+import schemacrawler.tools.loader.ermodel.AbstractERModelLoaderProvider;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
-public class AttributesLoaderProvider extends AbstractCatalogLoaderProvider {
+public class AttributesLoaderProvider extends AbstractERModelLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName(

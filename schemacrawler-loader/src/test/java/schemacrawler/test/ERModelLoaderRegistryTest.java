@@ -26,7 +26,7 @@ import us.fatehi.utility.property.PropertyName;
 
 public class ERModelLoaderRegistryTest {
 
-  private static final int NUM_LOADERS = 2;
+  private static final int NUM_LOADERS = 3;
 
   @Test
   public void chainedLoaders() {
@@ -44,7 +44,8 @@ public class ERModelLoaderRegistryTest {
     assertThat(String.valueOf(commandLineCommands), commandLineCommands.size(), is(greaterThan(0)));
     final List<String> names =
         commandLineCommands.stream().map(PluginCommand::getName).collect(toList());
-    assertThat(names, containsInAnyOrder("loader:implicitassociationsloader"));
+    assertThat(
+        names, containsInAnyOrder("loader:attributesloader", "loader:implicitassociationsloader"));
   }
 
   @Test
@@ -53,7 +54,8 @@ public class ERModelLoaderRegistryTest {
         ERModelLoaderRegistry.getERModelLoaderRegistry().getHelpCommands();
     assertThat(String.valueOf(helpCommands), helpCommands.size(), is(greaterThan(0)));
     final List<String> names = helpCommands.stream().map(PluginCommand::getName).collect(toList());
-    assertThat(names, containsInAnyOrder("loader:implicitassociationsloader"));
+    assertThat(
+        names, containsInAnyOrder("loader:attributesloader", "loader:implicitassociationsloader"));
   }
 
   @Test
@@ -69,6 +71,8 @@ public class ERModelLoaderRegistryTest {
     assertThat(supportedLoaders, hasSize(NUM_LOADERS));
     final List<String> names =
         supportedLoaders.stream().map(PropertyName::getName).collect(toList());
-    assertThat(names, containsInAnyOrder("primarymodelloader", "implicitassociationsloader"));
+    assertThat(
+        names,
+        containsInAnyOrder("primarymodelloader", "attributesloader", "implicitassociationsloader"));
   }
 }

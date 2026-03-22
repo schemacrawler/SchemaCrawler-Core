@@ -22,11 +22,11 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.IORuntimeException;
-import schemacrawler.tools.loader.catalog.AbstractCatalogLoader;
 import schemacrawler.tools.loader.catalog.model.CatalogAttributes;
 import schemacrawler.tools.loader.catalog.model.ColumnAttributes;
 import schemacrawler.tools.loader.catalog.model.TableAttributes;
 import schemacrawler.tools.loader.catalog.model.WeakAssociationAttributes;
+import schemacrawler.tools.loader.ermodel.AbstractERModelLoader;
 import us.fatehi.utility.ioresource.InputResource;
 import us.fatehi.utility.ioresource.InputResourceUtility;
 import us.fatehi.utility.property.PropertyName;
@@ -35,7 +35,7 @@ import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 import us.fatehi.utility.string.StringFormat;
 
-class AttributesLoader extends AbstractCatalogLoader<AttributesLoaderOptions> {
+class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
 
   private static final Logger LOGGER = Logger.getLogger(AttributesLoader.class.getName());
 
