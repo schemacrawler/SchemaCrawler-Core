@@ -61,8 +61,7 @@ public class ImplicitAssociationsERModelLoaderProvider extends AbstractERModelLo
   }
 
   private ImplicitAssociationsERModelLoaderOptions createOptionsFromConfig(final Config config) {
-    final boolean loadImplicitAssociations =
-        config.getBooleanValue(OPTION_IMPLICIT_ASSOCIATIONS, true);
+    final boolean loadImplicitAssociations = config.getBooleanValue(OPTION_IMPLICIT_ASSOCIATIONS);
     return new ImplicitAssociationsERModelLoaderOptions(loadImplicitAssociations);
   }
 }

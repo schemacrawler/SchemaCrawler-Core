@@ -27,9 +27,6 @@ public class TableRowCountsCatalogLoader
   private static final Logger LOGGER =
       Logger.getLogger(TableRowCountsCatalogLoader.class.getName());
 
-  static final String OPTION_NO_EMPTY_TABLES = "no-empty-tables";
-  static final String OPTION_LOAD_ROW_COUNTS = "load-row-counts";
-
   TableRowCountsCatalogLoader(final PropertyName catalogLoaderName) {
     super(catalogLoaderName);
   }

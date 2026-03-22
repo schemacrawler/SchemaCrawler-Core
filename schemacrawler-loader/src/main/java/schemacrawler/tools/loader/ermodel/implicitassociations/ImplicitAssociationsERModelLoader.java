@@ -32,8 +32,6 @@ final class ImplicitAssociationsERModelLoader
   private static final Logger LOGGER =
       Logger.getLogger(ImplicitAssociationsERModelLoader.class.getName());
 
-  static final String OPTION_IMPLICIT_ASSOCIATIONS = "implicit-associations";
-
   ImplicitAssociationsERModelLoader(final PropertyName loaderName) {
     super(loaderName);
   }

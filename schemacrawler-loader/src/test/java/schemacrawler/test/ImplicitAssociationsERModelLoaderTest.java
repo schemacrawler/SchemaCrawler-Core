@@ -75,7 +75,7 @@ public class ImplicitAssociationsERModelLoaderTest {
   }
 
   @Test
-  public void loaderDefaultsToEnabled() {
+  public void loaderDefaultsToDisabled() {
     final ERModel erModel = SchemaCrawlerUtility.buildERModel(catalog);
 
     final ImplicitAssociationsERModelLoaderProvider provider =
@@ -85,7 +85,7 @@ public class ImplicitAssociationsERModelLoaderTest {
     loader.setERModel(erModel);
     loader.execute();
 
-    assertThat(loader.getERModel().getImplicitRelationships().size(), is(greaterThan(0)));
+    assertThat(loader.getERModel().getImplicitRelationships(), is(empty()));
   }
 
   @Test
