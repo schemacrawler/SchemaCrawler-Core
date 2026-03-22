@@ -31,8 +31,8 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.tools.loader.ermodel.ERModelLoader;
-import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsERModelLoaderOptions;
-import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsERModelLoaderProvider;
+import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsLoaderOptions;
+import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsLoaderProvider;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
@@ -64,8 +64,7 @@ public class ImplicitAssociationsERModelLoaderTest {
 
     final Config config = ConfigUtility.newConfig();
     config.put("implicit-associations", true);
-    final ImplicitAssociationsERModelLoaderProvider provider =
-        new ImplicitAssociationsERModelLoaderProvider();
+    final ImplicitAssociationsLoaderProvider provider = new ImplicitAssociationsLoaderProvider();
     final ERModelLoader<?> loader = provider.newCommand(config);
     loader.setCatalog(catalog);
     loader.setERModel(erModel);
@@ -78,8 +77,7 @@ public class ImplicitAssociationsERModelLoaderTest {
   public void loaderDefaultsToDisabled() {
     final ERModel erModel = SchemaCrawlerUtility.buildERModel(catalog);
 
-    final ImplicitAssociationsERModelLoaderProvider provider =
-        new ImplicitAssociationsERModelLoaderProvider();
+    final ImplicitAssociationsLoaderProvider provider = new ImplicitAssociationsLoaderProvider();
     final ERModelLoader<?> loader = provider.newCommand(ConfigUtility.newConfig());
     loader.setCatalog(catalog);
     loader.setERModel(erModel);
@@ -90,8 +88,7 @@ public class ImplicitAssociationsERModelLoaderTest {
 
   @Test
   public void loaderDoesNothingWhenERModelNotLoaded() {
-    final ImplicitAssociationsERModelLoaderProvider provider =
-        new ImplicitAssociationsERModelLoaderProvider();
+    final ImplicitAssociationsLoaderProvider provider = new ImplicitAssociationsLoaderProvider();
     final ERModelLoader<?> loader = provider.newCommand(ConfigUtility.newConfig());
     loader.setCatalog(catalog);
 
@@ -122,8 +119,7 @@ public class ImplicitAssociationsERModelLoaderTest {
 
     final Config config = ConfigUtility.newConfig();
     config.put("implicit-associations", false);
-    final ImplicitAssociationsERModelLoaderProvider provider =
-        new ImplicitAssociationsERModelLoaderProvider();
+    final ImplicitAssociationsLoaderProvider provider = new ImplicitAssociationsLoaderProvider();
     final ERModelLoader<?> loader = provider.newCommand(config);
     loader.setCatalog(catalog);
     loader.setERModel(erModel);
@@ -135,22 +131,19 @@ public class ImplicitAssociationsERModelLoaderTest {
 
   @Test
   public void loaderOptionsCanBeDisabled() {
-    final ImplicitAssociationsERModelLoaderOptions options =
-        new ImplicitAssociationsERModelLoaderOptions(false);
+    final ImplicitAssociationsLoaderOptions options = new ImplicitAssociationsLoaderOptions(false);
     assertThat(options.loadImplicitAssociations(), is(false));
   }
 
   @Test
   public void loaderOptionsDefaultToEnabled() {
-    final ImplicitAssociationsERModelLoaderOptions options =
-        new ImplicitAssociationsERModelLoaderOptions(true);
+    final ImplicitAssociationsLoaderOptions options = new ImplicitAssociationsLoaderOptions(true);
     assertThat(options.loadImplicitAssociations(), is(true));
   }
 
   @Test
   public void providerSupportsExpectedCommand() {
-    final ImplicitAssociationsERModelLoaderProvider provider =
-        new ImplicitAssociationsERModelLoaderProvider();
+    final ImplicitAssociationsLoaderProvider provider = new ImplicitAssociationsLoaderProvider();
     assertThat(provider.getSupportedCommands(), hasSize(1));
     final PropertyName commandName = provider.getSupportedCommands().iterator().next();
     assertThat(commandName.getName(), is("implicitassociationsloader"));

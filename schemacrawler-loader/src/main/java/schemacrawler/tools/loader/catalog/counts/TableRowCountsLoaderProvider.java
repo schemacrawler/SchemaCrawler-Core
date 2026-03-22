@@ -17,7 +17,7 @@ import schemacrawler.tools.loader.catalog.AbstractCatalogLoaderProvider;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
-public class TableRowCountsCatalogLoaderProvider extends AbstractCatalogLoaderProvider {
+public class TableRowCountsLoaderProvider extends AbstractCatalogLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName("countsloader", "Loader for table row counts");
@@ -50,19 +50,19 @@ public class TableRowCountsCatalogLoaderProvider extends AbstractCatalogLoaderPr
   }
 
   @Override
-  public TableRowCountsCatalogLoader newCommand(final Config config) {
+  public TableRowCountsLoader newCommand(final Config config) {
     requireNonNull(config, "No config provided");
 
-    final TableRowCountsCatalogLoader loader = new TableRowCountsCatalogLoader(NAME);
-    final TableRowCountsCatalogLoaderOptions options = createOptionsfromConfig(config);
+    final TableRowCountsLoader loader = new TableRowCountsLoader(NAME);
+    final TableRowCountsLoaderOptions options = createOptionsfromConfig(config);
     loader.configure(options);
 
     return loader;
   }
 
-  private TableRowCountsCatalogLoaderOptions createOptionsfromConfig(final Config config) {
+  private TableRowCountsLoaderOptions createOptionsfromConfig(final Config config) {
     final boolean loadRowCounts = config.getBooleanValue(OPTION_LOAD_ROW_COUNTS, false);
     final boolean noEmptyTables = config.getBooleanValue(OPTION_NO_EMPTY_TABLES, false);
-    return new TableRowCountsCatalogLoaderOptions(loadRowCounts, noEmptyTables);
+    return new TableRowCountsLoaderOptions(loadRowCounts, noEmptyTables);
   }
 }

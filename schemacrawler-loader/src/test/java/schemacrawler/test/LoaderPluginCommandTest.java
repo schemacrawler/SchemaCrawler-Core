@@ -13,8 +13,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.loader.catalog.attributes.AttributesCatalogLoaderProvider;
-import schemacrawler.tools.loader.catalog.counts.TableRowCountsCatalogLoaderProvider;
+import schemacrawler.tools.loader.catalog.attributes.AttributesLoaderProvider;
+import schemacrawler.tools.loader.catalog.counts.TableRowCountsLoaderProvider;
 import schemacrawler.tools.loader.catalog.weakassociations.WeakAssociationsCatalogLoaderProvider;
 
 public class LoaderPluginCommandTest {
@@ -23,7 +23,7 @@ public class LoaderPluginCommandTest {
   public void loaderPluginCommands() {
 
     final PluginCommand rowCountsPluginCommand =
-        new TableRowCountsCatalogLoaderProvider().getCommandLineCommand();
+        new TableRowCountsLoaderProvider().getCommandLineCommand();
     assertThat(
         rowCountsPluginCommand.toString(),
         is(
@@ -35,7 +35,7 @@ public class LoaderPluginCommandTest {
             """));
 
     final PluginCommand attributesPluginCommand =
-        new AttributesCatalogLoaderProvider().getCommandLineCommand();
+        new AttributesLoaderProvider().getCommandLineCommand();
     assertThat(
         attributesPluginCommand.toString(),
         is(

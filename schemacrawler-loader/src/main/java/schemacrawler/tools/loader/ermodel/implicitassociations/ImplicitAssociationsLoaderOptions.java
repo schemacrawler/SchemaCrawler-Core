@@ -15,5 +15,5 @@ import schemacrawler.tools.command.CommandOptions;
  *
  * @param loadImplicitAssociations Whether to load implicit associations into the ER model
  */
-public record ImplicitAssociationsERModelLoaderOptions(boolean loadImplicitAssociations)
+public record ImplicitAssociationsLoaderOptions(boolean loadImplicitAssociations)
     implements CommandOptions {}

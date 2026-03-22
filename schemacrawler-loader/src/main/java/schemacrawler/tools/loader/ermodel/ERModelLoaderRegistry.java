@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
-import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsERModelLoaderProvider;
+import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsLoaderProvider;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
@@ -41,8 +41,7 @@ public final class ERModelLoaderRegistry extends BasePluginCommandRegistry<ERMod
   private ERModelLoaderRegistry() {
     super(
         "ER Model Loaders",
-        List.of(
-            new PrimaryERModelLoaderProvider(), new ImplicitAssociationsERModelLoaderProvider()));
+        List.of(new PrimaryERModelLoaderProvider(), new ImplicitAssociationsLoaderProvider()));
   }
 
   /**

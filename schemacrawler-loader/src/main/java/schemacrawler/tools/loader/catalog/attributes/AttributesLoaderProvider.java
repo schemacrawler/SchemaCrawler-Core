@@ -17,7 +17,7 @@ import schemacrawler.tools.loader.catalog.AbstractCatalogLoaderProvider;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
-public class AttributesCatalogLoaderProvider extends AbstractCatalogLoaderProvider {
+public class AttributesLoaderProvider extends AbstractCatalogLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName(
@@ -41,18 +41,18 @@ public class AttributesCatalogLoaderProvider extends AbstractCatalogLoaderProvid
   }
 
   @Override
-  public AttributesCatalogLoader newCommand(final Config config) {
+  public AttributesLoader newCommand(final Config config) {
     requireNonNull(config, "No config provided");
 
-    final AttributesCatalogLoader loader = new AttributesCatalogLoader(NAME);
-    final AttributesCatalogLoaderOptions options = createOptionsfromConfig(config);
+    final AttributesLoader loader = new AttributesLoader(NAME);
+    final AttributesLoaderOptions options = createOptionsfromConfig(config);
     loader.configure(options);
 
     return loader;
   }
 
-  private AttributesCatalogLoaderOptions createOptionsfromConfig(final Config config) {
+  private AttributesLoaderOptions createOptionsfromConfig(final Config config) {
     final String catalogAttributesFile = config.getStringValue(OPTION_ATTRIBUTES_FILE);
-    return new AttributesCatalogLoaderOptions(catalogAttributesFile);
+    return new AttributesLoaderOptions(catalogAttributesFile);
   }
 }

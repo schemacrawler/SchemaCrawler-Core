@@ -39,11 +39,11 @@ import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 import us.fatehi.utility.string.StringFormat;
 
-class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoaderOptions> {
+class AttributesLoader extends AbstractCatalogLoader<AttributesLoaderOptions> {
 
-  private static final Logger LOGGER = Logger.getLogger(AttributesCatalogLoader.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(AttributesLoader.class.getName());
 
-  AttributesCatalogLoader(final PropertyName catalogLoaderName) {
+  AttributesLoader(final PropertyName catalogLoaderName) {
     super(catalogLoaderName);
   }
 
@@ -53,7 +53,7 @@ class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoa
       return;
     }
 
-    final AttributesCatalogLoaderOptions commandOptions = getCommandOptions();
+    final AttributesLoaderOptions commandOptions = getCommandOptions();
 
     if (!commandOptions.hasCatalogAttributesFile()) {
       LOGGER.log(Level.CONFIG, "No catalog attributes file specified");

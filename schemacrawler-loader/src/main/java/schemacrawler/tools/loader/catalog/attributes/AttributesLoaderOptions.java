@@ -12,8 +12,7 @@ import static us.fatehi.utility.Utility.isBlank;
 
 import schemacrawler.tools.command.CommandOptions;
 
-public record AttributesCatalogLoaderOptions(String catalogAttributesFile)
-    implements CommandOptions {
+public record AttributesLoaderOptions(String catalogAttributesFile) implements CommandOptions {
 
   public boolean hasCatalogAttributesFile() {
     return !isBlank(catalogAttributesFile);

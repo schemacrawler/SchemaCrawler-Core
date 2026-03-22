@@ -18,12 +18,12 @@ import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
 /**
- * Provider for {@link ImplicitAssociationsERModelLoader}.
+ * Provider for {@link ImplicitAssociationsLoader}.
  *
  * <p>This provider registers the implicit associations ER model loader, which enriches an existing
  * ER model with implicit relationships discovered from table and column naming patterns.
  */
-public class ImplicitAssociationsERModelLoaderProvider extends AbstractERModelLoaderProvider {
+public class ImplicitAssociationsLoaderProvider extends AbstractERModelLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName(
@@ -54,21 +54,21 @@ public class ImplicitAssociationsERModelLoaderProvider extends AbstractERModelLo
   }
 
   @Override
-  public ImplicitAssociationsERModelLoader newCommand(final Config config) {
+  public ImplicitAssociationsLoader newCommand(final Config config) {
     requireNonNull(config, "No config provided");
 
-    final ImplicitAssociationsERModelLoader loader = new ImplicitAssociationsERModelLoader(NAME);
-    final ImplicitAssociationsERModelLoaderOptions options = createOptionsFromConfig(config);
+    final ImplicitAssociationsLoader loader = new ImplicitAssociationsLoader(NAME);
+    final ImplicitAssociationsLoaderOptions options = createOptionsFromConfig(config);
     loader.configure(options);
 
     return loader;
   }
 
-  private ImplicitAssociationsERModelLoaderOptions createOptionsFromConfig(final Config config) {
+  private ImplicitAssociationsLoaderOptions createOptionsFromConfig(final Config config) {
     // NOTE: Check weak associations - for backward compatibility only
     final boolean loadWeakAssociations = config.getBooleanValue(OPTION_WEAK_ASSOCIATIONS);
     final boolean loadImplicitAssociations =
         config.getBooleanValue(OPTION_IMPLICIT_ASSOCIATIONS) || loadWeakAssociations;
-    return new ImplicitAssociationsERModelLoaderOptions(loadImplicitAssociations);
+    return new ImplicitAssociationsLoaderOptions(loadImplicitAssociations);
   }
 }
