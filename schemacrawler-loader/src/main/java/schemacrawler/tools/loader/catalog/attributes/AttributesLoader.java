@@ -14,19 +14,15 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.crawl.AlternateKeyBuilder;
-import schemacrawler.crawl.AlternateKeyBuilder.AlternateKeyDefinition;
 import schemacrawler.crawl.WeakAssociationBuilder;
 import schemacrawler.crawl.WeakAssociationBuilder.WeakAssociationColumn;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import schemacrawler.tools.loader.catalog.AbstractCatalogLoader;
-import schemacrawler.tools.loader.catalog.model.AlternateKeyAttributes;
 import schemacrawler.tools.loader.catalog.model.CatalogAttributes;
 import schemacrawler.tools.loader.catalog.model.ColumnAttributes;
 import schemacrawler.tools.loader.catalog.model.TableAttributes;
@@ -75,7 +71,6 @@ class AttributesLoader extends AbstractCatalogLoader<AttributesLoaderOptions> {
                                     .formatted(catalogAttributesFile)));
             final CatalogAttributes catalogAttributes = readCatalogAttributes(inputResource);
             loadRemarks(catalog, catalogAttributes);
-            loadAlternateKeys(catalog, catalogAttributes);
             loadWeakAssociations(catalog, catalogAttributes);
           };
       taskRunner.add(new TaskDefinition("retrieveCatalogAttributes", taskRunnable));
@@ -85,31 +80,6 @@ class AttributesLoader extends AbstractCatalogLoader<AttributesLoaderOptions> {
       throw e;
     } catch (final Exception e) {
       throw new ExecutionRuntimeException("Exception loading catalog attributes", e);
-    }
-  }
-
-  private void loadAlternateKeys(final Catalog catalog, final CatalogAttributes catalogAttributes) {
-    final AlternateKeyBuilder alternateKeyBuilder = AlternateKeyBuilder.builder(catalog);
-    for (final AlternateKeyAttributes alternateKeyAttributes :
-        catalogAttributes.getAlternateKeys()) {
-
-      final AlternateKeyDefinition alternateKeyDefinition =
-          new AlternateKeyDefinition(
-              alternateKeyAttributes.getSchema(), alternateKeyAttributes.getTableName(),
-              alternateKeyAttributes.getName(), alternateKeyAttributes.getColumns());
-
-      final Optional<PrimaryKey> optionalAlternateKey =
-          alternateKeyBuilder.addAlternateKey(alternateKeyDefinition);
-      if (optionalAlternateKey.isEmpty()) {
-        continue;
-      }
-      final PrimaryKey alternateKey = optionalAlternateKey.get();
-
-      alternateKey.setRemarks(alternateKeyAttributes.getRemarks());
-      for (final Entry<String, String> attribute :
-          alternateKeyAttributes.getAttributes().entrySet()) {
-        alternateKey.setAttribute(attribute.getKey(), attribute.getValue());
-      }
     }
   }
 

@@ -19,23 +19,14 @@ public final class CatalogAttributes extends ObjectAttributes {
 
   private final List<TableAttributes> tables;
   private final List<WeakAssociationAttributes> weakAssociations;
-  private final List<AlternateKeyAttributes> alternateKeys;
 
-  @ConstructorProperties({
-    "name",
-    "remarks",
-    "attributes",
-    "tables",
-    "weak-associations",
-    "alternate-keys"
-  })
+  @ConstructorProperties({"name", "remarks", "attributes", "tables", "weak-associations"})
   public CatalogAttributes(
       final String name,
       final List<String> remarks,
       final Map<String, String> attributes,
       final List<TableAttributes> tables,
-      final List<WeakAssociationAttributes> weakAssociations,
-      final List<AlternateKeyAttributes> alternateKeys) {
+      final List<WeakAssociationAttributes> weakAssociations) {
     super(name, remarks, attributes);
     if (tables == null) {
       this.tables = List.of();
@@ -47,15 +38,6 @@ public final class CatalogAttributes extends ObjectAttributes {
     } else {
       this.weakAssociations = List.copyOf(weakAssociations);
     }
-    if (alternateKeys == null) {
-      this.alternateKeys = List.of();
-    } else {
-      this.alternateKeys = List.copyOf(alternateKeys);
-    }
-  }
-
-  public List<AlternateKeyAttributes> getAlternateKeys() {
-    return alternateKeys;
   }
 
   public List<TableAttributes> getTables() {
