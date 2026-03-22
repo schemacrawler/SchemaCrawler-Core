@@ -43,8 +43,6 @@ class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoa
 
   private static final Logger LOGGER = Logger.getLogger(AttributesCatalogLoader.class.getName());
 
-  static final String OPTION_ATTRIBUTES_FILE = "attributes-file";
-
   AttributesCatalogLoader(final PropertyName catalogLoaderName) {
     super(catalogLoaderName);
   }

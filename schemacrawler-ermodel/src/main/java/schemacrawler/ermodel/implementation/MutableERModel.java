@@ -130,6 +130,8 @@ public class MutableERModel implements ERModel {
     }
     final NamedObjectKey key = table.key();
     // Look up bridge table
+    // Only bridge tables can be looked up by this method, since the relationship key for many--many
+    // relationships is the same as the bridge table key
     if (relationshipsMap.containsKey(key)) {
       return Optional.of(relationshipsMap.get(key));
     }

@@ -31,6 +31,10 @@ public class ImplicitAssociationsERModelLoaderProvider extends AbstractERModelLo
 
   private static final String OPTION_IMPLICIT_ASSOCIATIONS = "implicit-associations";
 
+  // NOTE: For backward compatibility only
+  @Deprecated(forRemoval = true)
+  private static final String OPTION_WEAK_ASSOCIATIONS = "weak-associations";
+
   @Override
   public PluginCommand getCommandLineCommand() {
     final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(NAME);
@@ -61,8 +65,10 @@ public class ImplicitAssociationsERModelLoaderProvider extends AbstractERModelLo
   }
 
   private ImplicitAssociationsERModelLoaderOptions createOptionsFromConfig(final Config config) {
+    // NOTE: Check weak associations - for backward compatibility only
+    final boolean loadWeakAssociations = config.getBooleanValue(OPTION_WEAK_ASSOCIATIONS);
     final boolean loadImplicitAssociations =
-        config.getBooleanValue(OPTION_IMPLICIT_ASSOCIATIONS, true);
+        config.getBooleanValue(OPTION_IMPLICIT_ASSOCIATIONS) || loadWeakAssociations;
     return new ImplicitAssociationsERModelLoaderOptions(loadImplicitAssociations);
   }
 }

@@ -42,9 +42,6 @@ final class WeakAssociationsCatalogLoader
   private static final Logger LOGGER =
       Logger.getLogger(WeakAssociationsCatalogLoader.class.getName());
 
-  static final String OPTION_WEAK_ASSOCIATIONS = "weak-associations";
-  static final String OPTION_INFER_EXTENSION_TABLES = "infer-extension-tables";
-
   WeakAssociationsCatalogLoader(final PropertyName catalogLoaderName) {
     super(catalogLoaderName);
   }
