@@ -13,9 +13,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.loader.catalog.attributes.AttributesLoaderProvider;
 import schemacrawler.tools.loader.catalog.counts.TableRowCountsLoaderProvider;
 import schemacrawler.tools.loader.catalog.weakassociations.WeakAssociationsCatalogLoaderProvider;
+import schemacrawler.tools.loader.ermodel.attributes.AttributesLoaderProvider;
 
 public class LoaderPluginCommandTest {
 

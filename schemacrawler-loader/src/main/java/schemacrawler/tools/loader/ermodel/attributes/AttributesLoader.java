@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.loader.catalog.attributes;
+package schemacrawler.tools.loader.ermodel.attributes;
 
 import static schemacrawler.tools.loader.catalog.model.CatalogAttributesUtility.readCatalogAttributes;
 

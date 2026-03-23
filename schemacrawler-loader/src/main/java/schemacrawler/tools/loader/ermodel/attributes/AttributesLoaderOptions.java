@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.loader.catalog.attributes;
+package schemacrawler.tools.loader.ermodel.attributes;
 
 import static us.fatehi.utility.Utility.isBlank;
 
