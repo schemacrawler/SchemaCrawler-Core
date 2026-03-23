@@ -25,7 +25,6 @@ import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -55,15 +54,14 @@ public class ImplicitAssociationsAnalyzerTest {
               .withExtensionTableMatcher();
 
       final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer = builder.build();
-      final Collection<TableReference> proposedAssociations =
+      final Collection<ColumnReference> proposedAssociations =
           implicitAssociationsAnalyzer.analyzeTables();
       assertThat(
           "Proposed implicit association count does not match",
           proposedAssociations.size(),
           greaterThan(0));
-      for (final TableReference proposedAssociation : proposedAssociations) {
-        final ColumnReference columnReference = proposedAssociation.getColumnReferences().get(0);
-        out.println("implicit association: %s".formatted(columnReference));
+      for (final ColumnReference proposedAssociation : proposedAssociations) {
+        out.println("implicit association: %s".formatted(proposedAssociation));
       }
     }
 

@@ -13,20 +13,24 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.crawl.ImplicitAssociationBuilder;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.schema.Catalog;
+import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.Builder;
 import us.fatehi.utility.string.StringFormat;
 
 /** Builder for adding implicit associations to an ER model. */
-public final class ImplicitAssociationBuilder implements Builder<ERModel> {
+public final class ERModelImplicitAssociationBuilder implements Builder<ERModel> {
 
-  private static final Logger LOGGER = Logger.getLogger(ImplicitAssociationBuilder.class.getName());
+  private static final Logger LOGGER =
+      Logger.getLogger(ERModelImplicitAssociationBuilder.class.getName());
 
   /**
    * Creates a new builder for adding implicit associations to the given ER model.
@@ -34,18 +38,22 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
    * @param erModel Mutable ER model to enrich
    * @return New builder instance
    */
-  public static ImplicitAssociationBuilder builder(final ERModel erModel) {
+  public static ERModelImplicitAssociationBuilder builder(
+      final Catalog catalog, final ERModel erModel) {
+    requireNonNull(catalog, "No catalog provided");
     requireNonNull(erModel, "No ER model provided");
     if (!(erModel instanceof final MutableERModel mutableERModel)) {
       throw new IllegalArgumentException("Cannot add implicit associations to ER model");
     }
-    return new ImplicitAssociationBuilder(mutableERModel);
+    return new ERModelImplicitAssociationBuilder(catalog, mutableERModel);
   }
 
+  private final Catalog catalog;
   private final MutableERModel erModel;
   private ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer;
 
-  private ImplicitAssociationBuilder(final MutableERModel erModel) {
+  private ERModelImplicitAssociationBuilder(final Catalog catalog, final MutableERModel erModel) {
+    this.catalog = catalog;
     this.erModel = erModel;
     implicitAssociationsAnalyzer =
         ImplicitAssociationsAnalyzerBuilder.completeBuilder(erModel.getTables()).build();
@@ -53,23 +61,36 @@ public final class ImplicitAssociationBuilder implements Builder<ERModel> {
 
   @Override
   public ERModel build() {
-    final Collection<TableReference> implicitAssociations =
+
+    final ImplicitAssociationBuilder associationBuilder =
+        ImplicitAssociationBuilder.builder(catalog);
+
+    final Collection<ColumnReference> implicitAssociations =
         implicitAssociationsAnalyzer.analyzeTables();
     if (implicitAssociations == null || implicitAssociations.isEmpty()) {
       return erModel;
     }
 
-    for (final TableReference implicitAssociation : implicitAssociations) {
+    // Implicit associations have only one column reference each, so convert each
+    // column reference to a relationship
+    for (final ColumnReference implicitAssociation : implicitAssociations) {
+      if (implicitAssociation == null) {
+        continue;
+      }
       LOGGER.log(
           Level.INFO,
           new StringFormat("Adding implicit association <%s> to ER model", implicitAssociation));
-      addImplicitAssociation(implicitAssociation);
+      associationBuilder.addColumnReference(
+          implicitAssociation.getForeignKeyColumn(), implicitAssociation.getPrimaryKeyColumn());
+      final TableReference tableReference = associationBuilder.build();
+      addImplicitAssociation(tableReference);
+      associationBuilder.clear();
     }
 
     return erModel;
   }
 
-  public ImplicitAssociationBuilder withImplicitAssociationsAnalyzer(
+  public ERModelImplicitAssociationBuilder withImplicitAssociationsAnalyzer(
       final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer) {
     if (implicitAssociationsAnalyzer != null) {
       this.implicitAssociationsAnalyzer = implicitAssociationsAnalyzer;

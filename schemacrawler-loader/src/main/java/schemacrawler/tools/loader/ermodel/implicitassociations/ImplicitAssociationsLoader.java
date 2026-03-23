@@ -10,8 +10,9 @@ package schemacrawler.tools.loader.ermodel.implicitassociations;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.ermodel.implementation.ImplicitAssociationBuilder;
+import schemacrawler.ermodel.implementation.ERModelImplicitAssociationBuilder;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.loader.ermodel.AbstractERModelLoader;
 import us.fatehi.utility.property.PropertyName;
@@ -63,8 +64,10 @@ final class ImplicitAssociationsLoader
   }
 
   private void loadImplicitAssociations() {
+    final Catalog catalog = getCatalog();
     final ERModel erModel = getERModel();
-    final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(erModel);
+    final ERModelImplicitAssociationBuilder builder =
+        ERModelImplicitAssociationBuilder.builder(catalog, erModel);
     builder.build();
     // The ER model is enhanced with implicit associations, so no need to set it back into the
     // execution state

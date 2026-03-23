@@ -11,7 +11,7 @@ package schemacrawler.test.utility;
 import static java.util.Objects.requireNonNull;
 
 import schemacrawler.ermodel.implementation.ERModelBuilder;
-import schemacrawler.ermodel.implementation.ImplicitAssociationBuilder;
+import schemacrawler.ermodel.implementation.ERModelImplicitAssociationBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
 import us.fatehi.utility.UtilityMarker;
@@ -23,7 +23,7 @@ public class TestERModelUtility {
   public static ERModel buildERModel(final Catalog catalog) {
     requireNonNull(catalog, "No catalog provided");
     final ERModel erModel = ERModelBuilder.builder(catalog).build();
-    ImplicitAssociationBuilder.builder(erModel).build();
+    ERModelImplicitAssociationBuilder.builder(catalog, erModel).build();
     return erModel;
   }
 

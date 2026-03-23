@@ -13,7 +13,6 @@ import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +24,6 @@ import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.TableReference;
 import us.fatehi.utility.string.StringFormat;
 
 /**
@@ -54,14 +52,14 @@ public final class ImplicitAssociationsAnalyzer {
     this.implicitAssociationRule = requireNonNull(implicitAssociationRule, "No rules provided");
   }
 
-  public Collection<TableReference> analyzeTables() {
+  public Collection<ColumnReference> analyzeTables() {
     if (tableMatchKeys.getTables().size() < 2) {
       return List.of();
     }
 
     LOGGER.log(Level.INFO, "Finding implicit associations");
 
-    final List<ColumnReference> implicitColumnReferences = new ArrayList<>();
+    final List<ColumnReference> proposedReferences = new ArrayList<>();
 
     final List<Table> tables = tableMatchKeys.getTables();
     final ColumnMatchKeys columnMatchKeys = new ColumnMatchKeys(tables);
@@ -97,26 +95,19 @@ public final class ImplicitAssociationsAnalyzer {
           if (!isValid(fkColumn, candidateKey)) {
             continue;
           }
-          final ImplicitColumnReference proposedAssociation =
-              new ImplicitColumnReference(fkColumn, candidateKey);
+          final ProposedAssociation proposedAssociation =
+              new ProposedAssociation(fkColumn, candidateKey);
           if (implicitAssociationRule.test(proposedAssociation)) {
             LOGGER.log(
                 Level.FINE,
                 new StringFormat("Found implicit association <%s>", proposedAssociation));
-            implicitColumnReferences.add(proposedAssociation);
+            proposedReferences.add(proposedAssociation);
           }
         }
       }
     }
 
-    Collections.sort(implicitColumnReferences);
-
-    final List<TableReference> implicitAssociations = new ArrayList<>();
-    for (final ColumnReference implicitColumnReference : implicitColumnReferences) {
-      implicitAssociations.add(new ImplicitAssociation(implicitColumnReference));
-    }
-
-    return implicitAssociations;
+    return proposedReferences;
   }
 
   /**

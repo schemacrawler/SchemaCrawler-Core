@@ -18,7 +18,6 @@ import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.loader.catalog.AbstractCatalogLoader;
@@ -82,13 +81,11 @@ final class WeakAssociationsCatalogLoader
     }
 
     final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer = analyzerBuilder.build();
-    final Collection<TableReference> weakAssociations =
-        implicitAssociationsAnalyzer.analyzeTables();
+    final Collection<ColumnReference> weakReferences = implicitAssociationsAnalyzer.analyzeTables();
 
-    for (final TableReference weakAssociation : weakAssociations) {
-      LOGGER.log(Level.INFO, new StringFormat("Adding weak association <%s> ", weakAssociation));
+    for (final ColumnReference weakReference : weakReferences) {
+      LOGGER.log(Level.INFO, new StringFormat("Adding weak association <%s> ", weakReference));
 
-      final ColumnReference weakReference = weakAssociation.getColumnReferences().get(0);
       final Column fkColumn = weakReference.getForeignKeyColumn();
       final Column pkColumn = weakReference.getPrimaryKeyColumn();
 

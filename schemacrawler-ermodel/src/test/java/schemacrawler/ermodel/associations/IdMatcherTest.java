@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Column;
 import schemacrawler.test.utility.crawl.LightColumn;
+import schemacrawler.test.utility.crawl.LightColumnReference;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class IdMatcherTest {
@@ -18,7 +19,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn("orders", "id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(false));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumn)), is(false));
   }
 
   @Test
@@ -27,7 +28,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn("orders", "order", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(false));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumn)), is(false));
   }
 
   @Test
@@ -39,7 +40,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn("orders", "order_id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(false));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumn)), is(false));
   }
 
   @Test
@@ -48,7 +49,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn("orders", "id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(true));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumn)), is(true));
   }
 
   @Test
@@ -57,7 +58,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn("orders", "order_id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(true));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumn)), is(true));
   }
 
   @Test
@@ -66,7 +67,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn("orders", "id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(true));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumn)), is(true));
   }
 
   @Test
@@ -75,7 +76,7 @@ public class IdMatcherTest {
     final Column pkColumn = mockColumn("orders", "order_id", true);
 
     final IdMatcher matcher = new IdMatcher();
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumn)), is(true));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumn)), is(true));
   }
 
   private Column mockColumn(
