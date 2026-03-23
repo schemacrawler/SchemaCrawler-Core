@@ -21,7 +21,8 @@ public class AttributesLoaderProvider extends AbstractERModelLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName(
-          "attributesloader", "Loader for catalog attributes, such as remarks or tags");
+          "attributesloader",
+          "Loader for ER model notes, such as remarks or tags and implicit associations");
 
   private static final String OPTION_ATTRIBUTES_FILE = "attributes-file";
 
