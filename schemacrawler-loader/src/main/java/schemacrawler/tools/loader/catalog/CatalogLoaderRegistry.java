@@ -16,8 +16,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.schemacrawler.exceptions.SchemaCrawlerException;
-import schemacrawler.tools.loader.catalog.attributes.AttributesCatalogLoaderProvider;
-import schemacrawler.tools.loader.catalog.counts.TableRowCountsCatalogLoaderProvider;
+import schemacrawler.tools.loader.catalog.counts.TableRowCountsLoaderProvider;
 import schemacrawler.tools.loader.catalog.offline.OfflineCatalogLoaderProvider;
 import schemacrawler.tools.loader.catalog.weakassociations.WeakAssociationsCatalogLoaderProvider;
 import schemacrawler.tools.options.Config;
@@ -45,8 +44,7 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
         List.of(
             new OfflineCatalogLoaderProvider(),
             new PrimaryCatalogLoaderProvider(),
-            new AttributesCatalogLoaderProvider(),
-            new TableRowCountsCatalogLoaderProvider(),
+            new TableRowCountsLoaderProvider(),
             new WeakAssociationsCatalogLoaderProvider()));
   }
 

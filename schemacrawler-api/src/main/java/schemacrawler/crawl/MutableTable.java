@@ -56,7 +56,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   private final NamedObjectList<MutableForeignKey> foreignKeys = new NamedObjectList<>();
   private final NamedObjectList<MutableWeakAssociation> weakAssociations = new NamedObjectList<>();
   private final NamedObjectList<MutableColumn> hiddenColumns = new NamedObjectList<>();
-  private final NamedObjectList<MutablePrimaryKey> alternateKeys = new NamedObjectList<>();
   private final NamedObjectList<MutableIndex> indexes = new NamedObjectList<>();
   private final NamedObjectList<MutablePrivilege<Table>> privileges = new NamedObjectList<>();
   private final NamedObjectList<MutableTrigger> triggers = new NamedObjectList<>();
@@ -102,9 +101,10 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   }
 
   /** {@inheritDoc} */
+  @Deprecated(forRemoval = true)
   @Override
   public Collection<PrimaryKey> getAlternateKeys() {
-    return Set.copyOf(alternateKeys.values());
+    return List.of();
   }
 
   /** {@inheritDoc} */
@@ -267,7 +267,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   /** {@inheritDoc} */
   @Override
   public Optional<MutablePrimaryKey> lookupAlternateKey(final String name) {
-    return alternateKeys.lookup(this, name);
+    return Optional.empty();
   }
 
   /** {@inheritDoc} */
@@ -313,10 +313,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   @Override
   public Optional<MutableTrigger> lookupTrigger(final String triggerName) {
     return triggers.lookup(this, triggerName);
-  }
-
-  final void addAlternateKey(final MutablePrimaryKey alternateKey) {
-    alternateKeys.add(alternateKey);
   }
 
   final void addColumn(final MutableColumn column) {

@@ -24,6 +24,7 @@ public interface Table
    *
    * @return Alternate keys of the table.
    */
+  @Deprecated(forRemoval = true)
   Collection<PrimaryKey> getAlternateKeys();
 
   /**

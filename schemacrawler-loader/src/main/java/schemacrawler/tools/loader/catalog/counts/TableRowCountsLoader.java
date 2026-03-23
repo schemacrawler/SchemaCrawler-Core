@@ -21,13 +21,11 @@ import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 
-public class TableRowCountsCatalogLoader
-    extends AbstractCatalogLoader<TableRowCountsCatalogLoaderOptions> {
+public class TableRowCountsLoader extends AbstractCatalogLoader<TableRowCountsLoaderOptions> {
 
-  private static final Logger LOGGER =
-      Logger.getLogger(TableRowCountsCatalogLoader.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(TableRowCountsLoader.class.getName());
 
-  TableRowCountsCatalogLoader(final PropertyName catalogLoaderName) {
+  TableRowCountsLoader(final PropertyName catalogLoaderName) {
     super(catalogLoaderName);
   }
 
@@ -42,7 +40,7 @@ public class TableRowCountsCatalogLoader
       final Catalog catalog = getCatalog();
       final TableRowCountsRetriever rowCountsRetriever =
           new TableRowCountsRetriever(getConnectionSource(), catalog);
-      final TableRowCountsCatalogLoaderOptions commandOptions = getCommandOptions();
+      final TableRowCountsLoaderOptions commandOptions = getCommandOptions();
 
       final boolean loadRowCounts = commandOptions.loadRowCounts();
       if (!loadRowCounts) {

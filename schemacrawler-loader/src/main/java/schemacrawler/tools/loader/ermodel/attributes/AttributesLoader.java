@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.loader.catalog.attributes;
+package schemacrawler.tools.loader.ermodel.attributes;
 
 import static schemacrawler.tools.loader.catalog.model.CatalogAttributesUtility.readCatalogAttributes;
 
@@ -14,23 +14,19 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.crawl.AlternateKeyBuilder;
-import schemacrawler.crawl.AlternateKeyBuilder.AlternateKeyDefinition;
 import schemacrawler.crawl.WeakAssociationBuilder;
 import schemacrawler.crawl.WeakAssociationBuilder.WeakAssociationColumn;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.IORuntimeException;
-import schemacrawler.tools.loader.catalog.AbstractCatalogLoader;
-import schemacrawler.tools.loader.catalog.model.AlternateKeyAttributes;
 import schemacrawler.tools.loader.catalog.model.CatalogAttributes;
 import schemacrawler.tools.loader.catalog.model.ColumnAttributes;
 import schemacrawler.tools.loader.catalog.model.TableAttributes;
 import schemacrawler.tools.loader.catalog.model.WeakAssociationAttributes;
+import schemacrawler.tools.loader.ermodel.AbstractERModelLoader;
 import us.fatehi.utility.ioresource.InputResource;
 import us.fatehi.utility.ioresource.InputResourceUtility;
 import us.fatehi.utility.property.PropertyName;
@@ -39,11 +35,11 @@ import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 import us.fatehi.utility.string.StringFormat;
 
-class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoaderOptions> {
+class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
 
-  private static final Logger LOGGER = Logger.getLogger(AttributesCatalogLoader.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(AttributesLoader.class.getName());
 
-  AttributesCatalogLoader(final PropertyName catalogLoaderName) {
+  AttributesLoader(final PropertyName catalogLoaderName) {
     super(catalogLoaderName);
   }
 
@@ -53,7 +49,7 @@ class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoa
       return;
     }
 
-    final AttributesCatalogLoaderOptions commandOptions = getCommandOptions();
+    final AttributesLoaderOptions commandOptions = getCommandOptions();
 
     if (!commandOptions.hasCatalogAttributesFile()) {
       LOGGER.log(Level.CONFIG, "No catalog attributes file specified");
@@ -75,7 +71,6 @@ class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoa
                                     .formatted(catalogAttributesFile)));
             final CatalogAttributes catalogAttributes = readCatalogAttributes(inputResource);
             loadRemarks(catalog, catalogAttributes);
-            loadAlternateKeys(catalog, catalogAttributes);
             loadWeakAssociations(catalog, catalogAttributes);
           };
       taskRunner.add(new TaskDefinition("retrieveCatalogAttributes", taskRunnable));
@@ -85,31 +80,6 @@ class AttributesCatalogLoader extends AbstractCatalogLoader<AttributesCatalogLoa
       throw e;
     } catch (final Exception e) {
       throw new ExecutionRuntimeException("Exception loading catalog attributes", e);
-    }
-  }
-
-  private void loadAlternateKeys(final Catalog catalog, final CatalogAttributes catalogAttributes) {
-    final AlternateKeyBuilder alternateKeyBuilder = AlternateKeyBuilder.builder(catalog);
-    for (final AlternateKeyAttributes alternateKeyAttributes :
-        catalogAttributes.getAlternateKeys()) {
-
-      final AlternateKeyDefinition alternateKeyDefinition =
-          new AlternateKeyDefinition(
-              alternateKeyAttributes.getSchema(), alternateKeyAttributes.getTableName(),
-              alternateKeyAttributes.getName(), alternateKeyAttributes.getColumns());
-
-      final Optional<PrimaryKey> optionalAlternateKey =
-          alternateKeyBuilder.addAlternateKey(alternateKeyDefinition);
-      if (optionalAlternateKey.isEmpty()) {
-        continue;
-      }
-      final PrimaryKey alternateKey = optionalAlternateKey.get();
-
-      alternateKey.setRemarks(alternateKeyAttributes.getRemarks());
-      for (final Entry<String, String> attribute :
-          alternateKeyAttributes.getAttributes().entrySet()) {
-        alternateKey.setAttribute(attribute.getKey(), attribute.getValue());
-      }
     }
   }
 

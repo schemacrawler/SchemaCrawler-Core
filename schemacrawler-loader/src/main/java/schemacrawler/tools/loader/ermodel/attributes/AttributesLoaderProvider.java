@@ -6,22 +6,23 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.loader.catalog.attributes;
+package schemacrawler.tools.loader.ermodel.attributes;
 
 import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import java.util.List;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.loader.catalog.AbstractCatalogLoaderProvider;
+import schemacrawler.tools.loader.ermodel.AbstractERModelLoaderProvider;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 
-public class AttributesCatalogLoaderProvider extends AbstractCatalogLoaderProvider {
+public class AttributesLoaderProvider extends AbstractERModelLoaderProvider {
 
   private static final PropertyName NAME =
       new PropertyName(
-          "attributesloader", "Loader for catalog attributes, such as remarks or tags");
+          "attributesloader",
+          "Loader for ER model notes, such as remarks or tags and implicit associations");
 
   private static final String OPTION_ATTRIBUTES_FILE = "attributes-file";
 
@@ -41,18 +42,18 @@ public class AttributesCatalogLoaderProvider extends AbstractCatalogLoaderProvid
   }
 
   @Override
-  public AttributesCatalogLoader newCommand(final Config config) {
+  public AttributesLoader newCommand(final Config config) {
     requireNonNull(config, "No config provided");
 
-    final AttributesCatalogLoader loader = new AttributesCatalogLoader(NAME);
-    final AttributesCatalogLoaderOptions options = createOptionsfromConfig(config);
+    final AttributesLoader loader = new AttributesLoader(NAME);
+    final AttributesLoaderOptions options = createOptionsfromConfig(config);
     loader.configure(options);
 
     return loader;
   }
 
-  private AttributesCatalogLoaderOptions createOptionsfromConfig(final Config config) {
+  private AttributesLoaderOptions createOptionsfromConfig(final Config config) {
     final String catalogAttributesFile = config.getStringValue(OPTION_ATTRIBUTES_FILE);
-    return new AttributesCatalogLoaderOptions(catalogAttributesFile);
+    return new AttributesLoaderOptions(catalogAttributesFile);
   }
 }

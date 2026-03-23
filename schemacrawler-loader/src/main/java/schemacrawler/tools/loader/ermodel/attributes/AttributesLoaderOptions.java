@@ -6,14 +6,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.loader.catalog.attributes;
+package schemacrawler.tools.loader.ermodel.attributes;
 
 import static us.fatehi.utility.Utility.isBlank;
 
 import schemacrawler.tools.command.CommandOptions;
 
-public record AttributesCatalogLoaderOptions(String catalogAttributesFile)
-    implements CommandOptions {
+public record AttributesLoaderOptions(String catalogAttributesFile) implements CommandOptions {
 
   public boolean hasCatalogAttributesFile() {
     return !isBlank(catalogAttributesFile);

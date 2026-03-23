@@ -26,13 +26,12 @@ import us.fatehi.utility.scheduler.TaskRunners;
  * <p>This loader runs after the primary ER model has been built and enriches it with implicit
  * relationships inferred from naming patterns across all tables.
  */
-final class ImplicitAssociationsERModelLoader
-    extends AbstractERModelLoader<ImplicitAssociationsERModelLoaderOptions> {
+final class ImplicitAssociationsLoader
+    extends AbstractERModelLoader<ImplicitAssociationsLoaderOptions> {
 
-  private static final Logger LOGGER =
-      Logger.getLogger(ImplicitAssociationsERModelLoader.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(ImplicitAssociationsLoader.class.getName());
 
-  ImplicitAssociationsERModelLoader(final PropertyName loaderName) {
+  ImplicitAssociationsLoader(final PropertyName loaderName) {
     super(loaderName);
   }
 
@@ -43,7 +42,7 @@ final class ImplicitAssociationsERModelLoader
       return;
     }
 
-    final ImplicitAssociationsERModelLoaderOptions commandOptions = getCommandOptions();
+    final ImplicitAssociationsLoaderOptions commandOptions = getCommandOptions();
     if (!commandOptions.loadImplicitAssociations()) {
       LOGGER.log(
           Level.INFO, "Not loading implicit associations into ER model, since not requested");

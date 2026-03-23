@@ -27,7 +27,7 @@ import us.fatehi.utility.property.PropertyName;
 
 public class CatalogLoaderRegistryTest {
 
-  private static final int NUM_LOADERS = 5;
+  private static final int NUM_LOADERS = 4;
 
   @Test
   public void chainedLoaders() {
@@ -46,10 +46,7 @@ public class CatalogLoaderRegistryTest {
     assertThat(String.valueOf(commandLineCommands), commandLineCommands.size(), is(greaterThan(0)));
     final List<String> names =
         commandLineCommands.stream().map(PluginCommand::getName).collect(toList());
-    assertThat(
-        names,
-        containsInAnyOrder(
-            "loader:weakassociationsloader", "loader:attributesloader", "loader:countsloader"));
+    assertThat(names, containsInAnyOrder("loader:weakassociationsloader", "loader:countsloader"));
   }
 
   @Test
@@ -58,10 +55,7 @@ public class CatalogLoaderRegistryTest {
         CatalogLoaderRegistry.getCatalogLoaderRegistry().getHelpCommands();
     assertThat(String.valueOf(helpCommands), helpCommands.size(), is(greaterThan(0)));
     final List<String> names = helpCommands.stream().map(PluginCommand::getName).collect(toList());
-    assertThat(
-        names,
-        containsInAnyOrder(
-            "loader:weakassociationsloader", "loader:attributesloader", "loader:countsloader"));
+    assertThat(names, containsInAnyOrder("loader:weakassociationsloader", "loader:countsloader"));
   }
 
   @Test
@@ -80,10 +74,6 @@ public class CatalogLoaderRegistryTest {
     assertThat(
         names,
         containsInAnyOrder(
-            "attributesloader",
-            "countsloader",
-            "offlineloader",
-            "primarycatalogloader",
-            "weakassociationsloader"));
+            "countsloader", "offlineloader", "primarycatalogloader", "weakassociationsloader"));
   }
 }

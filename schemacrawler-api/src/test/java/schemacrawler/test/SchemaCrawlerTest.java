@@ -44,8 +44,6 @@ import java.util.TreeMap;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import schemacrawler.crawl.AlternateKeyBuilder;
-import schemacrawler.crawl.AlternateKeyBuilder.AlternateKeyDefinition;
 import schemacrawler.crawl.WeakAssociationBuilder;
 import schemacrawler.crawl.WeakAssociationBuilder.WeakAssociationColumn;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
@@ -60,7 +58,6 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Grant;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.JdbcDriverProperty;
-import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineParameter;
@@ -174,52 +171,6 @@ public class SchemaCrawlerTest {
   }
 
   private Catalog catalog;
-
-  @Test
-  public void alternateKeys(final TestContext testContext) throws Exception {
-
-    final Schema alternateKeySchema = new SchemaReference("PUBLIC", "BOOKS");
-
-    final AlternateKeyBuilder builder = AlternateKeyBuilder.builder(catalog);
-    // 1. Happy path - good alternate key
-    builder.addAlternateKey(
-        new AlternateKeyDefinition(
-            alternateKeySchema, "AUTHORS", "1_alternate_key", List.of("ID")));
-    // 2. External table - not built
-    builder.addAlternateKey(
-        new AlternateKeyDefinition(
-            alternateKeySchema, "OTHERTABLE", "2_alternate_key", List.of("ID")));
-    // 3. External column - not built
-    builder.addAlternateKey(
-        new AlternateKeyDefinition(
-            alternateKeySchema, "AUTHORS", "3_alternate_key", List.of("OTHERCOLUMN")));
-
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
-      final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
-      assertThat("Schema count does not match", schemas, arrayWithSize(5));
-      for (final Schema schema : schemas) {
-        out.println("schema: " + schema.getFullName());
-        final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
-        for (final Table table : tables) {
-          out.println("  table: " + table.getFullName());
-          final Collection<PrimaryKey> alternateKeys = table.getAlternateKeys();
-          for (final PrimaryKey alternateKey : alternateKeys) {
-            out.println("    altermate key: " + alternateKey.getName());
-            out.println("      columns: ");
-            final List<TableConstraintColumn> constrainedColumns =
-                alternateKey.getConstrainedColumns();
-            for (final TableConstraintColumn tableConstraintColumn : constrainedColumns) {
-              out.println("        ordinal: " + tableConstraintColumn.getOrdinalPosition());
-              out.println("          " + tableConstraintColumn);
-            }
-          }
-        }
-      }
-    }
-    assertThat(
-        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
-  }
 
   @Test
   public void columnDataTypes(final TestContext testContext) throws Exception {

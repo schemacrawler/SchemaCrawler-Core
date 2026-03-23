@@ -83,6 +83,7 @@ public class AttributesCatalogLoaderTest {
       final Catalog catalog =
           SchemaCrawlerUtility.getCatalog(
               connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+      SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(6));
       for (final Schema schema : schemas) {

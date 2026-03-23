@@ -18,6 +18,8 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public abstract class ObjectAttributes implements Serializable, Comparable<ObjectAttributes> {
 
@@ -28,7 +30,7 @@ public abstract class ObjectAttributes implements Serializable, Comparable<Objec
 
   private final String name;
   private final List<String> remarks;
-  private final Map<String, String> attributes;
+  private final SortedMap<String, String> attributes;
 
   public ObjectAttributes(
       final String name, final List<String> remarks, final Map<String, String> attributes) {
@@ -44,9 +46,9 @@ public abstract class ObjectAttributes implements Serializable, Comparable<Objec
       this.remarks = List.copyOf(remarks);
     }
     if (attributes == null) {
-      this.attributes = Map.of();
+      this.attributes = new TreeMap<>();
     } else {
-      this.attributes = Map.copyOf(attributes);
+      this.attributes = new TreeMap<>(attributes);
     }
   }
 

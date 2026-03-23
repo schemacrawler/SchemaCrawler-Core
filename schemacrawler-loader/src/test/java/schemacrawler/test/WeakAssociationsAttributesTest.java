@@ -10,7 +10,6 @@ package schemacrawler.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
-import static schemacrawler.tools.utility.SchemaCrawlerUtility.getCatalog;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
@@ -43,6 +42,7 @@ import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
+import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.test.utility.extensions.TestContext;
@@ -78,8 +78,9 @@ public class WeakAssociationsAttributesTest {
     additionalConfig.put("attributes-file", "/attributes-weakassociations.yaml");
 
     catalog =
-        getCatalog(
+        SchemaCrawlerUtility.getCatalog(
             connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+    SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
   }
 
   /** Keep in sync with {@link SchemaCrawlerTest#weakAssociations() LabelName} */
