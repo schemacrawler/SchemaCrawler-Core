@@ -84,7 +84,6 @@ public final class ERModelImplicitAssociationBuilder implements Builder<ERModel>
           implicitAssociation.getForeignKeyColumn(), implicitAssociation.getPrimaryKeyColumn());
       final TableReference tableReference = associationBuilder.build();
       addImplicitAssociation(tableReference);
-      associationBuilder.clear();
     }
 
     return erModel;

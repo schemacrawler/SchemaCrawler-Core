@@ -104,22 +104,19 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
     return addColumnReference(fkColumn, pkColumn);
   }
 
+  /** Clear accumulated column references and return the table reference. */
   @Override
   public TableReference build() {
-    return findOrCreate().orElse(null);
-  }
-
-  public ImplicitAssociationBuilder clear() {
+    final TableReference tableRef = findOrCreate();
     columnReferences.clear();
-    LOGGER.log(Level.FINER, new StringFormat("Builder <%s> cleared", hashCode()));
-    return this;
+    return tableRef;
   }
 
-  private Optional<TableReference> findOrCreate() {
+  private TableReference findOrCreate() {
     if (columnReferences.isEmpty()) {
       LOGGER.log(
           Level.CONFIG, "Implicit association not built, since there are no column references");
-      return Optional.empty();
+      return null;
     }
 
     final Iterator<ColumnReference> iterator = columnReferences.iterator();
@@ -143,7 +140,7 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
             new StringFormat(
                 "Implicit association not built, since column references are not consistent <%s>",
                 columnReferences));
-        return Optional.empty();
+        return null;
       }
     }
 
@@ -157,10 +154,10 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
           new StringFormat(
               "Implicit association not built, since it matches foreign key <%s>",
               optionalMatchingForeignKey.get()));
-      return Optional.empty();
+      return null;
     }
 
-    return Optional.of(implicitAssociation);
+    return implicitAssociation;
   }
 
   private Optional<ForeignKey> lookupMatchingForeignKey(final TableReference implicitAssociation) {
