@@ -14,6 +14,7 @@ import static schemacrawler.utility.MetaDataUtility.isPartial;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,29 +33,12 @@ import us.fatehi.utility.string.StringFormat;
 
 public class ImplicitAssociationBuilder implements Builder<TableReference> {
 
-  public static class ImplicitAssociationColumn {
-
-    private final Schema schema;
-    private final String tableName;
-    private final String columnName;
-
-    public ImplicitAssociationColumn(
-        final Schema schema, final String tableName, final String columnName) {
-      this.schema = requireNonNull(schema, "No schema provided");
-      this.tableName = requireNotBlank(tableName, "No table name provided");
-      this.columnName = requireNotBlank(columnName, "No column name provided");
-    }
-
-    public String columnName() {
-      return columnName;
-    }
-
-    public Schema schema() {
-      return schema;
-    }
-
-    public String tableName() {
-      return tableName;
+  public static record ImplicitAssociationColumn(
+      Schema schema, String tableName, String columnName) {
+    public ImplicitAssociationColumn {
+      schema = requireNonNull(schema, "No schema provided");
+      tableName = requireNotBlank(tableName, "No table name provided");
+      columnName = requireNotBlank(columnName, "No column name provided");
     }
   }
 
@@ -65,11 +49,13 @@ public class ImplicitAssociationBuilder implements Builder<TableReference> {
   }
 
   private final Catalog catalog;
+  private final Collection<TableReference> previouslyBuilt;
   private final Collection<ColumnReference> columnReferences;
   private String implicitAssociationName;
 
   protected ImplicitAssociationBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
+    previouslyBuilt = new ArrayList<>();
     columnReferences = new HashSet<>();
     implicitAssociationName = null;
   }
@@ -128,6 +114,9 @@ public class ImplicitAssociationBuilder implements Builder<TableReference> {
   public TableReference build() {
     final TableReference tableRef = findOrCreate();
     columnReferences.clear();
+    if (tableRef != null && !(tableRef instanceof ForeignKey)) {
+      previouslyBuilt.add(tableRef);
+    }
     return tableRef;
   }
 
@@ -174,7 +163,7 @@ public class ImplicitAssociationBuilder implements Builder<TableReference> {
 
     // If there is a matching foreign key, do not create a similar implicit
     // association
-    final ForeignKey foreignKey = lookupMatchingForeignKey(implicitAssociation).orElse(null);
+    final ForeignKey foreignKey = lookupMatchingForeignKey(implicitAssociation);
     if (foreignKey != null) {
       LOGGER.log(
           Level.CONFIG,
@@ -183,25 +172,35 @@ public class ImplicitAssociationBuilder implements Builder<TableReference> {
       return foreignKey;
     }
 
+    // If there is a previously built implicit association, return that instead
+    // NOTE: Use compareTo, not equals (that is, not contains from the set)
+    final Optional<TableReference> isPreviouslyBuilt =
+        previouslyBuilt.stream()
+            .filter(previous -> previous.compareTo(implicitAssociation) == 0)
+            .findFirst();
+    if (isPreviouslyBuilt.isPresent()) {
+      return isPreviouslyBuilt.get();
+    }
+
     return implicitAssociation;
   }
 
-  private Optional<ForeignKey> lookupMatchingForeignKey(final TableReference implicitAssociation) {
+  private ForeignKey lookupMatchingForeignKey(final TableReference implicitAssociation) {
     requireNonNull(implicitAssociation, "No implicit association provided");
 
     final Table referencedTable = implicitAssociation.getReferencedTable();
     if (!(referencedTable instanceof MutableTable)) {
-      return Optional.empty();
+      return null;
     }
 
     // Search foreign keys by column references
     final Collection<ForeignKey> exportedForeignKeys = referencedTable.getExportedForeignKeys();
     for (final ForeignKey foreignKey : exportedForeignKeys) {
       if (implicitAssociation.compareTo(foreignKey) == 0) {
-        return Optional.of(foreignKey);
+        return foreignKey;
       }
     }
 
-    return Optional.empty();
+    return null;
   }
 }

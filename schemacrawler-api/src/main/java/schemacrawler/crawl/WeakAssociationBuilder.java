@@ -8,14 +8,10 @@
 
 package schemacrawler.crawl;
 
-import static java.util.Objects.requireNonNull;
-
-import java.util.Collection;
 import java.util.Iterator;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
-import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 
 public final class WeakAssociationBuilder extends ImplicitAssociationBuilder {
@@ -35,13 +31,6 @@ public final class WeakAssociationBuilder extends ImplicitAssociationBuilder {
       return implicitAssociation;
     }
 
-    // If there is a matching weak association (checked by the column references),
-    // do not create another
-    final TableReference matchingWeakAssociation =
-        lookupMatchingWeakAssociation(implicitAssociation);
-    if (matchingWeakAssociation != null) {
-      return matchingWeakAssociation;
-    }
     // Convert to weak association
     final Iterator<ColumnReference> columnRefsIterator =
         implicitAssociation.getColumnReferences().iterator();
@@ -60,25 +49,5 @@ public final class WeakAssociationBuilder extends ImplicitAssociationBuilder {
     }
 
     return weakAssociation;
-  }
-
-  private TableReference lookupMatchingWeakAssociation(final TableReference weakAssociation) {
-    requireNonNull(weakAssociation, "No weak association provided");
-
-    final Table referencedTable = weakAssociation.getReferencedTable();
-    if (!(referencedTable instanceof MutableTable)) {
-      return null;
-    }
-
-    // Search weak associations by column references
-    final Collection<? extends TableReference> weakAssociations =
-        referencedTable.getWeakAssociations();
-    for (final TableReference weakAssociationInTable : weakAssociations) {
-      if (weakAssociation.compareTo(weakAssociationInTable) == 0) {
-        return weakAssociationInTable;
-      }
-    }
-
-    return null;
   }
 }

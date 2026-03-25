@@ -114,13 +114,12 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
 
   private void loadWeakAssociations(
       final Catalog catalog, final CatalogAttributes catalogAttributes) {
+    final WeakAssociationBuilder weakAssociationBuilder = WeakAssociationBuilder.builder(catalog);
     for (final WeakAssociationAttributes weakAssociationAttributes :
         catalogAttributes.getWeakAssociations()) {
 
       final TableAttributes pkTableAttributes = weakAssociationAttributes.getReferencedTable();
       final TableAttributes fkTableAttributes = weakAssociationAttributes.getDependentTable();
-
-      final WeakAssociationBuilder weakAssociationBuilder = WeakAssociationBuilder.builder(catalog);
 
       for (final Entry<String, String> entry :
           weakAssociationAttributes.getColumnReferences().entrySet()) {
