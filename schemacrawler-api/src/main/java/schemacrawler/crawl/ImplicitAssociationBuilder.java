@@ -31,7 +31,7 @@ import schemacrawler.schema.TableReference;
 import us.fatehi.utility.Builder;
 import us.fatehi.utility.string.StringFormat;
 
-public class ImplicitAssociationBuilder implements Builder<TableReference> {
+public final class ImplicitAssociationBuilder implements Builder<TableReference> {
 
   public static record ImplicitAssociationColumn(
       Schema schema, String tableName, String columnName) {
@@ -53,7 +53,7 @@ public class ImplicitAssociationBuilder implements Builder<TableReference> {
   private final Collection<ColumnReference> columnReferences;
   private String implicitAssociationName;
 
-  protected ImplicitAssociationBuilder(final Catalog catalog) {
+  private ImplicitAssociationBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
     previouslyBuilt = new ArrayList<>();
     columnReferences = new HashSet<>();

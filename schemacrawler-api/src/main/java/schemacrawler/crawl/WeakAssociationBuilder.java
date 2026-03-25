@@ -9,24 +9,38 @@
 package schemacrawler.crawl;
 
 import java.util.Iterator;
+import schemacrawler.crawl.ImplicitAssociationBuilder.ImplicitAssociationColumn;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.TableReference;
 
-public final class WeakAssociationBuilder extends ImplicitAssociationBuilder {
+public final class WeakAssociationBuilder {
 
   public static WeakAssociationBuilder builder(final Catalog catalog) {
     return new WeakAssociationBuilder(catalog);
   }
 
+  private final ImplicitAssociationBuilder implicitAssociationBuilder;
+
   private WeakAssociationBuilder(final Catalog catalog) {
-    super(catalog);
+    implicitAssociationBuilder = ImplicitAssociationBuilder.builder(catalog);
   }
 
-  @Override
+  public ImplicitAssociationBuilder addColumnReference(
+      final Column fkColumn, final Column pkColumn) {
+    return implicitAssociationBuilder.addColumnReference(fkColumn, pkColumn);
+  }
+
+  public ImplicitAssociationBuilder addColumnReference(
+      final ImplicitAssociationColumn referencingColumn,
+      final ImplicitAssociationColumn referencedColumn) {
+    return implicitAssociationBuilder.addColumnReference(referencingColumn, referencedColumn);
+  }
+
   public TableReference build() {
-    final TableReference implicitAssociation = super.build();
+    final TableReference implicitAssociation = implicitAssociationBuilder.build();
     if (implicitAssociation == null || implicitAssociation instanceof ForeignKey) {
       return implicitAssociation;
     }
@@ -49,5 +63,9 @@ public final class WeakAssociationBuilder extends ImplicitAssociationBuilder {
     }
 
     return weakAssociation;
+  }
+
+  public ImplicitAssociationBuilder withName(final String weakAssociationName) {
+    return implicitAssociationBuilder.withName(weakAssociationName);
   }
 }
