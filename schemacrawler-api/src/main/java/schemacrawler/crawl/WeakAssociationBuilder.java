@@ -9,235 +9,76 @@
 package schemacrawler.crawl;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.crawl.RetrieverUtility.lookupOrCreateColumn;
-import static schemacrawler.utility.MetaDataUtility.isPartial;
-import static us.fatehi.utility.Utility.isBlank;
-import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
-import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
-import schemacrawler.schema.WeakAssociation;
-import us.fatehi.utility.Builder;
-import us.fatehi.utility.string.StringFormat;
 
-public final class WeakAssociationBuilder implements Builder<TableReference> {
-
-  public static final class WeakAssociationColumn {
-
-    private final Schema schema;
-    private final String tableName;
-    private final String columnName;
-
-    public WeakAssociationColumn(final Column column) {
-      this(
-          requireNonNull(column, "No column provided").getSchema(),
-          column.getParent().getName(),
-          column.getName());
-    }
-
-    public WeakAssociationColumn(final Schema schema, final String table, final String column) {
-      this.schema = requireNonNull(schema, "No schema provided");
-      tableName = requireNotBlank(table, "No table name provided");
-      columnName = requireNotBlank(column, "No column name provided");
-    }
-
-    public String getColumnName() {
-      return columnName;
-    }
-
-    public Schema getSchema() {
-      return schema;
-    }
-
-    public String getTableName() {
-      return tableName;
-    }
-
-    @Override
-    public String toString() {
-      return "weak-association <%s.%s.%s>".formatted(schema, tableName, columnName);
-    }
-  }
-
-  private static final Logger LOGGER = Logger.getLogger(WeakAssociationBuilder.class.getName());
+public final class WeakAssociationBuilder extends ImplicitAssociationBuilder {
 
   public static WeakAssociationBuilder builder(final Catalog catalog) {
     return new WeakAssociationBuilder(catalog);
   }
 
-  private final Catalog catalog;
-  private final Collection<ColumnReference> columnReferences;
-
   private WeakAssociationBuilder(final Catalog catalog) {
-    this.catalog = requireNonNull(catalog, "No catalog provided");
-    columnReferences = new HashSet<>();
-  }
-
-  public WeakAssociationBuilder addColumnReference(
-      final WeakAssociationColumn referencingColumn, final WeakAssociationColumn referencedColumn) {
-    requireNonNull(referencingColumn, "No referencing column provided");
-    requireNonNull(referencedColumn, "No referenced column provided");
-
-    final Column fkColumn =
-        lookupOrCreateColumn(
-            catalog,
-            referencingColumn.getSchema(),
-            referencingColumn.getTableName(),
-            referencingColumn.getColumnName());
-    final Column pkColumn =
-        lookupOrCreateColumn(
-            catalog,
-            referencedColumn.getSchema(),
-            referencedColumn.getTableName(),
-            referencedColumn.getColumnName());
-
-    // Ensure that we have non-null values, since the constructor for WeakAssociationColumn can take
-    // any kind of column as arguments
-    requireNonNull(fkColumn, "No referencing column provided");
-    requireNonNull(pkColumn, "No referenced column provided");
-
-    if (fkColumn.equals(pkColumn)) {
-      return this;
-    }
-
-    final boolean isFkColumnPartial = isPartial(fkColumn);
-    final boolean isPkColumnPartial = isPartial(pkColumn);
-    if (isFkColumnPartial && isPkColumnPartial) {
-      return this;
-    }
-
-    // Start key sequences at index 1
-    final int keySequence = columnReferences.size() + 1;
-    final ColumnReference columnReference =
-        new ImmutableColumnReference(keySequence, fkColumn, pkColumn);
-    columnReferences.add(columnReference);
-
-    return this;
+    super(catalog);
   }
 
   @Override
   public TableReference build() {
-    final Optional<TableReference> optionalTableReference = findOrCreate(null);
-    if (optionalTableReference.isPresent()) {
-      return optionalTableReference.get();
-    }
-    return null;
-  }
-
-  public WeakAssociationBuilder clear() {
-    columnReferences.clear();
-    LOGGER.log(Level.FINER, new StringFormat("Builder <%s> cleared", hashCode()));
-    return this;
-  }
-
-  public Optional<TableReference> findOrCreate(final String name) {
-    if (columnReferences.isEmpty()) {
-      LOGGER.log(Level.CONFIG, "Weak association not built, since there are no column references");
-      return Optional.empty();
+    final TableReference implicitAssociation = super.build();
+    if (implicitAssociation == null || implicitAssociation instanceof ForeignKey) {
+      return implicitAssociation;
     }
 
-    final Iterator<ColumnReference> iterator = columnReferences.iterator();
-
-    final ColumnReference someColumnReference = iterator.next();
-    final Table referencedTable = someColumnReference.getPrimaryKeyColumn().getParent();
-    final Table dependentTable = someColumnReference.getForeignKeyColumn().getParent();
-
-    final String weakAssociationName;
-    if (isBlank(name)) {
-      weakAssociationName =
-          RetrieverUtility.constructForeignKeyName(referencedTable, dependentTable);
-    } else {
-      weakAssociationName = name;
+    // If there is a matching weak association (checked by the column references),
+    // do not create another
+    final TableReference matchingWeakAssociation =
+        lookupMatchingWeakAssociation(implicitAssociation);
+    if (matchingWeakAssociation != null) {
+      return matchingWeakAssociation;
     }
-
+    // Convert to weak association
+    final Iterator<ColumnReference> columnRefsIterator =
+        implicitAssociation.getColumnReferences().iterator();
     final MutableWeakAssociation weakAssociation =
-        new MutableWeakAssociation(weakAssociationName, someColumnReference);
-    while (iterator.hasNext()) {
-      final ColumnReference columnReference = iterator.next();
-      // Add a column reference only if they reference the same two tables
-      final boolean addedColumnReference = weakAssociation.addColumnReference(columnReference);
-      if (!addedColumnReference) {
-        LOGGER.log(
-            Level.CONFIG,
-            new StringFormat(
-                "Weak association not built, since column references are not consistent, %s",
-                columnReferences));
-        return Optional.empty();
-      }
-    }
-
-    // If there is a matching foreign key, do not create a similar weak association
-    final Optional<ForeignKey> optionalMatchingForeignKey =
-        lookupMatchingForeignKey(weakAssociation);
-    if (optionalMatchingForeignKey.isPresent()) {
-      return Optional.of(optionalMatchingForeignKey.get());
-    }
-
-    // If there is a matching weak association (checked by the column references), do not create
-    // another
-    final Optional<WeakAssociation> optionalMatchingWeakAssociation =
-        lookupMatchingWeakAssociation(weakAssociation);
-    if (optionalMatchingWeakAssociation.isPresent()) {
-      return Optional.of(optionalMatchingWeakAssociation.get());
+        new MutableWeakAssociation(implicitAssociation.getName(), columnRefsIterator.next());
+    while (columnRefsIterator.hasNext()) {
+      final ColumnReference columnReference = columnRefsIterator.next();
+      weakAssociation.addColumnReference(columnReference);
     }
     // Add weak association to tables if no matching foreign key is found
-    if (referencedTable instanceof final MutableTable table) {
+    if (weakAssociation.getPrimaryKeyTable() instanceof final MutableTable table) {
       table.addWeakAssociation(weakAssociation);
     }
-    if (dependentTable instanceof final MutableTable table) {
+    if (weakAssociation.getForeignKeyTable() instanceof final MutableTable table) {
       table.addWeakAssociation(weakAssociation);
     }
 
-    return Optional.of(weakAssociation);
+    return weakAssociation;
   }
 
-  private Optional<ForeignKey> lookupMatchingForeignKey(final WeakAssociation weakAssociation) {
+  private TableReference lookupMatchingWeakAssociation(final TableReference weakAssociation) {
     requireNonNull(weakAssociation, "No weak association provided");
 
     final Table referencedTable = weakAssociation.getReferencedTable();
     if (!(referencedTable instanceof MutableTable)) {
-      return Optional.empty();
-    }
-
-    // Search foreign keys by column references
-    final Collection<ForeignKey> exportedForeignKeys = referencedTable.getExportedForeignKeys();
-    for (final ForeignKey foreignKey : exportedForeignKeys) {
-      if (weakAssociation.compareTo(foreignKey) == 0) {
-        return Optional.of(foreignKey);
-      }
-    }
-
-    return Optional.empty();
-  }
-
-  private Optional<WeakAssociation> lookupMatchingWeakAssociation(
-      final WeakAssociation weakAssociation) {
-    requireNonNull(weakAssociation, "No weak association provided");
-
-    final Table referencedTable = weakAssociation.getReferencedTable();
-    if (!(referencedTable instanceof MutableTable)) {
-      return Optional.empty();
+      return null;
     }
 
     // Search weak associations by column references
-    final Collection<WeakAssociation> weakAssociations = referencedTable.getWeakAssociations();
-    for (final WeakAssociation weakAssociationInTable : weakAssociations) {
+    final Collection<? extends TableReference> weakAssociations =
+        referencedTable.getWeakAssociations();
+    for (final TableReference weakAssociationInTable : weakAssociations) {
       if (weakAssociation.compareTo(weakAssociationInTable) == 0) {
-        return Optional.of(weakAssociationInTable);
+        return weakAssociationInTable;
       }
     }
 
-    return Optional.empty();
+    return null;
   }
 }

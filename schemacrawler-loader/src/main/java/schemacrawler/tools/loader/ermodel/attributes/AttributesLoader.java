@@ -14,8 +14,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.crawl.ImplicitAssociationBuilder.ImplicitAssociationColumn;
 import schemacrawler.crawl.WeakAssociationBuilder;
-import schemacrawler.crawl.WeakAssociationBuilder.WeakAssociationColumn;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
@@ -127,25 +127,25 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
         final String fkColumnName = entry.getKey();
         final String pkColumnName = entry.getValue();
 
-        final WeakAssociationColumn fkColumn =
-            new WeakAssociationColumn(
+        final ImplicitAssociationColumn fkColumn =
+            new ImplicitAssociationColumn(
                 fkTableAttributes.getSchema(), fkTableAttributes.getName(), fkColumnName);
-        final WeakAssociationColumn pkColumn =
-            new WeakAssociationColumn(
+        final ImplicitAssociationColumn pkColumn =
+            new ImplicitAssociationColumn(
                 pkTableAttributes.getSchema(), pkTableAttributes.getName(), pkColumnName);
 
         weakAssociationBuilder.addColumnReference(fkColumn, pkColumn);
       }
 
-      final Optional<TableReference> optionalTableReference =
-          weakAssociationBuilder.findOrCreate(weakAssociationAttributes.getName());
+      weakAssociationBuilder.withName(weakAssociationAttributes.getName());
 
-      if (optionalTableReference.isPresent()) {
-        final TableReference tableReference = optionalTableReference.get();
-        tableReference.setRemarks(weakAssociationAttributes.getRemarks());
+      final TableReference implicitAssociation = weakAssociationBuilder.build();
+
+      if (implicitAssociation != null) {
+        implicitAssociation.setRemarks(weakAssociationAttributes.getRemarks());
         for (final Entry<String, String> attribute :
             weakAssociationAttributes.getAttributes().entrySet()) {
-          tableReference.setAttribute(attribute.getKey(), attribute.getValue());
+          implicitAssociation.setAttribute(attribute.getKey(), attribute.getValue());
         }
       }
     }

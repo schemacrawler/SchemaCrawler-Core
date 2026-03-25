@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.WeakAssociationBuilder;
-import schemacrawler.crawl.WeakAssociationBuilder.WeakAssociationColumn;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
 import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
 import schemacrawler.schema.Catalog;
@@ -90,8 +89,7 @@ final class WeakAssociationsCatalogLoader
       final Column pkColumn = weakReference.getPrimaryKeyColumn();
 
       final WeakAssociationBuilder builder = WeakAssociationBuilder.builder(catalog);
-      builder.addColumnReference(
-          new WeakAssociationColumn(fkColumn), new WeakAssociationColumn(pkColumn));
+      builder.addColumnReference(fkColumn, pkColumn);
       builder.build();
     }
   }

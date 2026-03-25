@@ -11,6 +11,7 @@ package schemacrawler.crawl;
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.crawl.RetrieverUtility.lookupOrCreateColumn;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
+import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.Collection;
@@ -29,15 +30,31 @@ import schemacrawler.schema.TableReference;
 import us.fatehi.utility.Builder;
 import us.fatehi.utility.string.StringFormat;
 
-public final class ImplicitAssociationBuilder implements Builder<TableReference> {
+public class ImplicitAssociationBuilder implements Builder<TableReference> {
 
-  public static final record ImplicitAssociationColumn(
-      Schema schema, String tableName, String columnName) {
+  public static class ImplicitAssociationColumn {
 
-    public ImplicitAssociationColumn {
-      schema = requireNonNull(schema, "No schema provided");
-      tableName = requireNotBlank(tableName, "No table name provided");
-      columnName = requireNotBlank(columnName, "No column name provided");
+    private final Schema schema;
+    private final String tableName;
+    private final String columnName;
+
+    public ImplicitAssociationColumn(
+        final Schema schema, final String tableName, final String columnName) {
+      this.schema = requireNonNull(schema, "No schema provided");
+      this.tableName = requireNotBlank(tableName, "No table name provided");
+      this.columnName = requireNotBlank(columnName, "No column name provided");
+    }
+
+    public String columnName() {
+      return columnName;
+    }
+
+    public Schema schema() {
+      return schema;
+    }
+
+    public String tableName() {
+      return tableName;
     }
   }
 
@@ -49,10 +66,12 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
 
   private final Catalog catalog;
   private final Collection<ColumnReference> columnReferences;
+  private String implicitAssociationName;
 
-  private ImplicitAssociationBuilder(final Catalog catalog) {
+  protected ImplicitAssociationBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
     columnReferences = new HashSet<>();
+    implicitAssociationName = null;
   }
 
   public ImplicitAssociationBuilder addColumnReference(
@@ -112,6 +131,13 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
     return tableRef;
   }
 
+  public ImplicitAssociationBuilder withName(final String weakAssociationName) {
+    if (!isBlank(weakAssociationName)) {
+      implicitAssociationName = weakAssociationName;
+    }
+    return this;
+  }
+
   private TableReference findOrCreate() {
     if (columnReferences.isEmpty()) {
       LOGGER.log(
@@ -125,8 +151,10 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
     final Table referencedTable = someColumnReference.getPrimaryKeyColumn().getParent();
     final Table dependentTable = someColumnReference.getForeignKeyColumn().getParent();
 
-    final String implicitAssociationName =
-        RetrieverUtility.constructForeignKeyName(referencedTable, dependentTable);
+    if (isBlank(implicitAssociationName)) {
+      implicitAssociationName =
+          RetrieverUtility.constructForeignKeyName(referencedTable, dependentTable);
+    }
 
     final MutableImplicitAssociation implicitAssociation =
         new MutableImplicitAssociation(implicitAssociationName, someColumnReference);
@@ -146,15 +174,13 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
 
     // If there is a matching foreign key, do not create a similar implicit
     // association
-    final Optional<ForeignKey> optionalMatchingForeignKey =
-        lookupMatchingForeignKey(implicitAssociation);
-    if (optionalMatchingForeignKey.isPresent()) {
+    final ForeignKey foreignKey = lookupMatchingForeignKey(implicitAssociation).orElse(null);
+    if (foreignKey != null) {
       LOGGER.log(
           Level.CONFIG,
           new StringFormat(
-              "Implicit association not built, since it matches foreign key <%s>",
-              optionalMatchingForeignKey.get()));
-      return null;
+              "Implicit association not built, since it matches foreign key <%s>", foreignKey));
+      return foreignKey;
     }
 
     return implicitAssociation;
