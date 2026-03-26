@@ -15,8 +15,9 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.TableReference;
+import us.fatehi.utility.Builder;
 
-public final class WeakAssociationBuilder {
+public final class WeakAssociationBuilder implements Builder<TableReference> {
 
   public static WeakAssociationBuilder builder(final Catalog catalog) {
     return new WeakAssociationBuilder(catalog);
@@ -28,17 +29,19 @@ public final class WeakAssociationBuilder {
     implicitAssociationBuilder = ImplicitAssociationBuilder.builder(catalog);
   }
 
-  public ImplicitAssociationBuilder addColumnReference(
-      final Column fkColumn, final Column pkColumn) {
-    return implicitAssociationBuilder.addColumnReference(fkColumn, pkColumn);
+  public WeakAssociationBuilder addColumnReference(final Column fkColumn, final Column pkColumn) {
+    implicitAssociationBuilder.addColumnReference(fkColumn, pkColumn);
+    return this;
   }
 
-  public ImplicitAssociationBuilder addColumnReference(
+  public WeakAssociationBuilder addColumnReference(
       final ImplicitAssociationColumn referencingColumn,
       final ImplicitAssociationColumn referencedColumn) {
-    return implicitAssociationBuilder.addColumnReference(referencingColumn, referencedColumn);
+    implicitAssociationBuilder.addColumnReference(referencingColumn, referencedColumn);
+    return this;
   }
 
+  @Override
   public TableReference build() {
     final TableReference implicitAssociation = implicitAssociationBuilder.build();
     if (implicitAssociation == null || implicitAssociation instanceof ForeignKey) {
@@ -65,7 +68,8 @@ public final class WeakAssociationBuilder {
     return weakAssociation;
   }
 
-  public ImplicitAssociationBuilder withName(final String weakAssociationName) {
-    return implicitAssociationBuilder.withName(weakAssociationName);
+  public WeakAssociationBuilder withName(final String weakAssociationName) {
+    implicitAssociationBuilder.withName(weakAssociationName);
+    return this;
   }
 }
