@@ -26,8 +26,7 @@ public class AvailableLoaderRegistryTest {
   public void availableCatalogLoaders() {
     assertThat(
         getRegisteredPlugins(CatalogLoaderRegistry.getCatalogLoaderRegistry()),
-        arrayContainingInAnyOrder(
-            "countsloader", "offlineloader", "primarycatalogloader", "weakassociationsloader"));
+        arrayContainingInAnyOrder("countsloader", "offlineloader", "primarycatalogloader"));
   }
 
   @Test

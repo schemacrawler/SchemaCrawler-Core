@@ -9,13 +9,11 @@
 package schemacrawler.test;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.isEmpty;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -44,16 +42,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import schemacrawler.crawl.ImplicitAssociationBuilder.ImplicitAssociationColumn;
-import schemacrawler.crawl.WeakAssociationBuilder;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.DataTypeType;
 import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schema.DatabaseObject;
-import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Grant;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.JdbcDriverProperty;
@@ -66,11 +61,9 @@ import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintColumn;
-import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.Trigger;
 import schemacrawler.schema.View;
-import schemacrawler.schema.WeakAssociation;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.LoadOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -670,152 +663,6 @@ public class SchemaCrawlerTest {
           out.println("  - table usage");
           for (final Table usedTable : view.getTableUsage()) {
             out.println("    - table: %s".formatted(usedTable));
-          }
-        }
-      }
-    }
-    assertThat(
-        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
-  }
-
-  /** Keep in sync with {@link WeakAssociationsAttributesTest#weakAssociations() LabelName} */
-  @Test
-  public void weakAssociations(final TestContext testContext) throws Exception {
-
-    final Column pkColumn =
-        catalog
-            .lookupTable(new SchemaReference("PUBLIC", "BOOKS"), "AUTHORS")
-            .get()
-            .lookupColumn("ID")
-            .get();
-    final Column fkColumn =
-        catalog
-            .lookupTable(new SchemaReference("PUBLIC", "BOOKS"), "BOOKS")
-            .get()
-            .lookupColumn("ID")
-            .get();
-
-    final WeakAssociationBuilder builder = WeakAssociationBuilder.builder(catalog);
-    // 1. Happy path - good weak association
-    builder
-        .withName("1_weak")
-        .addColumnReference(
-            newImplicitAssociationColumn(fkColumn), newImplicitAssociationColumn(pkColumn));
-    builder.build();
-    // 2. Partial foreign key
-    builder
-        .withName("2_weak_partial_fk")
-        .addColumnReference(
-            newImplicitAssociationColumn(
-                new SchemaReference("PRIVATE", "LIBRARY"), "BOOKAUTHORS", "AUTHORID"),
-            newImplicitAssociationColumn(pkColumn));
-    builder.build();
-    // 3. Partial primary key
-    builder
-        .withName("3_weak_partial_pk")
-        .addColumnReference(
-            newImplicitAssociationColumn(fkColumn),
-            newImplicitAssociationColumn(new SchemaReference("PRIVATE", "LIBRARY"), "BOOKS", "ID"));
-    builder.build();
-    // 4. Partial both (not built)
-    builder
-        .withName("4_weak_partial_both")
-        .addColumnReference(
-            newImplicitAssociationColumn(
-                new SchemaReference("PRIVATE", "LIBRARY"), "BOOKAUTHORS", "AUTHORID"),
-            newImplicitAssociationColumn(
-                new SchemaReference("PRIVATE", "LIBRARY"), "AUTHORS", "ID"));
-    // 5. No column references (not built)
-    builder.withName("5_weak_no_references").build();
-    // 6. Multiple tables in play (not built)
-    builder
-        .withName("6_weak_conflicting")
-        .addColumnReference(
-            newImplicitAssociationColumn(
-                new SchemaReference("PRIVATE", "LIBRARY"), "BOOKAUTHORS", "AUTHORID"),
-            newImplicitAssociationColumn(pkColumn));
-    builder.addColumnReference(
-        newImplicitAssociationColumn(fkColumn),
-        newImplicitAssociationColumn(new SchemaReference("PRIVATE", "LIBRARY"), "AUTHORS", "ID"));
-    builder.build();
-    // 7. Duplicate column references (only one column reference built)
-    builder
-        .withName("7_weak_duplicate")
-        .addColumnReference(
-            newImplicitAssociationColumn(
-                new SchemaReference("PRIVATE", "LIBRARY"), "MAGAZINEARTICLES", "AUTHORID"),
-            newImplicitAssociationColumn(pkColumn));
-    builder.addColumnReference(
-        newImplicitAssociationColumn(
-            new SchemaReference("PRIVATE", "LIBRARY"), "MAGAZINEARTICLES", "AUTHORID"),
-        newImplicitAssociationColumn(pkColumn));
-    builder.build();
-    // 8. Two column references
-    builder
-        .withName("8_weak_two_references")
-        .addColumnReference(
-            newImplicitAssociationColumn(
-                new SchemaReference("PRIVATE", "ALLSALES"), "REGIONS", "POSTALCODE"),
-            newImplicitAssociationColumn(
-                new SchemaReference("PUBLIC", "PUBLISHER SALES"), "SALES", "POSTALCODE"));
-    builder.addColumnReference(
-        newImplicitAssociationColumn(
-            new SchemaReference("PRIVATE", "ALLSALES"), "REGIONS", "COUNTRY"),
-        newImplicitAssociationColumn(
-            new SchemaReference("PUBLIC", "PUBLISHER SALES"), "SALES", "COUNTRY"));
-    builder.build();
-    // 9. Self-reference
-    builder
-        .withName("9_weak_self_reference")
-        .addColumnReference(
-            newImplicitAssociationColumn(
-                new SchemaReference("PUBLIC", "BOOKS"), "BOOKS", "OTHEREDITIONID"),
-            newImplicitAssociationColumn(new SchemaReference("PUBLIC", "BOOKS"), "BOOKS", "ID"));
-    builder.build();
-    // 10. Self-reference in partial table (not built)
-    builder
-        .withName("10_weak_partial_self_reference")
-        .addColumnReference(
-            newImplicitAssociationColumn(
-                new SchemaReference("PRIVATE", "LIBRARY"), "BOOKS", "PREVIOUSEDITIONID"),
-            newImplicitAssociationColumn(new SchemaReference("PRIVATE", "LIBRARY"), "BOOKS", "ID"));
-    builder.build();
-    // 11. Duplicate weak association (not built)
-    builder
-        .withName("1_weak_duplicate")
-        .addColumnReference(
-            newImplicitAssociationColumn(fkColumn), newImplicitAssociationColumn(pkColumn));
-    builder.build();
-    // 12. Same as foreign key
-    builder
-        .withName("12_same_as_fk")
-        .addColumnReference(
-            newImplicitAssociationColumn(
-                new SchemaReference("PUBLIC", "BOOKS"), "BOOKAUTHORS", "AUTHORID"),
-            newImplicitAssociationColumn(pkColumn));
-    final TableReference optionalTableRef = builder.build();
-    assertThat(optionalTableRef, is(not(nullValue())));
-    assertThat(optionalTableRef, instanceOf(ForeignKey.class));
-    assertThat(optionalTableRef.getName(), is("Z_FK_AUTHOR"));
-
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
-      final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
-      assertThat("Schema count does not match", schemas, arrayWithSize(5));
-      for (final Schema schema : schemas) {
-        out.println("schema: " + schema.getFullName());
-        final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
-        for (final Table table : tables) {
-          out.println("  table: " + table.getFullName());
-          for (final WeakAssociation foreignKey : table.getWeakAssociations()) {
-            out.println("    weak association: " + foreignKey.getName());
-            out.println("      column references: ");
-            final List<ColumnReference> columnReferences = foreignKey.getColumnReferences();
-            for (int i = 0; i < columnReferences.size(); i++) {
-              final ColumnReference columnReference = columnReferences.get(i);
-              out.println("        key sequence: " + (i + 1));
-              out.println("          " + columnReference);
-            }
           }
         }
       }

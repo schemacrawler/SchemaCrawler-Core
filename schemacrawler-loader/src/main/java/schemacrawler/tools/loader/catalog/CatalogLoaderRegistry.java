@@ -18,7 +18,6 @@ import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.schemacrawler.exceptions.SchemaCrawlerException;
 import schemacrawler.tools.loader.catalog.counts.TableRowCountsLoaderProvider;
 import schemacrawler.tools.loader.catalog.offline.OfflineCatalogLoaderProvider;
-import schemacrawler.tools.loader.catalog.weakassociations.WeakAssociationsCatalogLoaderProvider;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
@@ -44,8 +43,7 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
         List.of(
             new OfflineCatalogLoaderProvider(),
             new PrimaryCatalogLoaderProvider(),
-            new TableRowCountsLoaderProvider(),
-            new WeakAssociationsCatalogLoaderProvider()));
+            new TableRowCountsLoaderProvider()));
   }
 
   public ChainedCatalogLoader newChainedCatalogLoader(
