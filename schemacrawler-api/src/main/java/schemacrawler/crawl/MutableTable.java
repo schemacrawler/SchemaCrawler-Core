@@ -54,7 +54,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   private final NamedObjectList<MutableColumn> columns = new NamedObjectList<>();
   private final NamedObjectList<TableConstraint> constraints = new NamedObjectList<>();
   private final NamedObjectList<MutableForeignKey> foreignKeys = new NamedObjectList<>();
-  private final NamedObjectList<MutableWeakAssociation> weakAssociations = new NamedObjectList<>();
   private final NamedObjectList<MutableColumn> hiddenColumns = new NamedObjectList<>();
   private final NamedObjectList<MutableIndex> indexes = new NamedObjectList<>();
   private final NamedObjectList<MutablePrivilege<Table>> privileges = new NamedObjectList<>();
@@ -227,7 +226,7 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   @Override
   @Deprecated(forRemoval = true)
   public Collection<WeakAssociation> getWeakAssociations() {
-    return getTableReferences(weakAssociations, TableAssociationType.all);
+    return List.of();
   }
 
   @Override
@@ -348,10 +347,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
 
   final void addTrigger(final MutableTrigger trigger) {
     triggers.add(trigger);
-  }
-
-  final void addWeakAssociation(final MutableWeakAssociation weakAssociation) {
-    weakAssociations.add(weakAssociation);
   }
 
   final NamedObjectList<MutableColumn> getAllColumns() {

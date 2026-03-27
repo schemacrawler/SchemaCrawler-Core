@@ -14,7 +14,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.jupiter.api.Test;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.loader.catalog.counts.TableRowCountsLoaderProvider;
-import schemacrawler.tools.loader.catalog.weakassociations.WeakAssociationsCatalogLoaderProvider;
 import schemacrawler.tools.loader.ermodel.attributes.AttributesLoaderProvider;
 
 public class LoaderPluginCommandTest {
@@ -42,18 +41,6 @@ public class LoaderPluginCommandTest {
             """
             PluginCommand[name='attributesloader', options=[\
             PluginCommandOption[name='attributes-file', valueClass=java.lang.String]\
-            ]]\
-            """));
-
-    final PluginCommand weakAssociationsPluginCommand =
-        new WeakAssociationsCatalogLoaderProvider().getCommandLineCommand();
-    assertThat(
-        weakAssociationsPluginCommand.toString(),
-        is(
-            """
-            PluginCommand[name='weakassociationsloader', options=[\
-            PluginCommandOption[name='weak-associations', valueClass=java.lang.Boolean], \
-            PluginCommandOption[name='infer-extension-tables', valueClass=java.lang.Boolean]\
             ]]\
             """));
   }
