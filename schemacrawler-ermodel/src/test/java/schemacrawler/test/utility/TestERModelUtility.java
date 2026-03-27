@@ -34,7 +34,10 @@ public class TestERModelUtility {
   private static void loadImplicitAssociations(final Catalog catalog, final ERModel erModel) {
 
     final ImplicitAssociationAnalyzer associationAnalyzer =
-        ImplicitAssociationAnalyzerBuilder.completeBuilder(erModel.getTables()).build();
+        ImplicitAssociationAnalyzerBuilder.builder(erModel.getTables())
+            .withIdMatcher()
+            .withExtensionTableMatcher()
+            .build();
 
     final Collection<ColumnReference> implicitAssociations = associationAnalyzer.analyzeTables();
     final ImplicitRelationshipBuilder implicitRelationshipBuilder =

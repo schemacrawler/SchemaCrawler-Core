@@ -72,11 +72,16 @@ final class ImplicitAssociationsLoader
    * execution state
    */
   private void loadImplicitAssociations() {
+    final ImplicitAssociationsLoaderOptions options = getCommandOptions();
     final Catalog catalog = getCatalog();
     final ERModel erModel = getERModel();
 
-    final ImplicitAssociationAnalyzer associationAnalyzer =
-        ImplicitAssociationAnalyzerBuilder.completeBuilder(erModel.getTables()).build();
+    final ImplicitAssociationAnalyzerBuilder associationAnalyzerBuilder =
+        ImplicitAssociationAnalyzerBuilder.builder(erModel.getTables()).withIdMatcher();
+    if (options.inferExtensionTables()) {
+      associationAnalyzerBuilder.withExtensionTableMatcher();
+    }
+    final ImplicitAssociationAnalyzer associationAnalyzer = associationAnalyzerBuilder.build();
 
     final Collection<ColumnReference> implicitAssociations = associationAnalyzer.analyzeTables();
     if (implicitAssociations == null || implicitAssociations.isEmpty()) {
