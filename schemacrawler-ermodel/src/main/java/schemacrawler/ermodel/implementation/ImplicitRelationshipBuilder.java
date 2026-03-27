@@ -41,7 +41,10 @@ public final class ImplicitRelationshipBuilder implements Builder<TableReference
   private ImplicitRelationshipBuilder(final Catalog catalog, final ERModel erModel) {
     implicitAssociationBuilder = ImplicitAssociationBuilder.builder(catalog);
     requireNonNull(erModel, "No ER model provided");
-    this.erModel = (MutableERModel) erModel;
+    if (!(erModel instanceof final MutableERModel mutableERModel)) {
+      throw new IllegalArgumentException("ER model cannot be loaded");
+    }
+    this.erModel = mutableERModel;
   }
 
   public ImplicitRelationshipBuilder addColumnReference(

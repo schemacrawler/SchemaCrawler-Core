@@ -26,7 +26,17 @@ record ProposedAssociation(Column foreignKeyColumn, Column primaryKeyColumn)
 
   @Override
   public int compareTo(final ColumnReference o) {
-    return 0;
+    throw new UnsupportedOperationException("Prevent adding to collection");
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    throw new UnsupportedOperationException("Prevent adding to collection");
+  }
+
+  @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException("Prevent adding to collection");
   }
 
   @Override

@@ -8,11 +8,15 @@
 
 package schemacrawler.tools.loader.ermodel.implicitassociations;
 
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.ermodel.implementation.ERModelImplicitAssociationBuilder;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.implementation.ImplicitRelationshipBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.ColumnReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.loader.ermodel.AbstractERModelLoader;
 import us.fatehi.utility.property.PropertyName;
@@ -63,13 +67,32 @@ final class ImplicitAssociationsLoader
     }
   }
 
+  /**
+   * The ER model is enhanced with implicit associations, so no need to set it back into the
+   * execution state
+   */
   private void loadImplicitAssociations() {
     final Catalog catalog = getCatalog();
     final ERModel erModel = getERModel();
-    final ERModelImplicitAssociationBuilder builder =
-        ERModelImplicitAssociationBuilder.builder(catalog, erModel);
-    builder.build();
-    // The ER model is enhanced with implicit associations, so no need to set it back into the
-    // execution state
+
+    final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer =
+        ImplicitAssociationsAnalyzerBuilder.completeBuilder(erModel.getTables()).build();
+
+    final Collection<ColumnReference> implicitAssociations =
+        implicitAssociationsAnalyzer.analyzeTables();
+    if (implicitAssociations == null || implicitAssociations.isEmpty()) {
+      return;
+    }
+
+    final ImplicitRelationshipBuilder implicitRelationshipBuilder =
+        ImplicitRelationshipBuilder.builder(catalog, erModel);
+
+    // Implicit associations have only one column reference each, so convert each
+    // column reference to a relationship
+    for (final ColumnReference implicitAssociation : implicitAssociations) {
+      implicitRelationshipBuilder.addColumnReference(
+          implicitAssociation.getForeignKeyColumn(), implicitAssociation.getPrimaryKeyColumn());
+      implicitRelationshipBuilder.build();
+    }
   }
 }
