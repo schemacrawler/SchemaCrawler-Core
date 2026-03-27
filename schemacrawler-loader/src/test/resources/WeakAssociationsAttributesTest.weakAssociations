@@ -71,7 +71,7 @@ schema: PUBLIC.BOOKS
           PUBLIC.BOOKS.BOOKS.OTHEREDITIONID --> PUBLIC.BOOKS.BOOKS.ID
       attributes: 
         REMARKS: 
-    weak-association: SCHCRWLR_AFD2BA21_B8DA20C0
+    weak-association: SCHCRWLR_20BE6F95_3B49BEC4
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.PUBLISHERID --> PUBLIC.BOOKS.PUBLISHERS.ID
@@ -101,7 +101,7 @@ schema: PUBLIC.BOOKS
           PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΕΚΔΌΤΗΣ --> PUBLIC.BOOKS.PUBLISHERS.ID
       attributes: 
         PK_NAME: SYS_PK_10127
-    weak-association: SCHCRWLR_AFD2BA21_B8DA20C0
+    weak-association: SCHCRWLR_20BE6F95_3B49BEC4
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.PUBLISHERID --> PUBLIC.BOOKS.PUBLISHERS.ID

@@ -15,7 +15,9 @@ import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 import static us.fatehi.utility.Utility.isBlank;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +26,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.model.Entity;
+import schemacrawler.ermodel.model.Relationship;
+import schemacrawler.ermodel.model.TableReferenceRelationship;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
@@ -31,7 +37,6 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
-import schemacrawler.schema.WeakAssociation;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.LoadOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -54,6 +59,7 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 public class WeakAssociationsAttributesTest {
 
   private Catalog catalog;
+  private ERModel erModel;
 
   @BeforeAll
   public void loadCatalog(
@@ -80,7 +86,7 @@ public class WeakAssociationsAttributesTest {
     catalog =
         SchemaCrawlerUtility.getCatalog(
             connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
-    SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
+    erModel = SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
   }
 
   /** Keep in sync with {@link SchemaCrawlerTest#weakAssociations() LabelName} */
@@ -97,13 +103,36 @@ public class WeakAssociationsAttributesTest {
           out.println("  table: " + table.getFullName());
           final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
           printTableReferences("foreign-key", foreignKeys, out);
-          final Collection<WeakAssociation> weakAssociations = table.getWeakAssociations();
+          final Collection<? extends TableReference> weakAssociations =
+              getImplicitAssociations(table);
           printTableReferences("weak-association", weakAssociations, out);
         }
       }
     }
     assertThat(
         outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+  }
+
+  private Collection<? extends TableReference> getImplicitAssociations(final Table table) {
+    final Entity entity = erModel.lookupEntity(table).orElse(null);
+    if (entity == null) {
+      return List.of();
+    }
+    final List<TableReference> implicitAssociations = new ArrayList<>();
+    for (final Relationship rel : entity.getImplicitRelationships()) {
+      if (rel instanceof final TableReferenceRelationship tableRel) {
+        final TableReference tableReference = tableRel.getTableReference();
+        implicitAssociations.add(tableReference);
+      }
+    }
+    erModel.getUnmodeledTableReferences().stream()
+        .filter(
+            tableRel ->
+                tableRel.getPrimaryKeyTable().equals(table)
+                    || tableRel.getForeignKeyTable().equals(table))
+        .forEach(implicitAssociations::add);
+    Collections.sort(implicitAssociations);
+    return implicitAssociations;
   }
 
   private void printTableReferences(

@@ -12,6 +12,7 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.crawl.LightColumnReference;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class ExtensionTableMatcherTest {
@@ -73,11 +74,10 @@ public class ExtensionTableMatcherTest {
 
     final ExtensionTableMatcher matcher = new ExtensionTableMatcher(new TableMatchKeys(tables));
 
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumnTop1)), is(true));
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumnTop2)), is(true));
-    assertThat(matcher.test(new ImplicitColumnReference(fkColumn, pkColumnLow)), is(true));
-    assertThat(
-        matcher.test(new ImplicitColumnReference(fkColumnSchema2, pkColumnSchema2)), is(true));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumnTop1)), is(true));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumnTop2)), is(true));
+    assertThat(matcher.test(new LightColumnReference(fkColumn, pkColumnLow)), is(true));
+    assertThat(matcher.test(new LightColumnReference(fkColumnSchema2, pkColumnSchema2)), is(true));
   }
 
   private Column mockColumn(
