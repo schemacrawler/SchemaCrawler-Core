@@ -60,13 +60,7 @@ public final class ImplicitRelationshipBuilder implements Builder<TableReference
   @Override
   public TableReferenceRelationship build() {
     final TableReference implicitAssociation = implicitAssociationBuilder.build();
-    if (implicitAssociation == null) {
-      return null;
-    }
-
-    final TableReferenceRelationship implicitRelationship =
-        addTableReferenceRelationship(implicitAssociation);
-    return implicitRelationship;
+    return addTableReferenceRelationship(implicitAssociation);
   }
 
   public ImplicitRelationshipBuilder withName(final String weakAssociationName) {
@@ -88,55 +82,46 @@ public final class ImplicitRelationshipBuilder implements Builder<TableReference
       return null;
     }
 
+    final MutableTableReferenceRelationship rel =
+        new MutableTableReferenceRelationship(implicitAssociation);
+
     final Table leftTable = implicitAssociation.getForeignKeyTable();
     final Table rightTable = implicitAssociation.getPrimaryKeyTable();
-    final Entity leftEntity = erModel.lookupEntity(leftTable).orElse(null);
-    final Entity rightEntity = erModel.lookupEntity(rightTable).orElse(null);
 
+    // Check if the association is an actual foreign key. If it is, it's not truly
+    // an implicit association, but one already defined
+    // in the database.
     if (implicitAssociation instanceof ForeignKey) {
       LOGGER.log(
           Level.FINE,
           new StringFormat(
               "Implicit association <%s> not modeled from foreign key <%s> -> <%s>",
               implicitAssociation, leftTable, rightTable));
-      final MutableTableReferenceRelationship rel =
-          new MutableTableReferenceRelationship(implicitAssociation);
       return rel;
     }
 
-    final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(leftTable);
-    if (modelInferrer.inferBridgeTable()) {
-      LOGGER.log(
-          Level.FINE,
-          new StringFormat(
-              "Implicit association <%s> not built from bridge table <%s>",
-              implicitAssociation, leftTable));
-      return addUnmodeled(implicitAssociation);
-    }
-
+    // Lookup the entities in the ER model. If both sides of the relationship
+    // are not found as entities, the relationship cannot be modeled.
+    final Entity leftEntity = erModel.lookupEntity(leftTable).orElse(null);
+    final Entity rightEntity = erModel.lookupEntity(rightTable).orElse(null);
     if (leftEntity == null || rightEntity == null) {
       LOGGER.log(
           Level.FINE,
           new StringFormat(
               "Implicit association <%s> cannot be modeled from <%s> -> <%s>",
               implicitAssociation, leftTable, rightTable));
-      return addUnmodeled(implicitAssociation);
+      erModel.addUnmodeledTableReference(implicitAssociation);
+      return rel;
     }
 
-    final MutableTableReferenceRelationship rel =
-        new MutableTableReferenceRelationship(implicitAssociation);
+    // Create a new relationship, and set its cardinality and entities.
+    final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(leftTable);
     final RelationshipCardinality cardinality = modelInferrer.inferCardinality(implicitAssociation);
     rel.setCardinality(cardinality);
     rel.setEntities(leftEntity, rightEntity);
 
+    // Add the implicit relationship to the ER model.
     erModel.addImplicitRelationship(rel);
-    return rel;
-  }
-
-  private TableReferenceRelationship addUnmodeled(final TableReference implicitAssociation) {
-    final MutableTableReferenceRelationship rel =
-        new MutableTableReferenceRelationship(implicitAssociation);
-    erModel.addUnmodeledTableReference(implicitAssociation);
     return rel;
   }
 }
