@@ -11,8 +11,8 @@ package schemacrawler.tools.loader.ermodel.implicitassociations;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.associations.ImplicitAssociationAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationAnalyzerBuilder;
 import schemacrawler.ermodel.implementation.ImplicitRelationshipBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
@@ -75,11 +75,10 @@ final class ImplicitAssociationsLoader
     final Catalog catalog = getCatalog();
     final ERModel erModel = getERModel();
 
-    final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer =
-        ImplicitAssociationsAnalyzerBuilder.completeBuilder(erModel.getTables()).build();
+    final ImplicitAssociationAnalyzer associationAnalyzer =
+        ImplicitAssociationAnalyzerBuilder.completeBuilder(erModel.getTables()).build();
 
-    final Collection<ColumnReference> implicitAssociations =
-        implicitAssociationsAnalyzer.analyzeTables();
+    final Collection<ColumnReference> implicitAssociations = associationAnalyzer.analyzeTables();
     if (implicitAssociations == null || implicitAssociations.isEmpty()) {
       return;
     }

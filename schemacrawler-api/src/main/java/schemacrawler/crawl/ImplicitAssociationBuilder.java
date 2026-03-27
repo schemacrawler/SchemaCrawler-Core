@@ -137,12 +137,11 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
     final Iterator<ColumnReference> iterator = columnReferences.iterator();
 
     final ColumnReference someColumnReference = iterator.next();
-    final Table referencedTable = someColumnReference.getPrimaryKeyColumn().getParent();
-    final Table dependentTable = someColumnReference.getForeignKeyColumn().getParent();
 
     if (isBlank(implicitAssociationName)) {
-      implicitAssociationName =
-          RetrieverUtility.constructForeignKeyName(referencedTable, dependentTable);
+      final Table pkTable = someColumnReference.getPrimaryKeyColumn().getParent();
+      final Table fkTable = someColumnReference.getForeignKeyColumn().getParent();
+      implicitAssociationName = RetrieverUtility.constructForeignKeyName(fkTable, pkTable);
     }
 
     final MutableImplicitAssociation implicitAssociation =

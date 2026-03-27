@@ -20,8 +20,8 @@ import java.util.Collection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.associations.ImplicitAssociationAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationAnalyzerBuilder;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
@@ -48,12 +48,12 @@ public class ImplicitAssociationsAnalyzerTest {
 
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
-      final ImplicitAssociationsAnalyzerBuilder builder =
-          ImplicitAssociationsAnalyzerBuilder.builder(catalog.getTables())
+      final ImplicitAssociationAnalyzerBuilder builder =
+          ImplicitAssociationAnalyzerBuilder.builder(catalog.getTables())
               .withIdMatcher()
               .withExtensionTableMatcher();
 
-      final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer = builder.build();
+      final ImplicitAssociationAnalyzer implicitAssociationsAnalyzer = builder.build();
       final Collection<ColumnReference> proposedAssociations =
           implicitAssociationsAnalyzer.analyzeTables();
       assertThat(
