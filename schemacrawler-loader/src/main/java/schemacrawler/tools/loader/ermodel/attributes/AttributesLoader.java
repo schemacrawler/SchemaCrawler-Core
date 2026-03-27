@@ -15,11 +15,12 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.ImplicitAssociationBuilder.ImplicitAssociationColumn;
-import schemacrawler.crawl.WeakAssociationBuilder;
+import schemacrawler.ermodel.implementation.ImplicitRelationshipBuilder;
+import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.model.TableReferenceRelationship;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import schemacrawler.tools.loader.catalog.model.CatalogAttributes;
@@ -60,6 +61,7 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
     final String catalogAttributesFile = commandOptions.catalogAttributesFile();
     try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadAttributes", 1); ) {
       final Catalog catalog = getCatalog();
+      final ERModel erModel = getERModel();
       final TaskDefinition.TaskRunnable taskRunnable =
           () -> {
             final InputResource inputResource =
@@ -71,7 +73,7 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
                                     .formatted(catalogAttributesFile)));
             final CatalogAttributes catalogAttributes = readCatalogAttributes(inputResource);
             loadRemarks(catalog, catalogAttributes);
-            loadWeakAssociations(catalog, catalogAttributes);
+            loadWeakAssociations(catalog, erModel, catalogAttributes);
           };
       taskRunner.add(new TaskDefinition("retrieveCatalogAttributes", taskRunnable));
       taskRunner.submit();
@@ -113,8 +115,9 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
   }
 
   private void loadWeakAssociations(
-      final Catalog catalog, final CatalogAttributes catalogAttributes) {
-    final WeakAssociationBuilder weakAssociationBuilder = WeakAssociationBuilder.builder(catalog);
+      final Catalog catalog, final ERModel erModel, final CatalogAttributes catalogAttributes) {
+    final ImplicitRelationshipBuilder relationshipBuilder =
+        ImplicitRelationshipBuilder.builder(catalog, erModel);
     for (final WeakAssociationAttributes weakAssociationAttributes :
         catalogAttributes.getWeakAssociations()) {
 
@@ -133,18 +136,18 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
             new ImplicitAssociationColumn(
                 pkTableAttributes.getSchema(), pkTableAttributes.getName(), pkColumnName);
 
-        weakAssociationBuilder.addColumnReference(fkColumn, pkColumn);
+        relationshipBuilder.addColumnReference(fkColumn, pkColumn);
       }
 
-      weakAssociationBuilder.withName(weakAssociationAttributes.getName());
+      relationshipBuilder.withName(weakAssociationAttributes.getName());
 
-      final TableReference implicitAssociation = weakAssociationBuilder.build();
-
-      if (implicitAssociation != null) {
-        implicitAssociation.setRemarks(weakAssociationAttributes.getRemarks());
+      final TableReferenceRelationship implicitRelationship = relationshipBuilder.build();
+      // Set remarks and attributes
+      if (implicitRelationship != null) {
+        implicitRelationship.setRemarks(weakAssociationAttributes.getRemarks());
         for (final Entry<String, String> attribute :
             weakAssociationAttributes.getAttributes().entrySet()) {
-          implicitAssociation.setAttribute(attribute.getKey(), attribute.getValue());
+          implicitRelationship.setAttribute(attribute.getKey(), attribute.getValue());
         }
       }
     }

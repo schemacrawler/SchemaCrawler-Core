@@ -11,6 +11,7 @@ package schemacrawler.ermodel.model;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 
@@ -68,6 +69,8 @@ public interface ERModel extends Serializable {
    * @return All tables
    */
   Collection<Table> getTables();
+
+  Set<TableReference> getUnmodeledTableReferences();
 
   /**
    * Gets all tables from the catalog that are not modeled as entities or relationships.

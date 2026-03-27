@@ -16,7 +16,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntitySubtype;
@@ -35,12 +37,14 @@ public class MutableERModel implements ERModel {
       EnumSet.of(EntityType.strong_entity, EntityType.weak_entity, EntityType.subtype);
 
   private final Map<NamedObjectKey, Table> tablesMap;
+  private final Set<TableReference> unmodeledTableReferences;
   private final Map<NamedObjectKey, Entity> entitiesMap;
   private final Map<NamedObjectKey, Relationship> relationshipsMap;
   private final Map<NamedObjectKey, Relationship> implicitRelationshipsMap;
 
   public MutableERModel() {
     tablesMap = new ConcurrentHashMap<>();
+    unmodeledTableReferences = new CopyOnWriteArraySet<>();
     entitiesMap = new ConcurrentHashMap<>();
     relationshipsMap = new ConcurrentHashMap<>();
     implicitRelationshipsMap = new ConcurrentHashMap<>();
@@ -108,6 +112,11 @@ public class MutableERModel implements ERModel {
   }
 
   @Override
+  public Set<TableReference> getUnmodeledTableReferences() {
+    return Set.copyOf(unmodeledTableReferences);
+  }
+
+  @Override
   public Collection<Table> getUnmodeledTables() {
     return tablesMap.keySet().stream()
         // Not a valid entity
@@ -130,7 +139,8 @@ public class MutableERModel implements ERModel {
     }
     final NamedObjectKey key = table.key();
     // Look up bridge table
-    // Only bridge tables can be looked up by this method, since the relationship key for many--many
+    // Only bridge tables can be looked up by this method, since the relationship
+    // key for many--many
     // relationships is the same as the bridge table key
     if (relationshipsMap.containsKey(key)) {
       return Optional.of(relationshipsMap.get(key));
@@ -224,6 +234,12 @@ public class MutableERModel implements ERModel {
   void addTable(final Table table) {
     if (table != null) {
       tablesMap.put(table.key(), table);
+    }
+  }
+
+  void addUnmodeledTableReference(final TableReference tableRef) {
+    if (tableRef != null) {
+      unmodeledTableReferences.add(tableRef);
     }
   }
 
