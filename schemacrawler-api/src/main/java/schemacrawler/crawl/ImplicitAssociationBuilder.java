@@ -113,10 +113,10 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
   @Override
   public TableReference build() {
     final TableReference tableRef = findOrCreate();
-    columnReferences.clear();
     if (tableRef != null && !(tableRef instanceof ForeignKey)) {
       previouslyBuilt.add(tableRef);
     }
+    clearWorkingState();
     return tableRef;
   }
 
@@ -125,6 +125,11 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
       implicitAssociationName = weakAssociationName;
     }
     return this;
+  }
+
+  private void clearWorkingState() {
+    columnReferences.clear();
+    implicitAssociationName = null;
   }
 
   private TableReference findOrCreate() {
