@@ -38,15 +38,15 @@ import us.fatehi.utility.string.StringFormat;
  *   <li>Validate proposed pairs and apply configured match rules.
  * </ol>
  */
-public final class ImplicitAssociationsAnalyzer {
+public final class ImplicitAssociationAnalyzer {
 
   private static final Logger LOGGER =
-      Logger.getLogger(ImplicitAssociationsAnalyzer.class.getName());
+      Logger.getLogger(ImplicitAssociationAnalyzer.class.getName());
 
   private final TableMatchKeys tableMatchKeys;
   private final Predicate<ColumnReference> implicitAssociationRule;
 
-  ImplicitAssociationsAnalyzer(
+  ImplicitAssociationAnalyzer(
       final TableMatchKeys matchKeys, final Predicate<ColumnReference> implicitAssociationRule) {
     tableMatchKeys = requireNonNull(matchKeys, "No table match keys provided");
     this.implicitAssociationRule = requireNonNull(implicitAssociationRule, "No rules provided");

@@ -13,21 +13,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.emptyString;
 import static schemacrawler.schema.TableConstraintType.weak_association;
-import static schemacrawler.tools.utility.SchemaCrawlerUtility.getCatalog;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
+import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.WeakAssociation;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.LoadOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -35,9 +36,11 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.test.utility.DatabaseTestUtility;
+import schemacrawler.test.utility.ProposedWeakAssociationsTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
+import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.test.utility.extensions.TestContext;
@@ -49,6 +52,7 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 public class WeakAssociationsTest {
 
   private Catalog catalog;
+  private ERModel erModel;
 
   @BeforeAll
   public void loadCatalog(final DatabaseConnectionSource connectionSource) throws Exception {
@@ -73,8 +77,9 @@ public class WeakAssociationsTest {
     additionalConfig.put("weak-associations", true);
 
     catalog =
-        getCatalog(
+        SchemaCrawlerUtility.getCatalog(
             connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
+    erModel = SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
   }
 
   @Test
@@ -88,20 +93,23 @@ public class WeakAssociationsTest {
         final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
         for (final Table table : tables) {
           out.println("  table: " + table.getFullName());
-          for (final WeakAssociation weakAssociation : table.getWeakAssociations()) {
-            out.println("    weak association: " + weakAssociation.getName());
+          final Collection<? extends TableReference> implicitAssociations =
+              ProposedWeakAssociationsTestUtility.collectImplicitAssociations(table, erModel);
+          for (final TableReference implicitAssociation : implicitAssociations) {
+            out.println("    weak association: " + implicitAssociation.getName());
             out.println("      column references: ");
-            final List<ColumnReference> columnReferences = weakAssociation.getColumnReferences();
+            final List<ColumnReference> columnReferences =
+                implicitAssociation.getColumnReferences();
             for (int i = 0; i < columnReferences.size(); i++) {
               final ColumnReference columnReference = columnReferences.get(i);
               out.println("        key sequence: " + (i + 1));
               out.println("          " + columnReference);
             }
-            assertThat(weakAssociation.getDefinition(), is(emptyString()));
-            assertThat(weakAssociation.getType(), is(weak_association));
-            assertThat(weakAssociation.hasDefinition(), is(false));
-            assertThat(weakAssociation.isDeferrable(), is(false));
-            assertThat(weakAssociation.isInitiallyDeferred(), is(false));
+            assertThat(implicitAssociation.getDefinition(), is(emptyString()));
+            assertThat(implicitAssociation.getType(), is(weak_association));
+            assertThat(implicitAssociation.hasDefinition(), is(false));
+            assertThat(implicitAssociation.isDeferrable(), is(false));
+            assertThat(implicitAssociation.isInitiallyDeferred(), is(false));
           }
         }
       }

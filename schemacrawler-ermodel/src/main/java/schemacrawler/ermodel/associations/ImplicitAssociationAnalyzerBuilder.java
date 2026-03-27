@@ -19,42 +19,35 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.Builder;
 
-public class ImplicitAssociationsAnalyzerBuilder implements Builder<ImplicitAssociationsAnalyzer> {
+public class ImplicitAssociationAnalyzerBuilder implements Builder<ImplicitAssociationAnalyzer> {
 
-  public static ImplicitAssociationsAnalyzerBuilder builder(final Collection<Table> allTables) {
+  public static ImplicitAssociationAnalyzerBuilder builder(final Collection<Table> allTables) {
     requireNonNull(allTables, "No tables provided");
     final List<Table> tables = new ArrayList<>(allTables);
     Collections.sort(tables);
-    return new ImplicitAssociationsAnalyzerBuilder(List.copyOf(tables));
-  }
-
-  public static ImplicitAssociationsAnalyzerBuilder completeBuilder(
-      final Collection<Table> allTables) {
-    return ImplicitAssociationsAnalyzerBuilder.builder(allTables)
-        .withIdMatcher()
-        .withExtensionTableMatcher();
+    return new ImplicitAssociationAnalyzerBuilder(List.copyOf(tables));
   }
 
   private final TableMatchKeys tableMatchKeys;
   private Predicate<ColumnReference> implicitAssociationsRule;
 
-  private ImplicitAssociationsAnalyzerBuilder(final List<Table> allTables) {
+  private ImplicitAssociationAnalyzerBuilder(final List<Table> allTables) {
     tableMatchKeys = new TableMatchKeys(allTables);
     implicitAssociationsRule = colRef -> false;
   }
 
   @Override
-  public ImplicitAssociationsAnalyzer build() {
-    return new ImplicitAssociationsAnalyzer(tableMatchKeys, implicitAssociationsRule);
+  public ImplicitAssociationAnalyzer build() {
+    return new ImplicitAssociationAnalyzer(tableMatchKeys, implicitAssociationsRule);
   }
 
-  public ImplicitAssociationsAnalyzerBuilder withExtensionTableMatcher() {
+  public ImplicitAssociationAnalyzerBuilder withExtensionTableMatcher() {
     implicitAssociationsRule =
         implicitAssociationsRule.or(new ExtensionTableMatcher(tableMatchKeys));
     return this;
   }
 
-  public ImplicitAssociationsAnalyzerBuilder withIdMatcher() {
+  public ImplicitAssociationAnalyzerBuilder withIdMatcher() {
     implicitAssociationsRule = implicitAssociationsRule.or(new IdMatcher());
     return this;
   }

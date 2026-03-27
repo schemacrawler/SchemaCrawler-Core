@@ -13,14 +13,21 @@ import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.model.Entity;
+import schemacrawler.ermodel.model.Relationship;
+import schemacrawler.ermodel.model.TableReferenceRelationship;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.WeakAssociation;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
@@ -63,19 +70,22 @@ public class ProposedWeakAssociationsTestUtility {
       final Catalog catalog =
           SchemaCrawlerUtility.getCatalog(
               connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, config);
+      final ERModel erModel = SchemaCrawlerUtility.buildERModel(catalog, config);
 
       final Schema schema = new SchemaReference("PUBLIC", "PUBLIC");
       final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
       Arrays.sort(tables, NamedObjectSort.alphabetical);
       for (final Table table : tables) {
         out.println("table: " + table.getFullName());
-        final Collection<WeakAssociation> weakAssociations = table.getWeakAssociations();
-        for (final WeakAssociation weakFk : weakAssociations) {
+        final Collection<? extends TableReference> implicitAssociations =
+            collectImplicitAssociations(table, erModel);
+        for (final TableReference implicitAssociation : implicitAssociations) {
+          // out.println("  weak association: %s".formatted(implicitAssociation.getName()));
           out.println("  weak association:");
-          for (final ColumnReference weakAssociationColumnReference : weakFk) {
-            out.println("    column reference: %s".formatted(weakAssociationColumnReference));
-            final Column fkColumn = weakAssociationColumnReference.getForeignKeyColumn();
-            final Column pkColumn = weakAssociationColumnReference.getPrimaryKeyColumn();
+          for (final ColumnReference colRef : implicitAssociation) {
+            out.println("    column reference: %s".formatted(colRef));
+            final Column fkColumn = colRef.getForeignKeyColumn();
+            final Column pkColumn = colRef.getPrimaryKeyColumn();
             if (fkColumn.isPartOfPrimaryKey()) {
               out.println("                      (fk is part of pk)");
             } else if (fkColumn.getName().equalsIgnoreCase(pkColumn.getName())) {
@@ -86,6 +96,29 @@ public class ProposedWeakAssociationsTestUtility {
       }
     }
     assertThat(outputOf(testout), hasSameContentAs(classpathResource(currentMethodFullName)));
+  }
+
+  public static Collection<? extends TableReference> collectImplicitAssociations(
+      final Table table, final ERModel erModel) {
+    final Entity entity = erModel.lookupEntity(table).orElse(null);
+    if (entity == null) {
+      return List.of();
+    }
+    final List<TableReference> implicitAssociations = new ArrayList<>();
+    for (final Relationship rel : entity.getImplicitRelationships()) {
+      if (rel instanceof final TableReferenceRelationship tableRel) {
+        final TableReference tableReference = tableRel.getTableReference();
+        implicitAssociations.add(tableReference);
+      }
+    }
+    erModel.getUnmodeledTableReferences().stream()
+        .filter(
+            tableRel ->
+                tableRel.getPrimaryKeyTable().equals(table)
+                    || tableRel.getForeignKeyTable().equals(table))
+        .forEach(implicitAssociations::add);
+    Collections.sort(implicitAssociations);
+    return implicitAssociations;
   }
 
   private ProposedWeakAssociationsTestUtility() {

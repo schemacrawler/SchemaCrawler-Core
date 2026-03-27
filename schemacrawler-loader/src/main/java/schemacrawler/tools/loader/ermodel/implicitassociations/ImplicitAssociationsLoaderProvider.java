@@ -30,6 +30,7 @@ public class ImplicitAssociationsLoaderProvider extends AbstractERModelLoaderPro
           "implicitassociationsloader", "Loader for implicit associations in ER Model");
 
   private static final String OPTION_IMPLICIT_ASSOCIATIONS = "implicit-associations";
+  private static final String OPTION_INFER_EXTENSION_TABLES = "infer-extension-tables";
 
   // NOTE: For backward compatibility only
   @Deprecated(forRemoval = true)
@@ -44,6 +45,12 @@ public class ImplicitAssociationsLoaderProvider extends AbstractERModelLoaderPro
         "Analyzes the schema to find implicit associations between entities, based on naming"
             + " patterns",
         "This can be a time consuming operation",
+        "Optional, defaults to false");
+    pluginCommand.addOption(
+        OPTION_INFER_EXTENSION_TABLES,
+        Boolean.class,
+        "Infers extension tables that have similarly named primary keys, and reports them as"
+            + " implicit associations",
         "Optional, defaults to false");
     return pluginCommand;
   }
@@ -69,6 +76,8 @@ public class ImplicitAssociationsLoaderProvider extends AbstractERModelLoaderPro
     final boolean loadWeakAssociations = config.getBooleanValue(OPTION_WEAK_ASSOCIATIONS);
     final boolean loadImplicitAssociations =
         config.getBooleanValue(OPTION_IMPLICIT_ASSOCIATIONS) || loadWeakAssociations;
-    return new ImplicitAssociationsLoaderOptions(loadImplicitAssociations);
+    final boolean inferExtensionTables =
+        config.getBooleanValue(OPTION_INFER_EXTENSION_TABLES, false);
+    return new ImplicitAssociationsLoaderOptions(loadImplicitAssociations, inferExtensionTables);
   }
 }

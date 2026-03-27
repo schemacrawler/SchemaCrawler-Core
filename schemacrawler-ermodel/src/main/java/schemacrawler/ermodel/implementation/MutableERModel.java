@@ -13,6 +13,7 @@ import static java.util.function.Predicate.not;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,7 +74,9 @@ public class MutableERModel implements ERModel {
 
   @Override
   public Collection<Relationship> getImplicitRelationships() {
-    return List.copyOf(implicitRelationshipsMap.values().stream().sorted().toList());
+    final Set<Relationship> implicitRelationships =
+        new HashSet<>(implicitRelationshipsMap.values());
+    return List.copyOf(implicitRelationships.stream().sorted().toList());
   }
 
   @Override

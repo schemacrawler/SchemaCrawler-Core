@@ -11,8 +11,8 @@ package schemacrawler.test.utility;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzer;
-import schemacrawler.ermodel.associations.ImplicitAssociationsAnalyzerBuilder;
+import schemacrawler.ermodel.associations.ImplicitAssociationAnalyzer;
+import schemacrawler.ermodel.associations.ImplicitAssociationAnalyzerBuilder;
 import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.implementation.ImplicitRelationshipBuilder;
 import schemacrawler.ermodel.model.ERModel;
@@ -33,11 +33,13 @@ public class TestERModelUtility {
 
   private static void loadImplicitAssociations(final Catalog catalog, final ERModel erModel) {
 
-    final ImplicitAssociationsAnalyzer implicitAssociationsAnalyzer =
-        ImplicitAssociationsAnalyzerBuilder.completeBuilder(erModel.getTables()).build();
+    final ImplicitAssociationAnalyzer associationAnalyzer =
+        ImplicitAssociationAnalyzerBuilder.builder(erModel.getTables())
+            .withIdMatcher()
+            .withExtensionTableMatcher()
+            .build();
 
-    final Collection<ColumnReference> implicitAssociations =
-        implicitAssociationsAnalyzer.analyzeTables();
+    final Collection<ColumnReference> implicitAssociations = associationAnalyzer.analyzeTables();
     final ImplicitRelationshipBuilder implicitRelationshipBuilder =
         ImplicitRelationshipBuilder.builder(catalog, erModel);
     for (final ColumnReference implicitAssociation : implicitAssociations) {

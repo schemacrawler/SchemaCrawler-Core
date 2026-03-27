@@ -60,10 +60,13 @@ public class ImplicitAssociationsERModelLoaderTest {
 
   @Test
   public void loaderAddsImplicitAssociationsWhenEnabled() {
-    final ERModel erModel = SchemaCrawlerUtility.buildERModel(catalog);
 
     final Config config = ConfigUtility.newConfig();
     config.put("implicit-associations", true);
+    config.put("infer-extension-tables", true);
+
+    final ERModel erModel = SchemaCrawlerUtility.buildERModel(catalog, config);
+
     final ImplicitAssociationsLoaderProvider provider = new ImplicitAssociationsLoaderProvider();
     final ERModelLoader<?> loader = provider.newCommand(config);
     loader.setCatalog(catalog);
@@ -131,14 +134,18 @@ public class ImplicitAssociationsERModelLoaderTest {
 
   @Test
   public void loaderOptionsCanBeDisabled() {
-    final ImplicitAssociationsLoaderOptions options = new ImplicitAssociationsLoaderOptions(false);
+    final ImplicitAssociationsLoaderOptions options =
+        new ImplicitAssociationsLoaderOptions(false, false);
     assertThat(options.loadImplicitAssociations(), is(false));
+    assertThat(options.inferExtensionTables(), is(false));
   }
 
   @Test
   public void loaderOptionsDefaultToEnabled() {
-    final ImplicitAssociationsLoaderOptions options = new ImplicitAssociationsLoaderOptions(true);
+    final ImplicitAssociationsLoaderOptions options =
+        new ImplicitAssociationsLoaderOptions(true, true);
     assertThat(options.loadImplicitAssociations(), is(true));
+    assertThat(options.inferExtensionTables(), is(true));
   }
 
   @Test

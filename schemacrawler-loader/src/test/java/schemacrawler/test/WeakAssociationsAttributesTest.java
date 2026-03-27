@@ -15,9 +15,7 @@ import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 import static us.fatehi.utility.Utility.isBlank;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,9 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.ermodel.model.Entity;
-import schemacrawler.ermodel.model.Relationship;
-import schemacrawler.ermodel.model.TableReferenceRelationship;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
@@ -44,6 +39,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.test.utility.DatabaseTestUtility;
+import schemacrawler.test.utility.ProposedWeakAssociationsTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
@@ -104,35 +100,13 @@ public class WeakAssociationsAttributesTest {
           final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
           printTableReferences("foreign-key", foreignKeys, out);
           final Collection<? extends TableReference> weakAssociations =
-              getImplicitAssociations(table);
+              ProposedWeakAssociationsTestUtility.collectImplicitAssociations(table, erModel);
           printTableReferences("weak-association", weakAssociations, out);
         }
       }
     }
     assertThat(
         outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
-  }
-
-  private Collection<? extends TableReference> getImplicitAssociations(final Table table) {
-    final Entity entity = erModel.lookupEntity(table).orElse(null);
-    if (entity == null) {
-      return List.of();
-    }
-    final List<TableReference> implicitAssociations = new ArrayList<>();
-    for (final Relationship rel : entity.getImplicitRelationships()) {
-      if (rel instanceof final TableReferenceRelationship tableRel) {
-        final TableReference tableReference = tableRel.getTableReference();
-        implicitAssociations.add(tableReference);
-      }
-    }
-    erModel.getUnmodeledTableReferences().stream()
-        .filter(
-            tableRel ->
-                tableRel.getPrimaryKeyTable().equals(table)
-                    || tableRel.getForeignKeyTable().equals(table))
-        .forEach(implicitAssociations::add);
-    Collections.sort(implicitAssociations);
-    return implicitAssociations;
   }
 
   private void printTableReferences(

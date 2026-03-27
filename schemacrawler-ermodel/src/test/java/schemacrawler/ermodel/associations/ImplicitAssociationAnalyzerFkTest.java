@@ -18,7 +18,7 @@ import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 
-public class ImplicitAssociationsAnalyzerFkTest {
+public class ImplicitAssociationAnalyzerFkTest {
 
   @Test
   public void implicitAssociationAddedIfFkDoesNotExist() {
@@ -35,8 +35,8 @@ public class ImplicitAssociationsAnalyzerFkTest {
     // Analyzer setup
     final List<Table> tables = List.of(tableA, tableB);
     final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
-    final ImplicitAssociationsAnalyzer analyzer =
-        new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
+    final ImplicitAssociationAnalyzer analyzer =
+        new ImplicitAssociationAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
     final Collection<ColumnReference> implicitAssociations = analyzer.analyzeTables();
@@ -68,8 +68,8 @@ public class ImplicitAssociationsAnalyzerFkTest {
     // Analyzer setup
     final List<Table> tables = List.of(tableA, tableB);
     final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
-    final ImplicitAssociationsAnalyzer analyzer =
-        new ImplicitAssociationsAnalyzer(tableMatchKeys, new IdMatcher());
+    final ImplicitAssociationAnalyzer analyzer =
+        new ImplicitAssociationAnalyzer(tableMatchKeys, new IdMatcher());
 
     // Execute
     final Collection<ColumnReference> implicitAssociations = analyzer.analyzeTables();
