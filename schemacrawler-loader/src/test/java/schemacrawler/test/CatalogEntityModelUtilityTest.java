@@ -16,7 +16,7 @@ import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import schemacrawler.ermodel.utility.EntityModelUtility;
+import schemacrawler.ermodel.utility.ERModelUtility;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
@@ -53,12 +53,11 @@ public class CatalogEntityModelUtilityTest {
           for (final ForeignKey fk : table.getForeignKeys()) {
             out.println(fk);
             out.println(
-                "  - cardinality=%s"
-                    .formatted(EntityModelUtility.inferCardinality(fk).description()));
-            out.println("  - covered by index=%s".formatted(EntityModelUtility.coveredByIndex(fk)));
+                "  - cardinality=%s".formatted(ERModelUtility.inferCardinality(fk).description()));
+            out.println("  - covered by index=%s".formatted(ERModelUtility.coveredByIndex(fk)));
             out.println(
                 "  - covered by unique index=%s"
-                    .formatted(EntityModelUtility.coveredByUniqueIndex(fk)));
+                    .formatted(ERModelUtility.coveredByUniqueIndex(fk)));
           }
         }
       }
@@ -74,9 +73,8 @@ public class CatalogEntityModelUtilityTest {
       for (final Schema schema : catalog.getSchemas()) {
         for (final Table table : catalog.getTables(schema)) {
           out.println(table);
-          out.println("  - entity type=%s".formatted(EntityModelUtility.inferEntityType(table)));
-          out.println(
-              "  - is bridge table=%s".formatted(EntityModelUtility.inferBridgeTable(table)));
+          out.println("  - entity type=%s".formatted(ERModelUtility.inferEntityType(table)));
+          out.println("  - is bridge table=%s".formatted(ERModelUtility.inferBridgeTable(table)));
         }
       }
     }

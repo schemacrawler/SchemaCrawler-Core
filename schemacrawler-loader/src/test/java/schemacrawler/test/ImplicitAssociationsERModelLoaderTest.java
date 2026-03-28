@@ -22,7 +22,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.ermodel.utility.EntityModelUtility;
+import schemacrawler.ermodel.utility.ERModelUtility;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
@@ -116,7 +116,7 @@ public class ImplicitAssociationsERModelLoaderTest {
   @Test
   public void loaderDoesNothingWhenOptionDisabled2() {
 
-    final ERModel erModel = EntityModelUtility.buildEmptyERModel();
+    final ERModel erModel = ERModelUtility.buildEmptyERModel();
     // Assert there are no implicit relationships at the start
     assertThat(erModel.getImplicitRelationships(), is(empty()));
 

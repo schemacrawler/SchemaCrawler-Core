@@ -25,7 +25,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import schemacrawler.ermodel.model.EntityAttributeType;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
-import schemacrawler.ermodel.utility.EntityModelUtility;
+import schemacrawler.ermodel.utility.ERModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ForeignKey;
@@ -51,28 +51,25 @@ public class EntityModelUtilityTest {
     // zero_one: Unique, Nullable
     final Table zeroOneTable = catalog.lookupTable(schema, "ZEROONECHILD").get();
     final ForeignKey zeroOneFk = zeroOneTable.getForeignKeys().iterator().next();
-    assertThat(
-        EntityModelUtility.inferCardinality(zeroOneFk), is(RelationshipCardinality.zero_one));
+    assertThat(ERModelUtility.inferCardinality(zeroOneFk), is(RelationshipCardinality.zero_one));
 
     // one_one: Unique, Not Null
     final Table oneOneTable = catalog.lookupTable(schema, "ONEONECHILD").get();
     final ForeignKey oneOneFk = oneOneTable.getForeignKeys().iterator().next();
-    assertThat(EntityModelUtility.inferCardinality(oneOneFk), is(RelationshipCardinality.one_one));
+    assertThat(ERModelUtility.inferCardinality(oneOneFk), is(RelationshipCardinality.one_one));
 
     // zero_many: Not Unique, Nullable
     final Table zeroManyTable = catalog.lookupTable(schema, "ZEROMANYCHILD").get();
     final ForeignKey zeroManyFk = zeroManyTable.getForeignKeys().iterator().next();
-    assertThat(
-        EntityModelUtility.inferCardinality(zeroManyFk), is(RelationshipCardinality.zero_many));
+    assertThat(ERModelUtility.inferCardinality(zeroManyFk), is(RelationshipCardinality.zero_many));
 
     // one_many: Not Unique, Not Null
     final Table oneManyTable = catalog.lookupTable(schema, "ONEMANYCHILD").get();
     final ForeignKey oneManyFk = oneManyTable.getForeignKeys().iterator().next();
-    assertThat(
-        EntityModelUtility.inferCardinality(oneManyFk), is(RelationshipCardinality.one_many));
+    assertThat(ERModelUtility.inferCardinality(oneManyFk), is(RelationshipCardinality.one_many));
 
     // unknown
-    assertThat(EntityModelUtility.inferCardinality(null), is(RelationshipCardinality.unknown));
+    assertThat(ERModelUtility.inferCardinality(null), is(RelationshipCardinality.unknown));
   }
 
   @BeforeAll
@@ -92,13 +89,13 @@ public class EntityModelUtilityTest {
 
     final Table zeroOneTable = catalog.lookupTable(schema, "ZEROONECHILD").get();
     final ForeignKey zeroOneFk = zeroOneTable.getForeignKeys().iterator().next();
-    assertThat(EntityModelUtility.coveredByIndex(zeroOneFk), is(OptionalBoolean.true_value));
+    assertThat(ERModelUtility.coveredByIndex(zeroOneFk), is(OptionalBoolean.true_value));
 
     final Table zeroManyTable = catalog.lookupTable(schema, "ZEROMANYCHILD").get();
     final ForeignKey zeroManyFk = zeroManyTable.getForeignKeys().iterator().next();
 
-    assertThat(EntityModelUtility.coveredByIndex(zeroManyFk), is(OptionalBoolean.true_value));
-    assertThat(EntityModelUtility.coveredByIndex(null), is(OptionalBoolean.unknown));
+    assertThat(ERModelUtility.coveredByIndex(zeroManyFk), is(OptionalBoolean.true_value));
+    assertThat(ERModelUtility.coveredByIndex(null), is(OptionalBoolean.unknown));
   }
 
   @Test
@@ -107,14 +104,13 @@ public class EntityModelUtilityTest {
 
     final Table zeroOneTable = catalog.lookupTable(schema, "ZEROONECHILD").get();
     final ForeignKey zeroOneFk = zeroOneTable.getForeignKeys().iterator().next();
-    assertThat(EntityModelUtility.coveredByUniqueIndex(zeroOneFk), is(OptionalBoolean.true_value));
+    assertThat(ERModelUtility.coveredByUniqueIndex(zeroOneFk), is(OptionalBoolean.true_value));
 
     final Table zeroManyTable = catalog.lookupTable(schema, "ZEROMANYCHILD").get();
     final ForeignKey zeroManyFk = zeroManyTable.getForeignKeys().iterator().next();
-    assertThat(
-        EntityModelUtility.coveredByUniqueIndex(zeroManyFk), is(OptionalBoolean.false_value));
+    assertThat(ERModelUtility.coveredByUniqueIndex(zeroManyFk), is(OptionalBoolean.false_value));
 
-    assertThat(EntityModelUtility.coveredByUniqueIndex(null), is(OptionalBoolean.unknown));
+    assertThat(ERModelUtility.coveredByUniqueIndex(null), is(OptionalBoolean.unknown));
   }
 
   @Test
@@ -122,12 +118,12 @@ public class EntityModelUtilityTest {
     final Schema schema = catalog.lookupSchema("PUBLIC.PUBLIC").get();
 
     final Table bridgeTable = catalog.lookupTable(schema, "BRIDGE").get();
-    assertThat(EntityModelUtility.inferBridgeTable(bridgeTable), is(OptionalBoolean.true_value));
+    assertThat(ERModelUtility.inferBridgeTable(bridgeTable), is(OptionalBoolean.true_value));
 
     final Table parentTable = catalog.lookupTable(schema, "PARENT").get();
-    assertThat(EntityModelUtility.inferBridgeTable(parentTable), is(OptionalBoolean.false_value));
+    assertThat(ERModelUtility.inferBridgeTable(parentTable), is(OptionalBoolean.false_value));
 
-    assertThat(EntityModelUtility.inferBridgeTable(null), is(OptionalBoolean.unknown));
+    assertThat(ERModelUtility.inferBridgeTable(null), is(OptionalBoolean.unknown));
   }
 
   @Test
@@ -135,9 +131,9 @@ public class EntityModelUtilityTest {
     final Schema schema = catalog.lookupSchema("PUBLIC.PUBLIC").get();
 
     final Table parentTable = catalog.lookupTable(schema, "PARENT").get();
-    assertThat(EntityModelUtility.inferEntityType(parentTable), is(EntityType.strong_entity));
+    assertThat(ERModelUtility.inferEntityType(parentTable), is(EntityType.strong_entity));
 
-    assertThat(EntityModelUtility.inferEntityType(null), is(EntityType.unknown));
+    assertThat(ERModelUtility.inferEntityType(null), is(EntityType.unknown));
   }
 
   @Test
@@ -167,16 +163,16 @@ public class EntityModelUtilityTest {
     for (Entry<String, EntityAttributeType> attributeTypeCase : attributeTypes.entrySet()) {
       assertThat(
           "Wrong attribute type for <%s>".formatted(attributeTypeCase.getKey()),
-          EntityModelUtility.inferEntityAttributeType(
+          ERModelUtility.inferEntityAttributeType(
               LightColumnDataTypeUtility.columnDataType(attributeTypeCase.getKey())),
           is(attributeTypeCase.getValue()));
     }
 
-    assertThat(EntityModelUtility.inferEntityAttributeType(null), is(EntityAttributeType.unknown));
+    assertThat(ERModelUtility.inferEntityAttributeType(null), is(EntityAttributeType.unknown));
 
     final ColumnDataType enumeratedDataType = enumColumnDataType();
     assertThat(
-        EntityModelUtility.inferEntityAttributeType(enumeratedDataType),
+        ERModelUtility.inferEntityAttributeType(enumeratedDataType),
         is(EntityAttributeType.enumerated));
   }
 }
