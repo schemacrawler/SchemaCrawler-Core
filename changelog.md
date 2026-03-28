@@ -2,8 +2,9 @@
 
 SchemaCrawler Core release notes.
 
-<a name="v17.8.3"></a>
-## Release 17.8.3 - 2026-03-28
+
+<a name="v17.9.0"></a>
+## Release 17.9.0 - 2026-03-28
 
 - Deprecate alternate keys loader
 - Have attributes files loaded into the ER model rather than the catalog
