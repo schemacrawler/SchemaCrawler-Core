@@ -48,12 +48,19 @@ import static java.sql.Types.VARBINARY;
 import static java.sql.Types.VARCHAR;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import schemacrawler.ermodel.implementation.MutableERModel;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityAttributeType;
 import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.ermodel.model.TableReferenceRelationship;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
@@ -62,10 +69,33 @@ import us.fatehi.utility.UtilityMarker;
 
 /** Utility for inferring entity model information from tables and foreign keys. */
 @UtilityMarker
-public class EntityModelUtility {
+public class ERModelUtility {
 
   public static ERModel buildEmptyERModel() {
     return new MutableERModel();
+  }
+
+  public static Collection<? extends TableReference> collectImplicitAssociations(
+      final Table table, final ERModel erModel) {
+    final Entity entity = erModel.lookupEntity(table).orElse(null);
+    if (entity == null) {
+      return List.of();
+    }
+    final List<TableReference> implicitAssociations = new ArrayList<>();
+    for (final Relationship rel : entity.getImplicitRelationships()) {
+      if (rel instanceof final TableReferenceRelationship tableRel) {
+        final TableReference tableReference = tableRel.getTableReference();
+        implicitAssociations.add(tableReference);
+      }
+    }
+    erModel.getUnmodeledTableReferences().stream()
+        .filter(
+            tableRel ->
+                tableRel.getPrimaryKeyTable().equals(table)
+                    || tableRel.getForeignKeyTable().equals(table))
+        .forEach(implicitAssociations::add);
+    Collections.sort(implicitAssociations);
+    return implicitAssociations;
   }
 
   /**
@@ -199,7 +229,7 @@ public class EntityModelUtility {
     return entityType;
   }
 
-  private EntityModelUtility() {
+  private ERModelUtility() {
     // Prevent instantiation
   }
 }

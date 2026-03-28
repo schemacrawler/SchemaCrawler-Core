@@ -13,15 +13,10 @@ import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.ermodel.model.Entity;
-import schemacrawler.ermodel.model.Relationship;
-import schemacrawler.ermodel.model.TableReferenceRelationship;
+import schemacrawler.ermodel.utility.ERModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
@@ -78,7 +73,7 @@ public class ProposedWeakAssociationsTestUtility {
       for (final Table table : tables) {
         out.println("table: " + table.getFullName());
         final Collection<? extends TableReference> implicitAssociations =
-            collectImplicitAssociations(table, erModel);
+            ERModelUtility.collectImplicitAssociations(table, erModel);
         for (final TableReference implicitAssociation : implicitAssociations) {
           // out.println("  weak association: %s".formatted(implicitAssociation.getName()));
           out.println("  weak association:");
@@ -96,29 +91,6 @@ public class ProposedWeakAssociationsTestUtility {
       }
     }
     assertThat(outputOf(testout), hasSameContentAs(classpathResource(currentMethodFullName)));
-  }
-
-  public static Collection<? extends TableReference> collectImplicitAssociations(
-      final Table table, final ERModel erModel) {
-    final Entity entity = erModel.lookupEntity(table).orElse(null);
-    if (entity == null) {
-      return List.of();
-    }
-    final List<TableReference> implicitAssociations = new ArrayList<>();
-    for (final Relationship rel : entity.getImplicitRelationships()) {
-      if (rel instanceof final TableReferenceRelationship tableRel) {
-        final TableReference tableReference = tableRel.getTableReference();
-        implicitAssociations.add(tableReference);
-      }
-    }
-    erModel.getUnmodeledTableReferences().stream()
-        .filter(
-            tableRel ->
-                tableRel.getPrimaryKeyTable().equals(table)
-                    || tableRel.getForeignKeyTable().equals(table))
-        .forEach(implicitAssociations::add);
-    Collections.sort(implicitAssociations);
-    return implicitAssociations;
   }
 
   private ProposedWeakAssociationsTestUtility() {

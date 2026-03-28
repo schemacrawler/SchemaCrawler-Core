@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.utility.ERModelUtility;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
@@ -36,7 +37,6 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.test.utility.DatabaseTestUtility;
-import schemacrawler.test.utility.ProposedWeakAssociationsTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
@@ -94,7 +94,7 @@ public class WeakAssociationsTest {
         for (final Table table : tables) {
           out.println("  table: " + table.getFullName());
           final Collection<? extends TableReference> implicitAssociations =
-              ProposedWeakAssociationsTestUtility.collectImplicitAssociations(table, erModel);
+              ERModelUtility.collectImplicitAssociations(table, erModel);
           for (final TableReference implicitAssociation : implicitAssociations) {
             out.println("    weak association: " + implicitAssociation.getName());
             out.println("      column references: ");
