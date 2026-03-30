@@ -59,7 +59,7 @@ public class ProposedWeakAssociationsTestUtility {
           SchemaRetrievalOptionsBuilder.newSchemaRetrievalOptions();
 
       final Config config = ConfigUtility.newConfig();
-      config.put("weak-associations", true);
+      config.put("implicit-associations", true);
       config.put("infer-extension-tables", Boolean.valueOf(inferExtensionTables));
 
       final Catalog catalog =

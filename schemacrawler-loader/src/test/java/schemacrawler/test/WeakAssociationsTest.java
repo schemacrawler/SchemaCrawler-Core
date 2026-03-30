@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.emptyString;
-import static schemacrawler.schema.TableConstraintType.weak_association;
+import static schemacrawler.schema.TableConstraintType.implicit_association;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
@@ -74,7 +74,7 @@ public class WeakAssociationsTest {
             .withLoadOptions(loadOptionsBuilder.toOptions());
 
     final Config additionalConfig = ConfigUtility.newConfig();
-    additionalConfig.put("weak-associations", true);
+    additionalConfig.put("implicit-associations", true);
 
     catalog =
         SchemaCrawlerUtility.getCatalog(
@@ -106,7 +106,7 @@ public class WeakAssociationsTest {
               out.println("          " + columnReference);
             }
             assertThat(implicitAssociation.getDefinition(), is(emptyString()));
-            assertThat(implicitAssociation.getType(), is(weak_association));
+            assertThat(implicitAssociation.getType(), is(implicit_association));
             assertThat(implicitAssociation.hasDefinition(), is(false));
             assertThat(implicitAssociation.isDeferrable(), is(false));
             assertThat(implicitAssociation.isInitiallyDeferred(), is(false));

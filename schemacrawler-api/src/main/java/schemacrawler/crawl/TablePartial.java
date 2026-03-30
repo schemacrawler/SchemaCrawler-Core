@@ -27,7 +27,6 @@ import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.Trigger;
-import schemacrawler.schema.WeakAssociation;
 import schemacrawler.schemacrawler.exceptions.NotLoadedException;
 
 final class TablePartial extends AbstractDatabaseObject implements Table, PartialDatabaseObject {
@@ -44,11 +43,6 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
   TablePartial(final Table table) {
     this(requireNonNull(table, "No table provided").getSchema(), table.getName());
     addAttributes(table.getAttributes());
-  }
-
-  @Override
-  public Collection<PrimaryKey> getAlternateKeys() {
-    throw new NotLoadedException(this);
   }
 
   @Override
@@ -123,12 +117,6 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
 
   @Override
   public Collection<DatabaseObject> getUsedByObjects() {
-    throw new NotLoadedException(this);
-  }
-
-  @Override
-  @Deprecated(forRemoval = true)
-  public Collection<WeakAssociation> getWeakAssociations() {
     throw new NotLoadedException(this);
   }
 
