@@ -44,10 +44,12 @@ public class WeakAssociationAttributes extends ObjectAttributes {
     if (columnReferences == null || columnReferences.isEmpty()) {
       throw new IllegalArgumentException("No column references provided");
     }
+    // This is an ordered map read from a file, so do not make a copy
     this.columnReferences = columnReferences;
   }
 
   public Map<String, String> getColumnReferences() {
+    // This is an ordered map read from a file, so do not make a copy
     return columnReferences;
   }
 

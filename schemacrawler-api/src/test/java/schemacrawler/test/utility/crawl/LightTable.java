@@ -28,7 +28,6 @@ import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.Trigger;
-import schemacrawler.schema.WeakAssociation;
 import schemacrawler.schemacrawler.SchemaReference;
 
 public final class LightTable extends AbstractLightDatabaseObject implements Table {
@@ -92,11 +91,6 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
     if (trigger != null) {
       triggers.add(trigger);
     }
-  }
-
-  @Override
-  public Collection<PrimaryKey> getAlternateKeys() {
-    return List.of();
   }
 
   @Override
@@ -171,12 +165,6 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public Collection<DatabaseObject> getUsedByObjects() {
-    return List.of();
-  }
-
-  @Override
-  @Deprecated(forRemoval = true)
-  public Collection<WeakAssociation> getWeakAssociations() {
     return List.of();
   }
 

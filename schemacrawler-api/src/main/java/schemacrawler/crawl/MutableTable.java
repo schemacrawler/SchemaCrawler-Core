@@ -30,7 +30,6 @@ import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -39,7 +38,6 @@ import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.Trigger;
-import schemacrawler.schema.WeakAssociation;
 
 class MutableTable extends AbstractDatabaseObject implements Table {
 
@@ -97,13 +95,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
     }
 
     return comparison;
-  }
-
-  /** {@inheritDoc} */
-  @Deprecated(forRemoval = true)
-  @Override
-  public Collection<PrimaryKey> getAlternateKeys() {
-    return List.of();
   }
 
   /** {@inheritDoc} */
@@ -220,13 +211,6 @@ class MutableTable extends AbstractDatabaseObject implements Table {
   @Override
   public Collection<DatabaseObject> getUsedByObjects() {
     return Set.copyOf(usedByObjects);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  @Deprecated(forRemoval = true)
-  public Collection<WeakAssociation> getWeakAssociations() {
-    return List.of();
   }
 
   @Override

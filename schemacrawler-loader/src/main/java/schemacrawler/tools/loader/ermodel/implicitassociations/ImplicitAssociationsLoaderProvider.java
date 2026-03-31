@@ -32,10 +32,6 @@ public class ImplicitAssociationsLoaderProvider extends AbstractERModelLoaderPro
   private static final String OPTION_IMPLICIT_ASSOCIATIONS = "implicit-associations";
   private static final String OPTION_INFER_EXTENSION_TABLES = "infer-extension-tables";
 
-  // NOTE: For backward compatibility only
-  @Deprecated(forRemoval = true)
-  private static final String OPTION_WEAK_ASSOCIATIONS = "weak-associations";
-
   @Override
   public PluginCommand getCommandLineCommand() {
     final PluginCommand pluginCommand = PluginCommand.newCatalogLoaderCommand(NAME);
@@ -72,10 +68,7 @@ public class ImplicitAssociationsLoaderProvider extends AbstractERModelLoaderPro
   }
 
   private ImplicitAssociationsLoaderOptions createOptionsFromConfig(final Config config) {
-    // NOTE: Check weak associations - for backward compatibility only
-    final boolean loadWeakAssociations = config.getBooleanValue(OPTION_WEAK_ASSOCIATIONS);
-    final boolean loadImplicitAssociations =
-        config.getBooleanValue(OPTION_IMPLICIT_ASSOCIATIONS) || loadWeakAssociations;
+    final boolean loadImplicitAssociations = config.getBooleanValue(OPTION_IMPLICIT_ASSOCIATIONS);
     final boolean inferExtensionTables =
         config.getBooleanValue(OPTION_INFER_EXTENSION_TABLES, false);
     return new ImplicitAssociationsLoaderOptions(loadImplicitAssociations, inferExtensionTables);

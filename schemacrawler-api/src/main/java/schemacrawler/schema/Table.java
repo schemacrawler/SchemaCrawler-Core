@@ -20,14 +20,6 @@ public interface Table
     extends DatabaseObject, TypedObject<TableType>, DefinedObject, ReferencingObject {
 
   /**
-   * Gets the list of all alternate keys of the table.
-   *
-   * @return Alternate keys of the table.
-   */
-  @Deprecated(forRemoval = true)
-  Collection<PrimaryKey> getAlternateKeys();
-
-  /**
    * Gets the list of columns in ordinal order.
    *
    * @return Columns of the table
@@ -150,14 +142,6 @@ public interface Table
    * @return Collection of using objects.
    */
   Collection<DatabaseObject> getUsedByObjects();
-
-  /**
-   * Gets the list of weak associations.
-   *
-   * @return Weak associations of the table.
-   */
-  @Deprecated(forRemoval = true)
-  Collection<WeakAssociation> getWeakAssociations();
 
   /**
    * Checks if the table has any foreign keys, whether imported or exported.

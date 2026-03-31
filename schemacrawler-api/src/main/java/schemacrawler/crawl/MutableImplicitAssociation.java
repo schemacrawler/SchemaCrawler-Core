@@ -11,10 +11,9 @@ package schemacrawler.crawl;
 import java.io.Serial;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.TableConstraintType;
-import schemacrawler.schema.WeakAssociation;
 
 /** Represents a foreign-key mapping to a primary key in another table. */
-final class MutableImplicitAssociation extends AbstractTableReference implements WeakAssociation {
+final class MutableImplicitAssociation extends AbstractTableReference {
 
   @Serial private static final long serialVersionUID = -5164664131926303038L;
 
@@ -29,7 +28,7 @@ final class MutableImplicitAssociation extends AbstractTableReference implements
 
   @Override
   public TableConstraintType getType() {
-    return TableConstraintType.weak_association;
+    return TableConstraintType.implicit_association;
   }
 
   @Override
