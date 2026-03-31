@@ -66,8 +66,8 @@ public final class ImplicitRelationshipBuilder implements Builder<TableReference
     return addTableReferenceRelationship(implicitAssociation);
   }
 
-  public ImplicitRelationshipBuilder withName(final String weakAssociationName) {
-    implicitAssociationBuilder.withName(weakAssociationName);
+  public ImplicitRelationshipBuilder withName(final String implicitAssociationName) {
+    implicitAssociationBuilder.withName(implicitAssociationName);
     return this;
   }
 

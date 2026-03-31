@@ -120,9 +120,9 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
     return tableRef;
   }
 
-  public ImplicitAssociationBuilder withName(final String weakAssociationName) {
-    if (!isBlank(weakAssociationName)) {
-      implicitAssociationName = weakAssociationName;
+  public ImplicitAssociationBuilder withName(final String implicitAssociationName) {
+    if (!isBlank(implicitAssociationName)) {
+      this.implicitAssociationName = implicitAssociationName;
     }
     return this;
   }
