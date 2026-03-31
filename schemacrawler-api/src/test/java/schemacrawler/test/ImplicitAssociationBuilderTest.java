@@ -113,7 +113,7 @@ public class ImplicitAssociationBuilderTest {
             .get();
 
     final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(catalog);
-    // 1. Happy path - good weak association
+    // 1. Happy path - good implicit association
     builder
         .withName("1_weak")
         .addColumnReference(
@@ -215,7 +215,7 @@ public class ImplicitAssociationBuilderTest {
             newImplicitAssociationColumn(new SchemaReference("PRIVATE", "LIBRARY"), "BOOKS", "ID"));
     implicitAssociation = builder.build();
     assertThat(implicitAssociation, is(nullValue()));
-    // 11. Duplicate weak association (not built)
+    // 11. Duplicate implicit association (not built)
     builder
         .withName("1_weak_duplicate")
         .addColumnReference(
