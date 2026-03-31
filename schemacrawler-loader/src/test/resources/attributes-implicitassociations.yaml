@@ -1,6 +1,6 @@
 name: schemacrawler.test.SchemaCrawlerTest
-weak-associations:
-  # 1. Happy path - good weak association
+implicit-associations:
+  # 1. Happy path - good implicit association
   - name: 1_weak
     referenced-table:
       catalog: PUBLIC
@@ -107,7 +107,7 @@ weak-associations:
       name: BOOKS
     column-references:
       PREVIOUSEDITIONID: ID
-  # 11. Duplicate weak association (not built, but overwrite remarks for 1_weak)
+  # 11. Duplicate implicit association (not built, but overwrite remarks for 1_weak)
   - name: 1_weak_duplicate
     referenced-table:
       catalog: PUBLIC

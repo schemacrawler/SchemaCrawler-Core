@@ -35,9 +35,9 @@ import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.TestContext;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
-public class ProposedWeakAssociationsTestUtility {
+public class ProposedImplicitAssociationsTestUtility {
 
-  public static void weakAssociations(
+  public static void implicitAssociations(
       final TestContext testContext,
       final DatabaseConnectionSource connectionSource,
       final boolean inferExtensionTables)
@@ -75,8 +75,8 @@ public class ProposedWeakAssociationsTestUtility {
         final Collection<? extends TableReference> implicitAssociations =
             ERModelUtility.collectImplicitAssociations(table, erModel);
         for (final TableReference implicitAssociation : implicitAssociations) {
-          // out.println("  weak association: %s".formatted(implicitAssociation.getName()));
-          out.println("  weak association:");
+          // out.println("  implicit association: %s".formatted(implicitAssociation.getName()));
+          out.println("  implicit association:");
           for (final ColumnReference colRef : implicitAssociation) {
             out.println("    column reference: %s".formatted(colRef));
             final Column fkColumn = colRef.getForeignKeyColumn();
@@ -93,7 +93,7 @@ public class ProposedWeakAssociationsTestUtility {
     assertThat(outputOf(testout), hasSameContentAs(classpathResource(currentMethodFullName)));
   }
 
-  private ProposedWeakAssociationsTestUtility() {
+  private ProposedImplicitAssociationsTestUtility() {
     // Prevent instantiation
   }
 }

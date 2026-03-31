@@ -6,9 +6,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.weakassociations;
+package schemacrawler.loader.implicitassociations;
 
-import static schemacrawler.test.utility.ProposedWeakAssociationsTestUtility.weakAssociations;
+import static schemacrawler.test.utility.ProposedImplicitAssociationsTestUtility.implicitAssociations;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.test.utility.DisableLogging;
@@ -19,53 +19,53 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
 @DisableLogging
 @ResolveTestContext
-public class PrimaryKeyWeakAssociationsTest {
+public class PrimaryKeyImplicitAssociationsTest {
 
   @Test
   @WithTestDatabase(script = "/pk_test_1.sql")
-  public void weakAssociations1(
+  public void implicitAssociations1(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
-    weakAssociations(testContext, connectionSource, false);
+    implicitAssociations(testContext, connectionSource, false);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_1.sql")
-  public void weakAssociations1a(
+  public void implicitAssociations1a(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
-    weakAssociations(testContext, connectionSource, true);
+    implicitAssociations(testContext, connectionSource, true);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_2.sql")
-  public void weakAssociations2(
+  public void implicitAssociations2(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
-    weakAssociations(testContext, connectionSource, false);
+    implicitAssociations(testContext, connectionSource, false);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_2.sql")
-  public void weakAssociations2a(
+  public void implicitAssociations2a(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
-    weakAssociations(testContext, connectionSource, true);
+    implicitAssociations(testContext, connectionSource, true);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_3.sql")
-  public void weakAssociations3(
+  public void implicitAssociations3(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
-    weakAssociations(testContext, connectionSource, false);
+    implicitAssociations(testContext, connectionSource, false);
   }
 
   @Test
   @WithTestDatabase(script = "/pk_test_3.sql")
-  public void weakAssociations3a(
+  public void implicitAssociations3a(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
-    weakAssociations(testContext, connectionSource, true);
+    implicitAssociations(testContext, connectionSource, true);
   }
 }

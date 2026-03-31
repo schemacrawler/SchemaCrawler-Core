@@ -6,9 +6,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.weakassociations;
+package schemacrawler.loader.implicitassociations;
 
-import static schemacrawler.test.utility.ProposedWeakAssociationsTestUtility.weakAssociations;
+import static schemacrawler.test.utility.ProposedImplicitAssociationsTestUtility.implicitAssociations;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.test.utility.DisableLogging;
@@ -19,23 +19,23 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
 @DisableLogging
 @ResolveTestContext
-public class SimpleWeakAssociationsTest {
+public class SimpleImplicitAssociationsTest {
 
   @Test
-  @WithTestDatabase(script = "/simple_weak_association_with_ids.sql")
-  public void simpleWeakAssociationWithIds(
+  @WithTestDatabase(script = "/simple_implicit_association_with_ids.sql")
+  public void simpleImplicitAssociationWithIds(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
-    weakAssociations(testContext, connectionSource, false);
-    weakAssociations(testContext, connectionSource, true);
+    implicitAssociations(testContext, connectionSource, false);
+    implicitAssociations(testContext, connectionSource, true);
   }
 
   @Test
-  @WithTestDatabase(script = "/simple_weak_association_with_plurals.sql")
-  public void simpleWeakAssociationWithPlurals(
+  @WithTestDatabase(script = "/simple_implicit_association_with_plurals.sql")
+  public void simpleImplicitAssociationWithPlurals(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
-    weakAssociations(testContext, connectionSource, false);
-    weakAssociations(testContext, connectionSource, true);
+    implicitAssociations(testContext, connectionSource, false);
+    implicitAssociations(testContext, connectionSource, true);
   }
 }

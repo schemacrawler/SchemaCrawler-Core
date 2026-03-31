@@ -123,7 +123,7 @@
       NOTES: On Jackson
           1. Jackson is distributed with the SchemaCrawler distribution
           2. Used in "loader", "diagram" and "text" for tests of catalog attributes
-          for weak associations
+          for implicit Associations
           3. Used in "operations" for data XML serialization
           4. Used in "scripting" for catalog YAML and XML serialization
     -->

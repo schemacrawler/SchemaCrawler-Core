@@ -25,8 +25,8 @@ import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import schemacrawler.tools.loader.catalog.model.CatalogAttributes;
 import schemacrawler.tools.loader.catalog.model.ColumnAttributes;
+import schemacrawler.tools.loader.catalog.model.ImplicitAssociationAttributes;
 import schemacrawler.tools.loader.catalog.model.TableAttributes;
-import schemacrawler.tools.loader.catalog.model.WeakAssociationAttributes;
 import schemacrawler.tools.loader.ermodel.AbstractERModelLoader;
 import us.fatehi.utility.ioresource.InputResource;
 import us.fatehi.utility.ioresource.InputResourceUtility;
@@ -73,7 +73,7 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
                                     .formatted(catalogAttributesFile)));
             final CatalogAttributes catalogAttributes = readCatalogAttributes(inputResource);
             loadRemarks(catalog, catalogAttributes);
-            loadWeakAssociations(catalog, erModel, catalogAttributes);
+            loadImplicitAssociations(catalog, erModel, catalogAttributes);
           };
       taskRunner.add(new TaskDefinition("retrieveCatalogAttributes", taskRunnable));
       taskRunner.submit();
@@ -114,18 +114,18 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
     }
   }
 
-  private void loadWeakAssociations(
+  private void loadImplicitAssociations(
       final Catalog catalog, final ERModel erModel, final CatalogAttributes catalogAttributes) {
     final ImplicitRelationshipBuilder relationshipBuilder =
         ImplicitRelationshipBuilder.builder(catalog, erModel);
-    for (final WeakAssociationAttributes weakAssociationAttributes :
-        catalogAttributes.getWeakAssociations()) {
+    for (final ImplicitAssociationAttributes implicitAssociationAttributes :
+        catalogAttributes.getImplicitAssociations()) {
 
-      final TableAttributes pkTableAttributes = weakAssociationAttributes.getReferencedTable();
-      final TableAttributes fkTableAttributes = weakAssociationAttributes.getDependentTable();
+      final TableAttributes pkTableAttributes = implicitAssociationAttributes.getReferencedTable();
+      final TableAttributes fkTableAttributes = implicitAssociationAttributes.getDependentTable();
 
       for (final Entry<String, String> entry :
-          weakAssociationAttributes.getColumnReferences().entrySet()) {
+          implicitAssociationAttributes.getColumnReferences().entrySet()) {
         final String fkColumnName = entry.getKey();
         final String pkColumnName = entry.getValue();
 
@@ -139,14 +139,14 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
         relationshipBuilder.addColumnReference(fkColumn, pkColumn);
       }
 
-      relationshipBuilder.withName(weakAssociationAttributes.getName());
+      relationshipBuilder.withName(implicitAssociationAttributes.getName());
 
       final TableReferenceRelationship implicitRelationship = relationshipBuilder.build();
       // Set remarks and attributes
       if (implicitRelationship != null) {
-        implicitRelationship.setRemarks(weakAssociationAttributes.getRemarks());
+        implicitRelationship.setRemarks(implicitAssociationAttributes.getRemarks());
         for (final Entry<String, String> attribute :
-            weakAssociationAttributes.getAttributes().entrySet()) {
+            implicitAssociationAttributes.getAttributes().entrySet()) {
           implicitRelationship.setAttribute(attribute.getKey(), attribute.getValue());
         }
       }

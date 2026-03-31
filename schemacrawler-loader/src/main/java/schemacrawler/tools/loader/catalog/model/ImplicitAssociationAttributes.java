@@ -15,7 +15,7 @@ import java.io.Serial;
 import java.util.List;
 import java.util.Map;
 
-public class WeakAssociationAttributes extends ObjectAttributes {
+public class ImplicitAssociationAttributes extends ObjectAttributes {
 
   @Serial private static final long serialVersionUID = 8305929253225133307L;
 
@@ -31,7 +31,7 @@ public class WeakAssociationAttributes extends ObjectAttributes {
     "referencing-table",
     "column-references"
   })
-  public WeakAssociationAttributes(
+  public ImplicitAssociationAttributes(
       final String name,
       final List<String> remarks,
       final Map<String, String> attributes,

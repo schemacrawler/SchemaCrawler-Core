@@ -1,8 +1,8 @@
 table: PUBLIC.PUBLIC.TABLE3_FK
-  weak association:
+  implicit association:
     column reference: PUBLIC.PUBLIC.TABLE3_FK.ENTITY_ID --> PUBLIC.PUBLIC.TABLE9_PK.ENTITY_ID
                       (fk is NOT part of pk)
 table: PUBLIC.PUBLIC.TABLE9_PK
-  weak association:
+  implicit association:
     column reference: PUBLIC.PUBLIC.TABLE3_FK.ENTITY_ID --> PUBLIC.PUBLIC.TABLE9_PK.ENTITY_ID
                       (fk is NOT part of pk)

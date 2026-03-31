@@ -89,7 +89,9 @@ public class ImplicitAssociationBuilderTest {
     catalog = getCatalog(connection, schemaRetrievalOptions, schemaCrawlerOptions);
   }
 
-  /** Keep in sync with {@link WeakAssociationsAttributesTest#weakAssociations() LabelName} */
+  /**
+   * Keep in sync with {@link ImplicitAssociationsAttributesTest#implicitAssociations() LabelName}
+   */
   @Test
   public void implicitAssociations(final TestContext testContext) throws Exception {
 
@@ -111,7 +113,7 @@ public class ImplicitAssociationBuilderTest {
             .get();
 
     final ImplicitAssociationBuilder builder = ImplicitAssociationBuilder.builder(catalog);
-    // 1. Happy path - good weak association
+    // 1. Happy path - good implicit association
     builder
         .withName("1_weak")
         .addColumnReference(
@@ -213,7 +215,7 @@ public class ImplicitAssociationBuilderTest {
             newImplicitAssociationColumn(new SchemaReference("PRIVATE", "LIBRARY"), "BOOKS", "ID"));
     implicitAssociation = builder.build();
     assertThat(implicitAssociation, is(nullValue()));
-    // 11. Duplicate weak association (not built)
+    // 11. Duplicate implicit association (not built)
     builder
         .withName("1_weak_duplicate")
         .addColumnReference(
@@ -243,7 +245,7 @@ public class ImplicitAssociationBuilderTest {
         for (final Table table : tables) {
           out.println("  table: " + table.getFullName());
           for (final TableReference loadedTableReference : implicitAssociations.get(table.key())) {
-            out.println("    weak association: " + loadedTableReference.getName());
+            out.println("    implicit association: " + loadedTableReference.getName());
             out.println("      column references: ");
             final List<ColumnReference> columnReferences =
                 loadedTableReference.getColumnReferences();

@@ -10,19 +10,19 @@ schema: PUBLIC.BOOKS
         REMARKS: Overwritten foreign key remarks line 1
         some tag 1: tagvalue1
         tag2: tag value 2
-    weak-association: 2_weak_partial_fk
+    implicit-association: 2_weak_partial_fk
       column references: 
         key sequence: 1
           PRIVATE.LIBRARY.BOOKAUTHORS.AUTHORID --> PUBLIC.BOOKS.AUTHORS.ID
       attributes: 
         REMARKS: 
-    weak-association: 7_weak_duplicate
+    implicit-association: 7_weak_duplicate
       column references: 
         key sequence: 1
           PRIVATE.LIBRARY.MAGAZINEARTICLES.AUTHORID --> PUBLIC.BOOKS.AUTHORS.ID
       attributes: 
         REMARKS: 
-    weak-association: 1_weak
+    implicit-association: 1_weak
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.ID --> PUBLIC.BOOKS.AUTHORS.ID
@@ -50,13 +50,13 @@ schema: PUBLIC.BOOKS
           PUBLIC.BOOKS.BOOKAUTHORS.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
       attributes: 
         PK_NAME: PK_BOOKS
-    weak-association: 3_weak_partial_pk
+    implicit-association: 3_weak_partial_pk
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.ID --> PRIVATE.LIBRARY.BOOKS.ID
       attributes: 
         REMARKS: 
-    weak-association: 1_weak
+    implicit-association: 1_weak
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.ID --> PUBLIC.BOOKS.AUTHORS.ID
@@ -65,13 +65,13 @@ schema: PUBLIC.BOOKS
         REMARKS: Overwritten remarks line 1
         some tag 1: tagvalue1
         tag2: tag value 2
-    weak-association: 9_weak_self_reference
+    implicit-association: 9_weak_self_reference
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.OTHEREDITIONID --> PUBLIC.BOOKS.BOOKS.ID
       attributes: 
         REMARKS: 
-    weak-association: SCHCRWLR_B8DA20C0_AFD2BA21
+    implicit-association: SCHCRWLR_B8DA20C0_AFD2BA21
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.PUBLISHERID --> PUBLIC.BOOKS.PUBLISHERS.ID
@@ -83,7 +83,7 @@ schema: PUBLIC.BOOKS
       attributes: 
         PK_NAME: PK_Celebrities
   table: PUBLIC.BOOKS.COUPONS
-    weak-association: SCHCRWLR_3B49BEC4_20BE6F95
+    implicit-association: SCHCRWLR_3B49BEC4_20BE6F95
       column references: 
         key sequence: 1
           PUBLIC."PUBLISHER SALES".SALES.COUPON_ID --> PUBLIC.BOOKS.COUPONS.ID
@@ -101,7 +101,7 @@ schema: PUBLIC.BOOKS
           PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΕΚΔΌΤΗΣ --> PUBLIC.BOOKS.PUBLISHERS.ID
       attributes: 
         PK_NAME: SYS_PK_10127
-    weak-association: SCHCRWLR_B8DA20C0_AFD2BA21
+    implicit-association: SCHCRWLR_B8DA20C0_AFD2BA21
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.PUBLISHERID --> PUBLIC.BOOKS.PUBLISHERS.ID
@@ -184,11 +184,11 @@ schema: PUBLIC."PUBLISHER SALES"
           PUBLIC."PUBLISHER SALES".SALES.COUNTRY --> PUBLIC."PUBLISHER SALES".REGIONS.COUNTRY
       attributes: 
         PK_NAME: PK_CUSTOMERS
-    weak-association: SCHCRWLR_3B49BEC4_20BE6F95
+    implicit-association: SCHCRWLR_3B49BEC4_20BE6F95
       column references: 
         key sequence: 1
           PUBLIC."PUBLISHER SALES".SALES.COUPON_ID --> PUBLIC.BOOKS.COUPONS.ID
-    weak-association: 8_weak_two_references
+    implicit-association: 8_weak_two_references
       column references: 
         key sequence: 1
           PRIVATE.ALLSALES.REGIONS.POSTALCODE --> PUBLIC."PUBLISHER SALES".SALES.POSTALCODE
