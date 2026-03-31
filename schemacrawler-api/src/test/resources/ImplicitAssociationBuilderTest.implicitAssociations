@@ -1,27 +1,27 @@
 schema: PUBLIC.BOOKS
   table: PUBLIC.BOOKS.AUTHORS
-    weak association: 2_weak_partial_fk
+    implicit association: 2_weak_partial_fk
       column references: 
         key sequence: 1
           PRIVATE.LIBRARY.BOOKAUTHORS.AUTHORID --> PUBLIC.BOOKS.AUTHORS.ID
-    weak association: 7_weak_duplicate
+    implicit association: 7_weak_duplicate
       column references: 
         key sequence: 1
           PRIVATE.LIBRARY.MAGAZINEARTICLES.AUTHORID --> PUBLIC.BOOKS.AUTHORS.ID
-    weak association: 1_weak
+    implicit association: 1_weak
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.ID --> PUBLIC.BOOKS.AUTHORS.ID
   table: PUBLIC.BOOKS.BOOKS
-    weak association: 3_weak_partial_pk
+    implicit association: 3_weak_partial_pk
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.ID --> PRIVATE.LIBRARY.BOOKS.ID
-    weak association: 9_weak_self_reference
+    implicit association: 9_weak_self_reference
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.OTHEREDITIONID --> PUBLIC.BOOKS.BOOKS.ID
-    weak association: 1_weak
+    implicit association: 1_weak
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.ID --> PUBLIC.BOOKS.AUTHORS.ID
@@ -40,7 +40,7 @@ schema: PUBLIC."PUBLISHER SALES"
   table: PUBLIC."PUBLISHER SALES".REGIONS
   table: PUBLIC."PUBLISHER SALES".SALESDATA
   table: PUBLIC."PUBLISHER SALES".SALES
-    weak association: 8_weak_two_references
+    implicit association: 8_weak_two_references
       column references: 
         key sequence: 1
           PRIVATE.ALLSALES.REGIONS.POSTALCODE --> PUBLIC."PUBLISHER SALES".SALES.POSTALCODE

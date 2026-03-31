@@ -49,7 +49,7 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 @WithTestDatabase
 @ResolveTestContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class WeakAssociationsTest {
+public class ImplicitAssociationsTest {
 
   private Catalog catalog;
   private ERModel erModel;
@@ -83,7 +83,7 @@ public class WeakAssociationsTest {
   }
 
   @Test
-  public void weakAssociations(final TestContext testContext) throws Exception {
+  public void implicitAssociations(final TestContext testContext) throws Exception {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
@@ -96,7 +96,7 @@ public class WeakAssociationsTest {
           final Collection<? extends TableReference> implicitAssociations =
               ERModelUtility.collectImplicitAssociations(table, erModel);
           for (final TableReference implicitAssociation : implicitAssociations) {
-            out.println("    weak association: " + implicitAssociation.getName());
+            out.println("    implicit association: " + implicitAssociation.getName());
             out.println("      column references: ");
             final List<ColumnReference> columnReferences =
                 implicitAssociation.getColumnReferences();

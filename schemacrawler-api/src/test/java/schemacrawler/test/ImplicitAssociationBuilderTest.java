@@ -89,7 +89,9 @@ public class ImplicitAssociationBuilderTest {
     catalog = getCatalog(connection, schemaRetrievalOptions, schemaCrawlerOptions);
   }
 
-  /** Keep in sync with {@link WeakAssociationsAttributesTest#weakAssociations() LabelName} */
+  /**
+   * Keep in sync with {@link ImplicitAssociationsAttributesTest#implicitAssociations() LabelName}
+   */
   @Test
   public void implicitAssociations(final TestContext testContext) throws Exception {
 
@@ -243,7 +245,7 @@ public class ImplicitAssociationBuilderTest {
         for (final Table table : tables) {
           out.println("  table: " + table.getFullName());
           for (final TableReference loadedTableReference : implicitAssociations.get(table.key())) {
-            out.println("    weak association: " + loadedTableReference.getName());
+            out.println("    implicit association: " + loadedTableReference.getName());
             out.println("      column references: ");
             final List<ColumnReference> columnReferences =
                 loadedTableReference.getColumnReferences();

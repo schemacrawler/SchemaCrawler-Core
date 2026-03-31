@@ -18,25 +18,25 @@ public final class CatalogAttributes extends ObjectAttributes {
   @Serial private static final long serialVersionUID = 1436642683972751860L;
 
   private final List<TableAttributes> tables;
-  private final List<WeakAssociationAttributes> weakAssociations;
+  private final List<ImplicitAssociationAttributes> implicitAssociations;
 
-  @ConstructorProperties({"name", "remarks", "attributes", "tables", "weak-associations"})
+  @ConstructorProperties({"name", "remarks", "attributes", "tables", "implicit-associations"})
   public CatalogAttributes(
       final String name,
       final List<String> remarks,
       final Map<String, String> attributes,
       final List<TableAttributes> tables,
-      final List<WeakAssociationAttributes> weakAssociations) {
+      final List<ImplicitAssociationAttributes> implicitAssociations) {
     super(name, remarks, attributes);
     if (tables == null) {
       this.tables = List.of();
     } else {
       this.tables = List.copyOf(tables);
     }
-    if (weakAssociations == null) {
-      this.weakAssociations = List.of();
+    if (implicitAssociations == null) {
+      this.implicitAssociations = List.of();
     } else {
-      this.weakAssociations = List.copyOf(weakAssociations);
+      this.implicitAssociations = List.copyOf(implicitAssociations);
     }
   }
 
@@ -44,7 +44,7 @@ public final class CatalogAttributes extends ObjectAttributes {
     return tables;
   }
 
-  public List<WeakAssociationAttributes> getWeakAssociations() {
-    return weakAssociations;
+  public List<ImplicitAssociationAttributes> getImplicitAssociations() {
+    return implicitAssociations;
   }
 }
