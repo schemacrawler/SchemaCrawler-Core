@@ -104,7 +104,6 @@
       <artifactId>clickhouse-jdbc</artifactId>
       <version>0.9.8</version>
       <classifier>all</classifier>
-      <scope>test</scope>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
