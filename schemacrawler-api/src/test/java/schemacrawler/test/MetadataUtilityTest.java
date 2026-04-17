@@ -12,6 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static schemacrawler.schema.IdentifierQuotingStrategy.quote_all;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
@@ -24,6 +26,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
@@ -31,6 +35,7 @@ import schemacrawler.schema.Index;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -129,5 +134,29 @@ public class MetadataUtilityTest {
     }
     assertThat(
         outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+  }
+
+  @Test
+  public void systemGeneratedForeignKeyName_nullFk() {
+    assertThat(MetaDataUtility.isSystemGeneratedForeignKeyName(null), is(false));
+  }
+
+  @ParameterizedTest(name = "\"{0}\" => system-generated: {1}")
+  @CsvSource({
+    "'',                            false", // empty name
+    "FK_USERS_ROLES,                false", // user-defined name
+    "INTEG_42,                      true", // Firebird
+    "CONSTRAINT_AB12C,              true", // H2
+    "SYS_FK_00042,                  true", // HSQLDB
+    "SQL202301011234567,            true", // DB2
+    "orders_ibfk_1,                 true", // MySQL/MariaDB
+    "SYS_C001234,                   true", // Oracle
+    "FK__Users__RoleId__AB12CD34,   true", // SQL Server
+    "SCHCRWLR_fk_users,             true", // SchemaCrawler
+  })
+  public void systemGeneratedForeignKeyName(final String fkName, final boolean expected) {
+    final TableReference fk = mock(TableReference.class);
+    when(fk.getName()).thenReturn(fkName);
+    assertThat(MetaDataUtility.isSystemGeneratedForeignKeyName(fk), is(expected));
   }
 }
