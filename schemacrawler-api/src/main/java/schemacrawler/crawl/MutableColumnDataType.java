@@ -42,7 +42,7 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
   private boolean fixedPrecisionScale;
   private transient String fullName;
   private JavaSqlType javaSqlType;
-  private Class<?> javaSqlTypeMappedClass;
+  private String javaSqlTypeMappedClassName;
   private String literalPrefix;
   private String literalSuffix;
   private String localizedTypeName;
@@ -64,7 +64,7 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
     createParameters = columnDataType.getCreateParameters();
     fixedPrecisionScale = columnDataType.isFixedPrecisionScale();
     javaSqlType = columnDataType.getJavaSqlType();
-    javaSqlTypeMappedClass = columnDataType.getTypeMappedClass();
+    javaSqlTypeMappedClassName = columnDataType.getTypeMappedClassName();
     literalPrefix = columnDataType.getLiteralPrefix();
     literalSuffix = columnDataType.getLiteralSuffix();
     localizedTypeName = columnDataType.getLocalTypeName();
@@ -85,7 +85,7 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
     this.type = type;
 
     javaSqlType = JavaSqlType.UNKNOWN;
-    javaSqlTypeMappedClass = Object.class;
+    javaSqlTypeMappedClassName = Object.class.getCanonicalName();
     searchable = SearchableType.unknown;
 
     literalPrefix = "";
@@ -181,8 +181,24 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
 
   /** {@inheritDoc} */
   @Override
+  @Deprecated
   public Class<?> getTypeMappedClass() {
-    return javaSqlTypeMappedClass;
+    try {
+      return Class.forName(
+          javaSqlTypeMappedClassName, true, Thread.currentThread().getContextClassLoader());
+    } catch (final ClassNotFoundException e) {
+      LOGGER.log(
+          Level.FINE,
+          e,
+          new StringFormat("Could not load mapped class <%s>", javaSqlTypeMappedClassName));
+      return Object.class;
+    }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getTypeMappedClassName() {
+    return javaSqlTypeMappedClassName;
   }
 
   /** {@inheritDoc} */
@@ -300,25 +316,9 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
     this.searchable = searchable;
   }
 
-  void setTypeMappedClass(final Class<?> mappedClass) {
-    if (mappedClass != null) {
-      javaSqlTypeMappedClass = mappedClass;
-    } else {
-      javaSqlTypeMappedClass = Object.class;
-    }
-  }
-
-  void setTypeMappedClass(final String mappedClassName) {
+  void setTypeMappedClassName(final String mappedClassName) {
     if (!isBlank(mappedClassName)) {
-      try {
-        javaSqlTypeMappedClass = Class.forName(mappedClassName);
-      } catch (final ClassNotFoundException e) {
-        LOGGER.log(
-            Level.FINE, e, new StringFormat("Could not load mapped class <%s>", mappedClassName));
-        javaSqlTypeMappedClass = Object.class;
-      }
-    } else {
-      javaSqlTypeMappedClass = Object.class;
+      javaSqlTypeMappedClassName = mappedClassName;
     }
   }
 

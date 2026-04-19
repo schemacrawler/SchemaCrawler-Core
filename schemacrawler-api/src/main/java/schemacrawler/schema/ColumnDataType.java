@@ -40,15 +40,6 @@ public interface ColumnDataType extends DatabaseObject, TypedObject<DataTypeType
   }
 
   /**
-   * Gets the database specific data type name.
-   *
-   * @return Database specific data type name
-   */
-  default String getStandardTypeName() {
-    return getJavaSqlType().getName();
-  }
-
-  /**
    * Get list of enum values if the data type is enumerated.
    *
    * @return List of enum values
@@ -119,11 +110,29 @@ public interface ColumnDataType extends DatabaseObject, TypedObject<DataTypeType
   SearchableType getSearchable();
 
   /**
+   * Gets the database specific data type name.
+   *
+   * @return Database specific data type name
+   */
+  default String getStandardTypeName() {
+    return getJavaSqlType().getName();
+  }
+
+  /**
+   * Gets the Java class mapped to the type.
+   *
+   * @return The Java class mapped to the type
+   * @deprecated
+   */
+  @Deprecated(forRemoval = true)
+  Class<?> getTypeMappedClass();
+
+  /**
    * Gets the Java class mapped to the type.
    *
    * @return The Java class mapped to the type
    */
-  Class<?> getTypeMappedClass();
+  String getTypeMappedClassName();
 
   /**
    * Whether the data type is auto-incrementable.

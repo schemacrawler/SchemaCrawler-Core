@@ -19,9 +19,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.DataTypeType;
+import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.JavaSqlType;
 import schemacrawler.schema.Schema;
-import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.Retriever;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.utility.TypeMap;
@@ -229,9 +229,9 @@ final class DataTypeLookup {
       } else {
         mappedClass = typeMap.get(javaSqlType.getName());
       }
-      columnDataType.setTypeMappedClass(mappedClass);
+      columnDataType.setTypeMappedClassName(mappedClass.getCanonicalName());
     } else {
-      columnDataType.setTypeMappedClass(mappedClassName);
+      columnDataType.setTypeMappedClassName(mappedClassName);
     }
     columnDataType.withQuoting(retrieverConnection.getIdentifiers());
   }
