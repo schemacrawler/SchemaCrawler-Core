@@ -154,7 +154,7 @@ final class ResultsRetriever {
       final MutableColumnDataType columnDataType =
           new MutableColumnDataType(schema, databaseSpecificTypeName, user_defined);
       columnDataType.setJavaSqlType(javaSqlTypes.valueOf(javaSqlType));
-      columnDataType.setTypeMappedClass(columnClassName);
+      columnDataType.setTypeMappedClassName(columnClassName);
       columnDataType.setPrecision(resultsMetaData.getPrecision(columnIndex));
       final int scale = resultsMetaData.getScale(columnIndex);
       columnDataType.setMaximumScale(scale);
