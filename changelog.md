@@ -3,6 +3,13 @@
 SchemaCrawler Core release notes.
 
 
+<a name="v17.10.2"></a>
+## Release 17.10.2 - 2026-04-20
+
+- Allow additional diagrams to be run from the command-line using Velocity templates
+- Add support for [QuickDBD](https://www.quickdatabasediagrams.com/) diagrams
+
+
 <a name="v17.10.1"></a>
 ## Release 17.10.1 - 2026-04-12
 
