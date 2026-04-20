@@ -1,0 +1,10 @@
+Database,Generalized Pattern,PK Example,FK Example,Index Example,Check Constraint Example
+Firebird,INTEG_[0-9]+,INTEG_10,INTEG_9,RDB$PRIMARY2,
+H2,CONSTRAINT_[A-Z0-9]+,CONSTRAINT_F9,CONSTRAINT_4,,
+HSQLDB,SYS_[FP]K_[0-9]{5},SYS_PK_10127,SYS_FK_10121,UQ_CUSTOMERS,SYS_CT_10128
+DB2,SQL[0-9]{15},SQL260313021730380,SQL260313021730290,,0313021730108328000007000200
+"MySQL, MariaDB",.+_ibfk_1,PRIMARY,bookauthors_ibfk_1,UIDX_BookAuthors,
+Oracle,SYS_C.+,SYS_C008753,SYS_C008750,SYS_C_SNAP$_1PK_AUTHORS,
+PostgreSQL,.+_[pf]key,publishers_pkey,bookauthors_bookid_fkey,16385_16485_1_not_null,
+SQL Server,(FK__[^_]+__[^_]+__[A-Z0-9]+|PK__[^_]+__[A-Z0-9]+|IDX_[^_]+_[^_]+),PK__Publishe__3214EC071D6AAAD3,FK__BookAutho__BookI__412EB0B6,IDX_Clustered_AuthorsCountries,
+SchemaCrawler,SCHCRWLR_[A-Z0-9]{8}_[A-Z0-9]{8},,SCHCRWLR_B8DA20C0_AFD2BA21,,
