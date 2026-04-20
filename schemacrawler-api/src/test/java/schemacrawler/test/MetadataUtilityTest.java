@@ -20,6 +20,7 @@ import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOption
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
+import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,15 +28,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -136,27 +137,32 @@ public class MetadataUtilityTest {
         outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
   }
 
-  @Test
-  public void systemGeneratedForeignKeyName_nullFk() {
-    assertThat(MetaDataUtility.isSystemGeneratedForeignKeyName(null), is(false));
+  @ParameterizedTest(name = "[{index}] {0}: Check database object name is system-generated")
+  @CsvFileSource(resources = "/system_generated_names.csv", numLinesToSkip = 1)
+  public void systemGeneratedName(
+      final String database,
+      final String pattern,
+      final String pkExample,
+      final String fkExample,
+      final String indexExample,
+      final String checkConstraintExample) {
+
+    final String[] names = {pkExample, fkExample, indexExample, checkConstraintExample};
+    for (final String name : names) {
+      if (isBlank(name)) {
+        continue;
+      }
+      final DatabaseObject dbObject = mock(DatabaseObject.class);
+      when(dbObject.getName()).thenReturn(fkExample);
+      assertThat(
+          "%s: Database object name <%s> should be system-generated".formatted(database, name),
+          MetaDataUtility.hasSystemGeneratedName(dbObject),
+          is(true));
+    }
   }
 
-  @ParameterizedTest(name = "\"{0}\" => system-generated: {1}")
-  @CsvSource({
-    "'',                            false", // empty name
-    "FK_USERS_ROLES,                false", // user-defined name
-    "INTEG_42,                      true", // Firebird
-    "CONSTRAINT_AB12C,              true", // H2
-    "SYS_FK_00042,                  true", // HSQLDB
-    "SQL202301011234567,            true", // DB2
-    "orders_ibfk_1,                 true", // MySQL/MariaDB
-    "SYS_C001234,                   true", // Oracle
-    "FK__Users__RoleId__AB12CD34,   true", // SQL Server
-    "SCHCRWLR_fk_users,             true", // SchemaCrawler
-  })
-  public void systemGeneratedForeignKeyName(final String fkName, final boolean expected) {
-    final TableReference fk = mock(TableReference.class);
-    when(fk.getName()).thenReturn(fkName);
-    assertThat(MetaDataUtility.isSystemGeneratedForeignKeyName(fk), is(expected));
+  @Test
+  public void systemGeneratedName_nullArg() {
+    assertThat(MetaDataUtility.hasSystemGeneratedName(null), is(false));
   }
 }
