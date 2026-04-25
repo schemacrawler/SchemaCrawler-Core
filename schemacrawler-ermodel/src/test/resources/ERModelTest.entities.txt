@@ -22,6 +22,8 @@
   - super-type: PUBLIC.BOOKS."Celebrities"
   - relationships
     - relationship: SYS_FK_10131
+  - identifying relationship
+    - relationship: SYS_FK_10131
 - PUBLIC.BOOKS.PUBLISHERS [strong_entity]
   - relationships
     - relationship: FK_ΒΙΒΛΊΑ_PUBLISHERS
