@@ -13,12 +13,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.loader.catalog.CatalogLoaderProvider;
-import schemacrawler.tools.loader.catalog.counts.TableRowCountsLoaderProvider;
-import schemacrawler.tools.loader.catalog.offline.OfflineCatalogLoaderProvider;
-import schemacrawler.tools.loader.ermodel.ERModelLoaderProvider;
-import schemacrawler.tools.loader.ermodel.attributes.AttributesLoaderProvider;
-import schemacrawler.tools.loader.ermodel.implicitassociations.ImplicitAssociationsLoaderProvider;
+import schemacrawler.loader.catalog.CatalogLoaderProvider;
+import schemacrawler.loader.catalog.counts.TableRowCountsLoaderProvider;
+import schemacrawler.loader.catalog.offline.OfflineCatalogLoaderProvider;
+import schemacrawler.loader.ermodel.ERModelLoaderProvider;
+import schemacrawler.loader.ermodel.attributes.AttributesLoaderProvider;
+import schemacrawler.loader.ermodel.implicitassociations.ImplicitAssociationsLoaderProvider;
 
 public class LoaderPluginCommandTest {
 

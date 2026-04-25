@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import schemacrawler.tools.loader.catalog.CatalogLoaderRegistry;
-import schemacrawler.tools.loader.ermodel.ERModelLoaderRegistry;
+import schemacrawler.loader.catalog.CatalogLoaderRegistry;
+import schemacrawler.loader.ermodel.ERModelLoaderRegistry;
 import schemacrawler.tools.registry.PluginRegistry;
 import us.fatehi.utility.property.PropertyName;
 

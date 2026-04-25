@@ -20,8 +20,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.loader.catalog.CatalogLoaderRegistry;
-import schemacrawler.tools.loader.catalog.ChainedCatalogLoader;
+import schemacrawler.loader.catalog.CatalogLoaderRegistry;
+import schemacrawler.loader.catalog.ChainedCatalogLoader;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.property.PropertyName;
 

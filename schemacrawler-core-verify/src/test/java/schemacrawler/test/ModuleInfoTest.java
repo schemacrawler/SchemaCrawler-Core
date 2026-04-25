@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.tools.command.CommandRegistry;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
-import schemacrawler.tools.loader.catalog.CatalogLoaderRegistry;
+import schemacrawler.loader.catalog.CatalogLoaderRegistry;
 
 public class ModuleInfoTest {
 
