@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static schemacrawler.ermodel.model.EntityType.strong_entity;
 import static schemacrawler.ermodel.model.EntityType.subtype;
@@ -37,12 +38,23 @@ public class MutableERModelTest {
     final MutableEntitySubtype subEntity = new MutableEntitySubtype(subTable);
     subEntity.setSupertype(superEntity);
 
+    assertThat(subEntity.getIdentifyingRelationship(), is(nullValue()));
     assertThat(subEntity.getType(), is(subtype));
     assertThat(subEntity.getSupertype(), is(superEntity));
+
+    final LightForeignKey identifyingForeignKey =
+        new LightForeignKey("FK_SUB_SUPER", subTable, superTable);
+    final MutableTableReferenceRelationship identifyingRelationship =
+        new MutableTableReferenceRelationship(identifyingForeignKey);
+    identifyingRelationship.setEntities(subEntity, superEntity);
+    subEntity.setIdentifyingRelationship(identifyingRelationship);
+
+    assertThat(subEntity.getIdentifyingRelationship(), is(identifyingRelationship));
 
     final MutableERModel model = new MutableERModel();
     model.addEntity(superEntity);
     model.addEntity(subEntity);
+    model.addRelationship(identifyingRelationship);
 
     assertThat(model.getSubtypesOf(superEntity), containsInAnyOrder(subEntity));
     assertThat(model.getSubtypesOf(subEntity), is(empty()));

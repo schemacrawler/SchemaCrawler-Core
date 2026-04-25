@@ -124,6 +124,18 @@ public final class ERModelBuilder implements Builder<ERModel> {
     }
 
     rel.setEntities(leftEntity, rightEntity);
+
+    if (leftEntity instanceof final MutableEntitySubtype subEntity
+        && subEntity.hasSupertype()
+        && subEntity.getSupertype().equals(rightEntity)
+        && modelInferrer
+            .inferSuperTypeReference()
+            .map(ForeignKey::key)
+            .filter(key -> key.equals(tableReference.key()))
+            .isPresent()) {
+      subEntity.setIdentifyingRelationship(rel);
+    }
+
     return rel;
   }
 

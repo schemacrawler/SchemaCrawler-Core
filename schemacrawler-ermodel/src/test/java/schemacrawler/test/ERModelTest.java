@@ -83,6 +83,11 @@ public class ERModelTest {
         for (Relationship relationship : entity.getRelationships()) {
           out.println("    - relationship: %s".formatted(relationship.getName()));
         }
+        if (entity instanceof final EntitySubtype subtype) {
+          out.println("  - identifying relationship");
+          out.println(
+              "    - relationship: %s".formatted(subtype.getIdentifyingRelationship().getName()));
+        }
       }
     }
     assertThat(

@@ -11,6 +11,8 @@ package schemacrawler.ermodel.model;
 /** A subtype entity. */
 public interface EntitySubtype extends Entity {
 
+  Relationship getIdentifyingRelationship();
+
   Entity getSupertype();
 
   boolean hasSupertype();
