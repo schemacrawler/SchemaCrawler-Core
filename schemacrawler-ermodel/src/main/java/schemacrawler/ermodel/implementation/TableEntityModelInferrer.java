@@ -257,6 +257,15 @@ public final class TableEntityModelInferrer {
    * @return Entity type
    */
   public Optional<Table> inferSuperType() {
+    return inferSuperTypeReference().map(ForeignKey::getPrimaryKeyTable);
+  }
+
+  /**
+   * Identifies the foreign key from this subtype to its supertype.
+   *
+   * @return Foreign key to supertype, if this table is a subtype
+   */
+  public Optional<ForeignKey> inferSuperTypeReference() {
 
     if (inferEntityType() != EntityType.subtype) {
       return Optional.empty();
@@ -268,7 +277,7 @@ public final class TableEntityModelInferrer {
       final Set<Column> parentPkColumns = parentPkColumnsMap.get(fk.key());
       // Revisit subtype conditions to locate the supertype
       if (parentPkColumns.equals(fkParentColumns)) {
-        return Optional.of(fk.getPrimaryKeyTable());
+        return Optional.of(fk);
       }
     }
     return Optional.empty();

@@ -10,6 +10,7 @@ SchemaCrawler Core release notes.
 - Add support for [QuickDBD](https://www.quickdatabasediagrams.com/) diagrams
 - Change Mermaid diagram to be a true ER diagram rather than a schema diagram
 - Seal interfaces, and reduce reliance on reflection
+- Add identifying relationship to entity subtypes
 
 
 <a name="v17.10.1"></a>
