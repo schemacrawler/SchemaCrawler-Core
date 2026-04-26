@@ -8,7 +8,7 @@
 
 package schemacrawler.schemacrawler.exceptions;
 
-import static schemacrawler.utility.ExceptionUtility.makeExceptionMessage;
+import static schemacrawler.schemacrawler.exceptions.ExceptionUtility.makeExceptionMessage;
 
 import java.io.Serial;
 import java.sql.SQLException;

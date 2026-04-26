@@ -6,18 +6,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.utility;
+package schemacrawler.schemacrawler.exceptions;
 
 import static us.fatehi.utility.Utility.isBlank;
 
-import schemacrawler.schemacrawler.exceptions.SchemaCrawlerException;
-import schemacrawler.schemacrawler.exceptions.WrappedSQLException;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
-public class ExceptionUtility {
+class ExceptionUtility {
 
-  public static String makeExceptionMessage(final String message, final Throwable cause) {
+  static String makeExceptionMessage(final String message, final Throwable cause) {
     final String causeMessage;
     if (cause == null) {
       causeMessage = "";
@@ -30,11 +28,10 @@ public class ExceptionUtility {
       return causeMessage;
     }
     // If the cause message is blank, use the override message, even if the it is null
-    if (isBlank(causeMessage)) {
-      return message;
-    }
     // Do not use a combined message for known exceptions, since they may already be mapped
-    if (cause instanceof SchemaCrawlerException || cause instanceof WrappedSQLException) {
+    if (isBlank(causeMessage)
+        || cause instanceof SchemaCrawlerException
+        || cause instanceof WrappedSQLException) {
       return message;
     }
     // Use a combined message
