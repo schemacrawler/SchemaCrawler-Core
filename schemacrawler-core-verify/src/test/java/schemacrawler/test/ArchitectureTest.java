@@ -44,7 +44,7 @@ public class ArchitectureTest {
 
   @BeforeAll
   public void _classes() {
-    final String description = "SchemaCrawler core";
+    final String description = "SchemaCrawler production classes";
     classes =
         new ClassFileImporter()
             .withImportOption(DO_NOT_INCLUDE_TESTS)
@@ -129,19 +129,59 @@ public class ArchitectureTest {
         .check(classes);
   }
 
-  // The following structural cycles remain and require deeper refactoring to address:
-  //   - crawl ↔ filter ↔ schemacrawler (7 variations): *Retriever classes in crawl accept
-  //     InclusionRuleFilter from schemacrawler.filter, which in turn depends on schemacrawler
-  //   - ermodel.implementation ↔ ermodel.utility: ERModelUtility creates Mutable* objects
-  //   - filter ↔ schemacrawler (2 variations): filter classes depend on LimitOptions/GrepOptions
-  //   - loader.catalog ↔ loader.ermodel (3 variations): cross-dependencies in loader submodules
-  //   - schemacrawler ↔ utility: MetaDataUtility.reduceCatalog() accepts SchemaCrawlerOptions
-  //   - schemacrawler.exceptions ↔ utility: ExceptionUtility checks instanceof
-  // SchemaCrawlerException
-  //   - tools.command ↔ tools.registry: CommandRegistry extends BasePluginCommandRegistry
+  // The following 10 structural cycles were verified by running architectureCycles() and
+  // capturing the ArchUnit output. Each entry shows the cycle path and its root cause.
+  //
+  // schemacrawler-api cycles:
+  //   Cycle 1  crawl → utility → schemacrawler → crawl
+  //            crawl uses JavaSqlTypes/TypeMap/MetaDataUtility/NamedObjectSort from utility;
+  //            utility.MetaDataUtility.reduceCatalog() accepts SchemaCrawlerOptions;
+  //            schemacrawler.MetadataResultSet uses ResultsCrawler from crawl
+  //
+  //   Cycle 2  filter → schemacrawler → utility → filter
+  //            filter classes accept SchemaCrawlerOptions/LimitOptions/GrepOptions;
+  //            schemacrawler uses TypeMap/NamedObjectSort/BinaryData/MetaDataUtility from utility;
+  //            utility.MetaDataUtility.reduceCatalog() calls ReducerFactory from filter
+  //
+  //   Cycle 3  filter → utility → filter
+  //            filter.TablesReducer.includeRelatedTables() calls MetaDataUtility.isPartial();
+  //            utility.MetaDataUtility.reduceCatalog() calls ReducerFactory from filter
+  //
+  //   Cycle 4  schemacrawler → utility → schemacrawler
+  //            SchemaRetrievalOptions/Builder, QueryUtility, MetadataResultSet use TypeMap,
+  //            NamedObjectSort, BinaryData, MetaDataUtility from utility;
+  //            utility.MetaDataUtility.reduceCatalog() accepts SchemaCrawlerOptions
+  //
+  // schemacrawler-ermodel cycles:
+  //   Cycle 5  ermodel.implementation → ermodel.utility → ermodel.implementation
+  //            MutableEntityAttribute calls ERModelUtility.inferEntityAttributeType();
+  //            ERModelUtility uses ERModelBuilder and TableEntityModelInferrer from implementation
+  //
+  // schemacrawler-loader cycles:
+  //   Cycle 6  loader.catalog → loader.catalog.counts → loader.catalog
+  //            CatalogLoaderRegistry instantiates TableRowCountsLoaderProvider;
+  //            counts subpackage extends AbstractCatalogLoader/AbstractCatalogLoaderProvider
+  //
+  //   Cycle 7  loader.catalog → loader.catalog.offline → loader.catalog
+  //            CatalogLoaderRegistry instantiates OfflineCatalogLoaderProvider;
+  //            offline subpackage extends AbstractCatalogLoader/AbstractCatalogLoaderProvider
+  //
+  //   Cycle 8  loader.catalog → tools.utility → loader.catalog
+  //            ChainedCatalogLoader calls ExecutionStateUtility.transferState();
+  //            SchemaCrawlerUtility.getCatalog() uses CatalogLoaderRegistry
+  //
+  //   Cycle 9  loader.ermodel → loader.ermodel.implicitassociations → loader.ermodel
+  //            ERModelLoaderRegistry instantiates ImplicitAssociationsLoaderProvider;
+  //            implicitassociations subpackage extends
+  // AbstractERModelLoader/AbstractERModelLoaderProvider
+  //
+  // schemacrawler-tools cycles:
+  //   Cycle 10 tools.command → tools.registry → tools.command
+  //            CommandRegistry extends BasePluginCommandRegistry (from registry);
+  //            BasePluginCommandRegistry/PluginCommandRegistry use CommandProvider (from command)
   //
   // Re-enable this test once the above cycles have been refactored away.
-  @Disabled("Pre-existing structural cycles remain — see comment above")
+  @Disabled("10 verified structural cycles remain — see comment above")
   @Test
   public void architectureCycles() {
     slices()
