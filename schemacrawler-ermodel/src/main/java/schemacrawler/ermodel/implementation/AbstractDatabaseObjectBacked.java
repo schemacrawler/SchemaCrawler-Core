@@ -20,7 +20,9 @@ import schemacrawler.ermodel.model.DatabaseObjectBacked;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schemacrawler.ModelImplementation;
 
+@ModelImplementation
 abstract class AbstractDatabaseObjectBacked<DO extends DatabaseObject>
     implements DatabaseObjectBacked<DO> {
 

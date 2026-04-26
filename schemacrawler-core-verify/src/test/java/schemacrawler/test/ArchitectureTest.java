@@ -12,6 +12,7 @@ import static com.tngtech.archunit.base.DescribedPredicate.not;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideOutsideOfPackages;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleName;
+import static com.tngtech.archunit.core.domain.properties.CanBeAnnotated.Predicates.annotatedWith;
 import static com.tngtech.archunit.core.importer.ImportOption.Predefined.DO_NOT_INCLUDE_TESTS;
 import static com.tngtech.archunit.lang.conditions.ArchPredicates.are;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
@@ -33,6 +34,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import schemacrawler.schemacrawler.ModelImplementation;
+import schemacrawler.schemacrawler.Retriever;
 
 @TestInstance(PER_CLASS)
 public class ArchitectureTest {
@@ -63,60 +66,56 @@ public class ArchitectureTest {
   // module-path users; these tests enforce the same architectural boundary for all users.
   @Test
   public void architecture() {
-    // Use combined predicates scoped to schemacrawler.crawl. Both Mutable* and *Retriever
-    // classes exist in other packages too (e.g., MutableERModel in ermodel.implementation,
-    // TableRowCountsRetriever in loader.catalog.counts). The rules must only flag access to
-    // the package-private internal classes that belong specifically to schemacrawler.crawl.
-    final DescribedPredicate<JavaClass> mutableInCrawl =
-        resideInAPackage("schemacrawler.crawl")
-            .and(
-                new DescribedPredicate<JavaClass>("have simple name starting with 'Mutable'") {
-                  @Override
-                  public boolean test(final JavaClass javaClass) {
-                    return javaClass.getSimpleName().startsWith("Mutable");
-                  }
-                });
-    final DescribedPredicate<JavaClass> retrieverInCrawl =
-        resideInAPackage("schemacrawler.crawl")
-            .and(
-                new DescribedPredicate<JavaClass>("have simple name ending with 'Retriever'") {
-                  @Override
-                  public boolean test(final JavaClass javaClass) {
-                    return javaClass.getSimpleName().endsWith("Retriever");
-                  }
-                });
 
-    // No class outside schemacrawler.crawl may reference any Mutable* class from that package.
-    // These Mutable* classes are package-private internal implementations of the schema model.
+    final DescribedPredicate<JavaClass> modelImplInCrawl =
+        resideInAPackage("schemacrawler.crawl").and(annotatedWith(ModelImplementation.class));
+    final DescribedPredicate<JavaClass> modelImplInERModel =
+        resideInAPackage("schemacrawler.ermodel.implementation")
+            .and(annotatedWith(ModelImplementation.class));
+    final DescribedPredicate<JavaClass> retrieverInCrawl =
+        resideInAPackage("schemacrawler.crawl").and(annotatedWith(Retriever.class));
+
+    // No class outside schemacrawler.crawl may reference any @ModelImplementation class from that
+    // package. These classes are package-private internal implementations of the schema model.
     // They must only be used within schemacrawler.crawl to prevent classpath clients from
     // constructing schema model objects directly.
     noClasses()
         .that()
         .resideOutsideOfPackage("schemacrawler.crawl")
         .should()
-        .dependOnClassesThat(mutableInCrawl)
+        .dependOnClassesThat(modelImplInCrawl)
         .because(
-            "Mutable* classes in schemacrawler.crawl are package-private internal implementations"
-                + " of the schema model; they must only be used within schemacrawler.crawl to"
-                + " prevent classpath clients from constructing schema model objects directly")
+            "@ModelImplementation classes in schemacrawler.crawl are package-private internal"
+                + " schema model implementations; they must only be used within schemacrawler.crawl"
+                + " to prevent classpath clients from constructing schema model objects directly")
         .check(classes);
 
-    // No class outside schemacrawler.crawl may reference any *Retriever class from that package.
-    // All *Retriever classes in schemacrawler.crawl are package-private JDBC metadata extractors.
+    // No class outside schemacrawler.ermodel.implementation may reference any @ModelImplementation
+    // class from that package. These are internal ER model implementation classes.
+    noClasses()
+        .that()
+        .resideOutsideOfPackage("schemacrawler.ermodel.implementation")
+        .should()
+        .dependOnClassesThat(modelImplInERModel)
+        .because(
+            "@ModelImplementation classes in schemacrawler.ermodel.implementation are internal"
+                + " ER model implementations; they must only be used within that package")
+        .check(classes);
+
+    // No class outside schemacrawler.crawl may reference any @Retriever class from that package.
+    // All @Retriever classes in schemacrawler.crawl are package-private JDBC metadata extractors.
     noClasses()
         .that()
         .resideOutsideOfPackage("schemacrawler.crawl")
         .should()
         .dependOnClassesThat(retrieverInCrawl)
         .because(
-            "*Retriever classes in schemacrawler.crawl are package-private JDBC metadata"
+            "@Retriever classes in schemacrawler.crawl are package-private JDBC metadata"
                 + " extractors; they must only be used within schemacrawler.crawl")
         .check(classes);
   }
 
-  // The schema ↔ schemacrawler cycle from IdentifiersBuilder has been eliminated by
-  // moving Options and OptionsBuilder to us.fatehi.utility. However, the following
-  // structural cycles remain and require deeper refactoring to address:
+  // The following structural cycles remain and require deeper refactoring to address:
   //   - crawl ↔ filter ↔ schemacrawler (7 variations): *Retriever classes in crawl accept
   //     InclusionRuleFilter from schemacrawler.filter, which in turn depends on schemacrawler
   //   - ermodel.implementation ↔ ermodel.utility: ERModelUtility creates Mutable* objects

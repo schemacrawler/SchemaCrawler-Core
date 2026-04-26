@@ -36,6 +36,11 @@ public final class ERModelBuilder implements Builder<ERModel> {
     return new ERModelBuilder(catalog);
   }
 
+  /** Creates a new empty ER model with no entities or relationships. */
+  public static ERModel buildEmptyERModel() {
+    return new MutableERModel();
+  }
+
   private final Catalog catalog;
   final MutableERModel erModel;
   final Map<NamedObjectKey, TableEntityModelInferrer> inferrerMap;

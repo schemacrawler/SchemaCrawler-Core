@@ -20,4 +20,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Inherited
 @Target(value = {TYPE})
-public @interface Retriever {}
+public @interface ModelImplementation {}

@@ -16,8 +16,10 @@ import java.io.Serial;
 import java.util.Objects;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schemacrawler.ModelImplementation;
 
 /** Represents a named object. */
+@ModelImplementation
 abstract class AbstractNamedObject implements NamedObject {
 
   @Serial private static final long serialVersionUID = -1486322887991472729L;

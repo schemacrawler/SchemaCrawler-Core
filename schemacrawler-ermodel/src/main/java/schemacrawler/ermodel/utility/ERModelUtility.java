@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import schemacrawler.ermodel.implementation.MutableERModel;
+import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
@@ -72,7 +72,7 @@ import us.fatehi.utility.UtilityMarker;
 public class ERModelUtility {
 
   public static ERModel buildEmptyERModel() {
-    return new MutableERModel();
+    return ERModelBuilder.buildEmptyERModel();
   }
 
   public static Collection<? extends TableReference> collectImplicitAssociations(

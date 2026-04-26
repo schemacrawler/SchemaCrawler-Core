@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.JdbcDriverProperty;
+import schemacrawler.schemacrawler.ModelImplementation;
 import us.fatehi.utility.database.JdbcDriverInformation;
 import us.fatehi.utility.property.BaseProductVersion;
 
@@ -25,6 +26,7 @@ import us.fatehi.utility.property.BaseProductVersion;
  * JDBC driver information. Created from metadata returned by a JDBC call, and other sources of
  * information.
  */
+@ModelImplementation
 final class MutableJdbcDriverInfo extends BaseProductVersion implements JdbcDriverInfo {
 
   @Serial private static final long serialVersionUID = 8030156654422512161L;

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import schemacrawler.schema.DatabaseInfo;
+import schemacrawler.schemacrawler.ModelImplementation;
 import us.fatehi.utility.database.DatabaseInformation;
 import us.fatehi.utility.property.BaseProductVersion;
 import us.fatehi.utility.property.Property;
@@ -26,6 +27,7 @@ import us.fatehi.utility.property.Property;
  * Database and connection information. Created from metadata returned by a JDBC call, and other
  * sources of information.
  */
+@ModelImplementation
 final class MutableDatabaseInfo extends BaseProductVersion implements DatabaseInfo {
 
   @Serial private static final long serialVersionUID = 4051323422934251828L;
