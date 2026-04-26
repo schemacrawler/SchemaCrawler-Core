@@ -129,59 +129,63 @@ public class ArchitectureTest {
         .check(classes);
   }
 
-  // The following 10 structural cycles were verified by running architectureCycles() and
+  // The following 9 structural cycles were verified by running architectureCycles() and
   // capturing the ArchUnit output. Each entry shows the cycle path and its root cause.
+  // Cycles 1-4 from the original 10 (all involving MetaDataUtility.reduceCatalog) were
+  // eliminated by introducing CatalogReducer and moving reduction to schemacrawler.filter.
   //
   // schemacrawler-api cycles:
-  //   Cycle 1  crawl → utility → schemacrawler → crawl
-  //            crawl uses JavaSqlTypes/TypeMap/MetaDataUtility/NamedObjectSort from utility;
-  //            utility.MetaDataUtility.reduceCatalog() accepts SchemaCrawlerOptions;
-  //            schemacrawler.MetadataResultSet uses ResultsCrawler from crawl
+  //   Cycle 1  crawl → filter → schemacrawler → crawl
+  //            crawl retrievers accept InclusionRuleFilter parameters from filter;
+  //            filter classes accept SchemaCrawlerOptions/LimitOptions/GrepOptions from
+  // schemacrawler;
+  //            schemacrawler.MetadataResultSet instantiates ResultsCrawler from crawl.
+  //            Fix: move InclusionRuleFilter to schemacrawler.inclusionrule (task:
+  // cycle-fix-inclusion-rule-filter)
   //
-  //   Cycle 2  filter → schemacrawler → utility → filter
-  //            filter classes accept SchemaCrawlerOptions/LimitOptions/GrepOptions;
-  //            schemacrawler uses TypeMap/NamedObjectSort/BinaryData/MetaDataUtility from utility;
-  //            utility.MetaDataUtility.reduceCatalog() calls ReducerFactory from filter
-  //
-  //   Cycle 3  filter → utility → filter
-  //            filter.TablesReducer.includeRelatedTables() calls MetaDataUtility.isPartial();
-  //            utility.MetaDataUtility.reduceCatalog() calls ReducerFactory from filter
-  //
-  //   Cycle 4  schemacrawler → utility → schemacrawler
-  //            SchemaRetrievalOptions/Builder, QueryUtility, MetadataResultSet use TypeMap,
-  //            NamedObjectSort, BinaryData, MetaDataUtility from utility;
-  //            utility.MetaDataUtility.reduceCatalog() accepts SchemaCrawlerOptions
+  //   Cycle 2  crawl ↔ schemacrawler
+  //            crawl uses MetadataResultSet, SchemaCrawlerOptions from schemacrawler;
+  //            schemacrawler.MetadataResultSet instantiates ResultsCrawler from crawl.
+  //            Fix: move ResultsCrawler to schemacrawler.schemacrawler (task:
+  // cycle-fix-results-crawler)
   //
   // schemacrawler-ermodel cycles:
-  //   Cycle 5  ermodel.implementation → ermodel.utility → ermodel.implementation
+  //   Cycle 3  ermodel.implementation ↔ ermodel.utility
   //            MutableEntityAttribute calls ERModelUtility.inferEntityAttributeType();
-  //            ERModelUtility uses ERModelBuilder and TableEntityModelInferrer from implementation
+  //            ERModelUtility uses ERModelBuilder and TableEntityModelInferrer from implementation.
+  //            Fix: move inferEntityAttributeType() into ermodel.implementation (task:
+  // cycle-fix-infer-entity-attr)
   //
   // schemacrawler-loader cycles:
-  //   Cycle 6  loader.catalog → loader.catalog.counts → loader.catalog
+  //   Cycle 4  loader.catalog ↔ loader.catalog.counts
   //            CatalogLoaderRegistry instantiates TableRowCountsLoaderProvider;
   //            counts subpackage extends AbstractCatalogLoader/AbstractCatalogLoaderProvider
   //
-  //   Cycle 7  loader.catalog → loader.catalog.offline → loader.catalog
+  //   Cycle 5  loader.catalog ↔ loader.catalog.offline
   //            CatalogLoaderRegistry instantiates OfflineCatalogLoaderProvider;
   //            offline subpackage extends AbstractCatalogLoader/AbstractCatalogLoaderProvider
   //
-  //   Cycle 8  loader.catalog → tools.utility → loader.catalog
+  //   Cycle 6  loader.catalog ↔ tools.utility
   //            ChainedCatalogLoader calls ExecutionStateUtility.transferState();
   //            SchemaCrawlerUtility.getCatalog() uses CatalogLoaderRegistry
   //
-  //   Cycle 9  loader.ermodel → loader.ermodel.implicitassociations → loader.ermodel
+  //   Cycle 7  loader.ermodel ↔ loader.ermodel.attributes
+  //            ERModelLoaderRegistry instantiates AttributesLoaderProvider;
+  //            attributes subpackage extends AbstractERModelLoader/AbstractERModelLoaderProvider
+  //
+  //   Cycle 8  loader.ermodel ↔ loader.ermodel.implicitassociations
   //            ERModelLoaderRegistry instantiates ImplicitAssociationsLoaderProvider;
   //            implicitassociations subpackage extends
   // AbstractERModelLoader/AbstractERModelLoaderProvider
   //
   // schemacrawler-tools cycles:
-  //   Cycle 10 tools.command → tools.registry → tools.command
+  //   Cycle 9  tools.command ↔ tools.registry
   //            CommandRegistry extends BasePluginCommandRegistry (from registry);
-  //            BasePluginCommandRegistry/PluginCommandRegistry use CommandProvider (from command)
+  //            BasePluginCommandRegistry/PluginCommandRegistry use CommandProvider (from command).
+  //            Fix: move CommandRegistry to tools.registry (task: cycle-fix-command-registry)
   //
   // Re-enable this test once the above cycles have been refactored away.
-  @Disabled("10 verified structural cycles remain — see comment above")
+  @Disabled("9 verified structural cycles remain — see comment above")
   @Test
   public void architectureCycles() {
     slices()

@@ -23,7 +23,7 @@ import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.LimitOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 
-public final class FilterFactory {
+final class FilterFactory {
 
   public static Predicate<Routine> routineFilter(final SchemaCrawlerOptions options) {
     final LimitOptions limitOptions = options.limitOptions();

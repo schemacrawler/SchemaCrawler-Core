@@ -16,6 +16,7 @@ import static schemacrawler.filter.FilterFactory.synonymFilter;
 import static schemacrawler.filter.FilterFactory.tableFilter;
 
 import java.util.function.Predicate;
+import schemacrawler.schema.CatalogReducer;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Reducer;
 import schemacrawler.schema.ReducibleCollection;
@@ -47,6 +48,10 @@ public final class ReducerFactory {
       requireNonNull(allNamedObjects, "No named objects provided");
       allNamedObjects.resetFilter();
     }
+  }
+
+  public static CatalogReducer getCatalogReducer(final SchemaCrawlerOptions options) {
+    return new StandardCatalogReducer(options);
   }
 
   public static Reducer<Routine> getRoutineReducer(final SchemaCrawlerOptions options) {

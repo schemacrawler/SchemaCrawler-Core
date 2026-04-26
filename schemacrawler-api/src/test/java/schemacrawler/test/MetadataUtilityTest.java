@@ -29,7 +29,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import schemacrawler.filter.ReducerFactory;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.CatalogReducer;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
@@ -113,15 +115,16 @@ public class MetadataUtilityTest {
             .withLimitOptions(limitOptionsBuilder.toOptions());
 
     // Reduce catalog
-    MetaDataUtility.reduceCatalog(catalog, schemaCrawlerOptions);
+    final CatalogReducer reducer = ReducerFactory.getCatalogReducer(schemaCrawlerOptions);
+    reducer.reduce(catalog);
 
     final Schema schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
     assertThat("BOOKS Schema not found", schema, notNullValue());
 
     assertThat("BOOKS Table not found", catalog.lookupTable(schema, "BOOKS").isEmpty());
 
-    // Undo reduce catalog
-    MetaDataUtility.reduceCatalog(catalog, SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions());
+    // Reset catalog
+    reducer.reset(catalog);
 
     final Table table = catalog.lookupTable(schema, "BOOKS").get();
     assertThat("BOOKS Table not found", table, notNullValue());
