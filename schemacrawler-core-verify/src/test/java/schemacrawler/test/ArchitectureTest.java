@@ -85,9 +85,11 @@ public class ArchitectureTest {
         .should()
         .dependOnClassesThat(modelImplInCrawl)
         .because(
-            "@ModelImplementation classes in schemacrawler.crawl are package-private internal"
-                + " schema model implementations; they must only be used within schemacrawler.crawl"
-                + " to prevent classpath clients from constructing schema model objects directly")
+            """
+            @ModelImplementation classes in schemacrawler.crawl are package-private internal
+              schema model implementations; they must only be used within schemacrawler.crawl
+              to prevent classpath clients from constructing schema model objects directly
+            """)
         .check(classes);
 
     // No class outside schemacrawler.ermodel.implementation may reference any @ModelImplementation
@@ -98,8 +100,10 @@ public class ArchitectureTest {
         .should()
         .dependOnClassesThat(modelImplInERModel)
         .because(
-            "@ModelImplementation classes in schemacrawler.ermodel.implementation are internal"
-                + " ER model implementations; they must only be used within that package")
+            """
+            @ModelImplementation classes in schemacrawler.ermodel.implementation are internal
+              ER model implementations; they must only be used within that package
+            """)
         .check(classes);
 
     // No class outside schemacrawler.crawl may reference any @Retriever class from that package.
@@ -110,8 +114,10 @@ public class ArchitectureTest {
         .should()
         .dependOnClassesThat(retrieverInCrawl)
         .because(
-            "@Retriever classes in schemacrawler.crawl are package-private JDBC metadata"
-                + " extractors; they must only be used within schemacrawler.crawl")
+            """
+            @Retriever classes in schemacrawler.crawl are package-private JDBC metadata
+              extractors; they must only be used within schemacrawler.crawl
+            """)
         .check(classes);
   }
 
