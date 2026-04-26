@@ -124,7 +124,7 @@ public class MetadataUtilityTest {
     assertThat("BOOKS Table not found", catalog.lookupTable(schema, "BOOKS").isEmpty());
 
     // Reset catalog
-    reducer.reset(catalog);
+    reducer.undo(catalog);
 
     final Table table = catalog.lookupTable(schema, "BOOKS").get();
     assertThat("BOOKS Table not found", table, notNullValue());

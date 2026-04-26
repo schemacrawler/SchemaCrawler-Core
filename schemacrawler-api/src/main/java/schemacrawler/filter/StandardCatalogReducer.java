@@ -23,6 +23,7 @@ import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 
 final class StandardCatalogReducer implements CatalogReducer {
 
@@ -44,8 +45,10 @@ final class StandardCatalogReducer implements CatalogReducer {
   }
 
   @Override
-  public void reset(final Catalog catalog) {
+  public void undo(final Catalog catalog) {
     requireNonNull(catalog, "No catalog provided");
+
+    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     catalog.undo(Schema.class, getSchemaReducer(options));
     catalog.undo(Table.class, getTableReducer(options));
