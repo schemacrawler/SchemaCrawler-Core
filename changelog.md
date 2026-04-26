@@ -3,6 +3,12 @@
 SchemaCrawler Core release notes.
 
 
+<a name="v17.10.3"></a>
+## Release 17.10.3 - 2026-04-27
+
+- Create a catalog reducer pattern
+
+
 <a name="v17.10.2"></a>
 ## Release 17.10.2 - 2026-04-20
 
