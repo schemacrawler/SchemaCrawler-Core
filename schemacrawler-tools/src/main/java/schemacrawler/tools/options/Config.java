@@ -21,8 +21,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionRule;
-import schemacrawler.schemacrawler.Options;
 import us.fatehi.utility.ObjectToString;
+import us.fatehi.utility.Options;
 import us.fatehi.utility.readconfig.ReadConfig;
 import us.fatehi.utility.string.StringFormat;
 

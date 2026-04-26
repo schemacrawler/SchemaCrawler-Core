@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
+import us.fatehi.utility.OptionsBuilder;
 
 /** grep options builder, to build the immutable options to crawl a schema. */
 public final class GrepOptionsBuilder implements OptionsBuilder<GrepOptionsBuilder, GrepOptions> {

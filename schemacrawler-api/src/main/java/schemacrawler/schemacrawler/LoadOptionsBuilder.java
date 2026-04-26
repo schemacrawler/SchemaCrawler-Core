@@ -11,6 +11,8 @@ package schemacrawler.schemacrawler;
 import static us.fatehi.utility.scheduler.TaskRunner.MAX_THREADS;
 import static us.fatehi.utility.scheduler.TaskRunner.MIN_THREADS;
 
+import us.fatehi.utility.OptionsBuilder;
+
 public final class LoadOptionsBuilder implements OptionsBuilder<LoadOptionsBuilder, LoadOptions> {
 
   public static LoadOptionsBuilder builder() {

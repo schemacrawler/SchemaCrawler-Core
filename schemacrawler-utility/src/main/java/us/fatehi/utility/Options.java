@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.schemacrawler;
+package us.fatehi.utility;
 
-/** Options. */
+/** Marker interface for options objects. */
 public interface Options {}

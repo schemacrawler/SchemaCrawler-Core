@@ -20,6 +20,7 @@ import schemacrawler.inclusionrule.IncludeAll;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.TableTypes;
+import us.fatehi.utility.Options;
 
 /** SchemaCrawler options controlling inclusion/ limits. */
 public record LimitOptions(

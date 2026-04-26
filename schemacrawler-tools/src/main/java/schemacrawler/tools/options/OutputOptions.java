@@ -17,9 +17,9 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.UUID;
-import schemacrawler.schemacrawler.Options;
 import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import us.fatehi.utility.ObjectToString;
+import us.fatehi.utility.Options;
 import us.fatehi.utility.ioresource.FileOutputResource;
 import us.fatehi.utility.ioresource.OutputResource;
 

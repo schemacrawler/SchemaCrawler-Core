@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
-import schemacrawler.schemacrawler.Options;
+import us.fatehi.utility.Options;
 
 /**
  * Allows working with database object identifiers. All SQL 2003 keywords are considered

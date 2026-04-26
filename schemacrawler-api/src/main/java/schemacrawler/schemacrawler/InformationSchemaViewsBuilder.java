@@ -17,6 +17,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import us.fatehi.utility.OptionsBuilder;
 import us.fatehi.utility.TemplatingUtility;
 
 /** The database specific views to get additional database metadata in a standard format. */

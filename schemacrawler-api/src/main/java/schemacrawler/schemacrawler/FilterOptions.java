@@ -8,6 +8,8 @@
 
 package schemacrawler.schemacrawler;
 
+import us.fatehi.utility.Options;
+
 /** Options to control filtering depth for related tables. */
 public record FilterOptions(int childTableFilterDepth, int parentTableFilterDepth)
     implements Options {

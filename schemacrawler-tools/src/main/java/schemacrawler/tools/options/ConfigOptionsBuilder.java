@@ -8,7 +8,7 @@
 
 package schemacrawler.tools.options;
 
-import schemacrawler.schemacrawler.Options;
+import us.fatehi.utility.Options;
 
 /**
  * Convoluted interface to allow for subclasses builders, while maintaining a fluent interface.

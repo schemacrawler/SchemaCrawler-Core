@@ -6,9 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.schemacrawler;
-
-import us.fatehi.utility.Builder;
+package us.fatehi.utility;
 
 /**
  * Convoluted interface to allow for subclasses builders, while maintaining a fluent interface.

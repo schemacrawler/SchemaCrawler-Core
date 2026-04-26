@@ -9,13 +9,13 @@
 package schemacrawler.test;
 
 import static com.tngtech.archunit.base.DescribedPredicate.not;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideOutsideOfPackages;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleName;
 import static com.tngtech.archunit.core.importer.ImportOption.Predefined.DO_NOT_INCLUDE_TESTS;
 import static com.tngtech.archunit.lang.conditions.ArchPredicates.are;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
-import static com.tngtech.archunit.library.Architectures.onionArchitecture;
 import static com.tngtech.archunit.library.GeneralCodingRules.ACCESS_STANDARD_STREAMS;
 import static com.tngtech.archunit.library.GeneralCodingRules.THROW_GENERIC_EXCEPTIONS;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
@@ -23,6 +23,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import java.util.Optional;
@@ -49,35 +51,84 @@ public class ArchitectureTest {
     assertThat(description + " classes not found", classes.isEmpty(), is(false));
   }
 
-  @Disabled("Need more organization of packages")
+  // The schemacrawler.crawl package is intentionally kept flat (not split into subpackages).
+  //
+  // All Mutable* model implementations and *Retriever JDBC extractors are package-private.
+  // This prevents classpath users (those loading SchemaCrawler as a plain jar rather than
+  // via the JPMS module path) from constructing or referencing these internal classes.
+  //
+  // Java package-private visibility is strictly per-package. Splitting into subpackages would
+  // require making these classes at least public — immediately exposing them to classpath
+  // clients. The JPMS module system's "do not export schemacrawler.crawl" already protects
+  // module-path users; these tests enforce the same architectural boundary for all users.
   @Test
   public void architecture() {
-    onionArchitecture()
-        .domainModels("schemacrawler.schema..")
-        .domainServices(
-            "schemacrawler.crawl..",
-            "schemacrawler.schemacrawler..",
-            "schemacrawler.filter..",
-            "schemacrawler.plugin..",
-            "schemacrawler.analysis..",
-            "schemacrawler.inclusionrule..",
-            "schemacrawler.utility..")
-        .applicationServices(
-            "schemacrawler.tools.catalogloader..",
-            "schemacrawler.tools.databaseconnector..",
-            "schemacrawler.tools.executable..",
-            "schemacrawler.tools.options..",
-            "schemacrawler.tools.utility..",
-            "schemacrawler.tools.traversal..")
-        .adapter(
-            "Text output for schema, operations and diagram",
-            "schemacrawler.tools.command.text..",
-            "schemacrawler.tools.text.formatter..")
-        .because("an onion architecture model should be followed")
+    // Use combined predicates scoped to schemacrawler.crawl. Both Mutable* and *Retriever
+    // classes exist in other packages too (e.g., MutableERModel in ermodel.implementation,
+    // TableRowCountsRetriever in loader.catalog.counts). The rules must only flag access to
+    // the package-private internal classes that belong specifically to schemacrawler.crawl.
+    final DescribedPredicate<JavaClass> mutableInCrawl =
+        resideInAPackage("schemacrawler.crawl")
+            .and(
+                new DescribedPredicate<JavaClass>("have simple name starting with 'Mutable'") {
+                  @Override
+                  public boolean test(final JavaClass javaClass) {
+                    return javaClass.getSimpleName().startsWith("Mutable");
+                  }
+                });
+    final DescribedPredicate<JavaClass> retrieverInCrawl =
+        resideInAPackage("schemacrawler.crawl")
+            .and(
+                new DescribedPredicate<JavaClass>("have simple name ending with 'Retriever'") {
+                  @Override
+                  public boolean test(final JavaClass javaClass) {
+                    return javaClass.getSimpleName().endsWith("Retriever");
+                  }
+                });
+
+    // No class outside schemacrawler.crawl may reference any Mutable* class from that package.
+    // These Mutable* classes are package-private internal implementations of the schema model.
+    // They must only be used within schemacrawler.crawl to prevent classpath clients from
+    // constructing schema model objects directly.
+    noClasses()
+        .that()
+        .resideOutsideOfPackage("schemacrawler.crawl")
+        .should()
+        .dependOnClassesThat(mutableInCrawl)
+        .because(
+            "Mutable* classes in schemacrawler.crawl are package-private internal implementations"
+                + " of the schema model; they must only be used within schemacrawler.crawl to"
+                + " prevent classpath clients from constructing schema model objects directly")
+        .check(classes);
+
+    // No class outside schemacrawler.crawl may reference any *Retriever class from that package.
+    // All *Retriever classes in schemacrawler.crawl are package-private JDBC metadata extractors.
+    noClasses()
+        .that()
+        .resideOutsideOfPackage("schemacrawler.crawl")
+        .should()
+        .dependOnClassesThat(retrieverInCrawl)
+        .because(
+            "*Retriever classes in schemacrawler.crawl are package-private JDBC metadata"
+                + " extractors; they must only be used within schemacrawler.crawl")
         .check(classes);
   }
 
-  @Disabled("Layers are not well implemented")
+  // The schema ↔ schemacrawler cycle from IdentifiersBuilder has been eliminated by
+  // moving Options and OptionsBuilder to us.fatehi.utility. However, the following
+  // structural cycles remain and require deeper refactoring to address:
+  //   - crawl ↔ filter ↔ schemacrawler (7 variations): *Retriever classes in crawl accept
+  //     InclusionRuleFilter from schemacrawler.filter, which in turn depends on schemacrawler
+  //   - ermodel.implementation ↔ ermodel.utility: ERModelUtility creates Mutable* objects
+  //   - filter ↔ schemacrawler (2 variations): filter classes depend on LimitOptions/GrepOptions
+  //   - loader.catalog ↔ loader.ermodel (3 variations): cross-dependencies in loader submodules
+  //   - schemacrawler ↔ utility: MetaDataUtility.reduceCatalog() accepts SchemaCrawlerOptions
+  //   - schemacrawler.exceptions ↔ utility: ExceptionUtility checks instanceof
+  // SchemaCrawlerException
+  //   - tools.command ↔ tools.registry: CommandRegistry extends BasePluginCommandRegistry
+  //
+  // Re-enable this test once the above cycles have been refactored away.
+  @Disabled("Pre-existing structural cycles remain — see comment above")
   @Test
   public void architectureCycles() {
     slices()
@@ -85,7 +136,7 @@ public class ArchitectureTest {
         .as("SchemaCrawler core")
         .should()
         .beFreeOfCycles()
-        .because("code should be well-structured in packages")
+        .because("packages should have a clear, acyclic dependency structure")
         .check(classes);
   }
 
