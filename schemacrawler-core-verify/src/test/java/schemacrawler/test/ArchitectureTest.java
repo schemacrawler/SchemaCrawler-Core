@@ -69,16 +69,6 @@ public class ArchitectureTest {
 
     final DescribedPredicate<JavaClass> modelImplInCrawl =
         resideInAPackage("schemacrawler.crawl").and(annotatedWith(ModelImplementation.class));
-    final DescribedPredicate<JavaClass> modelImplInERModel =
-        resideInAPackage("schemacrawler.ermodel.implementation")
-            .and(annotatedWith(ModelImplementation.class));
-    final DescribedPredicate<JavaClass> retrieverInCrawl =
-        resideInAPackage("schemacrawler.crawl").and(annotatedWith(Retriever.class));
-
-    // No class outside schemacrawler.crawl may reference any @ModelImplementation class from that
-    // package. These classes are package-private internal implementations of the schema model.
-    // They must only be used within schemacrawler.crawl to prevent classpath clients from
-    // constructing schema model objects directly.
     noClasses()
         .that()
         .resideOutsideOfPackage("schemacrawler.crawl")
@@ -92,8 +82,9 @@ public class ArchitectureTest {
             """)
         .check(classes);
 
-    // No class outside schemacrawler.ermodel.implementation may reference any @ModelImplementation
-    // class from that package. These are internal ER model implementation classes.
+    final DescribedPredicate<JavaClass> modelImplInERModel =
+        resideInAPackage("schemacrawler.ermodel.implementation")
+            .and(annotatedWith(ModelImplementation.class));
     noClasses()
         .that()
         .resideOutsideOfPackage("schemacrawler.ermodel.implementation")
@@ -106,8 +97,25 @@ public class ArchitectureTest {
             """)
         .check(classes);
 
-    // No class outside schemacrawler.crawl may reference any @Retriever class from that package.
-    // All @Retriever classes in schemacrawler.crawl are package-private JDBC metadata extractors.
+    final DescribedPredicate<JavaClass> modelImplInLoaderCatalog =
+        resideInAPackage("schemacrawler.loader.catalog.model")
+            .and(annotatedWith(ModelImplementation.class));
+    noClasses()
+        .that()
+        .resideOutsideOfPackages(
+            "schemacrawler.loader.catalog.model", "schemacrawler.loader.ermodel.attributes")
+        .should()
+        .dependOnClassesThat(modelImplInLoaderCatalog)
+        .because(
+            """
+            @ModelImplementation classes in schemacrawler.loader.catalog.model are internal YAML
+              deserialization DTOs; only AttributesLoader in ermodel.attributes (the designated
+              processor) is permitted to reference them outside the model package
+            """)
+        .check(classes);
+
+    final DescribedPredicate<JavaClass> retrieverInCrawl =
+        resideInAPackage("schemacrawler.crawl").and(annotatedWith(Retriever.class));
     noClasses()
         .that()
         .resideOutsideOfPackage("schemacrawler.crawl")
