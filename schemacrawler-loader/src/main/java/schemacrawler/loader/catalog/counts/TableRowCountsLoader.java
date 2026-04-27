@@ -8,20 +8,40 @@
 
 package schemacrawler.loader.catalog.counts;
 
-import static schemacrawler.filter.ReducerFactory.getTableReducer;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.loader.catalog.AbstractCatalogLoader;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.Reducer;
+import schemacrawler.schema.ReducibleCollection;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
-import schemacrawler.loader.catalog.AbstractCatalogLoader;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
 import us.fatehi.utility.scheduler.TaskRunners;
 
 public class TableRowCountsLoader extends AbstractCatalogLoader<TableRowCountsLoaderOptions> {
+
+  // Filters tables by a custom predicate without depending on schemacrawler.filter internals.
+  private static final class TablePredicateReducer implements Reducer<Table> {
+
+    private final TableRowCountsFilter tableFilter;
+
+    TablePredicateReducer(final TableRowCountsFilter tableFilter) {
+      this.tableFilter = tableFilter;
+    }
+
+    @Override
+    public void reduce(final ReducibleCollection<? extends Table> tables) {
+      tables.filter(tableFilter);
+    }
+
+    @Override
+    public void undo(final ReducibleCollection<? extends Table> tables) {
+      tables.resetFilter();
+    }
+  }
 
   private static final Logger LOGGER = Logger.getLogger(TableRowCountsLoader.class.getName());
 
@@ -62,7 +82,8 @@ public class TableRowCountsLoader extends AbstractCatalogLoader<TableRowCountsLo
               "filterEmptyTables",
               () ->
                   catalog.reduce(
-                      Table.class, getTableReducer(new TableRowCountsFilter(noEmptyTables)))));
+                      Table.class,
+                      new TablePredicateReducer(new TableRowCountsFilter(noEmptyTables)))));
       taskRunner.submit();
 
       LOGGER.log(Level.INFO, taskRunner.report());
