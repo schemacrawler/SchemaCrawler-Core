@@ -7,7 +7,6 @@ import java.util.List;
 import schemacrawler.ermodel.model.EntityAttribute;
 import schemacrawler.ermodel.model.EntityAttributeType;
 import schemacrawler.ermodel.model.TableBacked;
-import schemacrawler.ermodel.utility.ERModelUtility;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.PartialDatabaseObject;
@@ -28,7 +27,7 @@ class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
     this.parent = requireNonNull(parent, "No parent provided");
 
     final ColumnDataType columnDataType = column.getColumnDataType();
-    type = ERModelUtility.inferEntityAttributeType(columnDataType);
+    type = EntityAttributeType.from(columnDataType);
     enumValues = columnDataType.getEnumValues();
     isPartial = column instanceof PartialDatabaseObject;
   }

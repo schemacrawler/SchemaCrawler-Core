@@ -31,7 +31,6 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import schemacrawler.schemacrawler.ModelImplementation;
@@ -129,49 +128,11 @@ public class ArchitectureTest {
         .check(classes);
   }
 
-  // 2 structural cycles verified by a live ArchUnit run on 2026-04-26.
-  // See schemacrawler-verified-cycles.md in the repository root for full details.
-  //
-  // History:
-  //   - Originally 10 cycles. Cycles 1-4 (MetaDataUtility.reduceCatalog) fixed by CatalogReducer.
-  //   - FilterFactory collapsed into StandardCatalogReducer (no cycle impact).
-  //   - Old cycles 4,5,7,8 (loader registry direct sub-package instantiation) fixed by
-  //     replacing 'new ProviderClass()' with string-based Class.forName loading in registries.
-  //     This eliminated compile-time loader.catalog→subpackage and loader.ermodel→subpackage
-  //     edges. One previously-hidden cycle became visible: loader.ermodel ↔ tools.utility.
-  //   - MetadataResultSet moved from schemacrawler.schemacrawler to schemacrawler.crawl,
-  //     eliminating the sole schemacrawler→crawl back-edge. Broke old Cycles 1 and 2 (6→4).
-  //   - BasePluginCommandRegistry and PluginCommandRegistry moved from tools.registry to
-  //     tools.command, breaking tools.command↔tools.registry. The loader cycles
-  //     (loader.catalog↔tools.state, loader.ermodel↔tools.state) merged into the
-  //     tools.command↔tools.state SCC and now surface as a single cycle (4→2).
-  //
-  // schemacrawler-ermodel:
-  //   Cycle 1  ermodel.implementation ↔ ermodel.utility  [2-way]
-  //            MutableEntityAttribute calls ERModelUtility.inferEntityAttributeType();
-  //            ERModelUtility constructs ERModelBuilder and TableEntityModelInferrer
-  //            (implementation).
-  //            Fix: move inferEntityAttributeType() into ermodel.implementation
-  //            (task: cycle-fix-infer-entity-attr)
-  //
-  // schemacrawler-tools:
-  //   Cycle 2  tools.command ↔ tools.state  [2-way]
-  //            AbstractCommand extends AbstractExecutionState (state);
-  //            BaseCommand extends ExecutionState (state);
-  //            ExecutionStateUtility.transferState() (state) checks instanceof BaseCommand
-  // (command).
-  //            Fix: extract a lean ExecutionState interface to a neutral package so that
-  //            tools.command implements it without importing tools.state.
-  //
-  // Re-enable this test once the above cycles have been refactored away.
-  @Disabled(
-      "2 verified structural cycles remain — see comment above and"
-          + " schemacrawler-verified-cycles.md")
   @Test
   public void architectureCycles() {
     slices()
         .matching("schemacrawler.(**)..")
-        .as("SchemaCrawler core")
+        .as("SchemaCrawler production classes")
         .should()
         .beFreeOfCycles()
         .because("packages should have a clear, acyclic dependency structure")

@@ -163,16 +163,14 @@ public class EntityModelUtilityTest {
     for (Entry<String, EntityAttributeType> attributeTypeCase : attributeTypes.entrySet()) {
       assertThat(
           "Wrong attribute type for <%s>".formatted(attributeTypeCase.getKey()),
-          ERModelUtility.inferEntityAttributeType(
+          EntityAttributeType.from(
               LightColumnDataTypeUtility.columnDataType(attributeTypeCase.getKey())),
           is(attributeTypeCase.getValue()));
     }
 
-    assertThat(ERModelUtility.inferEntityAttributeType(null), is(EntityAttributeType.unknown));
+    assertThat(EntityAttributeType.from(null), is(EntityAttributeType.unknown));
 
     final ColumnDataType enumeratedDataType = enumColumnDataType();
-    assertThat(
-        ERModelUtility.inferEntityAttributeType(enumeratedDataType),
-        is(EntityAttributeType.enumerated));
+    assertThat(EntityAttributeType.from(enumeratedDataType), is(EntityAttributeType.enumerated));
   }
 }
