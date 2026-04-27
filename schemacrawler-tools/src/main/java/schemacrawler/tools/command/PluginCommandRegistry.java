@@ -6,11 +6,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.registry;
+package schemacrawler.tools.command;
 
 import java.util.Collection;
-import schemacrawler.tools.command.CommandProvider;
 import schemacrawler.tools.executable.commandline.PluginCommand;
+import schemacrawler.tools.registry.PluginRegistry;
 
 public interface PluginCommandRegistry<R extends CommandProvider> extends PluginRegistry {
 

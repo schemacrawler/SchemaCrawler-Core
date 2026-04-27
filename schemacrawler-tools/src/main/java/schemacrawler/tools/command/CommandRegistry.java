@@ -23,7 +23,6 @@ import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.schemacrawler.exceptions.SchemaCrawlerException;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.OutputOptions;
-import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
 
 /** Command registry for mapping command to executable. */

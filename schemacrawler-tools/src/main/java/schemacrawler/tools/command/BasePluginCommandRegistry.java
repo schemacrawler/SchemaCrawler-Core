@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.registry;
+package schemacrawler.tools.command;
 
 import static java.util.Objects.requireNonNull;
 
@@ -16,8 +16,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
-import schemacrawler.tools.command.CommandProvider;
 import schemacrawler.tools.executable.commandline.PluginCommand;
+import schemacrawler.tools.registry.BasePluginRegistry;
 import us.fatehi.utility.property.PropertyName;
 
 public abstract class BasePluginCommandRegistry<R extends CommandProvider>

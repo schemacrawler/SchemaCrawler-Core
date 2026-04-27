@@ -129,7 +129,7 @@ public class ArchitectureTest {
         .check(classes);
   }
 
-  // 6 structural cycles verified by a live ArchUnit run on 2026-04-26.
+  // 2 structural cycles verified by a live ArchUnit run on 2026-04-26.
   // See schemacrawler-verified-cycles.md in the repository root for full details.
   //
   // History:
@@ -139,48 +139,33 @@ public class ArchitectureTest {
   //     replacing 'new ProviderClass()' with string-based Class.forName loading in registries.
   //     This eliminated compile-time loader.catalog→subpackage and loader.ermodel→subpackage
   //     edges. One previously-hidden cycle became visible: loader.ermodel ↔ tools.utility.
-  //
-  // schemacrawler-api:
-  //   Cycle 1  crawl → filter → schemacrawler → crawl  [3-way]
-  //            crawl retrievers accept InclusionRuleFilter (filter) as parameters;
-  //            filter classes accept SchemaCrawlerOptions/LimitOptions/GrepOptions (schemacrawler);
-  //            MetadataResultSet (schemacrawler) constructs ResultsCrawler (crawl).
-  //            Fix: move InclusionRuleFilter out of filter (task: cycle-fix-inclusion-rule-filter)
-  //
-  //   Cycle 2  crawl ↔ schemacrawler  [2-way]
-  //            crawl uses SchemaCrawlerOptions, annotations, etc. from schemacrawler;
-  //            MetadataResultSet (schemacrawler) constructs and calls ResultsCrawler (crawl).
-  //            Fix: move ResultsCrawler to schemacrawler (task: cycle-fix-results-crawler)
+  //   - MetadataResultSet moved from schemacrawler.schemacrawler to schemacrawler.crawl,
+  //     eliminating the sole schemacrawler→crawl back-edge. Broke old Cycles 1 and 2 (6→4).
+  //   - BasePluginCommandRegistry and PluginCommandRegistry moved from tools.registry to
+  //     tools.command, breaking tools.command↔tools.registry. The loader cycles
+  //     (loader.catalog↔tools.state, loader.ermodel↔tools.state) merged into the
+  //     tools.command↔tools.state SCC and now surface as a single cycle (4→2).
   //
   // schemacrawler-ermodel:
-  //   Cycle 3  ermodel.implementation ↔ ermodel.utility  [2-way]
+  //   Cycle 1  ermodel.implementation ↔ ermodel.utility  [2-way]
   //            MutableEntityAttribute calls ERModelUtility.inferEntityAttributeType();
   //            ERModelUtility constructs ERModelBuilder and TableEntityModelInferrer
-  // (implementation).
+  //            (implementation).
   //            Fix: move inferEntityAttributeType() into ermodel.implementation
   //            (task: cycle-fix-infer-entity-attr)
   //
-  // schemacrawler-loader:
-  //   Cycle 4  loader.catalog ↔ tools.utility  [cross-module]
-  //            ChainedCatalogLoader.execute() calls ExecutionStateUtility.transferState();
-  //            SchemaCrawlerUtility.getCatalog() uses CatalogLoaderRegistry/CatalogLoader.
-  //            Fix: move transferState() into loader.catalog, or extract a facade interface
-  //
-  //   Cycle 5  loader.ermodel ↔ tools.utility  [cross-module]
-  //            ChainedERModelLoader.execute() calls ExecutionStateUtility.transferState();
-  //            SchemaCrawlerUtility.buildERModel() uses ERModelLoaderRegistry/ChainedERModelLoader.
-  //            Fix: same approach as Cycle 4
-  //
   // schemacrawler-tools:
-  //   Cycle 6  tools.command ↔ tools.registry  [2-way]
-  //            CommandRegistry (command) extends BasePluginCommandRegistry (registry);
-  //            BasePluginCommandRegistry/PluginCommandRegistry type params bound to CommandProvider
+  //   Cycle 2  tools.command ↔ tools.state  [2-way]
+  //            AbstractCommand extends AbstractExecutionState (state);
+  //            BaseCommand extends ExecutionState (state);
+  //            ExecutionStateUtility.transferState() (state) checks instanceof BaseCommand
   // (command).
-  //            Fix: move CommandProvider to tools.registry (task: cycle-fix-command-registry)
+  //            Fix: extract a lean ExecutionState interface to a neutral package so that
+  //            tools.command implements it without importing tools.state.
   //
   // Re-enable this test once the above cycles have been refactored away.
   @Disabled(
-      "6 verified structural cycles remain — see comment above and"
+      "2 verified structural cycles remain — see comment above and"
           + " schemacrawler-verified-cycles.md")
   @Test
   public void architectureCycles() {
