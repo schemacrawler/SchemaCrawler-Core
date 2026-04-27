@@ -37,7 +37,7 @@ import schemacrawler.schemacrawler.ModelImplementation;
 import schemacrawler.schemacrawler.Retriever;
 
 @TestInstance(PER_CLASS)
-public class ArchitectureTest {
+public class CoreArchitectureTest {
 
   private JavaClasses classes;
 
@@ -53,6 +53,19 @@ public class ArchitectureTest {
     assertThat(description + " classes not found", classes.isEmpty(), is(false));
   }
 
+  @Test
+  public void lookupMethods() {
+    methods()
+        .that()
+        .haveNameMatching("lookup.*")
+        .and()
+        .arePublic()
+        .should()
+        .haveRawReturnType(Optional.class)
+        .because("lookups may not return a value")
+        .check(classes);
+  }
+
   // The schemacrawler.crawl package is intentionally kept flat (not split into subpackages).
   //
   // All Mutable* model implementations and *Retriever JDBC extractors are package-private.
@@ -64,7 +77,7 @@ public class ArchitectureTest {
   // clients. The JPMS module system's "do not export schemacrawler.crawl" already protects
   // module-path users; these tests enforce the same architectural boundary for all users.
   @Test
-  public void architecture() {
+  public void model() {
 
     final DescribedPredicate<JavaClass> modelImplInCrawl =
         resideInAPackage("schemacrawler.crawl").and(annotatedWith(ModelImplementation.class));
@@ -129,30 +142,6 @@ public class ArchitectureTest {
   }
 
   @Test
-  public void architectureCycles() {
-    slices()
-        .matching("schemacrawler.(**)..")
-        .as("SchemaCrawler production classes")
-        .should()
-        .beFreeOfCycles()
-        .because("packages should have a clear, acyclic dependency structure")
-        .check(classes);
-  }
-
-  @Test
-  public void lookupMethods() {
-    methods()
-        .that()
-        .haveNameMatching("lookup.*")
-        .and()
-        .arePublic()
-        .should()
-        .haveRawReturnType(Optional.class)
-        .because("lookups may not return a value")
-        .check(classes);
-  }
-
-  @Test
   public void notAccessStandardStreams() {
     noClasses()
         .that(
@@ -172,6 +161,17 @@ public class ArchitectureTest {
         .because(
             "SchemaCrawler defines it own exceptions, and wraps SQL exceptions with additional"
                 + " information")
+        .check(classes);
+  }
+
+  @Test
+  public void packageCycles() {
+    slices()
+        .matching("schemacrawler.(**)..")
+        .as("SchemaCrawler production classes")
+        .should()
+        .beFreeOfCycles()
+        .because("packages should have a clear, acyclic dependency structure")
         .check(classes);
   }
 }
