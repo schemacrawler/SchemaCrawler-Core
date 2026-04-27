@@ -16,8 +16,6 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.schemacrawler.exceptions.SchemaCrawlerException;
-import schemacrawler.loader.catalog.counts.TableRowCountsLoaderProvider;
-import schemacrawler.loader.catalog.offline.OfflineCatalogLoaderProvider;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
@@ -26,6 +24,15 @@ import us.fatehi.utility.string.StringFormat;
 public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<CatalogLoaderProvider> {
 
   private static final Logger LOGGER = Logger.getLogger(CatalogLoaderRegistry.class.getName());
+
+  // Provider classnames are listed as strings to avoid compile-time dependencies on subpackages,
+  // which would create package cycles. The list is fixed at compile time — no external injection
+  // is possible since ServiceLoader is not used.
+  private static final List<String> PROVIDER_CLASS_NAMES =
+      List.of(
+          "schemacrawler.loader.catalog.offline.OfflineCatalogLoaderProvider",
+          "schemacrawler.loader.catalog.PrimaryCatalogLoaderProvider",
+          "schemacrawler.loader.catalog.counts.TableRowCountsLoaderProvider");
 
   private static CatalogLoaderRegistry catalogLoaderRegistrySingleton;
 
@@ -38,12 +45,7 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
   }
 
   private CatalogLoaderRegistry() {
-    super(
-        "SchemaCrawler Catalog Loaders",
-        List.of(
-            new OfflineCatalogLoaderProvider(),
-            new PrimaryCatalogLoaderProvider(),
-            new TableRowCountsLoaderProvider()));
+    super("SchemaCrawler Catalog Loaders", instantiateProviders(PROVIDER_CLASS_NAMES));
   }
 
   public ChainedCatalogLoader newChainedCatalogLoader(

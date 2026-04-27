@@ -15,12 +15,29 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.tools.command.CommandProvider;
 import schemacrawler.tools.executable.commandline.PluginCommand;
 import us.fatehi.utility.property.PropertyName;
 
 public abstract class BasePluginCommandRegistry<R extends CommandProvider>
     extends BasePluginRegistry implements PluginCommandRegistry<R> {
+
+  @SuppressWarnings("unchecked")
+  protected static <R extends CommandProvider> List<R> instantiateProviders(
+      final List<String> classNames) {
+    final List<R> providers = new ArrayList<>();
+    for (final String className : classNames) {
+      try {
+        final Class<?> cls = Class.forName(className);
+        providers.add((R) cls.getDeclaredConstructor().newInstance());
+      } catch (final Exception e) {
+        throw new InternalRuntimeException(
+            "Could not instantiate plugin provider <%s>".formatted(className), e);
+      }
+    }
+    return List.copyOf(providers);
+  }
 
   private final List<R> commandProviders;
 
@@ -42,10 +59,6 @@ public abstract class BasePluginCommandRegistry<R extends CommandProvider>
       }
     }
     return commandLineCommands;
-  }
-
-  protected List<R> getCommandProviders() {
-    return List.copyOf(commandProviders);
   }
 
   @Override
@@ -74,5 +87,9 @@ public abstract class BasePluginCommandRegistry<R extends CommandProvider>
     final List<PropertyName> supportedCommandsOrdered = new ArrayList<>(supportedCommands);
     Collections.sort(supportedCommandsOrdered);
     return List.copyOf(supportedCommandsOrdered);
+  }
+
+  protected List<R> getCommandProviders() {
+    return List.copyOf(commandProviders);
   }
 }

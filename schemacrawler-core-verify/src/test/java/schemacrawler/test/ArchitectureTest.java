@@ -129,63 +129,59 @@ public class ArchitectureTest {
         .check(classes);
   }
 
-  // The following 9 structural cycles were verified by running architectureCycles() and
-  // capturing the ArchUnit output. Each entry shows the cycle path and its root cause.
-  // Cycles 1-4 from the original 10 (all involving MetaDataUtility.reduceCatalog) were
-  // eliminated by introducing CatalogReducer and moving reduction to schemacrawler.filter.
+  // 6 structural cycles verified by a live ArchUnit run on 2026-04-26.
+  // See schemacrawler-verified-cycles.md in the repository root for full details.
   //
-  // schemacrawler-api cycles:
-  //   Cycle 1  crawl → filter → schemacrawler → crawl
-  //            crawl retrievers accept InclusionRuleFilter parameters from filter;
-  //            filter classes accept SchemaCrawlerOptions/LimitOptions/GrepOptions from
-  // schemacrawler;
-  //            schemacrawler.MetadataResultSet instantiates ResultsCrawler from crawl.
-  //            Fix: move InclusionRuleFilter to schemacrawler.inclusionrule (task:
-  // cycle-fix-inclusion-rule-filter)
+  // History:
+  //   - Originally 10 cycles. Cycles 1-4 (MetaDataUtility.reduceCatalog) fixed by CatalogReducer.
+  //   - FilterFactory collapsed into StandardCatalogReducer (no cycle impact).
+  //   - Old cycles 4,5,7,8 (loader registry direct sub-package instantiation) fixed by
+  //     replacing 'new ProviderClass()' with string-based Class.forName loading in registries.
+  //     This eliminated compile-time loader.catalog→subpackage and loader.ermodel→subpackage
+  //     edges. One previously-hidden cycle became visible: loader.ermodel ↔ tools.utility.
   //
-  //   Cycle 2  crawl ↔ schemacrawler
-  //            crawl uses MetadataResultSet, SchemaCrawlerOptions from schemacrawler;
-  //            schemacrawler.MetadataResultSet instantiates ResultsCrawler from crawl.
-  //            Fix: move ResultsCrawler to schemacrawler.schemacrawler (task:
-  // cycle-fix-results-crawler)
+  // schemacrawler-api:
+  //   Cycle 1  crawl → filter → schemacrawler → crawl  [3-way]
+  //            crawl retrievers accept InclusionRuleFilter (filter) as parameters;
+  //            filter classes accept SchemaCrawlerOptions/LimitOptions/GrepOptions (schemacrawler);
+  //            MetadataResultSet (schemacrawler) constructs ResultsCrawler (crawl).
+  //            Fix: move InclusionRuleFilter out of filter (task: cycle-fix-inclusion-rule-filter)
   //
-  // schemacrawler-ermodel cycles:
-  //   Cycle 3  ermodel.implementation ↔ ermodel.utility
+  //   Cycle 2  crawl ↔ schemacrawler  [2-way]
+  //            crawl uses SchemaCrawlerOptions, annotations, etc. from schemacrawler;
+  //            MetadataResultSet (schemacrawler) constructs and calls ResultsCrawler (crawl).
+  //            Fix: move ResultsCrawler to schemacrawler (task: cycle-fix-results-crawler)
+  //
+  // schemacrawler-ermodel:
+  //   Cycle 3  ermodel.implementation ↔ ermodel.utility  [2-way]
   //            MutableEntityAttribute calls ERModelUtility.inferEntityAttributeType();
-  //            ERModelUtility uses ERModelBuilder and TableEntityModelInferrer from implementation.
-  //            Fix: move inferEntityAttributeType() into ermodel.implementation (task:
-  // cycle-fix-infer-entity-attr)
+  //            ERModelUtility constructs ERModelBuilder and TableEntityModelInferrer
+  // (implementation).
+  //            Fix: move inferEntityAttributeType() into ermodel.implementation
+  //            (task: cycle-fix-infer-entity-attr)
   //
-  // schemacrawler-loader cycles:
-  //   Cycle 4  loader.catalog ↔ loader.catalog.counts
-  //            CatalogLoaderRegistry instantiates TableRowCountsLoaderProvider;
-  //            counts subpackage extends AbstractCatalogLoader/AbstractCatalogLoaderProvider
+  // schemacrawler-loader:
+  //   Cycle 4  loader.catalog ↔ tools.utility  [cross-module]
+  //            ChainedCatalogLoader.execute() calls ExecutionStateUtility.transferState();
+  //            SchemaCrawlerUtility.getCatalog() uses CatalogLoaderRegistry/CatalogLoader.
+  //            Fix: move transferState() into loader.catalog, or extract a facade interface
   //
-  //   Cycle 5  loader.catalog ↔ loader.catalog.offline
-  //            CatalogLoaderRegistry instantiates OfflineCatalogLoaderProvider;
-  //            offline subpackage extends AbstractCatalogLoader/AbstractCatalogLoaderProvider
+  //   Cycle 5  loader.ermodel ↔ tools.utility  [cross-module]
+  //            ChainedERModelLoader.execute() calls ExecutionStateUtility.transferState();
+  //            SchemaCrawlerUtility.buildERModel() uses ERModelLoaderRegistry/ChainedERModelLoader.
+  //            Fix: same approach as Cycle 4
   //
-  //   Cycle 6  loader.catalog ↔ tools.utility
-  //            ChainedCatalogLoader calls ExecutionStateUtility.transferState();
-  //            SchemaCrawlerUtility.getCatalog() uses CatalogLoaderRegistry
-  //
-  //   Cycle 7  loader.ermodel ↔ loader.ermodel.attributes
-  //            ERModelLoaderRegistry instantiates AttributesLoaderProvider;
-  //            attributes subpackage extends AbstractERModelLoader/AbstractERModelLoaderProvider
-  //
-  //   Cycle 8  loader.ermodel ↔ loader.ermodel.implicitassociations
-  //            ERModelLoaderRegistry instantiates ImplicitAssociationsLoaderProvider;
-  //            implicitassociations subpackage extends
-  // AbstractERModelLoader/AbstractERModelLoaderProvider
-  //
-  // schemacrawler-tools cycles:
-  //   Cycle 9  tools.command ↔ tools.registry
-  //            CommandRegistry extends BasePluginCommandRegistry (from registry);
-  //            BasePluginCommandRegistry/PluginCommandRegistry use CommandProvider (from command).
-  //            Fix: move CommandRegistry to tools.registry (task: cycle-fix-command-registry)
+  // schemacrawler-tools:
+  //   Cycle 6  tools.command ↔ tools.registry  [2-way]
+  //            CommandRegistry (command) extends BasePluginCommandRegistry (registry);
+  //            BasePluginCommandRegistry/PluginCommandRegistry type params bound to CommandProvider
+  // (command).
+  //            Fix: move CommandProvider to tools.registry (task: cycle-fix-command-registry)
   //
   // Re-enable this test once the above cycles have been refactored away.
-  @Disabled("9 verified structural cycles remain — see comment above")
+  @Disabled(
+      "6 verified structural cycles remain — see comment above and"
+          + " schemacrawler-verified-cycles.md")
   @Test
   public void architectureCycles() {
     slices()

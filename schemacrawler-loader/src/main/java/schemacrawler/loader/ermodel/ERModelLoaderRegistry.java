@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
-import schemacrawler.loader.ermodel.attributes.AttributesLoaderProvider;
-import schemacrawler.loader.ermodel.implicitassociations.ImplicitAssociationsLoaderProvider;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.registry.BasePluginCommandRegistry;
 import us.fatehi.utility.string.StringFormat;
@@ -23,6 +21,15 @@ import us.fatehi.utility.string.StringFormat;
 public final class ERModelLoaderRegistry extends BasePluginCommandRegistry<ERModelLoaderProvider> {
 
   private static final Logger LOGGER = Logger.getLogger(ERModelLoaderRegistry.class.getName());
+
+  // Provider classnames are listed as strings to avoid compile-time dependencies on subpackages,
+  // which would create package cycles. The list is fixed at compile time — no external injection
+  // is possible since ServiceLoader is not used.
+  private static final List<String> PROVIDER_CLASS_NAMES =
+      List.of(
+          "schemacrawler.loader.ermodel.PrimaryERModelLoaderProvider",
+          "schemacrawler.loader.ermodel.implicitassociations.ImplicitAssociationsLoaderProvider",
+          "schemacrawler.loader.ermodel.attributes.AttributesLoaderProvider");
 
   private static ERModelLoaderRegistry erModelLoaderRegistrySingleton;
 
@@ -40,12 +47,7 @@ public final class ERModelLoaderRegistry extends BasePluginCommandRegistry<ERMod
   }
 
   private ERModelLoaderRegistry() {
-    super(
-        "ER Model Loaders",
-        List.of(
-            new PrimaryERModelLoaderProvider(),
-            new ImplicitAssociationsLoaderProvider(),
-            new AttributesLoaderProvider()));
+    super("ER Model Loaders", instantiateProviders(PROVIDER_CLASS_NAMES));
   }
 
   /**
