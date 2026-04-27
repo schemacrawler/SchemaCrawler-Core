@@ -8,11 +8,12 @@
 
 package schemacrawler.tools.command;
 
+import schemacrawler.tools.state.DatabaseOperator;
 import schemacrawler.tools.state.ExecutionState;
 import us.fatehi.utility.property.PropertyName;
 
 /** A SchemaCrawler executable unit. */
-public interface BaseCommand<P extends CommandOptions> extends ExecutionState {
+public interface BaseCommand<P extends CommandOptions> extends ExecutionState, DatabaseOperator {
 
   void configure(P parameters);
 
@@ -22,8 +23,4 @@ public interface BaseCommand<P extends CommandOptions> extends ExecutionState {
 
   /** Initializes the command for execution. */
   void initialize();
-
-  default boolean usesConnection() {
-    return false;
-  }
 }

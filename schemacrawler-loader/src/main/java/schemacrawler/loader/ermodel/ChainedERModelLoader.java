@@ -18,7 +18,6 @@ import schemacrawler.loader.ermodel.ChainedERModelLoader.ChainedERModelLoaderOpt
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
-import schemacrawler.tools.utility.ExecutionStateUtility;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.StringFormat;
 
@@ -56,12 +55,12 @@ public class ChainedERModelLoader extends AbstractERModelLoader<ChainedERModelLo
   @Override
   public void execute() {
     for (final ERModelLoader<?> erModelLoader : erModelLoaders) {
-      ExecutionStateUtility.transferState(this, erModelLoader);
+      transferState(erModelLoader);
 
       LOGGER.log(Level.INFO, new StringFormat("Executing ERModel loader <%s>", erModelLoader));
       erModelLoader.execute();
 
-      ExecutionStateUtility.transferState(erModelLoader, this);
+      erModelLoader.transferState(this);
     }
   }
 

@@ -31,4 +31,6 @@ public interface ExecutionState {
   void setConnectionSource(DatabaseConnectionSource connectionSource);
 
   void setERModel(ERModel erModel);
+
+  void transferState(ExecutionState to);
 }

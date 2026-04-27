@@ -19,7 +19,6 @@ import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
-import schemacrawler.tools.utility.ExecutionStateUtility;
 import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.ObjectToStringFormat;
@@ -55,7 +54,7 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
   public void execute() {
     final SchemaRetrievalOptions schemaRetrievalOptions = getSchemaRetrievalOptions();
     for (final CatalogLoader<?> catalogLoader : catalogLoaders) {
-      ExecutionStateUtility.transferState(this, catalogLoader);
+      transferState(catalogLoader);
       catalogLoader.setSchemaRetrievalOptions(schemaRetrievalOptions);
 
       // Execute
@@ -63,7 +62,7 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
       LOGGER.log(Level.CONFIG, new ObjectToStringFormat(catalogLoader.getCommandOptions()));
       catalogLoader.execute();
 
-      ExecutionStateUtility.transferState(catalogLoader, this);
+      catalogLoader.transferState(this);
     }
     MetaDataUtility.logCatalogSummary(getCatalog(), Level.INFO);
   }

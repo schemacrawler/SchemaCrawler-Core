@@ -28,9 +28,7 @@ import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.tools.options.OutputOptions;
 import schemacrawler.tools.options.OutputOptionsBuilder;
 import schemacrawler.tools.state.AbstractExecutionState;
-import schemacrawler.tools.state.ExecutionState;
 import schemacrawler.tools.utility.DatabaseConnectorUtility;
-import schemacrawler.tools.utility.ExecutionStateUtility;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.string.ObjectToStringFormat;
@@ -42,8 +40,7 @@ import us.fatehi.utility.string.StringFormat;
  * SchemaCrawlerExecutable will check if it is a query configured in the properties. If not, it will
  * assume that a query is specified on the command-line, and execute that.
  */
-public final class SchemaCrawlerExecutable extends AbstractExecutionState
-    implements ExecutionState {
+public final class SchemaCrawlerExecutable extends AbstractExecutionState {
 
   private static final Logger LOGGER = Logger.getLogger(SchemaCrawlerExecutable.class.getName());
 
@@ -105,7 +102,7 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState
       }
 
       // Prepare to execute
-      ExecutionStateUtility.transferState(this, scCommand);
+      transferState(scCommand);
 
       // Execute
       LOGGER.log(Level.INFO, new StringFormat("Executing SchemaCrawler command <%s>", command));
