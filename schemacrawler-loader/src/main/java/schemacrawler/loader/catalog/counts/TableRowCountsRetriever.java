@@ -29,15 +29,15 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.string.StringFormat;
 
 @Retriever
-public final class TableRowCountsRetriever {
+final class TableRowCountsRetriever {
 
   private static final Logger LOGGER = Logger.getLogger(TableRowCountsRetriever.class.getName());
 
   private final DatabaseConnectionSource connectionSource;
   private final Catalog catalog;
 
-  public TableRowCountsRetriever(
-      final DatabaseConnectionSource connectionSource, final Catalog catalog) throws SQLException {
+  TableRowCountsRetriever(final DatabaseConnectionSource connectionSource, final Catalog catalog)
+      throws SQLException {
     this.connectionSource =
         requireNonNull(connectionSource, "No database connection source provided");
     this.catalog = requireNonNull(catalog, "No catalog provided");

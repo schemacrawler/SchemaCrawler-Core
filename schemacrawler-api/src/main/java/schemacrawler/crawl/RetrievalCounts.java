@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import schemacrawler.schema.NamedObjectKey;
 import us.fatehi.utility.InclusionCounts;
 
-public final class RetrievalCounts extends InclusionCounts {
+final class RetrievalCounts extends InclusionCounts {
 
   private static class Counts {
 

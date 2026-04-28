@@ -13,7 +13,8 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintColumn;
 
-final class MutableTableConstraintColumn extends MutableKeyColumn implements TableConstraintColumn {
+final class MutableTableConstraintColumn extends AbstractKeyColumn
+    implements TableConstraintColumn {
 
   @Serial private static final long serialVersionUID = 8279216938257887408L;
 

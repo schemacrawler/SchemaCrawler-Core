@@ -18,8 +18,8 @@ import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.exceptions.NotLoadedException;
 
-abstract class RoutinePartial extends AbstractDatabaseObject
-    implements Routine, PartialDatabaseObject {
+abstract sealed class RoutinePartial extends AbstractDatabaseObject
+    implements Routine, PartialDatabaseObject permits FunctionPartial, ProcedurePartial {
 
   @Serial private static final long serialVersionUID = 1508498300413360531L;
 

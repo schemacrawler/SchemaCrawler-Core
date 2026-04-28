@@ -23,7 +23,7 @@ import java.util.TreeMap;
 import schemacrawler.schemacrawler.ModelImplementation;
 
 @ModelImplementation
-public abstract class ObjectAttributes implements Serializable, Comparable<ObjectAttributes> {
+abstract class ObjectAttributes implements Serializable, Comparable<ObjectAttributes> {
 
   @Serial private static final long serialVersionUID = -6819484903391182146L;
 

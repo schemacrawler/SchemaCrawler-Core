@@ -21,7 +21,7 @@ import schemacrawler.schema.RoutineReturnType;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 
-public class LightRoutine extends AbstractLightDatabaseObject implements Routine {
+public final class LightRoutine extends AbstractLightDatabaseObject implements Routine {
 
   @Serial private static final long serialVersionUID = 1L;
 

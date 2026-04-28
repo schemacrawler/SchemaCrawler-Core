@@ -19,7 +19,8 @@ import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Table;
 
-class MutableKeyColumn extends AbstractDependantObject<Table> implements KeyColumn {
+abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> implements KeyColumn
+    permits MutableIndexColumn, MutableTableConstraintColumn {
 
   @Serial private static final long serialVersionUID = 6988029161945610279L;
 
@@ -27,7 +28,7 @@ class MutableKeyColumn extends AbstractDependantObject<Table> implements KeyColu
   private final boolean isPartial;
   private int keyOrdinalPosition;
 
-  MutableKeyColumn(final Column column) {
+  AbstractKeyColumn(final Column column) {
     super(new TablePointer(column.getParent()), column.getName());
     this.column = column;
     isPartial = column instanceof PartialDatabaseObject;
@@ -48,7 +49,7 @@ class MutableKeyColumn extends AbstractDependantObject<Table> implements KeyColu
 
     int comparison = 0;
 
-    if (obj instanceof MutableKeyColumn other) {
+    if (obj instanceof AbstractKeyColumn other) {
       comparison = keyOrdinalPosition - other.keyOrdinalPosition;
     }
 
@@ -142,6 +143,7 @@ class MutableKeyColumn extends AbstractDependantObject<Table> implements KeyColu
     return column.isNullable();
   }
 
+  @Override
   public final boolean isPartial() {
     return isPartial;
   }

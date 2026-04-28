@@ -32,7 +32,7 @@ import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.ModelImplementation;
 
 @ModelImplementation
-public class MutableERModel implements ERModel {
+class MutableERModel implements ERModel {
 
   @Serial private static final long serialVersionUID = -1912075263587495283L;
 

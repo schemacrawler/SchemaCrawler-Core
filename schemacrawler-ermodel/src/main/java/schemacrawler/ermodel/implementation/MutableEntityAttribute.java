@@ -11,7 +11,7 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.PartialDatabaseObject;
 
-class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
+final class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
     implements EntityAttribute {
 
   @Serial private static final long serialVersionUID = 7349443487412594755L;

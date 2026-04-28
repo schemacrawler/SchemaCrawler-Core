@@ -15,6 +15,7 @@ import static com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleName;
 import static com.tngtech.archunit.core.domain.properties.CanBeAnnotated.Predicates.annotatedWith;
 import static com.tngtech.archunit.core.importer.ImportOption.Predefined.DO_NOT_INCLUDE_TESTS;
 import static com.tngtech.archunit.lang.conditions.ArchPredicates.are;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.GeneralCodingRules.ACCESS_STANDARD_STREAMS;
@@ -24,10 +25,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-import com.tngtech.archunit.base.DescribedPredicate;
-import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import java.lang.reflect.Constructor;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
@@ -69,23 +69,23 @@ public class CoreArchitectureTest {
   // The schemacrawler.crawl package is intentionally kept flat (not split into subpackages).
   //
   // All Mutable* model implementations and *Retriever JDBC extractors are package-private.
-  // This prevents classpath users (those loading SchemaCrawler as a plain jar rather than
-  // via the JPMS module path) from constructing or referencing these internal classes.
+  // This prevents both module-path and classpath users from constructing or referencing
+  // these internal classes.
   //
   // Java package-private visibility is strictly per-package. Splitting into subpackages would
-  // require making these classes at least public — immediately exposing them to classpath
-  // clients. The JPMS module system's "do not export schemacrawler.crawl" already protects
-  // module-path users; these tests enforce the same architectural boundary for all users.
+  // require making these classes at least public — immediately exposing them.
+  // Although schemacrawler.crawl is exported from the JPMS module (for MetadataResultSet and
+  // ResultsCrawler access), the package-private Mutable* and @Retriever classes remain
+  // inaccessible. These tests enforce the architectural boundary.
   @Test
   public void model() {
 
-    final DescribedPredicate<JavaClass> modelImplInCrawl =
-        resideInAPackage("schemacrawler.crawl").and(annotatedWith(ModelImplementation.class));
     noClasses()
         .that()
         .resideOutsideOfPackage("schemacrawler.crawl")
         .should()
-        .dependOnClassesThat(modelImplInCrawl)
+        .dependOnClassesThat(
+            resideInAPackage("schemacrawler.crawl").and(annotatedWith(ModelImplementation.class)))
         .because(
             """
             @ModelImplementation classes in schemacrawler.crawl are package-private internal
@@ -94,14 +94,13 @@ public class CoreArchitectureTest {
             """)
         .check(classes);
 
-    final DescribedPredicate<JavaClass> modelImplInERModel =
-        resideInAPackage("schemacrawler.ermodel.implementation")
-            .and(annotatedWith(ModelImplementation.class));
     noClasses()
         .that()
         .resideOutsideOfPackage("schemacrawler.ermodel.implementation")
         .should()
-        .dependOnClassesThat(modelImplInERModel)
+        .dependOnClassesThat(
+            resideInAPackage("schemacrawler.ermodel.implementation")
+                .and(annotatedWith(ModelImplementation.class)))
         .because(
             """
             @ModelImplementation classes in schemacrawler.ermodel.implementation are internal
@@ -109,15 +108,14 @@ public class CoreArchitectureTest {
             """)
         .check(classes);
 
-    final DescribedPredicate<JavaClass> modelImplInLoaderCatalog =
-        resideInAPackage("schemacrawler.loader.catalog.model")
-            .and(annotatedWith(ModelImplementation.class));
     noClasses()
         .that()
         .resideOutsideOfPackages(
             "schemacrawler.loader.catalog.model", "schemacrawler.loader.ermodel.attributes")
         .should()
-        .dependOnClassesThat(modelImplInLoaderCatalog)
+        .dependOnClassesThat(
+            resideInAPackage("schemacrawler.loader.catalog.model")
+                .and(annotatedWith(ModelImplementation.class)))
         .because(
             """
             @ModelImplementation classes in schemacrawler.loader.catalog.model are internal YAML
@@ -126,18 +124,67 @@ public class CoreArchitectureTest {
             """)
         .check(classes);
 
-    final DescribedPredicate<JavaClass> retrieverInCrawl =
-        resideInAPackage("schemacrawler.crawl").and(annotatedWith(Retriever.class));
     noClasses()
         .that()
         .resideOutsideOfPackage("schemacrawler.crawl")
         .should()
-        .dependOnClassesThat(retrieverInCrawl)
+        .dependOnClassesThat(
+            resideInAPackage("schemacrawler.crawl").and(annotatedWith(Retriever.class)))
         .because(
             """
             @Retriever classes in schemacrawler.crawl are package-private JDBC metadata
               extractors; they must only be used within schemacrawler.crawl
             """)
+        .check(classes);
+
+    classes()
+        .that()
+        .areAnnotatedWith(ModelImplementation.class)
+        .should()
+        .notBePublic()
+        .because(
+            """
+            @ModelImplementation classes are package-private internal implementations;
+              declaring them public exposes them to classpath clients
+            """)
+        .check(classes);
+
+    classes()
+        .that()
+        .areAnnotatedWith(Retriever.class)
+        .should()
+        .notBePublic()
+        .because(
+            """
+            @Retriever classes are package-private JDBC metadata extractors;
+              declaring them public exposes them to classpath clients
+            """)
+        .check(classes);
+  }
+
+  // Class.forName is the mechanism used by BasePluginCommandRegistry.instantiateProviders() to
+  // load plugin providers via string class names (breaking compile-time loader→subpackage edges).
+  // MutableColumnDataType.getTypeMappedClass() also uses it for SQL→Java type resolution.
+  // All other production code must resolve classes through normal imports; reflective loading
+  // anywhere else is a sign that the registry pattern has been bypassed.
+  @Test
+  public void reflectiveClassLoading() {
+    noClasses()
+        .that(
+            resideOutsideOfPackages("schemacrawler.tools.command", "schemacrawler.crawl")
+                .and(are(not(simpleName("BasePluginCommandRegistry"))))
+                .and(are(not(simpleName("MutableColumnDataType")))))
+        .should()
+        .callMethod(Class.class, "forName", String.class)
+        .orShould()
+        .callMethod(Class.class, "getDeclaredConstructors")
+        .orShould()
+        .callMethod(Class.class, "getDeclaredConstructor", Class[].class)
+        .orShould()
+        .callMethod(Class.class, "getConstructor", Class[].class)
+        .orShould()
+        .callMethod(Constructor.class, "newInstance")
+        .because("avoid reflective class loading")
         .check(classes);
   }
 

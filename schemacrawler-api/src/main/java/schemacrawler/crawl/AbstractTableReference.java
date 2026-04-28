@@ -27,7 +27,8 @@ import us.fatehi.utility.CollectionsUtility;
 import us.fatehi.utility.string.StringFormat;
 
 /** Represents a foreign-key mapping to a primary key in another table. */
-abstract class AbstractTableReference extends MutableTableConstraint implements TableReference {
+abstract sealed class AbstractTableReference extends MutableTableConstraint
+    implements TableReference permits MutableForeignKey, MutableImplicitAssociation {
 
   @Serial private static final long serialVersionUID = -5164664131926303038L;
 

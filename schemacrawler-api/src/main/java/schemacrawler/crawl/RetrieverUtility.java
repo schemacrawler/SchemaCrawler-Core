@@ -23,7 +23,7 @@ import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.string.StringFormat;
 
 @UtilityMarker
-public final class RetrieverUtility {
+final class RetrieverUtility {
 
   private static final Logger LOGGER = Logger.getLogger(RetrieverUtility.class.getName());
 

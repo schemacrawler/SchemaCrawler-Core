@@ -18,7 +18,8 @@ import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableConstraintType;
 
 /** Represents a table constraint. */
-class MutableTableConstraint extends AbstractDependantObject<Table> implements TableConstraint {
+sealed class MutableTableConstraint extends AbstractDependantObject<Table>
+    implements TableConstraint permits MutablePrimaryKey, AbstractTableReference {
 
   @Serial private static final long serialVersionUID = 1155277343302693656L;
 
