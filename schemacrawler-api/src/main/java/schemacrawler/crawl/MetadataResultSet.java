@@ -8,30 +8,20 @@
 
 package schemacrawler.crawl;
 
-import static java.sql.Types.BLOB;
-import static java.sql.Types.CLOB;
-import static java.sql.Types.LONGNVARCHAR;
-import static java.sql.Types.LONGVARBINARY;
-import static java.sql.Types.LONGVARCHAR;
-import static java.sql.Types.NCLOB;
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.schemacrawler.QueryUtility.executeAgainstSchema;
 import static us.fatehi.utility.EnumUtility.enumValue;
 import static us.fatehi.utility.EnumUtility.enumValueFromId;
-import static us.fatehi.utility.IOUtility.readFully;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.isIntegral;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
-import java.io.Reader;
 import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -41,9 +31,8 @@ import java.util.logging.Logger;
 import schemacrawler.schema.ResultsColumn;
 import schemacrawler.schema.ResultsColumns;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.utility.BinaryData;
 import us.fatehi.utility.IdentifiedEnum;
-import us.fatehi.utility.UtilityLogger;
+import us.fatehi.utility.database.AbstractDataResultSet;
 import us.fatehi.utility.string.StringFormat;
 
 /**
@@ -51,45 +40,30 @@ import us.fatehi.utility.string.StringFormat;
  * methods to obtain boolean, integer and string data, while abstracting away the quirks of the JDBC
  * metadata API.
  */
-public final class MetadataResultSet implements AutoCloseable {
+final class MetadataResultSet extends AbstractDataResultSet {
 
   private static final Logger LOGGER = Logger.getLogger(MetadataResultSet.class.getName());
 
-  private final ResultsColumns resultsColumns;
   private final ResultSet results;
+  private final ResultsColumns resultsColumns;
   private final String description;
   private Set<ResultsColumn> readColumns;
-  private int rowCount;
-  private boolean showLobs;
-  private int maxRows;
 
-  public MetadataResultSet(
+  MetadataResultSet(
       final Query query, final Statement statement, final Map<String, String> limitMap)
       throws SQLException {
     this(executeAgainstSchema(query, statement, limitMap), query.name());
   }
 
-  public MetadataResultSet(final ResultSet resultSet, final String description)
-      throws SQLException {
-    results = requireNonNull(resultSet, "Cannot use null results");
+  MetadataResultSet(final ResultSet resultSet, final String description) throws SQLException {
+    super(resultSet);
+    setReadLargeData(true);
+
+    results = getResults();
     this.description = requireNotBlank(description, "No result-set description provided");
 
     resultsColumns = new ResultsCrawler(results).crawl();
     readColumns = new HashSet<>();
-    showLobs = true;
-    maxRows = Integer.MAX_VALUE;
-  }
-
-  /**
-   * Releases this <code>ResultSet</code> object's database and JDBC resources immediately instead
-   * of waiting for this to happen when it is automatically closed.
-   *
-   * @throws SQLException On an exception
-   */
-  @Override
-  public void close() throws SQLException {
-    results.close();
-    LOGGER.log(Level.FINE, new StringFormat("Processed %d rows for <%s>", rowCount, description));
   }
 
   /**
@@ -170,12 +144,6 @@ public final class MetadataResultSet implements AutoCloseable {
       }
     }
     return false;
-  }
-
-  public String[] getColumnNames() {
-    final List<String> columnNames = new ArrayList<>();
-    resultsColumns.forEach(resultsColumn -> columnNames.add(resultsColumn.getName()));
-    return columnNames.toArray(new String[0]);
   }
 
   /**
@@ -353,93 +321,15 @@ public final class MetadataResultSet implements AutoCloseable {
    * @throws SQLException On a database access error
    */
   public boolean next() throws SQLException {
-    if (rowCount == maxRows) {
-      return false;
-    }
-
     readColumns = new HashSet<>();
 
-    final boolean next = results.next();
-    new UtilityLogger(LOGGER).logSQLWarnings(results);
-    if (next) {
-      rowCount = rowCount + 1;
-    }
-    return next;
-  }
-
-  public void resetMaxRows() {
-    maxRows = Integer.MAX_VALUE;
-  }
-
-  public List<Object> row() throws SQLException {
-    final List<Object> currentRow = new ArrayList<>();
-    for (final ResultsColumn resultsColumn : resultsColumns) {
-      currentRow.add(getColumnData(resultsColumn));
-    }
-
-    return currentRow;
-  }
-
-  public void setMaxRows(final int maxRows) {
-    if (maxRows < 0) {
-      return;
-    }
-    this.maxRows = maxRows;
-  }
-
-  public void setShowLobs(final boolean showLobs) {
-    this.showLobs = showLobs;
+    return advanceNext();
   }
 
   private Object getColumnData(final ResultsColumn resultsColumn) throws SQLException {
-    final int javaSqlType =
-        resultsColumn.getColumnDataType().getJavaSqlType().getVendorTypeNumber();
     final int ordinalPosition = resultsColumn.getOrdinalPosition();
 
-    Object columnData;
-
-    switch (javaSqlType) {
-      case BLOB:
-      case LONGVARBINARY:
-        // Do not read binary data - just determine if it is NULL
-        final Object object = results.getObject(ordinalPosition);
-        if (results.wasNull() || object == null) {
-          columnData = null;
-        } else {
-          columnData = new BinaryData();
-        }
-        break;
-      case CLOB:
-      case NCLOB:
-      case LONGNVARCHAR:
-      case LONGVARCHAR:
-        final Reader reader = results.getCharacterStream(ordinalPosition);
-        if (results.wasNull() || reader == null) {
-          columnData = null;
-        } else {
-          columnData = readCharacterData(reader);
-        }
-        break;
-      default:
-        columnData = results.getObject(ordinalPosition);
-        if (results.wasNull()) {
-          columnData = null;
-        }
-        break;
-    }
-    return columnData;
-  }
-
-  private Object readCharacterData(final Reader reader) {
-    try {
-      if (reader != null && showLobs) {
-        return readFully(reader);
-      }
-    } catch (final Exception e) {
-      LOGGER.log(Level.WARNING, "Could not read character data", e);
-    }
-
-    return new BinaryData();
+    return readColumnData(ordinalPosition);
   }
 
   private boolean useColumn(final String columnName) {

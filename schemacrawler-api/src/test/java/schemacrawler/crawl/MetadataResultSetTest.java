@@ -11,9 +11,7 @@ package schemacrawler.crawl;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -33,7 +31,6 @@ import org.junit.jupiter.api.TestInstance;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.ResultsColumns;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.utility.BinaryData;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.utility.database.DatabaseUtility;
 
@@ -72,14 +69,6 @@ public class MetadataResultSetTest {
           assertThat(value6, is(false));
           final DayOfWeek value7 = results.getEnum(columnName, DayOfWeek.MONDAY);
           assertThat(value7, is(DayOfWeek.MONDAY));
-
-          final List<Object> row = results.row();
-          assertThat(row, hasSize(1));
-          assertThat(row.get(0), is("A"));
-
-          final String[] columnNames = results.getColumnNames();
-          assertThat(columnNames, arrayWithSize(1));
-          assertThat(columnNames[0], is(columnName));
         }
       }
 
@@ -145,22 +134,6 @@ public class MetadataResultSetTest {
             } else {
               assertThat(stringValue, is("A"));
             }
-
-            final List<Object> row = results.row();
-            assertThat(row, hasSize(1));
-            final Object objectValue = row.get(0);
-            if ("BLOB".equals(dataType)) {
-              // BLOBs are not read
-              assertThat(String.valueOf(objectValue), is(new BinaryData().toString()));
-            } else if (dataType.contains("BINARY")) {
-              assertThat(objectValue, is(new byte[] {65}));
-            } else {
-              assertThat(objectValue, is("A"));
-            }
-
-            final String[] columnNames = results.getColumnNames();
-            assertThat(columnNames, arrayWithSize(1));
-            assertThat(columnNames[0], is(columnName));
 
             final ResultsColumns resultsColumns = new ResultsCrawler(resultSet).crawl();
             final ColumnDataType columnDataType =
@@ -233,14 +206,6 @@ public class MetadataResultSetTest {
 
             asserts.accept(column1Name, results);
             asserts.accept(column2Name, results);
-
-            final List<Object> row = results.row();
-            assertThat(row, hasSize(1));
-            assertThat(row.get(0), is(nullValue()));
-
-            final String[] columnNames = results.getColumnNames();
-            assertThat(columnNames, arrayWithSize(1));
-            assertThat(columnNames[0], is(column1Name));
 
             final ResultsColumns resultsColumns = new ResultsCrawler(resultSet).crawl();
             final ColumnDataType columnDataType =
