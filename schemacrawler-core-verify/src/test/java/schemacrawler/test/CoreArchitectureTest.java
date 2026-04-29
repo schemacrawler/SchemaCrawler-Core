@@ -193,7 +193,6 @@ public class CoreArchitectureTest {
     noClasses()
         .that(
             resideOutsideOfPackages("schemacrawler.testdb")
-                .and(are(not(simpleName("Version"))))
                 .and(are(not(simpleName("GraphvizProcessExecutor")))))
         .should(ACCESS_STANDARD_STREAMS)
         .because("production code should not write to standard streams")

@@ -27,11 +27,6 @@ public enum ColumnDataIndicator {
     this.description = description;
   }
 
-  /** Returns a human-readable description of this special value. */
-  public String description() {
-    return description;
-  }
-
   @Override
   public String toString() {
     return description;

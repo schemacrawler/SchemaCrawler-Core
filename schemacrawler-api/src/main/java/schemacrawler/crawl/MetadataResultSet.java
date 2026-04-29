@@ -326,6 +326,11 @@ final class MetadataResultSet extends AbstractDataResultSet {
     return advanceNext();
   }
 
+  @Override
+  public String toString() {
+    return description;
+  }
+
   private Object getColumnData(final ResultsColumn resultsColumn) throws SQLException {
     final int ordinalPosition = resultsColumn.getOrdinalPosition();
 
