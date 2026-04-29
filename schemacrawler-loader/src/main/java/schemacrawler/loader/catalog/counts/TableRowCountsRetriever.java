@@ -24,11 +24,9 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.Retriever;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.string.StringFormat;
 
-@Retriever
 final class TableRowCountsRetriever {
 
   private static final Logger LOGGER = Logger.getLogger(TableRowCountsRetriever.class.getName());

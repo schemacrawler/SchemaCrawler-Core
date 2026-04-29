@@ -128,8 +128,7 @@ public class CoreArchitectureTest {
         .that()
         .resideOutsideOfPackage("schemacrawler.crawl")
         .should()
-        .dependOnClassesThat(
-            resideInAPackage("schemacrawler.crawl").and(annotatedWith(Retriever.class)))
+        .dependOnClassesThat(annotatedWith(Retriever.class))
         .because(
             """
             @Retriever classes in schemacrawler.crawl are package-private JDBC metadata
@@ -171,8 +170,7 @@ public class CoreArchitectureTest {
   public void reflectiveClassLoading() {
     noClasses()
         .that(
-            resideOutsideOfPackages("schemacrawler.tools.command", "schemacrawler.crawl")
-                .and(are(not(simpleName("BasePluginCommandRegistry"))))
+            are(not(simpleName("BasePluginCommandRegistry")))
                 .and(are(not(simpleName("MutableColumnDataType")))))
         .should()
         .callMethod(Class.class, "forName", String.class)
@@ -202,7 +200,7 @@ public class CoreArchitectureTest {
   @Test
   public void notThrowGenericExceptions() {
     noClasses()
-        .that(resideOutsideOfPackages("schemacrawler.testdb", "sf.util"))
+        .that(resideOutsideOfPackages("schemacrawler.testdb"))
         .should(THROW_GENERIC_EXCEPTIONS)
         .because(
             "SchemaCrawler defines it own exceptions, and wraps SQL exceptions with additional"
