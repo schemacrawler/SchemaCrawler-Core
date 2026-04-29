@@ -44,16 +44,16 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.tools.command;
   exports schemacrawler.tools.executable;
   exports schemacrawler.tools.executable.commandline;
-  exports schemacrawler.tools.loader.catalog;
-  exports schemacrawler.tools.loader.ermodel;
+  exports schemacrawler.loader.catalog;
+  exports schemacrawler.loader.ermodel;
   exports schemacrawler.tools.options;
   exports schemacrawler.tools.registry;
   exports schemacrawler.tools.state;
   exports schemacrawler.tools.utility;
 
-  // Export public API packages from schemacrawler-loader
+    // Export public API packages from schemacrawler-loader
   exports schemacrawler.loader.utility;
-  exports schemacrawler.tools.loader.catalog.model;
+  exports schemacrawler.loader.catalog.model;
 
   // ServiceLoader providers
   uses java.sql.Driver;

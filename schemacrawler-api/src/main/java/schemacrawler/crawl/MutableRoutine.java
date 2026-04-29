@@ -27,7 +27,8 @@ import schemacrawler.schema.Schema;
 import us.fatehi.utility.CollectionsUtility;
 
 /** Represents a database routine. Created from metadata returned by a JDBC call. */
-abstract class MutableRoutine extends AbstractDatabaseObject implements Routine {
+abstract sealed class MutableRoutine extends AbstractDatabaseObject implements Routine
+    permits MutableFunction, MutableProcedure {
 
   @Serial private static final long serialVersionUID = 3906925686089134130L;
 

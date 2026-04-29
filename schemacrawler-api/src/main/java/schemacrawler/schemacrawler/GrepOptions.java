@@ -10,6 +10,7 @@ package schemacrawler.schemacrawler;
 
 import org.jspecify.annotations.Nullable;
 import schemacrawler.inclusionrule.InclusionRule;
+import us.fatehi.utility.Options;
 
 /** SchemaCrawler options for grep-like filtering. */
 public record GrepOptions(

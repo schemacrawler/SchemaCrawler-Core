@@ -35,6 +35,7 @@ import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.TableTypes;
+import us.fatehi.utility.OptionsBuilder;
 
 /** SchemaCrawler options builder, to build the immutable options to crawl a schema. */
 public final class LimitOptionsBuilder

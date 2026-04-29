@@ -14,7 +14,7 @@ import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexColumnSortSequence;
 
-final class MutableIndexColumn extends MutableKeyColumn implements IndexColumn {
+final class MutableIndexColumn extends AbstractKeyColumn implements IndexColumn {
 
   @Serial private static final long serialVersionUID = -237082413887184803L;
 

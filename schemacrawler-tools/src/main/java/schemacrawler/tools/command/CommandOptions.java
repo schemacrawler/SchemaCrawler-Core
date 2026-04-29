@@ -8,6 +8,6 @@
 
 package schemacrawler.tools.command;
 
-import schemacrawler.schemacrawler.Options;
+import us.fatehi.utility.Options;
 
 public interface CommandOptions extends Options {}

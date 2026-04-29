@@ -8,6 +8,8 @@
 
 package schemacrawler.schemacrawler;
 
+import us.fatehi.utility.OptionsBuilder;
+
 /** SchemaCrawler filter options builder, to build the immutable options to crawl a schema. */
 public final class FilterOptionsBuilder
     implements OptionsBuilder<FilterOptionsBuilder, FilterOptions> {

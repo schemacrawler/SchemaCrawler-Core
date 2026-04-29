@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.schemacrawler.OptionsBuilder;
-import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
+import us.fatehi.utility.OptionsBuilder;
 import us.fatehi.utility.ioresource.ClasspathInputResource;
 
 public class IdentifiersBuilder implements OptionsBuilder<IdentifiersBuilder, Identifiers> {
@@ -50,7 +49,7 @@ public class IdentifiersBuilder implements OptionsBuilder<IdentifiersBuilder, Id
       LOGGER.log(Level.WARNING, "Could not read list of SQL 2003 reserved words", e);
     }
     if (reservedWords.isEmpty()) {
-      throw new InternalRuntimeException("No SQL 2003 reserved words found");
+      throw new IllegalStateException("No SQL 2003 reserved words found");
     }
 
     return toUpperCase(reservedWords);

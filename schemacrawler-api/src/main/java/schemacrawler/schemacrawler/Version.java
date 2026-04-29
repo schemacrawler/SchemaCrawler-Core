@@ -9,7 +9,6 @@
 package schemacrawler.schemacrawler;
 
 import java.io.Serial;
-
 import us.fatehi.utility.property.BaseProductVersion;
 
 /**
@@ -44,15 +43,6 @@ public final class Version extends BaseProductVersion {
    */
   public static String about() {
     return ABOUT;
-  }
-
-  /**
-   * Main routine. Prints information about this product.
-   *
-   * @param args Arguments to the main routine - they are ignored.
-   */
-  public static void main(final String[] args) {
-    System.out.println(ABOUT);
   }
 
   public static Version version() {

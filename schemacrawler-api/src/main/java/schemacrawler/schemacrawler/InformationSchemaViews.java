@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.EnumMap;
 import java.util.Map;
 import us.fatehi.utility.ObjectToString;
+import us.fatehi.utility.Options;
 
 /** The database specific views to get additional database metadata in a standard format. */
 public final class InformationSchemaViews implements Options {

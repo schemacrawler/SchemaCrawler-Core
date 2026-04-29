@@ -18,7 +18,7 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.View;
 
 /** Represents a view in the database. */
-class MutableView extends MutableTable implements View {
+final class MutableView extends MutableTable implements View {
 
   @Serial private static final long serialVersionUID = 3257290248802284852L;
   private final NamedObjectList<MutableTable> tableUsage = new NamedObjectList<>();

@@ -9,11 +9,7 @@
 package schemacrawler.crawl;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.filter.ReducerFactory.getRoutineReducer;
-import static schemacrawler.filter.ReducerFactory.getSchemaReducer;
-import static schemacrawler.filter.ReducerFactory.getSequenceReducer;
-import static schemacrawler.filter.ReducerFactory.getSynonymReducer;
-import static schemacrawler.filter.ReducerFactory.getTableReducer;
+import static schemacrawler.filter.ReducerFactory.getCatalogReducer;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForColumnInclusion;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForRoutineInclusion;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForRoutineParameterInclusion;
@@ -60,12 +56,7 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
-import schemacrawler.schema.Schema;
-import schemacrawler.schema.Sequence;
-import schemacrawler.schema.Synonym;
-import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.LimitOptions;
 import schemacrawler.schemacrawler.LoadOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -254,7 +245,7 @@ public final class SchemaCrawler {
             "filterAndSortRoutines",
             () -> {
               // Filter the list of routines based on grep criteria
-              catalog.reduce(Routine.class, getRoutineReducer(options));
+              getCatalogReducer(options).reduce(catalog);
             })
         .submit();
 
@@ -273,7 +264,7 @@ public final class SchemaCrawler {
         .submit();
 
     taskRunner
-        .add("filterAndSortSchemas", () -> catalog.reduce(Schema.class, getSchemaReducer(options)))
+        .add("filterAndSortSchemas", () -> getCatalogReducer(options).reduce(catalog))
         .submit();
 
     final NamedObjectList<SchemaReference> schemas = retriever.getAllSchemas();
@@ -304,9 +295,7 @@ public final class SchemaCrawler {
         .submit();
 
     taskRunner
-        .add(
-            "filterAndSortSequences",
-            () -> catalog.reduce(Sequence.class, getSequenceReducer(options)))
+        .add("filterAndSortSequences", () -> getCatalogReducer(options).reduce(catalog))
         .submit();
   }
 
@@ -331,8 +320,7 @@ public final class SchemaCrawler {
         .submit();
 
     taskRunner
-        .add(
-            "filterAndSortSynonms", () -> catalog.reduce(Synonym.class, getSynonymReducer(options)))
+        .add("filterAndSortSynonms", () -> getCatalogReducer(options).reduce(catalog))
         .submit();
   }
 
@@ -425,7 +413,7 @@ public final class SchemaCrawler {
             () -> {
               // Filter the list of tables based on grep criteria, and
               // parent-child relationships
-              catalog.reduce(Table.class, getTableReducer(options));
+              getCatalogReducer(options).reduce(catalog);
 
               // Sort the remaining tables
               final TablesGraph tablesGraph = new TablesGraph(allTables);

@@ -1,0 +1,172 @@
+/*
+ * SchemaCrawler
+ * http://www.schemacrawler.com
+ * Copyright (c) 2000-2026, Sualeh Fatehi <sualeh@hotmail.com>.
+ * All rights reserved.
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+package schemacrawler.loader.ermodel.attributes;
+
+import static schemacrawler.loader.catalog.model.CatalogAttributesUtility.readCatalogAttributes;
+
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import schemacrawler.crawl.ImplicitAssociationBuilder.ImplicitAssociationColumn;
+import schemacrawler.ermodel.implementation.ImplicitRelationshipBuilder;
+import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.model.TableReferenceRelationship;
+import schemacrawler.schema.Catalog;
+import schemacrawler.schema.Column;
+import schemacrawler.schema.Table;
+import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
+import schemacrawler.schemacrawler.exceptions.IORuntimeException;
+import schemacrawler.loader.catalog.model.CatalogAttributes;
+import schemacrawler.loader.catalog.model.ColumnAttributes;
+import schemacrawler.loader.catalog.model.ImplicitAssociationAttributes;
+import schemacrawler.loader.catalog.model.TableAttributes;
+import schemacrawler.loader.ermodel.AbstractERModelLoader;
+import us.fatehi.utility.ioresource.InputResource;
+import us.fatehi.utility.ioresource.InputResourceUtility;
+import us.fatehi.utility.property.PropertyName;
+import us.fatehi.utility.scheduler.TaskDefinition;
+import us.fatehi.utility.scheduler.TaskRunner;
+import us.fatehi.utility.scheduler.TaskRunners;
+import us.fatehi.utility.string.StringFormat;
+
+class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
+
+  private static final Logger LOGGER = Logger.getLogger(AttributesLoader.class.getName());
+
+  AttributesLoader(final PropertyName catalogLoaderName) {
+    super(catalogLoaderName);
+  }
+
+  @Override
+  public void execute() {
+    if (!hasCatalog()) {
+      return;
+    }
+
+    final AttributesLoaderOptions commandOptions = getCommandOptions();
+
+    if (!commandOptions.hasCatalogAttributesFile()) {
+      LOGGER.log(Level.CONFIG, "No catalog attributes file specified");
+      return;
+    }
+
+    LOGGER.log(Level.INFO, "Retrieving catalog attributes");
+    final String catalogAttributesFile = commandOptions.catalogAttributesFile();
+    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadAttributes", 1); ) {
+      final Catalog catalog = getCatalog();
+      final ERModel erModel = getERModel();
+      final TaskDefinition.TaskRunnable taskRunnable =
+          () -> {
+            final InputResource inputResource =
+                resolveCatalogAttributesInputResource(catalogAttributesFile)
+                    .orElseThrow(
+                        () ->
+                            new IORuntimeException(
+                                "Cannot locate catalog attributes file <%s>"
+                                    .formatted(catalogAttributesFile)));
+            final CatalogAttributes catalogAttributes = readCatalogAttributes(inputResource);
+            loadRemarks(catalog, catalogAttributes);
+            loadImplicitAssociations(catalog, erModel, catalogAttributes);
+          };
+      taskRunner.add(new TaskDefinition("retrieveCatalogAttributes", taskRunnable));
+      taskRunner.submit();
+      LOGGER.log(Level.INFO, taskRunner.report());
+    } catch (final IORuntimeException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new ExecutionRuntimeException("Exception loading catalog attributes", e);
+    }
+  }
+
+  private void loadRemarks(final Catalog catalog, final CatalogAttributes catalogAttributes) {
+    for (final TableAttributes tableAttributes : catalogAttributes.getTables()) {
+      final Optional<Table> lookupTable =
+          catalog.lookupTable(tableAttributes.getSchema(), tableAttributes.getName());
+      final Table table;
+      if (lookupTable.isEmpty()) {
+        LOGGER.log(Level.CONFIG, new StringFormat("Table %s not found", tableAttributes));
+        continue;
+      }
+      table = lookupTable.get();
+
+      if (tableAttributes.hasRemarks()) {
+        table.setRemarks(tableAttributes.getRemarks());
+      }
+
+      for (final ColumnAttributes columnAttributes : tableAttributes) {
+        if (columnAttributes.hasRemarks()) {
+          final Optional<Column> lookupColumn = table.lookupColumn(columnAttributes.getName());
+          if (lookupColumn.isPresent()) {
+            final Column column = lookupColumn.get();
+            column.setRemarks(columnAttributes.getRemarks());
+          } else {
+            LOGGER.log(Level.CONFIG, new StringFormat("Column %s not found", columnAttributes));
+          }
+        }
+      }
+    }
+  }
+
+  private void loadImplicitAssociations(
+      final Catalog catalog, final ERModel erModel, final CatalogAttributes catalogAttributes) {
+    final ImplicitRelationshipBuilder relationshipBuilder =
+        ImplicitRelationshipBuilder.builder(catalog, erModel);
+    for (final ImplicitAssociationAttributes implicitAssociationAttributes :
+        catalogAttributes.getImplicitAssociations()) {
+
+      final TableAttributes pkTableAttributes = implicitAssociationAttributes.getReferencedTable();
+      final TableAttributes fkTableAttributes = implicitAssociationAttributes.getDependentTable();
+
+      for (final Entry<String, String> entry :
+          implicitAssociationAttributes.getColumnReferences().entrySet()) {
+        final String fkColumnName = entry.getKey();
+        final String pkColumnName = entry.getValue();
+
+        final ImplicitAssociationColumn fkColumn =
+            new ImplicitAssociationColumn(
+                fkTableAttributes.getSchema(), fkTableAttributes.getName(), fkColumnName);
+        final ImplicitAssociationColumn pkColumn =
+            new ImplicitAssociationColumn(
+                pkTableAttributes.getSchema(), pkTableAttributes.getName(), pkColumnName);
+
+        relationshipBuilder.addColumnReference(fkColumn, pkColumn);
+      }
+
+      relationshipBuilder.withName(implicitAssociationAttributes.getName());
+
+      final TableReferenceRelationship implicitRelationship = relationshipBuilder.build();
+      // Set remarks and attributes
+      if (implicitRelationship != null) {
+        implicitRelationship.setRemarks(implicitAssociationAttributes.getRemarks());
+        for (final Entry<String, String> attribute :
+            implicitAssociationAttributes.getAttributes().entrySet()) {
+          implicitRelationship.setAttribute(attribute.getKey(), attribute.getValue());
+        }
+      }
+    }
+  }
+
+  /**
+   * Resolves the catalog attributes resource, tolerating a leading slash for classpath resources.
+   *
+   * @param catalogAttributesFile Resource path or file location
+   * @return Resolved input resource, if available
+   */
+  private Optional<InputResource> resolveCatalogAttributesInputResource(
+      final String catalogAttributesFile) {
+    final Optional<InputResource> inputResource =
+        InputResourceUtility.createInputResource(catalogAttributesFile);
+    if (inputResource.isPresent() || !catalogAttributesFile.startsWith("/")) {
+      return inputResource;
+    }
+    final String normalized = catalogAttributesFile.substring(1);
+    return InputResourceUtility.createInputResource(normalized);
+  }
+}

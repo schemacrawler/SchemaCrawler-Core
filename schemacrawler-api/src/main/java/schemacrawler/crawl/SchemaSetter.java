@@ -8,18 +8,19 @@
 
 package schemacrawler.crawl;
 
+import static us.fatehi.utility.Utility.isBlank;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static us.fatehi.utility.Utility.isBlank;
 import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.SchemaReference;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.string.StringFormat;
 
-public class SchemaSetter implements AutoCloseable {
+class SchemaSetter implements AutoCloseable {
 
   private static final Logger LOGGER = Logger.getLogger(SchemaRetriever.class.getName());
 
@@ -28,7 +29,7 @@ public class SchemaSetter implements AutoCloseable {
   private final boolean isSupportsCatalogs;
   private final boolean isSupportsSchemas;
 
-  public SchemaSetter(final Connection connection, final Schema schema) {
+  SchemaSetter(final Connection connection, final Schema schema) {
     boolean errored = false;
     errored = schema == null;
     try {
@@ -87,7 +88,9 @@ public class SchemaSetter implements AutoCloseable {
         connection.setCatalog(catalogName);
       }
     } catch (final Exception e) {
-      LOGGER.log(Level.WARNING, e,
+      LOGGER.log(
+          Level.WARNING,
+          e,
           new StringFormat("Could not set catalog <%s> on connection", catalogName));
     }
 
@@ -97,7 +100,9 @@ public class SchemaSetter implements AutoCloseable {
         connection.setSchema(schemaName);
       }
     } catch (final Exception e) {
-      LOGGER.log(Level.WARNING, e,
+      LOGGER.log(
+          Level.WARNING,
+          e,
           new StringFormat("Could not set schema <%s> on connection", schemaName));
     }
 

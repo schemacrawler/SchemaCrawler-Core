@@ -11,6 +11,7 @@ package schemacrawler.schemacrawler;
 import static java.util.Objects.requireNonNull;
 
 import org.jspecify.annotations.NonNull;
+import us.fatehi.utility.Options;
 
 /** Options controlling how schema information is loaded. */
 public record LoadOptions(@NonNull SchemaInfoLevel schemaInfoLevel, int maxThreads)

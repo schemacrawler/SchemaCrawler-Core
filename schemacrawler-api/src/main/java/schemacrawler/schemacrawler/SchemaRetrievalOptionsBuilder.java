@@ -25,6 +25,7 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.TableTypes;
 import schemacrawler.utility.TypeMap;
+import us.fatehi.utility.OptionsBuilder;
 import us.fatehi.utility.datasource.DatabaseServerType;
 
 public final class SchemaRetrievalOptionsBuilder

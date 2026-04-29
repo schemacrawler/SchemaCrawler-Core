@@ -66,6 +66,28 @@ public abstract class AbstractExecutionState implements ExecutionState {
     this.erModel = requireNonNull(erModel, "No ER model provided");
   }
 
+  @Override
+  public void transferState(final ExecutionState to) {
+    final ExecutionState from = this;
+    if (to == null) {
+      return;
+    }
+    if (from.hasCatalog()) {
+      to.setCatalog(from.getCatalog());
+    }
+    if (from.hasERModel()) {
+      to.setERModel(from.getERModel());
+    }
+    if (to instanceof final DatabaseOperator command) {
+      if (!command.usesConnection()) {
+        return;
+      }
+    }
+    if (from.hasConnectionSource()) {
+      to.setConnectionSource(from.getConnectionSource());
+    }
+  }
+
   protected final void clear() {
     catalog = null;
     connectionSource = null;

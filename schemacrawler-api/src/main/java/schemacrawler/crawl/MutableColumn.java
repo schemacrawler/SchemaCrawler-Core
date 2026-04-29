@@ -23,6 +23,7 @@ import schemacrawler.schema.Table;
 final class MutableColumn extends AbstractColumn<Table> implements Column {
 
   @Serial private static final long serialVersionUID = 3834591019449528633L;
+
   private final NamedObjectList<MutablePrivilege<Column>> privileges = new NamedObjectList<>();
   private String defaultValue;
   private boolean isAutoIncremented;

@@ -23,7 +23,7 @@ import schemacrawler.schema.Table;
 import us.fatehi.utility.CollectionsUtility;
 
 /** Represents an index on a database table. */
-class MutableIndex extends AbstractDependantObject<Table> implements Index {
+final class MutableIndex extends AbstractDependantObject<Table> implements Index {
 
   @Serial private static final long serialVersionUID = 4051326747138079028L;
 

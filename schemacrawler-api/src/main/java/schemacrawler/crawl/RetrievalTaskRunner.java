@@ -23,15 +23,14 @@ import us.fatehi.utility.scheduler.TaskRunners;
  * Builds a list of task definitions that can be run in parallel. These are then submitted to be run
  * (in parallel) in a blocked way until all are complete.
  */
-public final class RetrievalTaskRunner {
+final class RetrievalTaskRunner {
 
   private static final Logger LOGGER = Logger.getLogger(RetrievalTaskRunner.class.getName());
 
   private final TaskRunner taskRunner;
   private final SchemaInfoLevel infoLevel;
 
-  public RetrievalTaskRunner(
-      final String runId, final SchemaInfoLevel infoLevel, final int maxThreads) {
+  RetrievalTaskRunner(final String runId, final SchemaInfoLevel infoLevel, final int maxThreads) {
 
     requireNotBlank(runId, "No SchemaCrawler run id provided");
     this.infoLevel = requireNonNull(infoLevel, "No info-level provided");

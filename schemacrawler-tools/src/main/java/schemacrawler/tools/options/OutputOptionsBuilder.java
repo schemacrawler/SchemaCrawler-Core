@@ -18,7 +18,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.UUID;
-import schemacrawler.schemacrawler.OptionsBuilder;
+import us.fatehi.utility.OptionsBuilder;
 import us.fatehi.utility.ioresource.ConsoleOutputResource;
 import us.fatehi.utility.ioresource.FileOutputResource;
 import us.fatehi.utility.ioresource.OutputResource;

@@ -9,11 +9,6 @@
 package schemacrawler.utility;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.filter.ReducerFactory.getRoutineReducer;
-import static schemacrawler.filter.ReducerFactory.getSchemaReducer;
-import static schemacrawler.filter.ReducerFactory.getSequenceReducer;
-import static schemacrawler.filter.ReducerFactory.getSynonymReducer;
-import static schemacrawler.filter.ReducerFactory.getTableReducer;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.util.ArrayList;
@@ -46,7 +41,6 @@ import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TypedObject;
 import schemacrawler.schema.View;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.graph.TreeNode;
 
@@ -215,27 +209,6 @@ public final class MetaDataUtility {
       return;
     }
     LOGGER.log(logLevel, () -> summarizeCatalog(catalog));
-  }
-
-  public static void reduceCatalog(
-      final Catalog catalog, final SchemaCrawlerOptions schemaCrawlerOptions) {
-    requireNonNull(catalog, "No catalog provided");
-    requireNonNull(schemaCrawlerOptions, "No SchemaCrawler options provided");
-
-    catalog.undo(Schema.class, getSchemaReducer(schemaCrawlerOptions));
-    catalog.reduce(Schema.class, getSchemaReducer(schemaCrawlerOptions));
-
-    catalog.undo(Table.class, getTableReducer(schemaCrawlerOptions));
-    catalog.reduce(Table.class, getTableReducer(schemaCrawlerOptions));
-
-    catalog.undo(Routine.class, getRoutineReducer(schemaCrawlerOptions));
-    catalog.reduce(Routine.class, getRoutineReducer(schemaCrawlerOptions));
-
-    catalog.undo(Synonym.class, getSynonymReducer(schemaCrawlerOptions));
-    catalog.reduce(Synonym.class, getSynonymReducer(schemaCrawlerOptions));
-
-    catalog.undo(Sequence.class, getSequenceReducer(schemaCrawlerOptions));
-    catalog.reduce(Sequence.class, getSequenceReducer(schemaCrawlerOptions));
   }
 
   public static String summarizeCatalog(final Catalog catalog) {

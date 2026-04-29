@@ -1,0 +1,50 @@
+/*
+ * SchemaCrawler
+ * http://www.schemacrawler.com
+ * Copyright (c) 2000-2026, Sualeh Fatehi <sualeh@hotmail.com>.
+ * All rights reserved.
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+package schemacrawler.loader.catalog.model;
+
+import java.beans.ConstructorProperties;
+import java.io.Serial;
+import java.util.List;
+import java.util.Map;
+
+public final class CatalogAttributes extends ObjectAttributes {
+
+  @Serial private static final long serialVersionUID = 1436642683972751860L;
+
+  private final List<TableAttributes> tables;
+  private final List<ImplicitAssociationAttributes> implicitAssociations;
+
+  @ConstructorProperties({"name", "remarks", "attributes", "tables", "implicit-associations"})
+  public CatalogAttributes(
+      final String name,
+      final List<String> remarks,
+      final Map<String, String> attributes,
+      final List<TableAttributes> tables,
+      final List<ImplicitAssociationAttributes> implicitAssociations) {
+    super(name, remarks, attributes);
+    if (tables == null) {
+      this.tables = List.of();
+    } else {
+      this.tables = List.copyOf(tables);
+    }
+    if (implicitAssociations == null) {
+      this.implicitAssociations = List.of();
+    } else {
+      this.implicitAssociations = List.copyOf(implicitAssociations);
+    }
+  }
+
+  public List<TableAttributes> getTables() {
+    return tables;
+  }
+
+  public List<ImplicitAssociationAttributes> getImplicitAssociations() {
+    return implicitAssociations;
+  }
+}

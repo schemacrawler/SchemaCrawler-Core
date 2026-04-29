@@ -18,7 +18,7 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.Trigger;
 
 /** Represents a trigger. */
-class MutableTrigger extends AbstractDependantObject<Table> implements Trigger {
+final class MutableTrigger extends AbstractDependantObject<Table> implements Trigger {
 
   @Serial private static final long serialVersionUID = -1619291073229701764L;
   private final StringBuffer actionCondition;

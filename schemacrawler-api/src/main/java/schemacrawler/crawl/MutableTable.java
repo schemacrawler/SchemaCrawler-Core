@@ -39,7 +39,7 @@ import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.Trigger;
 
-class MutableTable extends AbstractDatabaseObject implements Table {
+sealed class MutableTable extends AbstractDatabaseObject implements Table permits MutableView {
 
   private enum TableAssociationType {
     all,

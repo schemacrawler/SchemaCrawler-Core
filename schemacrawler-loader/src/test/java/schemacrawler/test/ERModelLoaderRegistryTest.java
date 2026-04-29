@@ -19,8 +19,8 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.loader.ermodel.ChainedERModelLoader;
-import schemacrawler.tools.loader.ermodel.ERModelLoaderRegistry;
+import schemacrawler.loader.ermodel.ChainedERModelLoader;
+import schemacrawler.loader.ermodel.ERModelLoaderRegistry;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.property.PropertyName;
 

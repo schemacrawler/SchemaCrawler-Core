@@ -21,7 +21,8 @@ import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.schema.Table;
 
 /** Conceptual entity backed by a SchemaCrawler table. */
-class MutableEntity extends AbstractTableBacked implements Entity {
+sealed class MutableEntity extends AbstractTableBacked implements Entity
+    permits MutableEntitySubtype {
 
   @Serial private static final long serialVersionUID = 3946422106166202467L;
 
