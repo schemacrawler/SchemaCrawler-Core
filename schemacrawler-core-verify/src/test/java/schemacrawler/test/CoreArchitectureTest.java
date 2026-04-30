@@ -205,9 +205,9 @@ public class CoreArchitectureTest {
         .check(classes);
   }
 
+  @Test
   public void reflectiveAccessOverride() {
     noClasses()
-        .that(are(not(simpleName("ObjectToString"))))
         .should()
         .callMethod(AccessibleObject.class, "setAccessible", boolean.class)
         .orShould()

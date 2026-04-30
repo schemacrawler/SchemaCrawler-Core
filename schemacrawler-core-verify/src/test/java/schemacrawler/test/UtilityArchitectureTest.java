@@ -65,6 +65,7 @@ public class UtilityArchitectureTest {
         .check(classes);
   }
 
+  @Test
   public void reflectiveAccessOverride() {
     noClasses()
         .that(are(not(simpleName("ObjectToString"))))
