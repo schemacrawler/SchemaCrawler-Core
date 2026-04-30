@@ -4,9 +4,11 @@ SchemaCrawler Core release notes.
 
 
 <a name="v17.10.3"></a>
-## Release 17.10.3 - 2026-04-27
+## Release 17.10.3 - 2026-04-30
 
 - Create a catalog reducer pattern
+- Reorganize code to remove cycles in packages
+- Add stronger architecture tests
 
 
 <a name="v17.10.2"></a>
