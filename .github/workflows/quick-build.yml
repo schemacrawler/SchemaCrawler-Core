@@ -32,6 +32,7 @@ jobs:
         mvn \
           --no-transfer-progress \
           --batch-mode \
+          --update-snapshots \
           -Dreactor.printOrder \
           clean verify
     - id: gather-expected-results

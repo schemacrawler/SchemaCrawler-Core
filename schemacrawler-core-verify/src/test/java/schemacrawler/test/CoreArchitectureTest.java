@@ -26,7 +26,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaMethod;
+import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -55,6 +58,14 @@ public class CoreArchitectureTest {
 
   @Test
   public void lookupMethods() {
+    final Optional<JavaMethod> anyMatchingMethod =
+        classes.stream()
+            .flatMap(c -> c.getMethods().stream())
+            .filter(m -> m.getName().matches("lookup.*"))
+            .filter(m -> m.getModifiers().contains(JavaModifier.PUBLIC))
+            .findAny();
+    assertThat(anyMatchingMethod.isPresent(), is(true));
+
     methods()
         .that()
         .haveNameMatching("lookup.*")
@@ -128,8 +139,7 @@ public class CoreArchitectureTest {
         .that()
         .resideOutsideOfPackage("schemacrawler.crawl")
         .should()
-        .dependOnClassesThat(
-            resideInAPackage("schemacrawler.crawl").and(annotatedWith(Retriever.class)))
+        .dependOnClassesThat(annotatedWith(Retriever.class))
         .because(
             """
             @Retriever classes in schemacrawler.crawl are package-private JDBC metadata
@@ -162,32 +172,6 @@ public class CoreArchitectureTest {
         .check(classes);
   }
 
-  // Class.forName is the mechanism used by BasePluginCommandRegistry.instantiateProviders() to
-  // load plugin providers via string class names (breaking compile-time loader→subpackage edges).
-  // MutableColumnDataType.getTypeMappedClass() also uses it for SQL→Java type resolution.
-  // All other production code must resolve classes through normal imports; reflective loading
-  // anywhere else is a sign that the registry pattern has been bypassed.
-  @Test
-  public void reflectiveClassLoading() {
-    noClasses()
-        .that(
-            resideOutsideOfPackages("schemacrawler.tools.command", "schemacrawler.crawl")
-                .and(are(not(simpleName("BasePluginCommandRegistry"))))
-                .and(are(not(simpleName("MutableColumnDataType")))))
-        .should()
-        .callMethod(Class.class, "forName", String.class)
-        .orShould()
-        .callMethod(Class.class, "getDeclaredConstructors")
-        .orShould()
-        .callMethod(Class.class, "getDeclaredConstructor", Class[].class)
-        .orShould()
-        .callMethod(Class.class, "getConstructor", Class[].class)
-        .orShould()
-        .callMethod(Constructor.class, "newInstance")
-        .because("avoid reflective class loading")
-        .check(classes);
-  }
-
   @Test
   public void notAccessStandardStreams() {
     noClasses()
@@ -202,7 +186,7 @@ public class CoreArchitectureTest {
   @Test
   public void notThrowGenericExceptions() {
     noClasses()
-        .that(resideOutsideOfPackages("schemacrawler.testdb", "sf.util"))
+        .that(resideOutsideOfPackages("schemacrawler.testdb"))
         .should(THROW_GENERIC_EXCEPTIONS)
         .because(
             "SchemaCrawler defines it own exceptions, and wraps SQL exceptions with additional"
@@ -218,6 +202,43 @@ public class CoreArchitectureTest {
         .should()
         .beFreeOfCycles()
         .because("packages should have a clear, acyclic dependency structure")
+        .check(classes);
+  }
+
+  @Test
+  public void reflectiveAccessOverride() {
+    noClasses()
+        .should()
+        .callMethod(AccessibleObject.class, "setAccessible", boolean.class)
+        .orShould()
+        .callMethod(
+            AccessibleObject.class, "setAccessible", AccessibleObject[].class, boolean.class)
+        .because("avoid reflective access override")
+        .check(classes);
+  }
+
+  // Class.forName is the mechanism used by BasePluginCommandRegistry.instantiateProviders() to
+  // load plugin providers via string class names (breaking compile-time loader→subpackage edges).
+  // MutableColumnDataType.getTypeMappedClass() also uses it for SQL→Java type resolution.
+  // All other production code must resolve classes through normal imports; reflective loading
+  // anywhere else is a sign that the registry pattern has been bypassed.
+  @Test
+  public void reflectiveClassLoading() {
+    noClasses()
+        .that(
+            are(not(simpleName("BasePluginCommandRegistry")))
+                .and(are(not(simpleName("MutableColumnDataType")))))
+        .should()
+        .callMethod(Class.class, "forName", String.class)
+        .orShould()
+        .callMethod(Class.class, "getDeclaredConstructors")
+        .orShould()
+        .callMethod(Class.class, "getDeclaredConstructor", Class[].class)
+        .orShould()
+        .callMethod(Class.class, "getConstructor", Class[].class)
+        .orShould()
+        .callMethod(Constructor.class, "newInstance")
+        .because("avoid reflective class loading")
         .check(classes);
   }
 }
