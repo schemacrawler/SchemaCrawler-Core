@@ -18,7 +18,6 @@ import schemacrawler.loader.catalog.ChainedCatalogLoader.ChainedCatalogLoaderOpt
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.options.Config;
-import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.ObjectToStringFormat;
@@ -31,7 +30,6 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
   private static final Logger LOGGER = Logger.getLogger(ChainedCatalogLoader.class.getName());
 
   private final List<CatalogLoader<?>> catalogLoaders;
-  private final Config additionalConfig;
 
   public ChainedCatalogLoader(
       final List<CatalogLoader<?>> catalogLoaders, final Config additionalConfig) {
@@ -40,12 +38,6 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
             "chainloader", "Chain of all catalog loaders, called in turn by priority"));
     requireNonNull(catalogLoaders);
     this.catalogLoaders = new ArrayList<>(catalogLoaders);
-
-    if (additionalConfig == null) {
-      this.additionalConfig = ConfigUtility.newConfig();
-    } else {
-      this.additionalConfig = additionalConfig;
-    }
 
     configure(new ChainedCatalogLoaderOptions());
   }

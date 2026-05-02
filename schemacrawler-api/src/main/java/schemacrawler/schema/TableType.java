@@ -13,6 +13,7 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.function.Function;
 
 /**
  * Represents a type of table in the database. Examples could be a base table, a view, a global
@@ -38,34 +39,27 @@ public final class TableType implements Serializable, Comparable<TableType> {
       return -1;
     }
 
-    final String thisToString = toString();
-    final String otherToString = other.toString();
+    final String thisStr = toString();
+    final String otherStr = other.toString();
 
-    if (thisToString.equalsIgnoreCase(otherToString)) {
+    if (thisStr.equalsIgnoreCase(otherStr)) {
       return 0;
     }
 
-    // Sort tables first
-    final boolean isThisTable = "TABLE".equalsIgnoreCase(thisToString);
-    final boolean isOtherTable = "TABLE".equalsIgnoreCase(otherToString);
-    if (isThisTable && !isOtherTable) {
-      return -1;
-    }
-    if (!isThisTable && isOtherTable) {
-      return 1;
-    }
+    final Function<String, Integer> tableTypePriority =
+        tableType ->
+            switch (tableType.toUpperCase()) {
+              case "TABLE" -> 0;
+              case "VIEW" -> 1;
+              default -> 2;
+            };
 
-    // Sort views second
-    final boolean isThisView = "VIEW".equalsIgnoreCase(thisToString);
-    final boolean isOtherView = "VIEW".equalsIgnoreCase(otherToString);
-    if (isThisView && !isOtherView) {
-      return -1;
+    final int compare =
+        Integer.compare(tableTypePriority.apply(thisStr), tableTypePriority.apply(otherStr));
+    if (compare != 0) {
+      return compare;
     }
-    if (!isThisView && isOtherView) {
-      return 1;
-    }
-
-    return thisToString.compareTo(otherToString);
+    return thisStr.compareTo(otherStr);
   }
 
   /** {@inheritDoc} */

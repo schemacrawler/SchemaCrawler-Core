@@ -1,52 +1,83 @@
-# Instructions for SchemaCrawler Core Project
+# AGENTS.md — SchemaCrawler-Core
 
-## Project Structure and Build
-- SchemaCrawler is set up as a multi-module **Apache Maven** project.
-- Standard Apache Maven commands can be used to build and test the project.
-- Integration tests use **Testcontainers**, and can be triggered with an additional `-Dheavydb` flag to the Apache Maven commands.
+SchemaCrawler-Core is the foundational API, JDBC metadata loader, schema domain model, and tools framework on which all other SchemaCrawler projects depend. It is published to Maven Central and consumed as a versioned dependency by SchemaCrawler, SchemaCrawler-AI, and other extensions.
+
+## Build and Test
+
+```bash
+# Standard build and unit tests
+mvn clean verify
+
+# With Testcontainers integration tests (requires Docker)
+mvn clean verify -Dheavydb
+
+# With architectural verification tests
+mvn clean verify -Dverify
+
+# Run a single test class or method
+mvn test -Dtest=ClassName
+mvn test -Dtest=ClassName#methodName
+```
 
 ## Module Layout
-- `schemacrawler-api` — core schema model, SQL metadata crawling (`schemacrawler.crawl`), public API (`schemacrawler.schema`, `schemacrawler.schemacrawler`, `schemacrawler.filter`).
-- `schemacrawler-ermodel` — ER model construction and inference (`schemacrawler.ermodel.*`).
-- `schemacrawler-tools` — command execution framework, registries, database connectors, output formatting (`schemacrawler.tools.*`).
-- `schemacrawler-loader` — catalog and ER model loaders and their registries (`schemacrawler.loader.*`).
-- `schemacrawler-utility` — low-level utilities in the `us.fatehi.utility` namespace (not `schemacrawler.*`).
-- `schemacrawler-test-utility` — shared test infrastructure only; never a production compile-time dependency.
-- `schemacrawler-core-verify` — ArchUnit architecture verification tests (`CoreArchitectureTest`, `ModuleInfoTest`).
 
-## General Coding Guidelines
-- Prefer **immutability** and use the `final` keyword for fields, parameters, and local variables wherever possible.
-- Follow **Java best practices**, including usage of `Optional`, `Streams`, and functional programming where applicable.
-- Ensure **thread safety** by avoiding mutable shared state and using synchronized wrappers or concurrency utilities when necessary.
-- Use **meaningful names** for classes, methods, and variables to improve code readability.
-- Follow **SOLID principles** to enhance maintainability and scalability.
-- Write meaningful **javadocs** for functions and classes.
+Modules must be built in dependency order:
 
-## Code Conventions
-The following conventions are enforced by ArchUnit and must not be violated:
+| Module | Purpose |
+|--------|---------|
+| `schemacrawler-utility` | Low-level utilities in `us.fatehi.utility`; no SchemaCrawler dependencies |
+| `schemacrawler-api` | Core domain interfaces: `Catalog`, `Schema`, `Table`, `Column`, `Index`, `ForeignKey`, `View`, `Routine` |
+| `schemacrawler-ermodel` | Entity-relationship model built on top of the API (`schemacrawler.ermodel.*`) |
+| `schemacrawler-loader` | JDBC metadata loading; catalog and ER model loaders and their registries |
+| `schemacrawler-tools` | Command execution framework, plugin registries, database connector infrastructure, output formatting |
+| `schemacrawler` | Shaded distribution JAR — shades api, ermodel, loader, and tools into one artifact |
+| `schemacrawler-testdb` | In-memory HSQLDB test database shared across test suites; test-scoped only |
+| `schemacrawler-test-utility` | Shared test helpers and JUnit extensions; test-scoped only, never a production dependency |
+| `schemacrawler-jdbc-drivers` | JDBC driver dependencies for use in tests |
+| `schemacrawler-core-verify` | ArchUnit architectural verification (`CoreArchitectureTest`, `ModuleInfoTest`) — activated by `-Dverify` |
 
-- **`lookup*` public methods must return `Optional<T>`** — never `null`, never a concrete type.
-- **No standard stream access** — production code must not write to `System.out` or `System.err`.
+**Dependency order:** `utility` → `api` → `ermodel` / `loader` → `tools` → `schemacrawler` (shaded)
+
+## Architecture
+
+### Key Packages
+
+| Package | Contents |
+|---------|---------|
+| `schemacrawler.schema` | Read-only public domain interfaces (`Table`, `Column`, `Index`, `ForeignKey`, etc.) |
+| `schemacrawler.schemacrawler` | Configuration options and builder classes (`SchemaCrawlerOptions`, `LimitOptions`, etc.) |
+| `schemacrawler.filter` / `schemacrawler.inclusionrule` | Filtering and inclusion/exclusion rule logic |
+| `schemacrawler.crawl` | **Intentionally flat, all package-private** — `Mutable*` model implementations and `*Retriever` JDBC extractors. Do not split this package; these classes must remain package-private. |
+| `schemacrawler.ermodel.implementation` | Internal ER model implementations (`Mutable*`); must remain package-private |
+| `schemacrawler.loader.catalog.model` | YAML deserialization DTOs; only `schemacrawler.loader.ermodel.attributes` may reference them outside this package |
+| `us.fatehi.utility` | Reusable utilities with no SchemaCrawler API dependencies |
+
+### Registry / Plugin Loading
+
+`*Registry` classes use **string-based loading** via `Class.forName` in `BasePluginCommandRegistry.instantiateProviders` rather than direct instantiation. This keeps compile-time edges out of `loader.*` packages and prevents package cycles.
+
+## ArchUnit Constraints (`schemacrawler-core-verify`)
+
+These rules are enforced by `CoreArchitectureTest` and must not be violated:
+
+- **`lookup*` methods must return `Optional<T>`** — never `null`, never a bare concrete type.
+- **No standard stream access** — no `System.out` or `System.err` in production code.
 - **No generic exceptions** — never `throw new RuntimeException(...)`, `Exception`, or `Throwable`. Use SchemaCrawler's own exception hierarchy.
-- **`@ModelImplementation` classes are package-private** — annotated classes are internal schema model implementations confined to `schemacrawler.crawl`, `schemacrawler.ermodel.implementation`, or `schemacrawler.loader.catalog.model`. No code outside those packages may reference them.
-- **`@Retriever` classes are package-private** — JDBC metadata extractors in `schemacrawler.crawl`; must not be referenced from any other package.
-- **`Mutable*` classes carry `@ModelImplementation`** — classes named `Mutable*` are always internal model implementations and must be annotated accordingly.
-- **`Class.forName` is restricted** — only `schemacrawler.tools.command` (registry loading via `BasePluginCommandRegistry`) and `schemacrawler.crawl` (`MutableColumnDataType` Java-type resolution) may call `Class.forName`. All other code must not use reflective class loading.
-- **No package cycles** — slices on `schemacrawler.(**).*` must be acyclic. Track any exceptions in `schemacrawler-verified-cycles.md` in the repository root.
+- **`@ModelImplementation` classes are package-private** — confined to `schemacrawler.crawl`, `schemacrawler.ermodel.implementation`, or `schemacrawler.loader.catalog.model`. No code outside those packages may reference them directly.
+- **`@Retriever` classes are package-private** — JDBC metadata extractors confined to `schemacrawler.crawl`.
+- **`Mutable*` classes carry `@ModelImplementation`** — always, without exception.
+- **`Class.forName` is restricted** — only `BasePluginCommandRegistry` (registry loading) and `MutableColumnDataType` (Java type resolution) may use reflective class loading. All other code must not.
+- **No package cycles** — slices on `schemacrawler.(**).*` must be acyclic. Document any approved exceptions in `schemacrawler-verified-cycles.md`.
+- **No `setAccessible()` calls** — reflective access bypasses is prohibited.
 
-## Internal Package Conventions
-- `schemacrawler.crawl` — intentionally flat (not split into subpackages). All `Mutable*` model implementations and `*Retriever` JDBC extractors are **package-private**. Do not split this package; doing so would require making these classes public.
-- `schemacrawler.ermodel.implementation` — internal ER model implementations (`Mutable*`); must remain package-private.
-- `schemacrawler.loader.catalog.model` — YAML deserialization DTOs; only `schemacrawler.loader.ermodel.attributes` may reference them outside the model package.
-- Registry classes (`*Registry`) use **string-based loading** (`Class.forName` in `BasePluginCommandRegistry.instantiateProviders`) instead of direct `new ProviderClass()` instantiation. This keeps compile-time edges out of `loader.*` packages and prevents package cycles.
+When introducing new structural patterns or constraints, update `CoreArchitectureTest` in `schemacrawler-core-verify`.
 
-## Dependencies and Versions
-- Define **explicit versions** for dependencies to prevent compatibility issues.
-- Prefer **dependency management** using `dependencyManagement` in `pom.xml` for centralized version control.
-- Use **dependency exclusions** where necessary to avoid unwanted transitive dependencies.
+## Coding Guidelines
 
-## Testing and Quality
-- Write **unit tests** for business logic using **JUnit 5** with **Hamcrest** matchers.
-- Use **Mockito** for mocking dependencies in tests.
-- Maintain **high test coverage** to ensure reliability.
-- Architecture tests live in `schemacrawler-core-verify`; update `CoreArchitectureTest` when introducing new structural patterns or constraints.
+- Prefer **immutability**: use `final` on fields, parameters, and local variables.
+- Use `Optional`, streams, and functional programming idioms.
+- Ensure **thread safety**: avoid mutable shared state.
+- Write meaningful **Javadoc** for all public API.
+- Tests use **JUnit 6** with **Hamcrest** matchers; mock with **Mockito**.
+- All dependency versions are managed in `schemacrawler-parent/pom.xml`; do not declare versions in sub-module POMs.
+- `schemacrawler-test-utility` and `schemacrawler-testdb` are test-scoped dependencies only; never add them as compile dependencies.

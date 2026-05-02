@@ -21,6 +21,7 @@ import schemacrawler.schema.JdbcDriverProperty;
 import schemacrawler.schemacrawler.ModelImplementation;
 import us.fatehi.utility.database.JdbcDriverInformation;
 import us.fatehi.utility.property.BaseProductVersion;
+import us.fatehi.utility.property.VersionNumber;
 
 /**
  * JDBC driver information. Created from metadata returned by a JDBC call, and other sources of
@@ -53,14 +54,22 @@ final class MutableJdbcDriverInfo extends BaseProductVersion implements JdbcDriv
     return jdbcDriverInformation.getDriverClassName();
   }
 
+  /**
+   * @deprecated
+   */
+  @Deprecated
   @Override
   public int getDriverMajorVersion() {
-    return jdbcDriverInformation.getDriverMajorVersion();
+    return jdbcDriverInformation.getDriverVersionNumber().major();
   }
 
+  /**
+   * @deprecated
+   */
+  @Deprecated
   @Override
   public int getDriverMinorVersion() {
-    return jdbcDriverInformation.getDriverMinorVersion();
+    return jdbcDriverInformation.getDriverVersionNumber().minor();
   }
 
   /** {@inheritDoc} */
@@ -72,13 +81,31 @@ final class MutableJdbcDriverInfo extends BaseProductVersion implements JdbcDriv
   }
 
   @Override
+  public VersionNumber getDriverVersionNumber() {
+    return jdbcDriverInformation.getDriverVersionNumber();
+  }
+
+  /**
+   * @deprecated
+   */
+  @Deprecated
+  @Override
   public int getJdbcMajorVersion() {
-    return jdbcDriverInformation.getJdbcMajorVersion();
+    return jdbcDriverInformation.getJdbcVersionNumber().major();
+  }
+
+  /**
+   * @deprecated
+   */
+  @Deprecated
+  @Override
+  public int getJdbcMinorVersion() {
+    return jdbcDriverInformation.getJdbcVersionNumber().minor();
   }
 
   @Override
-  public int getJdbcMinorVersion() {
-    return jdbcDriverInformation.getJdbcMinorVersion();
+  public VersionNumber getJdbcVersionNumber() {
+    return jdbcDriverInformation.getJdbcVersionNumber();
   }
 
   @Override

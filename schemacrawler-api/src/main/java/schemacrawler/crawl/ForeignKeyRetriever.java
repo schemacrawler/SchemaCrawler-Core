@@ -78,6 +78,37 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     }
   }
 
+  private void associateForeignKeyTable(
+      final MutableForeignKey foreignKey,
+      final Column fkColumn,
+      final Column pkColumn,
+      final Table fkTable,
+      final boolean isFkColumnPartial) {
+    if (fkColumn instanceof MutableColumn column) {
+      column.setReferencedColumn(pkColumn);
+      ((MutableTable) fkTable).addForeignKey(foreignKey);
+    } else if (isFkColumnPartial) {
+      ((ColumnPartial) fkColumn).setReferencedColumn(pkColumn);
+      ((TablePartial) fkTable).addForeignKey(foreignKey);
+    }
+  }
+
+  private boolean associatePrimaryKeyTable(
+      final MutableForeignKey foreignKey,
+      final Column pkColumn,
+      final Table pkTable,
+      final boolean isPkColumnPartial) {
+    if (pkColumn instanceof MutableColumn) {
+      ((MutableTable) pkTable).addForeignKey(foreignKey);
+      return true;
+    }
+    if (isPkColumnPartial) {
+      ((TablePartial) pkTable).addForeignKey(foreignKey);
+      return true;
+    }
+    return false;
+  }
+
   private boolean createForeignKey(
       final MetadataResultSet results, final Map<NamedObjectKey, MutableForeignKey> foreignKeys)
       throws SQLException {
@@ -114,22 +145,20 @@ final class ForeignKeyRetriever extends AbstractRetriever {
         lookupOrCreateColumn(pkTableCatalogName, pkTableSchemaName, pkTableName, pkColumnName);
     final Column fkColumn =
         lookupOrCreateColumn(fkTableCatalogName, fkTableSchemaName, fkTableName, fkColumnName);
+    if (pkColumn == null || fkColumn == null) {
+      return false;
+    }
+
     final boolean isPkColumnPartial = isPartial(pkColumn);
     final boolean isFkColumnPartial = isPartial(fkColumn);
-
-    if (pkColumn == null || fkColumn == null || isFkColumnPartial && isPkColumnPartial) {
+    if (isFkColumnPartial && isPkColumnPartial) {
       return false;
     }
 
     final Table fkTable = fkColumn.getParent();
     final Table pkTable = pkColumn.getParent();
 
-    if (fkTable instanceof MutableTable mutableFkTable && fkTable.equals(pkTable)) {
-      mutableFkTable.markAsSelfReferencing();
-      if (fkColumn instanceof MutableColumn mutableFkColumn) {
-        mutableFkColumn.markAsPartOfSelfReferencingRelationship();
-      }
-    }
+    markSelfReferencingRelationship(fkTable, pkTable, fkColumn);
 
     if (isBlank(foreignKeyName)) {
       foreignKeyName = RetrieverUtility.constructForeignKeyName(fkTable, pkTable);
@@ -145,16 +174,8 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     final ColumnReference columnReference =
         new ImmutableColumnReference(keySequence, fkColumn, pkColumn);
 
-    final Optional<MutableForeignKey> foreignKeyOptional =
-        Optional.ofNullable(foreignKeys.get(fkLookupKey));
-    final MutableForeignKey foreignKey;
-    if (foreignKeyOptional.isPresent()) {
-      foreignKey = foreignKeyOptional.get();
-      foreignKey.addColumnReference(columnReference);
-    } else {
-      foreignKey = new MutableForeignKey(foreignKeyName, columnReference);
-      foreignKeys.put(fkLookupKey, foreignKey);
-    }
+    final MutableForeignKey foreignKey =
+        lookupOrCreateForeignKey(fkLookupKey, foreignKeyName, columnReference, foreignKeys);
     foreignKey.withQuoting(getRetrieverConnection().getIdentifiers());
 
     foreignKey.setUpdateRule(updateRule);
@@ -162,23 +183,9 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     foreignKey.setDeferrability(deferrability);
     foreignKey.addAttributes(results.getAttributes());
 
-    if (fkColumn instanceof MutableColumn column) {
-      column.setReferencedColumn(pkColumn);
-      ((MutableTable) fkTable).addForeignKey(foreignKey);
-    } else if (isFkColumnPartial) {
-      ((ColumnPartial) fkColumn).setReferencedColumn(pkColumn);
-      ((TablePartial) fkTable).addForeignKey(foreignKey);
-    }
+    associateForeignKeyTable(foreignKey, fkColumn, pkColumn, fkTable, isFkColumnPartial);
 
-    if (pkColumn instanceof MutableColumn) {
-      ((MutableTable) pkTable).addForeignKey(foreignKey);
-      return true;
-    }
-    if (isPkColumnPartial) {
-      ((TablePartial) pkTable).addForeignKey(foreignKey);
-      return true;
-    }
-    return false;
+    return associatePrimaryKeyTable(foreignKey, pkColumn, pkTable, isPkColumnPartial);
   }
 
   /**
@@ -192,6 +199,32 @@ final class ForeignKeyRetriever extends AbstractRetriever {
       final String columnName) {
     return RetrieverUtility.lookupOrCreateColumn(
         catalog, catalogName, schemaName, tableName, columnName);
+  }
+
+  private MutableForeignKey lookupOrCreateForeignKey(
+      final NamedObjectKey fkLookupKey,
+      final String foreignKeyName,
+      final ColumnReference columnReference,
+      final Map<NamedObjectKey, MutableForeignKey> foreignKeys) {
+    final MutableForeignKey foreignKey;
+    if (foreignKeys.containsKey(fkLookupKey)) {
+      foreignKey = foreignKeys.get(fkLookupKey);
+      foreignKey.addColumnReference(columnReference);
+    } else {
+      foreignKey = new MutableForeignKey(foreignKeyName, columnReference);
+      foreignKeys.put(fkLookupKey, foreignKey);
+    }
+    return foreignKey;
+  }
+
+  private void markSelfReferencingRelationship(
+      final Table fkTable, final Table pkTable, final Column fkColumn) {
+    if (fkTable instanceof MutableTable mutableFkTable && fkTable.equals(pkTable)) {
+      mutableFkTable.markAsSelfReferencing();
+      if (fkColumn instanceof final MutableColumn mutableFkColumn) {
+        mutableFkColumn.markAsPartOfSelfReferencingRelationship();
+      }
+    }
   }
 
   private void retrieveForeignKeysFromDataDictionary() throws WrappedSQLException {

@@ -179,7 +179,9 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
     return type;
   }
 
-  /** {@inheritDoc} */
+  /**
+   * @deprecated
+   */
   @Override
   @Deprecated
   public Class<?> getTypeMappedClass() {

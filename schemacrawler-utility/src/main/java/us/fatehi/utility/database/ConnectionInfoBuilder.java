@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import us.fatehi.utility.property.VersionNumber;
 import us.fatehi.utility.string.StringFormat;
 
 public final class ConnectionInfoBuilder {
@@ -111,10 +112,12 @@ public final class ConnectionInfoBuilder {
         getConnectionInfoProperty(() -> dbMetaData.getDriverName(), ""),
         jdbcDriverClassName,
         getConnectionInfoProperty(() -> dbMetaData.getDriverVersion(), ""),
-        getConnectionInfoProperty(() -> dbMetaData.getDriverMajorVersion(), 0),
-        getConnectionInfoProperty(() -> dbMetaData.getDriverMinorVersion(), 0),
-        getConnectionInfoProperty(() -> dbMetaData.getJDBCMajorVersion(), 0),
-        getConnectionInfoProperty(() -> dbMetaData.getJDBCMinorVersion(), 0),
+        new VersionNumber(
+            getConnectionInfoProperty(() -> dbMetaData.getDriverMajorVersion(), 0),
+            getConnectionInfoProperty(() -> dbMetaData.getDriverMinorVersion(), 0)),
+        new VersionNumber(
+            getConnectionInfoProperty(() -> dbMetaData.getJDBCMajorVersion(), 0),
+            getConnectionInfoProperty(() -> dbMetaData.getJDBCMinorVersion(), 0)),
         isJdbcCompliant,
         connectionUrl);
   }

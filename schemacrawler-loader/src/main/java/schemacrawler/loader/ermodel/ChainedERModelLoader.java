@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 import schemacrawler.loader.ermodel.ChainedERModelLoader.ChainedERModelLoaderOptions;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.options.Config;
-import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.StringFormat;
 
@@ -34,7 +33,6 @@ public class ChainedERModelLoader extends AbstractERModelLoader<ChainedERModelLo
   private static final Logger LOGGER = Logger.getLogger(ChainedERModelLoader.class.getName());
 
   private final List<ERModelLoader<?>> erModelLoaders;
-  private final Config additionalConfig;
 
   ChainedERModelLoader(final List<ERModelLoader<?>> erModelLoaders, final Config additionalConfig) {
     super(
@@ -42,12 +40,6 @@ public class ChainedERModelLoader extends AbstractERModelLoader<ChainedERModelLo
             "ermodelchainloader", "Chain of all ERModel loaders, called in turn by priority"));
     requireNonNull(erModelLoaders, "No ERModel loaders provided");
     this.erModelLoaders = new ArrayList<>(erModelLoaders);
-
-    if (additionalConfig == null) {
-      this.additionalConfig = ConfigUtility.newConfig();
-    } else {
-      this.additionalConfig = additionalConfig;
-    }
 
     configure(new ChainedERModelLoaderOptions());
   }

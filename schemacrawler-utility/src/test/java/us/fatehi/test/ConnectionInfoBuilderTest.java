@@ -27,17 +27,12 @@ import us.fatehi.test.utility.DataSourceTestUtility;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
 import us.fatehi.utility.database.DatabaseInformation;
 import us.fatehi.utility.database.JdbcDriverInformation;
+import us.fatehi.utility.property.VersionNumber;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class ConnectionInfoBuilderTest {
 
   private Connection connection;
-
-  @BeforeAll
-  public void createDatabase() throws Exception {
-    final DataSource db = DataSourceTestUtility.newEmbeddedDatabase("/testdb.sql");
-    connection = db.getConnection();
-  }
 
   @Test
   public void connectionInfoBuilder() throws SQLException {
@@ -52,13 +47,11 @@ public class ConnectionInfoBuilderTest {
     assertThat(databaseInfo.getDatabaseProductVersion(), is("2.7.4"));
 
     assertThat(jdbcDriverInfo.getDriverClassName(), is("org.hsqldb.jdbc.JDBCDriver"));
-    assertThat(jdbcDriverInfo.getDriverMajorVersion(), is(2));
-    assertThat(jdbcDriverInfo.getDriverMinorVersion(), is(7));
+    assertThat(jdbcDriverInfo.getDriverVersionNumber(), is(new VersionNumber(2, 7)));
     assertThat(jdbcDriverInfo.getDriverName(), is("HSQL Database Engine Driver"));
     assertThat(jdbcDriverInfo.getDriverVersion(), is("2.7.4"));
 
-    assertThat(jdbcDriverInfo.getJdbcMajorVersion(), is(4));
-    assertThat(jdbcDriverInfo.getJdbcMinorVersion(), is(2));
+    assertThat(jdbcDriverInfo.getJdbcVersionNumber(), is(new VersionNumber(4, 2)));
     assertThat(databaseInfo.getUserName(), is("SA"));
   }
 
@@ -77,11 +70,16 @@ public class ConnectionInfoBuilderTest {
     final JdbcDriverInformation jdbcDriverInfo = connectionInfoBuilder.buildJdbcDriverInformation();
 
     assertThat(jdbcDriverInfo.getDriverClassName(), is("org.hsqldb.jdbc.JDBCDriver"));
-    assertThat(jdbcDriverInfo.getDriverMajorVersion(), is(2));
-    assertThat(jdbcDriverInfo.getDriverMinorVersion(), is(7));
+    assertThat(jdbcDriverInfo.getDriverVersionNumber(), is(new VersionNumber(2, 7)));
     assertThat(jdbcDriverInfo.getDriverName(), is("HSQL Database Engine Driver"));
     assertThat(jdbcDriverInfo.getDriverVersion(), is("2.7.4"));
 
     assertThat(databaseInfo.getUserName(), is(""));
+  }
+
+  @BeforeAll
+  public void createDatabase() throws Exception {
+    final DataSource db = DataSourceTestUtility.newEmbeddedDatabase("/testdb.sql");
+    connection = db.getConnection();
   }
 }

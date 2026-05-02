@@ -13,7 +13,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
+import schemacrawler.schema.IdentifierQuotingStrategy;
 import schemacrawler.schema.Identifiers;
+import schemacrawler.schema.IdentifiersBuilder;
 
 public class IdentifiersTest {
 
@@ -78,6 +80,50 @@ public class IdentifiersTest {
       assertThat(word, identifiers.isReservedWord(word), is(true));
       assertThat(word, identifiers.isToBeQuoted(word), is(true));
     }
+  }
+
+  @Test
+  public void quoteAllStrategy() {
+    final Identifiers quoteAll =
+        IdentifiersBuilder.builder()
+            .withIdentifierQuotingStrategy(IdentifierQuotingStrategy.quote_all)
+            .toOptions();
+    assertThat(quoteAll.isToBeQuoted("goodname"), is(true));
+    assertThat(quoteAll.isToBeQuoted("update"), is(true));
+    assertThat(quoteAll.isToBeQuoted("q2W"), is(true));
+    assertThat(quoteAll.isToBeQuoted(""), is(false));
+    assertThat(quoteAll.isToBeQuoted(null), is(false));
+  }
+
+  @Test
+  public void quoteNoneStrategy() {
+    final Identifiers quoteNone =
+        IdentifiersBuilder.builder()
+            .withIdentifierQuotingStrategy(IdentifierQuotingStrategy.quote_none)
+            .toOptions();
+    assertThat(quoteNone.isToBeQuoted("goodname"), is(false));
+    assertThat(quoteNone.isToBeQuoted("update"), is(false));
+    assertThat(quoteNone.isToBeQuoted("w@w"), is(false));
+    assertThat(quoteNone.isToBeQuoted("q2W"), is(false));
+  }
+
+  @Test
+  public void quoteIfSpecialCharactersStrategy() {
+    final Identifiers quoteSpecial =
+        IdentifiersBuilder.builder()
+            .withIdentifierQuotingStrategy(IdentifierQuotingStrategy.quote_if_special_characters)
+            .toOptions();
+    // Reserved words are NOT quoted under this strategy
+    assertThat(quoteSpecial.isToBeQuoted("update"), is(false));
+    assertThat(quoteSpecial.isToBeQuoted("select"), is(false));
+    // Special characters require quoting
+    assertThat(quoteSpecial.isToBeQuoted("w@w"), is(true));
+    assertThat(quoteSpecial.isToBeQuoted("1234"), is(true));
+    // Mixed case requires quoting
+    assertThat(quoteSpecial.isToBeQuoted("q2W"), is(true));
+    // Plain identifiers do not
+    assertThat(quoteSpecial.isToBeQuoted("goodname"), is(false));
+    assertThat(quoteSpecial.isToBeQuoted("GOODNAME"), is(false));
   }
 
   @Test
