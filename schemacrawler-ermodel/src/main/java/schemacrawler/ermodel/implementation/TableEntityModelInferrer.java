@@ -191,8 +191,7 @@ public final class TableEntityModelInferrer {
    */
   public EntityType inferEntityType() {
 
-    // Step 1: Check for non-entity pattern: Non-entity tables do not have a primary
-    // key.
+    // Step 1: Non-entity tables do not have a primary key.
     if (isPartial(table)) {
       return EntityType.unknown;
     }
@@ -200,54 +199,23 @@ public final class TableEntityModelInferrer {
       return EntityType.non_entity;
     }
 
+    // Steps 2 and 3: Check for subtype and weak entity patterns via FK analysis.
     for (final ForeignKey fk : importedForeignKeys) {
-      final Set<Column> fkParentColumns = pkColumnsMap.get(fk.key());
-      final Set<Column> parentPkColumns = parentPkColumnsMap.get(fk.key());
-      final Set<Column> fkChildColumns = importedColumnsMap.get(fk.key());
-
-      // Step 2: Check for subtype pattern: Subtype tables inherit their entire
-      // primary key from a single supertype table.
-      // If PK(T) exactly matches the child columns of a FK to a parent
-      // table P primary key PK(P), classify T as SUBTYPE of P.
-      if (!parentPkColumns.isEmpty()
-          && parentPkColumns.equals(fkParentColumns)
-          && tablePkColumns.equals(fkChildColumns)) {
+      if (isSubtypeRelationship(fk)) {
         return EntityType.subtype;
       }
-
-      // Step 3: Check for weak entity pattern: Weak entities combine a parent's full
-      // primary key (via identifying FK) with their own discriminator column(s).
-      // Else if PK(T) contains (as a proper subset) the child columns of some FK to
-      // parent P primary key PK(P), classify T as WEAK_ENTITY owned by P.
-      if (!parentPkColumns.isEmpty()
-          && parentPkColumns.equals(fkParentColumns)
-          && tablePkColumns.containsAll(fkChildColumns)
-          && tablePkColumns.size() > fkChildColumns.size()) {
+      if (isWeakEntityRelationship(fk)) {
         return EntityType.weak_entity;
       }
     }
 
-    // Step 4: Check for strong entity pattern: Strong entities have self-sufficient
-    // primary keys (no FK columns in PK) and low referential connectivity to other
-    // tables.
-    // Else if no FK columns participate in PK(T) AND T has foreign keys to fewer
-    // than 2 other tables (excluding self-references), classify T as
-    // STRONG_ENTITY. (If there are 2 or more relationships, it may be a bridge
-    // table.)
-    final boolean pkHasFkColumn = tablePkColumns.stream().anyMatch(Column::isPartOfForeignKey);
-
-    if (!pkHasFkColumn) {
-      final Set<Table> referencedTables = new HashSet<>(table.getReferencedTables());
-      // Self-references don't count towards the limit of 2 other tables
-      referencedTables.remove(table);
-      if (referencedTables.size() < 2) {
-        return EntityType.strong_entity;
-      }
+    // Step 4: Strong entities have self-sufficient PKs and low referential
+    // connectivity.
+    if (isStrongEntity()) {
+      return EntityType.strong_entity;
     }
 
-    // Step 5: Default classification: Tables with ambiguous patterns (high
-    // connectivity, composite FK-based PKs, etc.) cannot be confidently
-    // classified.
+    // Step 5: Tables with ambiguous patterns cannot be confidently classified.
     return EntityType.unknown;
   }
 
@@ -272,11 +240,7 @@ public final class TableEntityModelInferrer {
     }
 
     for (final ForeignKey fk : importedForeignKeys) {
-
-      final Set<Column> fkParentColumns = pkColumnsMap.get(fk.key());
-      final Set<Column> parentPkColumns = parentPkColumnsMap.get(fk.key());
-      // Revisit subtype conditions to locate the supertype
-      if (parentPkColumns.equals(fkParentColumns)) {
+      if (isSubtypeRelationship(fk)) {
         return Optional.of(fk);
       }
     }
@@ -352,5 +316,51 @@ public final class TableEntityModelInferrer {
     final boolean isNotValid =
         fk == null || isPartial(table) || !fk.getForeignKeyTable().equals(table);
     return !isNotValid;
+  }
+
+  /**
+   * Strong entities have self-sufficient primary keys (no FK columns in PK) and low referential
+   * connectivity. A table with FK columns in its PK, or foreign keys to 2 or more distinct parent
+   * tables (excluding self-references), is not classified as a strong entity because it may be a
+   * bridge table or have a composite FK-based PK.
+   */
+  private boolean isStrongEntity() {
+    final boolean pkHasFkColumn = tablePkColumns.stream().anyMatch(Column::isPartOfForeignKey);
+    if (pkHasFkColumn) {
+      return false;
+    }
+    final Set<Table> referencedTables = new HashSet<>(table.getReferencedTables());
+    // Self-references don't count towards the limit of 2 other tables
+    referencedTables.remove(table);
+    return referencedTables.size() < 2;
+  }
+
+  /**
+   * Subtype tables inherit their entire primary key from a single supertype table. PK(T) exactly
+   * matches the child columns of a FK to a parent table P whose primary key PK(P) equals the
+   * parent-side columns of that FK.
+   */
+  private boolean isSubtypeRelationship(final ForeignKey fk) {
+    final Set<Column> fkParentColumns = pkColumnsMap.get(fk.key());
+    final Set<Column> parentPkColumns = parentPkColumnsMap.get(fk.key());
+    final Set<Column> fkChildColumns = importedColumnsMap.get(fk.key());
+    return !parentPkColumns.isEmpty()
+        && parentPkColumns.equals(fkParentColumns)
+        && tablePkColumns.equals(fkChildColumns);
+  }
+
+  /**
+   * Weak entities combine a parent's full primary key (via an identifying FK) with their own
+   * discriminator column(s). PK(T) contains, as a proper superset, the child columns of a FK to
+   * parent P whose primary key PK(P) equals the parent-side columns of that FK.
+   */
+  private boolean isWeakEntityRelationship(final ForeignKey fk) {
+    final Set<Column> fkParentColumns = pkColumnsMap.get(fk.key());
+    final Set<Column> parentPkColumns = parentPkColumnsMap.get(fk.key());
+    final Set<Column> fkChildColumns = importedColumnsMap.get(fk.key());
+    return !parentPkColumns.isEmpty()
+        && parentPkColumns.equals(fkParentColumns)
+        && tablePkColumns.containsAll(fkChildColumns)
+        && tablePkColumns.size() > fkChildColumns.size();
   }
 }

@@ -21,6 +21,18 @@ import schemacrawler.schema.TableConstraintColumn;
 public class ImplicitAssociationAnalyzerFkTest {
 
   @Test
+  public void singleTableReturnsEmpty() {
+    final Table table = mockTable("orders");
+    final List<Table> tables = List.of(table);
+    final TableMatchKeys tableMatchKeys = new TableMatchKeys(tables);
+    final ImplicitAssociationAnalyzer analyzer =
+        new ImplicitAssociationAnalyzer(tableMatchKeys, new IdMatcher());
+
+    assertThat(
+        "Single table should yield no implicit associations", analyzer.analyzeTables(), empty());
+  }
+
+  @Test
   public void implicitAssociationAddedIfFkDoesNotExist() {
     // Table A (orders) with primary key "id"
     final Table tableA = mockTable("orders");

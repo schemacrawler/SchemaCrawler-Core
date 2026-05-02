@@ -91,23 +91,29 @@ public final class ImplicitAssociationAnalyzer {
           }
         }
 
-        for (final Column fkColumn : fkColumns) {
-          if (!isValid(fkColumn, candidateKey)) {
-            continue;
-          }
-          final ProposedAssociation proposedAssociation =
-              new ProposedAssociation(fkColumn, candidateKey);
-          if (implicitAssociationRule.test(proposedAssociation)) {
-            LOGGER.log(
-                Level.FINE,
-                new StringFormat("Found implicit association <%s>", proposedAssociation));
-            proposedReferences.add(proposedAssociation);
-          }
-        }
+        addProposedAssociations(fkColumns, candidateKey, proposedReferences);
       }
     }
 
     return proposedReferences;
+  }
+
+  private void addProposedAssociations(
+      final Set<Column> fkColumns,
+      final KeyColumn candidateKey,
+      final List<ColumnReference> proposedReferences) {
+    for (final Column fkColumn : fkColumns) {
+      if (!isValid(fkColumn, candidateKey)) {
+        continue;
+      }
+      final ProposedAssociation proposedAssociation =
+          new ProposedAssociation(fkColumn, candidateKey);
+      if (implicitAssociationRule.test(proposedAssociation)) {
+        LOGGER.log(
+            Level.FINE, new StringFormat("Found implicit association <%s>", proposedAssociation));
+        proposedReferences.add(proposedAssociation);
+      }
+    }
   }
 
   /**

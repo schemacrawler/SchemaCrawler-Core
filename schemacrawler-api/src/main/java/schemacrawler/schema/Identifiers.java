@@ -138,10 +138,10 @@ public final class Identifiers implements Options, Serializable {
       case quote_all:
         return true;
       case quote_if_special_characters:
-        return !isIdentifier(name) || isMixedCase(name);
+        return needsSpecialCharacterQuoting(name);
       case quote_if_special_characters_and_reserved_words:
       default:
-        return !isIdentifier(name) || isMixedCase(name) || isReservedWord(name);
+        return needsSpecialCharacterQuoting(name) || isReservedWord(name);
     }
   }
 
@@ -227,6 +227,10 @@ public final class Identifiers implements Options, Serializable {
       return name.substring(quoteLength, name.length() - quoteLength);
     }
     return name;
+  }
+
+  private boolean needsSpecialCharacterQuoting(final String name) {
+    return !isIdentifier(name) || isMixedCase(name);
   }
 
   private boolean isMixedCase(final String name) {
