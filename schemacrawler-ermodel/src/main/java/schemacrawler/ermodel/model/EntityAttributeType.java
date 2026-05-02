@@ -47,6 +47,8 @@ import static java.sql.Types.TINYINT;
 import static java.sql.Types.VARBINARY;
 import static java.sql.Types.VARCHAR;
 
+import java.util.HashMap;
+import java.util.Map;
 import schemacrawler.schema.ColumnDataType;
 
 /** Represents the entity attribute type, corresponding to the data type of the backing column. */
@@ -64,38 +66,44 @@ public enum EntityAttributeType {
   timestamp,
   ;
 
+  private static final Map<Integer, EntityAttributeType> TYPE_MAP = new HashMap<>();
+
+  static {
+    register(
+        other,
+        ARRAY,
+        DISTINCT,
+        JAVA_OBJECT,
+        OTHER,
+        STRUCT,
+        ROWID,
+        REF,
+        REF_CURSOR,
+        DATALINK,
+        SQLXML);
+    register(binary, BINARY, LONGVARBINARY, VARBINARY, BLOB);
+    register(bool, BIT, BOOLEAN);
+    register(string, CHAR, LONGNVARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, VARCHAR, CLOB, NCLOB);
+    register(integer, BIGINT, INTEGER, SMALLINT, TINYINT);
+    register(decimal, DECIMAL, DOUBLE, FLOAT, NUMERIC, REAL);
+    register(date, DATE);
+    register(time, TIME, TIME_WITH_TIMEZONE);
+    register(timestamp, TIMESTAMP, TIMESTAMP_WITH_TIMEZONE);
+  }
+
+  private static void register(final EntityAttributeType type, final int... sqlTypes) {
+    for (final int sqlType : sqlTypes) {
+      TYPE_MAP.put(sqlType, type);
+    }
+  }
+
   public static EntityAttributeType from(final ColumnDataType columnDataType) {
     if (columnDataType == null) {
       return unknown;
     }
-
     if (columnDataType.isEnumerated()) {
       return enumerated;
     }
-
-    final EntityAttributeType attributeType =
-        switch (columnDataType.getJavaSqlType().getVendorTypeNumber()) {
-          case ARRAY,
-              DISTINCT,
-              JAVA_OBJECT,
-              OTHER,
-              STRUCT,
-              ROWID,
-              REF,
-              REF_CURSOR,
-              DATALINK,
-              SQLXML ->
-              other;
-          case BINARY, LONGVARBINARY, VARBINARY, BLOB -> binary;
-          case BIT, BOOLEAN -> bool;
-          case CHAR, LONGNVARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, VARCHAR, CLOB, NCLOB -> string;
-          case BIGINT, INTEGER, SMALLINT, TINYINT -> integer;
-          case DECIMAL, DOUBLE, FLOAT, NUMERIC, REAL -> decimal;
-          case DATE -> date;
-          case TIME, TIME_WITH_TIMEZONE -> time;
-          case TIMESTAMP, TIMESTAMP_WITH_TIMEZONE -> timestamp;
-          default -> unknown;
-        };
-    return attributeType;
+    return TYPE_MAP.getOrDefault(columnDataType.getJavaSqlType().getVendorTypeNumber(), unknown);
   }
 }
