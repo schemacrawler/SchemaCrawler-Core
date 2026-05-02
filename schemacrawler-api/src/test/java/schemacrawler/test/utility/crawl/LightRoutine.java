@@ -8,7 +8,10 @@
 
 package schemacrawler.test.utility.crawl;
 
+import static us.fatehi.utility.Utility.trimToEmpty;
+
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -20,23 +23,37 @@ import schemacrawler.schema.RoutineParameter;
 import schemacrawler.schema.RoutineReturnType;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.SchemaReference;
 
 public final class LightRoutine extends AbstractLightDatabaseObject implements Routine {
 
   @Serial private static final long serialVersionUID = 1L;
 
+  private final List<RoutineParameter<?>> parameters = new ArrayList<>();
+  private String definition;
+
   public LightRoutine(final Schema schema, final String name) {
     super(schema, name);
   }
 
+  public LightRoutine(final String name) {
+    this(new SchemaReference(), name);
+  }
+
+  public void addParameter(final LightRoutineParameter parameter) {
+    if (parameter != null) {
+      parameters.add(parameter);
+    }
+  }
+
   @Override
   public String getDefinition() {
-    return "";
+    return trimToEmpty(definition);
   }
 
   @Override
   public <C extends RoutineParameter<? extends Routine>> List<C> getParameters() {
-    return List.of();
+    return (List<C>) List.copyOf(parameters);
   }
 
   @Override
@@ -71,12 +88,16 @@ public final class LightRoutine extends AbstractLightDatabaseObject implements R
 
   @Override
   public boolean hasDefinition() {
-    return false;
+    return definition != null && !definition.isEmpty();
   }
 
   @Override
   public <C extends RoutineParameter<? extends Routine>> Optional<C> lookupParameter(
       final String name) {
     return Optional.empty();
+  }
+
+  public void setDefinition(final String definition) {
+    this.definition = definition;
   }
 }

@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.Routine;
-import schemacrawler.schema.RoutineParameter;
 import schemacrawler.schemacrawler.GrepOptions;
 import us.fatehi.utility.string.StringFormat;
 
@@ -30,11 +29,11 @@ class RoutineGrepFilter implements Predicate<Routine> {
   }
 
   /**
-   * Special case for "grep" like functionality. Handle table if a table column inclusion rule is
-   * found, and at least one column matches the rule.
+   * Special case for "grep" like functionality. Handle routine if a routine parameter inclusion
+   * rule is found, and at least one parameter matches the rule.
    *
-   * @param routine Table to check
-   * @return Whether the column should be included
+   * @param routine Routine to check
+   * @return Whether the routine should be included
    */
   @Override
   public boolean test(final Routine routine) {
@@ -42,46 +41,42 @@ class RoutineGrepFilter implements Predicate<Routine> {
     final boolean checkIncludeForDefinitions = options.isGrepDefinitions();
 
     if (!checkIncludeForParameters && !checkIncludeForDefinitions) {
+      if (options.isGrepInvertMatch()) {
+        LOGGER.log(
+            Level.FINE,
+            new StringFormat(
+                "Ignoring the invert match setting for routine <%s>, "
+                    + "since no inclusion rules are set",
+                routine));
+      }
       return true;
     }
 
-    final InclusionRule grepDefinitionInclusionRule = options.grepDefinitionInclusionRule();
+    final boolean includeForParameters =
+        checkIncludeForParameters && checkIncludeForParameters(routine);
+    final boolean includeForDefinitions =
+        checkIncludeForDefinitions && checkIncludeForDefinitions(routine);
 
-    boolean includeForColumns = false;
-    boolean includeForDefinitions = false;
-    for (final RoutineParameter<?> parameter : routine.getParameters()) {
-      if (checkIncludeForParameters
-          && options.grepRoutineParameterInclusionRule().test(parameter.getFullName())) {
-        includeForColumns = true;
-        break;
-      }
-
-      if (checkIncludeForDefinitions && grepDefinitionInclusionRule.test(parameter.getRemarks())) {
-        includeForDefinitions = true;
-        break;
-      }
-    }
-    // Additional include checks for definitions
-    if (checkIncludeForDefinitions) {
-      if (grepDefinitionInclusionRule.test(routine.getRemarks())) {
-        includeForDefinitions = true;
-      }
-      if (grepDefinitionInclusionRule.test(routine.getDefinition())) {
-        includeForDefinitions = true;
-      }
-    }
-
-    boolean include =
-        checkIncludeForParameters && includeForColumns
-            || checkIncludeForDefinitions && includeForDefinitions;
-    if (options.grepInvertMatch()) {
+    boolean include = includeForParameters || includeForDefinitions;
+    if (options.isGrepInvertMatch()) {
       include = !include;
     }
 
     if (!include) {
       LOGGER.log(Level.FINE, new StringFormat("Excluding routine <%s>", routine));
     }
-
     return include;
+  }
+
+  private boolean checkIncludeForDefinitions(final Routine routine) {
+    final InclusionRule rule = options.grepDefinitionInclusionRule();
+    return rule.test(routine.getRemarks())
+        || rule.test(routine.getDefinition())
+        || routine.getParameters().stream().anyMatch(p -> rule.test(p.getRemarks()));
+  }
+
+  private boolean checkIncludeForParameters(final Routine routine) {
+    final InclusionRule rule = options.grepRoutineParameterInclusionRule();
+    return routine.getParameters().stream().anyMatch(p -> rule.test(p.getFullName()));
   }
 }

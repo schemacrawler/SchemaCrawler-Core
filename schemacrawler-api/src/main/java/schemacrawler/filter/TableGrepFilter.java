@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.Trigger;
 import schemacrawler.schemacrawler.GrepOptions;
 import us.fatehi.utility.string.StringFormat;
 
@@ -45,7 +44,7 @@ class TableGrepFilter implements Predicate<Table> {
     final boolean checkIncludeForDefinitions = options.isGrepDefinitions();
 
     if (!checkIncludeForTables && !checkIncludeForColumns && !checkIncludeForDefinitions) {
-      if (options.grepInvertMatch()) {
+      if (options.isGrepInvertMatch()) {
         LOGGER.log(
             Level.FINE,
             new StringFormat(
@@ -56,15 +55,13 @@ class TableGrepFilter implements Predicate<Table> {
       return true;
     }
 
-    boolean includeForTables = checkIncludeForTables(table);
-    boolean includeForColumns = checkIncludeForColumns(table);
-    boolean includeForDefinitions = checkIncludeForDefinitions(table);
+    final boolean includeForTables = checkIncludeForTables && checkIncludeForTables(table);
+    final boolean includeForColumns = checkIncludeForColumns && checkIncludeForColumns(table);
+    final boolean includeForDefinitions =
+        checkIncludeForDefinitions && checkIncludeForDefinitions(table);
 
-    boolean include =
-        checkIncludeForTables && includeForTables
-            || checkIncludeForColumns && includeForColumns
-            || checkIncludeForDefinitions && includeForDefinitions;
-    if (options.grepInvertMatch()) {
+    boolean include = includeForTables || includeForColumns || includeForDefinitions;
+    if (options.isGrepInvertMatch()) {
       include = !include;
     }
 
@@ -75,37 +72,19 @@ class TableGrepFilter implements Predicate<Table> {
   }
 
   private boolean checkIncludeForColumns(final Table table) {
-
-    final InclusionRule grepColumnInclusionRule = options.grepColumnInclusionRule();
-
     final List<Column> columns = table.getColumns();
     if (columns.isEmpty()) {
       return true;
     }
-    for (final Column column : columns) {
-      if (grepColumnInclusionRule != null && grepColumnInclusionRule.test(column.getFullName())) {
-        return true;
-      }
-    }
-    return false;
+    final InclusionRule rule = options.grepColumnInclusionRule();
+    return columns.stream().anyMatch(c -> rule.test(c.getFullName()));
   }
 
   private boolean checkIncludeForDefinitions(final Table table) {
-
-    final InclusionRule grepDefinitionInclusionRule = options.grepDefinitionInclusionRule();
-
-    if (grepDefinitionInclusionRule != null) {
-      if (grepDefinitionInclusionRule.test(table.getRemarks())
-          || grepDefinitionInclusionRule.test(table.getDefinition())) {
-        return true;
-      }
-      for (final Trigger trigger : table.getTriggers()) {
-        if (grepDefinitionInclusionRule.test(trigger.getActionStatement())) {
-          return true;
-        }
-      }
-    }
-    return false;
+    final InclusionRule rule = options.grepDefinitionInclusionRule();
+    return rule.test(table.getRemarks())
+        || rule.test(table.getDefinition())
+        || table.getTriggers().stream().anyMatch(t -> rule.test(t.getActionStatement()));
   }
 
   private boolean checkIncludeForTables(final Table table) {
