@@ -59,7 +59,7 @@
     <maven.javadoc.skip>true</maven.javadoc.skip>
     <jacoco.version>0.8.14</jacoco.version>
     <!-- byte-buddy-agent version must align with Mockito's version; update together -->
-    <byte.buddy.version>1.17.7</byte.buddy.version>
+    <byte.buddy.version>1.18.8</byte.buddy.version>
     <!-- Empty default; JaCoCo prepends its agent when the test-coverage-build profile is active -->
     <argLine></argLine>
   </properties>
