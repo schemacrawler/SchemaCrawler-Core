@@ -14,6 +14,7 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
 import us.fatehi.utility.property.BaseProductVersion;
+import us.fatehi.utility.property.VersionNumber;
 
 /**
  * JDBC driver information. Created from metadata returned by a JDBC call, and other sources of
@@ -24,10 +25,8 @@ public final class JdbcDriverInformation extends BaseProductVersion {
   @Serial private static final long serialVersionUID = 7192167974028174124L;
 
   private final String connectionUrl;
-  private final int driverMajorVersion;
-  private final int driverMinorVersion;
-  private final int jdbcMajorVersion;
-  private final int jdbcMinorVersion;
+  private final VersionNumber driverVersion;
+  private final VersionNumber jdbcVersion;
   private final String driverClassName;
   private final boolean jdbcCompliant;
 
@@ -35,19 +34,15 @@ public final class JdbcDriverInformation extends BaseProductVersion {
       final String driverName,
       final String driverClassName,
       final String driverVersion,
-      final int driverMajorVersion,
-      final int driverMinorVersion,
-      final int jdbcMajorVersion,
-      final int jdbcMinorVersion,
+      final VersionNumber driverVersionNumber,
+      final VersionNumber jdbcVersion,
       final boolean jdbcCompliant,
       final String connectionUrl) {
     super(driverName, driverVersion);
     this.driverClassName =
         requireNonNull(driverClassName, "No database driver Java class name provided");
-    this.driverMajorVersion = driverMajorVersion;
-    this.driverMinorVersion = driverMinorVersion;
-    this.jdbcMajorVersion = jdbcMajorVersion;
-    this.jdbcMinorVersion = jdbcMinorVersion;
+    this.driverVersion = requireNonNull(driverVersionNumber, "No driver version provided");
+    this.jdbcVersion = requireNonNull(jdbcVersion, "No JDBC version provided");
     this.jdbcCompliant = jdbcCompliant;
     this.connectionUrl = requireNotBlank(connectionUrl, "No database connection URL provided");
   }
@@ -60,12 +55,20 @@ public final class JdbcDriverInformation extends BaseProductVersion {
     return driverClassName;
   }
 
+  /**
+   * @deprecated
+   */
+  @Deprecated
   public int getDriverMajorVersion() {
-    return driverMajorVersion;
+    return driverVersion.major();
   }
 
+  /**
+   * @deprecated
+   */
+  @Deprecated
   public int getDriverMinorVersion() {
-    return driverMinorVersion;
+    return driverVersion.minor();
   }
 
   /**
@@ -86,12 +89,33 @@ public final class JdbcDriverInformation extends BaseProductVersion {
     return getProductVersion();
   }
 
-  public int getJdbcMajorVersion() {
-    return jdbcMajorVersion;
+  /**
+   * Gets the version of the JDBC driver.
+   *
+   * @return Version of the JDBC driver
+   */
+  public VersionNumber getDriverVersionNumber() {
+    return driverVersion;
   }
 
+  /**
+   * @deprecated
+   */
+  @Deprecated
+  public int getJdbcMajorVersion() {
+    return jdbcVersion.major();
+  }
+
+  /**
+   * @deprecated
+   */
+  @Deprecated
   public int getJdbcMinorVersion() {
-    return jdbcMinorVersion;
+    return jdbcVersion.minor();
+  }
+
+  public VersionNumber getJdbcVersionNumber() {
+    return jdbcVersion;
   }
 
   public boolean hasDriverClassName() {

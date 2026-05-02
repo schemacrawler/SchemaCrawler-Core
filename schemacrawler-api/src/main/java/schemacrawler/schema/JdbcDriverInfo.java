@@ -11,6 +11,7 @@ package schemacrawler.schema;
 import java.sql.SQLException;
 import java.util.Collection;
 import us.fatehi.utility.property.ProductVersion;
+import us.fatehi.utility.property.VersionNumber;
 
 /** JDBC driver information. */
 public interface JdbcDriverInfo extends ProductVersion {
@@ -33,14 +34,18 @@ public interface JdbcDriverInfo extends ProductVersion {
    * Retrieves JDBC driver's major version number.
    *
    * @return JDBC driver's major version
+   * @deprecated
    */
+  @Deprecated
   int getDriverMajorVersion();
 
   /**
    * Retrieves this JDBC driver's minor version number.
    *
    * @return JDBC driver's minor version number
+   * @deprecated
    */
+  @Deprecated
   int getDriverMinorVersion();
 
   /**
@@ -69,11 +74,20 @@ public interface JdbcDriverInfo extends ProductVersion {
   }
 
   /**
+   * Gets the version of the JDBC driver.
+   *
+   * @return Version of the JDBC driver
+   */
+  VersionNumber getDriverVersionNumber();
+
+  /**
    * Gets the major JDBC version number supported by JDBC driver.
    *
    * @return JDBC version major number
    * @exception SQLException if a database access error occurs
+   * @deprecated
    */
+  @Deprecated
   int getJdbcMajorVersion();
 
   /**
@@ -81,8 +95,18 @@ public interface JdbcDriverInfo extends ProductVersion {
    *
    * @return JDBC version major number
    * @exception SQLException if a database access error occurs
+   * @deprecated
    */
+  @Deprecated
   int getJdbcMinorVersion();
+
+  /**
+   * Gets the JDBC version number supported by JDBC driver.
+   *
+   * @return JDBC version major number
+   * @exception SQLException if a database access error occurs
+   */
+  VersionNumber getJdbcVersionNumber();
 
   /**
    * Whether the JDBC driver class name is available. It may either not have been retrieved, or may
