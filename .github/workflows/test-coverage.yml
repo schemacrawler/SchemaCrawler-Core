@@ -36,8 +36,7 @@ jobs:
           -Dreactor.printOrder \
           -Dmaven.javadoc.skip=false \
           -Dmaven.javadoc.failOnError=false \
-          clean verify \
-          jacoco:report-aggregate
+          clean verify
 
 # GET TEST RESULTS
     - id: upload-coverage-test-results
@@ -45,7 +44,7 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: coverage-test-results
-        path: ./schemacrawler-verify/target/site/jacoco-aggregate
+        path: ./schemacrawler-core-verify/target/site/jacoco-aggregate
         retention-days: 5
     - id: publish-coverage-codacy
       name: Upload coverage report to Codacy
