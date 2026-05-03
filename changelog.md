@@ -9,6 +9,7 @@ SchemaCrawler Core release notes.
 - Create a catalog reducer pattern
 - Reorganize code to remove cycles in packages
 - Add stronger architecture tests
+- Calculate load summaries for catalog and ER model
 
 
 <a name="v17.10.2"></a>
