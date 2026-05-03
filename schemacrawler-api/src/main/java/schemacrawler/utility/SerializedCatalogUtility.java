@@ -58,7 +58,7 @@ public final class SerializedCatalogUtility {
     try (final InputStream inputFileStream =
         new GZIPInputStream(newInputStream(offlineDatabasePath)); ) {
       catalog = readCatalog(inputFileStream);
-      LOGGER.log(Level.INFO, () -> MetaDataUtility.summarizeCatalog(catalog));
+      LOGGER.log(Level.INFO, () -> "Deserialized catalog from <%s>".formatted(offlineDatabasePath));
     }
     return catalog;
   }

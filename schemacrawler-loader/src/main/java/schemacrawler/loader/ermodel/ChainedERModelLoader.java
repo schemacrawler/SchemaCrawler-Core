@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.loader.ermodel.ChainedERModelLoader.ChainedERModelLoaderOptions;
+import schemacrawler.loader.ermodel.summary.ERModelSummaryUtility;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
@@ -54,6 +55,7 @@ public class ChainedERModelLoader extends AbstractERModelLoader<ChainedERModelLo
 
       erModelLoader.transferState(this);
     }
+    ERModelSummaryUtility.logSummary(getERModel(), Level.INFO);
   }
 
   @Override

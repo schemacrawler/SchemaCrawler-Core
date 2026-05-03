@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.loader.catalog.ChainedCatalogLoader.ChainedCatalogLoaderOptions;
+import schemacrawler.loader.catalog.summary.CatalogSummaryUtility;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.options.Config;
-import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
@@ -56,7 +56,7 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
 
       catalogLoader.transferState(this);
     }
-    MetaDataUtility.logCatalogSummary(getCatalog(), Level.INFO);
+    CatalogSummaryUtility.logSummary(getCatalog(), Level.INFO);
   }
 
   @Override

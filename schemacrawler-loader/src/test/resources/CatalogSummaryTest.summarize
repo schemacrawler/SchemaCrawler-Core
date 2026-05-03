@@ -1,0 +1,110 @@
+catalog: catalog
+crawl-info:
+  generated-by: SchemaCrawler 17.11.0
+  generated-on: '2026-05-03 20:54:51'
+  database: HSQL Database Engine 2.7.4
+  jdbc-driver: HSQL Database Engine Driver 2.7.4
+  os: Windows 11 10.0
+  jvm: Microsoft OpenJDK 64-Bit Server VM 21.0.8+9-LTS
+counts:
+  schemas: 6
+  data-types: 7
+  tables: 20
+  columns: 90
+  routines: 15
+  synonyms: 0
+  sequences: 0
+schemas:
+  - id: books_208b5502
+    name: PUBLIC.BOOKS
+    data-types:
+      count: 6
+    tables:
+      count: 11
+      columns: 43
+      primary-keys: 9
+      foreign-keys: 6
+      indexes: 19
+      triggers: 0
+    routines:
+      count: 5
+      procedures: 3
+      functions: 2
+      parameters: 7
+    synonyms:
+      count: 0
+    sequences:
+      count: 0
+  - id: for_lint_68ae7c51
+    name: PUBLIC.FOR_LINT
+    data-types:
+      count: 0
+    tables:
+      count: 6
+      columns: 34
+      primary-keys: 4
+      foreign-keys: 7
+      indexes: 15
+      triggers: 0
+    routines:
+      count: 0
+    synonyms:
+      count: 0
+    sequences:
+      count: 0
+  - id: information_schema_4fe042ac
+    name: PUBLIC.INFORMATION_SCHEMA
+    data-types:
+      count: 0
+    tables:
+      count: 0
+    routines:
+      count: 0
+    synonyms:
+      count: 0
+    sequences:
+      count: 0
+  - id: public_aa14d0e1
+    name: PUBLIC.PUBLIC
+    data-types:
+      count: 0
+    tables:
+      count: 0
+    routines:
+      count: 0
+    synonyms:
+      count: 0
+    sequences:
+      count: 0
+  - id: publishersales_7f7f6c20
+    name: PUBLIC."PUBLISHER SALES"
+    data-types:
+      count: 0
+    tables:
+      count: 3
+      columns: 13
+      primary-keys: 1
+      foreign-keys: 3
+      indexes: 5
+      triggers: 0
+    routines:
+      count: 0
+    synonyms:
+      count: 0
+    sequences:
+      count: 0
+  - id: system_lobs_4356bf9c
+    name: PUBLIC.SYSTEM_LOBS
+    data-types:
+      count: 1
+    tables:
+      count: 0
+    routines:
+      count: 10
+      procedures: 10
+      functions: 0
+      parameters: 23
+    synonyms:
+      count: 0
+    sequences:
+      count: 0

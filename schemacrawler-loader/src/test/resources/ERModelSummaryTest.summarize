@@ -1,0 +1,20 @@
+ermodel:
+  entities:
+    count: 12
+    strong-entities: 10
+    weak-entities: 1
+    subtypes: 1
+    non-entities: 0
+    unknown: 0
+  relationships:
+    count: 15
+    one-to-one: 2
+    one-to-many: 9
+    zero-to-one: 1
+    zero-to-many: 2
+    many-to-many: 1
+    unknown: 0
+  implicit-relationships:
+    count: 0
+  unmodeled-tables:
+    count: 7

@@ -17,9 +17,6 @@ import static org.mockito.Mockito.when;
 import static schemacrawler.schema.IdentifierQuotingStrategy.quote_all;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
-import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
-import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
-import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
@@ -44,9 +41,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.utility.MetaDataUtility;
-import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
-import us.fatehi.test.utility.extensions.TestContext;
 
 @WithTestDatabase
 @ResolveTestContext
@@ -128,16 +123,6 @@ public class MetadataUtilityTest {
 
     final Table table = catalog.lookupTable(schema, "BOOKS").get();
     assertThat("BOOKS Table not found", table, notNullValue());
-  }
-
-  @Test
-  public void summarizeCatalog(final TestContext testContext) throws Exception {
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
-      out.write(MetaDataUtility.summarizeCatalog(catalog));
-    }
-    assertThat(
-        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
   }
 
   @ParameterizedTest(name = "[{index}] {0}: Check database object name is system-generated")
