@@ -21,7 +21,7 @@ import schemacrawler.schema.Table;
  * Handler interface for catalog summary traversal. Implementations receive structured count data
  * for each schema and catalog-level aggregates.
  */
-public interface CatalogSummaryHandler {
+interface CatalogSummaryHandler {
 
   record DataTypeCounts(int count) {}
 

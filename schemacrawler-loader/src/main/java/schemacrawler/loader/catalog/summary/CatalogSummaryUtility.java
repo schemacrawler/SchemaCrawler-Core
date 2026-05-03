@@ -8,8 +8,6 @@
 
 package schemacrawler.loader.catalog.summary;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.Catalog;
@@ -44,21 +42,7 @@ public final class CatalogSummaryUtility {
     if (catalog == null) {
       return "";
     }
-    return CatalogSummaryUtility.toYaml(catalog);
-  }
-
-  /**
-   * Convenience method that traverses {@code catalog} with a {@link YamlCatalogSummaryHandler} and
-   * returns the resulting YAML string.
-   *
-   * @param catalog Catalog to summarize; must not be {@code null}
-   * @return Valid YAML summary of the catalog
-   */
-  private static String toYaml(final Catalog catalog) {
-    requireNonNull(catalog, "No catalog provided");
-    final YamlCatalogSummaryHandler handler = new YamlCatalogSummaryHandler();
-    CatalogSummaryTraverser.traverse(catalog, handler);
-    return handler.getYaml();
+    return CatalogSummaryTraverser.toYaml(catalog);
   }
 
   private CatalogSummaryUtility() {
