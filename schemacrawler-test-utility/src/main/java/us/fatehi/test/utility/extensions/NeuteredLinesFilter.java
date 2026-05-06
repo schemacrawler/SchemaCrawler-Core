@@ -17,6 +17,7 @@ final class NeuteredLinesFilter implements Predicate<String> {
     //
     Pattern.compile(".*jdbc:.*"),
     Pattern.compile("database product version.*"),
+    Pattern.compile("database version.*"),
     Pattern.compile("driver version.*"),
     Pattern.compile("-- operating system:.*"),
     Pattern.compile("-- JVM system:.*"),
