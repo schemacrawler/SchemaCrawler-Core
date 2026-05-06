@@ -66,10 +66,6 @@ public final class ERModelBuilder implements Builder<ERModel> {
         continue;
       }
 
-      // Build main entity
-      lookupOrCreateEntity(table);
-
-      // Check for M..N relationship
       final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
       if (modelInferrer.inferBridgeTable()) {
         // Build M..N relationship
@@ -85,7 +81,8 @@ public final class ERModelBuilder implements Builder<ERModel> {
 
         erModel.addRelationship(rel);
       } else {
-        // Build table reference relationships
+        // Build main entity and table reference relationships
+        lookupOrCreateEntity(table);
         for (final ForeignKey fk : table.getImportedForeignKeys()) {
           final MutableTableReferenceRelationship rel = createRelationship(fk);
           erModel.addRelationship(rel);

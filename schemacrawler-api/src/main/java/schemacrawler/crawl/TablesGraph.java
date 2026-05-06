@@ -8,8 +8,6 @@
 
 package schemacrawler.crawl;
 
-import static schemacrawler.utility.MetaDataUtility.isView;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -52,8 +50,8 @@ final class TablesGraph extends DirectedGraph<Table> {
       final List<View> sortedViews = new ArrayList<>();
       int sortIndex = 0;
       for (final Table table : sortedTables) {
-        if (isView(table)) {
-          sortedViews.add((View) table);
+        if (table instanceof final View view) {
+          sortedViews.add(view);
         } else if (table instanceof MutableTable mutableTable) {
           mutableTable.setSortIndex(sortIndex);
           sortIndex++;

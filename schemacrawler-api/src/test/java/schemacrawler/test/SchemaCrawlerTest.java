@@ -22,7 +22,6 @@ import static schemacrawler.crawl.IndexRetrieverTest.verifyRetrieveIndexes;
 import static schemacrawler.crawl.PrimaryKeyRetrieverTest.verifyRetrievePrimaryKeys;
 import static schemacrawler.crawl.TableColumnRetrieverTest.verifyRetrieveTableColumns;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
-import static schemacrawler.utility.MetaDataUtility.isView;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
 import static us.fatehi.test.utility.extensions.FileHasContent.hasSameContentAs;
 import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
@@ -652,17 +651,15 @@ public class SchemaCrawlerTest {
         final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
         Arrays.sort(tables, NamedObjectSort.alphabetical);
         for (final Table table : tables) {
-          if (!isView(table)) {
-            continue;
-          }
-          final View view = (View) table;
-          out.println("%s [%s]".formatted(view.getFullName(), view.getTableType()));
-          out.println("  - check option: %s".formatted(view.getCheckOption()));
-          out.println("  - updatable?: %b".formatted(view.isUpdatable()));
-          out.println("  - definition: %s".formatted(view.getDefinition()));
-          out.println("  - table usage");
-          for (final Table usedTable : view.getTableUsage()) {
-            out.println("    - table: %s".formatted(usedTable));
+          if (table instanceof final View view) {
+            out.println("%s [%s]".formatted(view.getFullName(), view.getTableType()));
+            out.println("  - check option: %s".formatted(view.getCheckOption()));
+            out.println("  - updatable?: %b".formatted(view.isUpdatable()));
+            out.println("  - definition: %s".formatted(view.getDefinition()));
+            out.println("  - table usage");
+            for (final Table usedTable : view.getTableUsage()) {
+              out.println("    - table: %s".formatted(usedTable));
+            }
           }
         }
       }
