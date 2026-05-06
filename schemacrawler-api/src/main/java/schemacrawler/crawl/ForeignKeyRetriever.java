@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.schemacrawler.InformationSchemaKey.FOREIGN_KEYS;
 import static schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy.foreignKeysRetrievalStrategy;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
-import static schemacrawler.utility.MetaDataUtility.isView;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
@@ -264,7 +263,7 @@ final class ForeignKeyRetriever extends AbstractRetriever {
       final Map<NamedObjectKey, MutableForeignKey> foreignKeys = new ConcurrentHashMap<>();
       final RetrievalCounts retrievalCounts = new RetrievalCounts("foreign keys");
       for (final MutableTable table : allTables) {
-        if (isView(table)) {
+        if (table.getTableType().isView()) {
           continue;
         }
 

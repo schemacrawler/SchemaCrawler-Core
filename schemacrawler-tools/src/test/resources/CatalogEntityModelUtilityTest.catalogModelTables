@@ -29,7 +29,7 @@ PUBLIC.BOOKS.ΒΙΒΛΊΑ
   - entity type=strong_entity
   - is bridge table=false_value
 PUBLIC.BOOKS.AUTHORSLIST
-  - entity type=non_entity
+  - entity type=unknown
   - is bridge table=false_value
 PUBLIC."PUBLISHER SALES".REGIONS
   - entity type=strong_entity

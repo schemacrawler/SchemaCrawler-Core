@@ -196,7 +196,8 @@ public final class TableEntityModelInferrer {
       return EntityType.unknown;
     }
     if (!table.hasPrimaryKey()) {
-      return EntityType.non_entity;
+      // Views without a primary key are unclassified; tables without a PK are non-entities
+      return table.getTableType().isView() ? EntityType.unknown : EntityType.non_entity;
     }
 
     // Steps 2 and 3: Check for subtype and weak entity patterns via FK analysis.
