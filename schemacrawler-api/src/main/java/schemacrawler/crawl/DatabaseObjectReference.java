@@ -20,7 +20,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import schemacrawler.schema.DatabaseObject;
-import schemacrawler.schema.PartialDatabaseObject;
 
 class DatabaseObjectReference<D extends DatabaseObject> implements Serializable {
 
@@ -73,7 +72,7 @@ class DatabaseObjectReference<D extends DatabaseObject> implements Serializable 
   }
 
   public boolean isPartialDatabaseObjectReference() {
-    return this.get() instanceof PartialDatabaseObject;
+    return isPartial(this.get());
   }
 
   @Override

@@ -15,9 +15,9 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Table;
+import schemacrawler.utility.MetaDataUtility;
 
 abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> implements KeyColumn
     permits MutableIndexColumn, MutableTableConstraintColumn {
@@ -31,7 +31,7 @@ abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> i
   AbstractKeyColumn(final Column column) {
     super(new TablePointer(column.getParent()), column.getName());
     this.column = column;
-    isPartial = column instanceof PartialDatabaseObject;
+    isPartial = MetaDataUtility.isPartial(column);
   }
 
   /**

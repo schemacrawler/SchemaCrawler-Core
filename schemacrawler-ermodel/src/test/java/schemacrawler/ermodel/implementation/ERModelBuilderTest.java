@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static schemacrawler.test.utility.crawl.LightCatalogUtility.lightCatalog;
 
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.ERModel;
@@ -62,8 +62,7 @@ public class ERModelBuilderTest {
     when(subTable.getForeignKeys()).thenReturn(List.of());
     when(superTable.getForeignKeys()).thenReturn(List.of());
 
-    final Catalog catalog = mock(Catalog.class);
-    when(catalog.getTables()).thenReturn(Arrays.asList(subTable, superTable));
+    final Catalog catalog = lightCatalog(subTable, superTable);
 
     final ERModelBuilder builder = ERModelBuilder.builder(catalog);
     final ERModel erModel = assertDoesNotThrow(() -> builder.build());
@@ -104,8 +103,7 @@ public class ERModelBuilderTest {
 
     when(subTable.getImportedForeignKeys()).thenReturn(List.of(fk));
 
-    final Catalog catalog = mock(Catalog.class);
-    when(catalog.getTables()).thenReturn(Arrays.asList(subTable, superTable));
+    final Catalog catalog = lightCatalog(subTable, superTable);
 
     final ERModel erModel = ERModelBuilder.builder(catalog).build();
 

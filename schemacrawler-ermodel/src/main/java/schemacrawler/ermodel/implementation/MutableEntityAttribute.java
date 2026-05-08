@@ -1,6 +1,7 @@
 package schemacrawler.ermodel.implementation;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.Serial;
 import java.util.List;
@@ -9,7 +10,6 @@ import schemacrawler.ermodel.model.EntityAttributeType;
 import schemacrawler.ermodel.model.TableBacked;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.PartialDatabaseObject;
 
 final class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
     implements EntityAttribute {
@@ -29,7 +29,7 @@ final class MutableEntityAttribute extends AbstractDatabaseObjectBacked<Column>
     final ColumnDataType columnDataType = column.getColumnDataType();
     type = EntityAttributeType.from(columnDataType);
     enumValues = columnDataType.getEnumValues();
-    isPartial = column instanceof PartialDatabaseObject;
+    isPartial = isPartial(column);
   }
 
   @Override
