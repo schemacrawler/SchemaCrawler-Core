@@ -37,6 +37,7 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
   private final List<Column> columns;
   private final List<Column> hiddenColumns;
   private final Collection<Trigger> triggers;
+  private PrimaryKey primaryKey;
   private String definition;
 
   public LightTable(final Schema schema, final String name) {
@@ -130,7 +131,7 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public PrimaryKey getPrimaryKey() {
-    return null;
+    return primaryKey;
   }
 
   @Override
@@ -185,7 +186,7 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public boolean hasPrimaryKey() {
-    return false;
+    return primaryKey != null;
   }
 
   @Override
@@ -238,7 +239,11 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
     return Optional.empty();
   }
 
-  public void setDefinition(String definition) {
+  public void setDefinition(final String definition) {
     this.definition = definition;
+  }
+
+  public void setPrimaryKey(final PrimaryKey primaryKey) {
+    this.primaryKey = primaryKey;
   }
 }

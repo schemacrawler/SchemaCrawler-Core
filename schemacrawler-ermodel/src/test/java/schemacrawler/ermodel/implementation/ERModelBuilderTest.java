@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static schemacrawler.test.utility.crawl.LightCatalogUtility.lightCatalog;
 
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.ERModel;
@@ -21,30 +21,23 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PrimaryKey;
-import schemacrawler.schema.Table;
-import schemacrawler.schema.TableConstraintColumn;
+import schemacrawler.test.utility.crawl.LightColumn;
+import schemacrawler.test.utility.crawl.LightPrimaryKey;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class ERModelBuilderTest {
 
   @Test
   public void testConcurrentModificationException() {
-    final Table superTable = spy(new LightTable("SUPER_TABLE"));
-    when(superTable.hasPrimaryKey()).thenReturn(true);
-    when(superTable.getImportedForeignKeys()).thenReturn(List.of());
+    final LightTable superTable = new LightTable("SUPER_TABLE");
+    final LightColumn superPkCol = superTable.addColumn("ID");
+    final PrimaryKey superPk = new LightPrimaryKey(superPkCol);
+    superTable.setPrimaryKey(superPk);
 
-    final PrimaryKey superPk = mock(PrimaryKey.class);
-    final TableConstraintColumn superPkCol = mock(TableConstraintColumn.class);
-    when(superPk.getConstrainedColumns()).thenReturn(List.of(superPkCol));
-    when(superTable.getPrimaryKey()).thenReturn(superPk);
-
-    final Table subTable = spy(new LightTable("SUB_TABLE"));
-    when(subTable.hasPrimaryKey()).thenReturn(true);
-
-    final TableConstraintColumn subPkCol = mock(TableConstraintColumn.class);
-    final PrimaryKey subPk = mock(PrimaryKey.class);
-    when(subPk.getConstrainedColumns()).thenReturn(List.of(subPkCol));
-    when(subTable.getPrimaryKey()).thenReturn(subPk);
+    final LightTable subTable = spy(new LightTable("SUB_TABLE"));
+    final LightColumn subPkCol = subTable.addColumn("ID");
+    final LightPrimaryKey subPk = new LightPrimaryKey(subPkCol);
+    subTable.setPrimaryKey(subPk);
 
     final ForeignKey fk = spy(ForeignKey.class);
     final NamedObjectKey fkKey = mock(NamedObjectKey.class);
@@ -58,12 +51,8 @@ public class ERModelBuilderTest {
     when(fk.getColumnReferences()).thenReturn(List.of(colRef));
 
     when(subTable.getImportedForeignKeys()).thenReturn(List.of(fk));
-    // TableEntityModelInferrer needs foreign keys too
-    when(subTable.getForeignKeys()).thenReturn(List.of());
-    when(superTable.getForeignKeys()).thenReturn(List.of());
 
-    final Catalog catalog = mock(Catalog.class);
-    when(catalog.getTables()).thenReturn(Arrays.asList(subTable, superTable));
+    final Catalog catalog = lightCatalog(subTable, superTable);
 
     final ERModelBuilder builder = ERModelBuilder.builder(catalog);
     final ERModel erModel = assertDoesNotThrow(() -> builder.build());
@@ -72,24 +61,15 @@ public class ERModelBuilderTest {
 
   @Test
   public void testSubtypeIdentifyingRelationship() {
-    final Table superTable = spy(new LightTable("SUPER_TABLE"));
-    when(superTable.hasPrimaryKey()).thenReturn(true);
-    when(superTable.getImportedForeignKeys()).thenReturn(List.of());
-    when(superTable.getForeignKeys()).thenReturn(List.of());
+    final LightTable superTable = new LightTable("SUPER_TABLE");
+    final LightColumn superPkCol = superTable.addColumn("ID");
+    final LightPrimaryKey superPk = new LightPrimaryKey(superPkCol);
+    superTable.setPrimaryKey(superPk);
 
-    final PrimaryKey superPk = mock(PrimaryKey.class);
-    final TableConstraintColumn superPkCol = mock(TableConstraintColumn.class);
-    when(superPk.getConstrainedColumns()).thenReturn(List.of(superPkCol));
-    when(superTable.getPrimaryKey()).thenReturn(superPk);
-
-    final Table subTable = spy(new LightTable("SUB_TABLE"));
-    when(subTable.hasPrimaryKey()).thenReturn(true);
-    when(subTable.getForeignKeys()).thenReturn(List.of());
-
-    final TableConstraintColumn subPkCol = mock(TableConstraintColumn.class);
-    final PrimaryKey subPk = mock(PrimaryKey.class);
-    when(subPk.getConstrainedColumns()).thenReturn(List.of(subPkCol));
-    when(subTable.getPrimaryKey()).thenReturn(subPk);
+    final LightTable subTable = spy(new LightTable("SUB_TABLE"));
+    final LightColumn subPkCol = subTable.addColumn("ID");
+    final LightPrimaryKey subPk = new LightPrimaryKey(subPkCol);
+    subTable.setPrimaryKey(subPk);
 
     final ForeignKey fk = spy(ForeignKey.class);
     final NamedObjectKey fkKey = mock(NamedObjectKey.class);
@@ -104,8 +84,7 @@ public class ERModelBuilderTest {
 
     when(subTable.getImportedForeignKeys()).thenReturn(List.of(fk));
 
-    final Catalog catalog = mock(Catalog.class);
-    when(catalog.getTables()).thenReturn(Arrays.asList(subTable, superTable));
+    final Catalog catalog = lightCatalog(subTable, superTable);
 
     final ERModel erModel = ERModelBuilder.builder(catalog).build();
 

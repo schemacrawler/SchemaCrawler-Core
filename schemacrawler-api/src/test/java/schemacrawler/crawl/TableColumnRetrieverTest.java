@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static schemacrawler.schemacrawler.MetadataRetrievalStrategy.data_dictionary_all;
 import static schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy.tableColumnsRetrievalStrategy;
@@ -64,6 +63,7 @@ import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.utility.IOUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import us.fatehi.utility.datasource.DatabaseConnectionSources;
 
 @WithTestDatabase
 @ResolveTestContext
@@ -177,10 +177,10 @@ public class TableColumnRetrieverTest {
   @DisplayName("Test exception handling when column retrieval operations fail")
   public void exceptionHandlingWhenColumnRetrievalFails() throws Exception {
     // Create a mock connection source that throws an exception
-    final DatabaseConnectionSource testDataSource = mock(DatabaseConnectionSource.class);
     final Connection mockConnection = mockConnection();
-    when(testDataSource.get()).thenReturn(mockConnection);
     when(mockConnection.getMetaData()).thenThrow(new SQLException("Test exception"));
+    final DatabaseConnectionSource testDataSource =
+        DatabaseConnectionSources.fromConnection(mockConnection);
 
     final SchemaRetrievalOptions schemaRetrievalOptions =
         SchemaRetrievalOptionsBuilder.builder().toOptions();

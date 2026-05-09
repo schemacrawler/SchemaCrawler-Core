@@ -8,13 +8,14 @@
 
 package schemacrawler.ermodel.implementation;
 
+import static schemacrawler.utility.MetaDataUtility.isPartial;
+
 import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import schemacrawler.ermodel.model.EntityAttribute;
 import schemacrawler.ermodel.model.TableBacked;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Table;
 
 abstract class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
@@ -27,14 +28,14 @@ abstract class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
   public AbstractTableBacked(final Table table) {
     super(table);
 
-    if (table instanceof PartialDatabaseObject) {
+    if (isPartial(table)) {
       entityAttributes = List.of();
     } else {
       entityAttributes =
           table.getColumns().stream()
               .filter(
                   column ->
-                      column instanceof PartialDatabaseObject
+                      isPartial(column)
                           || (!column.isPartOfPrimaryKey() && !column.isPartOfForeignKey()))
               .map(column -> new MutableEntityAttribute(this, column))
               .collect(Collectors.toList());
