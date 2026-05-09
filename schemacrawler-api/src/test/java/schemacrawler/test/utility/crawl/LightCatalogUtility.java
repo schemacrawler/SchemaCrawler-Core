@@ -96,7 +96,7 @@ public class LightCatalogUtility {
             case "getName", "getFullName", "toString" -> "light-catalog";
             case "equals" -> proxy == args[0];
             case "hashCode" -> System.identityHashCode(proxy);
-            case "getCrawlInfo" -> lightCrawlInfo();
+            case "getCrawlInfo" -> new LightCrawlInfo();
             case "getJdbcDriverInfo" -> TestObjectUtility.makeTestObject(JdbcDriverInfo.class);
             case "getDatabaseInfo" -> lightDatabaseInfo();
             case "getTables" -> tablesList;
@@ -107,22 +107,6 @@ public class LightCatalogUtility {
     return (Catalog)
         Proxy.newProxyInstance(
             Catalog.class.getClassLoader(), new Class<?>[] {Catalog.class}, handler);
-  }
-
-  public static CrawlInfo lightCrawlInfo() {
-    final Class<CrawlInfo> clazz = CrawlInfo.class;
-    final InvocationHandler handler =
-        (proxy, method, args) -> {
-          final Class<?> returnType = method.getReturnType();
-          if (ProductVersion.class.isAssignableFrom(returnType)) {
-            return Version.version();
-          }
-          return returnEmpty(method);
-        };
-
-    return (CrawlInfo)
-        Proxy.newProxyInstance(
-            LightCatalogUtility.class.getClassLoader(), new Class<?>[] {clazz}, handler);
   }
 
   public static DatabaseInfo lightDatabaseInfo() {

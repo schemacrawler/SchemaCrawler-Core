@@ -1,12 +1,4 @@
-/*
- * SchemaCrawler
- * http://www.schemacrawler.com
- * Copyright (c) 2000-2026, Sualeh Fatehi <sualeh@hotmail.com>.
- * All rights reserved.
- * SPDX-License-Identifier: EPL-2.0
- */
-
-package schemacrawler.crawl;
+package schemacrawler.test.utility.crawl;
 
 import static java.lang.System.lineSeparator;
 import static java.time.ZoneOffset.UTC;
@@ -17,9 +9,7 @@ import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.time.temporal.ChronoField.YEAR;
-import static java.util.Objects.requireNonNull;
 
-import java.io.Serial;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,14 +19,9 @@ import java.util.UUID;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schemacrawler.Version;
 import us.fatehi.utility.property.BaseProductVersion;
-import us.fatehi.utility.property.JvmSystemInfo;
-import us.fatehi.utility.property.OperatingSystemInfo;
 import us.fatehi.utility.property.ProductVersion;
 
-/** SchemaCrawler crawl information. */
-final class ImmutableCrawlInfo implements CrawlInfo {
-
-  @Serial private static final long serialVersionUID = 5982990326485881993L;
+public class LightCrawlInfo implements CrawlInfo {
 
   public static final DateTimeFormatter DATE_TIME_FORMATTER =
       new DateTimeFormatterBuilder()
@@ -61,18 +46,16 @@ final class ImmutableCrawlInfo implements CrawlInfo {
   private final ProductVersion databaseVersion;
   private final ProductVersion jdbcDriverVersion;
 
-  ImmutableCrawlInfo(final ProductVersion databaseInfo, final ProductVersion jdbcDriverInfo) {
-    requireNonNull(databaseInfo, "No database information provided");
-    requireNonNull(jdbcDriverInfo, "No JDBC driver information provided");
+  public LightCrawlInfo() {
 
     schemaCrawlerVersion = Version.version();
-    operatingSystemVersion = OperatingSystemInfo.operatingSystemInfo();
-    jvmVersion = JvmSystemInfo.jvmSystemInfo();
+    operatingSystemVersion = new BaseProductVersion("OS", "0.0");
+    jvmVersion = new BaseProductVersion("JDK", "0.0");
 
-    databaseVersion = new BaseProductVersion(databaseInfo);
-    jdbcDriverVersion = new BaseProductVersion(jdbcDriverInfo);
+    databaseVersion = new BaseProductVersion("TestDB", "v1.0");
+    jdbcDriverVersion = new BaseProductVersion("TestDB JDBC Driver", "v1.0");
 
-    crawlTimestamp = Instant.now();
+    crawlTimestamp = Instant.EPOCH;
     runId = UUID.randomUUID();
   }
 
