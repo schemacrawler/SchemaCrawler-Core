@@ -19,8 +19,8 @@ import schemacrawler.schema.NamedObject;
  * Represents a column in a database for tables and routines. Created from metadata returned by a
  * JDBC call.
  */
-abstract class AbstractColumn<P extends DatabaseObject> extends AbstractDependantObject<P>
-    implements BaseColumn<P> {
+abstract sealed class AbstractColumn<P extends DatabaseObject> extends AbstractDependantObject<P>
+    implements BaseColumn<P> permits MutableColumn, MutableResultsColumn, MutableRoutineParameter {
 
   @Serial private static final long serialVersionUID = -8492662324895309485L;
 
