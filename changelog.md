@@ -7,6 +7,8 @@ SchemaCrawler Core release notes.
 ## Release 17.11.1 - 2026-05-08
 
 - Handle bridge tables and views better in catalogs and ER models
+- Reduce instances of mocking in tests
+- Further seal internal classes
 
 
 <a name="v17.11.0"></a>
