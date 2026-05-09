@@ -21,30 +21,25 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PrimaryKey;
-import schemacrawler.schema.Table;
-import schemacrawler.schema.TableConstraintColumn;
+import schemacrawler.test.utility.crawl.LightColumn;
+import schemacrawler.test.utility.crawl.LightPrimaryKey;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class ERModelBuilderTest {
 
   @Test
   public void testConcurrentModificationException() {
-    final Table superTable = spy(new LightTable("SUPER_TABLE"));
-    when(superTable.hasPrimaryKey()).thenReturn(true);
+    final LightTable superTable = spy(new LightTable("SUPER_TABLE"));
     when(superTable.getImportedForeignKeys()).thenReturn(List.of());
 
-    final PrimaryKey superPk = mock(PrimaryKey.class);
-    final TableConstraintColumn superPkCol = mock(TableConstraintColumn.class);
-    when(superPk.getConstrainedColumns()).thenReturn(List.of(superPkCol));
-    when(superTable.getPrimaryKey()).thenReturn(superPk);
+    final LightColumn superPkCol = superTable.addColumn("ID");
+    final PrimaryKey superPk = new LightPrimaryKey(superPkCol);
+    superTable.setPrimaryKey(superPk);
 
-    final Table subTable = spy(new LightTable("SUB_TABLE"));
-    when(subTable.hasPrimaryKey()).thenReturn(true);
-
-    final TableConstraintColumn subPkCol = mock(TableConstraintColumn.class);
-    final PrimaryKey subPk = mock(PrimaryKey.class);
-    when(subPk.getConstrainedColumns()).thenReturn(List.of(subPkCol));
-    when(subTable.getPrimaryKey()).thenReturn(subPk);
+    final LightTable subTable = spy(new LightTable("SUB_TABLE"));
+    final LightColumn subPkCol = subTable.addColumn("ID");
+    final LightPrimaryKey subPk = new LightPrimaryKey(subPkCol);
+    subTable.setPrimaryKey(subPk);
 
     final ForeignKey fk = spy(ForeignKey.class);
     final NamedObjectKey fkKey = mock(NamedObjectKey.class);
@@ -71,24 +66,20 @@ public class ERModelBuilderTest {
 
   @Test
   public void testSubtypeIdentifyingRelationship() {
-    final Table superTable = spy(new LightTable("SUPER_TABLE"));
-    when(superTable.hasPrimaryKey()).thenReturn(true);
+    final LightTable superTable = spy(new LightTable("SUPER_TABLE"));
     when(superTable.getImportedForeignKeys()).thenReturn(List.of());
     when(superTable.getForeignKeys()).thenReturn(List.of());
 
-    final PrimaryKey superPk = mock(PrimaryKey.class);
-    final TableConstraintColumn superPkCol = mock(TableConstraintColumn.class);
-    when(superPk.getConstrainedColumns()).thenReturn(List.of(superPkCol));
-    when(superTable.getPrimaryKey()).thenReturn(superPk);
+    final LightColumn superPkCol = superTable.addColumn("ID");
+    final LightPrimaryKey superPk = new LightPrimaryKey(superPkCol);
+    superTable.setPrimaryKey(superPk);
 
-    final Table subTable = spy(new LightTable("SUB_TABLE"));
-    when(subTable.hasPrimaryKey()).thenReturn(true);
+    final LightTable subTable = spy(new LightTable("SUB_TABLE"));
     when(subTable.getForeignKeys()).thenReturn(List.of());
 
-    final TableConstraintColumn subPkCol = mock(TableConstraintColumn.class);
-    final PrimaryKey subPk = mock(PrimaryKey.class);
-    when(subPk.getConstrainedColumns()).thenReturn(List.of(subPkCol));
-    when(subTable.getPrimaryKey()).thenReturn(subPk);
+    final LightColumn subPkCol = subTable.addColumn("ID");
+    final LightPrimaryKey subPk = new LightPrimaryKey(subPkCol);
+    subTable.setPrimaryKey(subPk);
 
     final ForeignKey fk = spy(ForeignKey.class);
     final NamedObjectKey fkKey = mock(NamedObjectKey.class);
