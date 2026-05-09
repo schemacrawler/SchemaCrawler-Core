@@ -29,9 +29,7 @@ public class ERModelBuilderTest {
 
   @Test
   public void testConcurrentModificationException() {
-    final LightTable superTable = spy(new LightTable("SUPER_TABLE"));
-    when(superTable.getImportedForeignKeys()).thenReturn(List.of());
-
+    final LightTable superTable = new LightTable("SUPER_TABLE");
     final LightColumn superPkCol = superTable.addColumn("ID");
     final PrimaryKey superPk = new LightPrimaryKey(superPkCol);
     superTable.setPrimaryKey(superPk);
@@ -53,9 +51,6 @@ public class ERModelBuilderTest {
     when(fk.getColumnReferences()).thenReturn(List.of(colRef));
 
     when(subTable.getImportedForeignKeys()).thenReturn(List.of(fk));
-    // TableEntityModelInferrer needs foreign keys too
-    when(subTable.getForeignKeys()).thenReturn(List.of());
-    when(superTable.getForeignKeys()).thenReturn(List.of());
 
     final Catalog catalog = lightCatalog(subTable, superTable);
 
@@ -66,17 +61,12 @@ public class ERModelBuilderTest {
 
   @Test
   public void testSubtypeIdentifyingRelationship() {
-    final LightTable superTable = spy(new LightTable("SUPER_TABLE"));
-    when(superTable.getImportedForeignKeys()).thenReturn(List.of());
-    when(superTable.getForeignKeys()).thenReturn(List.of());
-
+    final LightTable superTable = new LightTable("SUPER_TABLE");
     final LightColumn superPkCol = superTable.addColumn("ID");
     final LightPrimaryKey superPk = new LightPrimaryKey(superPkCol);
     superTable.setPrimaryKey(superPk);
 
     final LightTable subTable = spy(new LightTable("SUB_TABLE"));
-    when(subTable.getForeignKeys()).thenReturn(List.of());
-
     final LightColumn subPkCol = subTable.addColumn("ID");
     final LightPrimaryKey subPk = new LightPrimaryKey(subPkCol);
     subTable.setPrimaryKey(subPk);

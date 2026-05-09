@@ -21,15 +21,33 @@ public final class LightPrimaryKey extends AbstractLightDatabaseObject implement
 
   @Serial private static final long serialVersionUID = -8327896738506432571L;
 
+  private static Column firstNonNull(final Column... columns) {
+    if (columns == null || columns.length == 0) {
+      throw new IllegalArgumentException("No columns provided");
+    }
+    for (final Column column : columns) {
+      if (column != null) {
+        return column;
+      }
+    }
+    throw new IllegalArgumentException("No columns provided");
+  }
+
   private final Table parent;
+
   private final List<TableConstraintColumn> tableConstraintColumns;
 
   public LightPrimaryKey(final Column... columns) {
-    super(columns[0].getSchema(), "PRIMARY_KEY");
-    parent = columns[0].getParent();
+    super(firstNonNull(columns).getSchema(), "PRIMARY_KEY");
+    parent = firstNonNull(columns).getParent();
     tableConstraintColumns = new ArrayList<>();
-    for (final Column column : columns) {
-      tableConstraintColumns.add(new LightTableConstraintColumn(column, 1 + 1, this));
+    for (int i = 0; i < columns.length; i++) {
+      final Column column = columns[i];
+      if (column == null) {
+        // Increment index, and continue
+        continue;
+      }
+      tableConstraintColumns.add(new LightTableConstraintColumn(column, i + 1, this));
     }
   }
 
