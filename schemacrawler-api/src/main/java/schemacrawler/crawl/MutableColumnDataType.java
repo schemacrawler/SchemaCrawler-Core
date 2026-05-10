@@ -14,7 +14,6 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DataTypeType;
@@ -22,7 +21,6 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.JavaSqlType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.SearchableType;
-import us.fatehi.utility.string.StringFormat;
 
 /**
  * Represents a column type. Provides the java.sql.Types type, the java.sql.Types type name, and the
@@ -177,24 +175,6 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
   @Override
   public DataTypeType getType() {
     return type;
-  }
-
-  /**
-   * @deprecated
-   */
-  @Override
-  @Deprecated
-  public Class<?> getTypeMappedClass() {
-    try {
-      return Class.forName(
-          javaSqlTypeMappedClassName, true, Thread.currentThread().getContextClassLoader());
-    } catch (final ClassNotFoundException e) {
-      LOGGER.log(
-          Level.FINE,
-          e,
-          new StringFormat("Could not load mapped class <%s>", javaSqlTypeMappedClassName));
-      return Object.class;
-    }
   }
 
   /** {@inheritDoc} */

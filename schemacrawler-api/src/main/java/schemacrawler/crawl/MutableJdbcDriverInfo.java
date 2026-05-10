@@ -54,24 +54,6 @@ final class MutableJdbcDriverInfo extends BaseProductVersion implements JdbcDriv
     return jdbcDriverInformation.getDriverClassName();
   }
 
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  @Override
-  public int getDriverMajorVersion() {
-    return jdbcDriverInformation.getDriverVersionNumber().major();
-  }
-
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  @Override
-  public int getDriverMinorVersion() {
-    return jdbcDriverInformation.getDriverVersionNumber().minor();
-  }
-
   /** {@inheritDoc} */
   @Override
   public Collection<JdbcDriverProperty> getDriverProperties() {
@@ -83,24 +65,6 @@ final class MutableJdbcDriverInfo extends BaseProductVersion implements JdbcDriv
   @Override
   public VersionNumber getDriverVersionNumber() {
     return jdbcDriverInformation.getDriverVersionNumber();
-  }
-
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  @Override
-  public int getJdbcMajorVersion() {
-    return jdbcDriverInformation.getJdbcVersionNumber().major();
-  }
-
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  @Override
-  public int getJdbcMinorVersion() {
-    return jdbcDriverInformation.getJdbcVersionNumber().minor();
   }
 
   @Override
