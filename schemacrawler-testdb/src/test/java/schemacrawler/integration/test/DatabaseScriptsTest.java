@@ -176,7 +176,6 @@ public class DatabaseScriptsTest {
 
     final URI uri = ClassLoader.getSystemResource("").toURI();
     final Path resourcesPath = Path.of(uri).resolve("../../src/main/resources");
-    System.out.println(resourcesPath);
     try (final Stream<Path> paths = Files.walk(resourcesPath)) {
       final List<String> resources =
           paths
