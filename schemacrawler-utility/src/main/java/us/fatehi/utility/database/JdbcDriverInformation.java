@@ -56,22 +56,6 @@ public final class JdbcDriverInformation extends BaseProductVersion {
   }
 
   /**
-   * @deprecated
-   */
-  @Deprecated
-  public int getDriverMajorVersion() {
-    return driverVersion.major();
-  }
-
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  public int getDriverMinorVersion() {
-    return driverVersion.minor();
-  }
-
-  /**
    * Gets the name of the JDBC driver.
    *
    * @return Name of the JDBC driver
@@ -96,22 +80,6 @@ public final class JdbcDriverInformation extends BaseProductVersion {
    */
   public VersionNumber getDriverVersionNumber() {
     return driverVersion;
-  }
-
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  public int getJdbcMajorVersion() {
-    return jdbcVersion.major();
-  }
-
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  public int getJdbcMinorVersion() {
-    return jdbcVersion.minor();
   }
 
   public VersionNumber getJdbcVersionNumber() {

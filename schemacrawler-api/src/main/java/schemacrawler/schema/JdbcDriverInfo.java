@@ -31,24 +31,6 @@ public interface JdbcDriverInfo extends ProductVersion {
   String getDriverClassName();
 
   /**
-   * Retrieves JDBC driver's major version number.
-   *
-   * @return JDBC driver's major version
-   * @deprecated
-   */
-  @Deprecated
-  int getDriverMajorVersion();
-
-  /**
-   * Retrieves this JDBC driver's minor version number.
-   *
-   * @return JDBC driver's minor version number
-   * @deprecated
-   */
-  @Deprecated
-  int getDriverMinorVersion();
-
-  /**
    * Gets the name of the JDBC driver.
    *
    * @return Name of the JDBC driver
@@ -79,26 +61,6 @@ public interface JdbcDriverInfo extends ProductVersion {
    * @return Version of the JDBC driver
    */
   VersionNumber getDriverVersionNumber();
-
-  /**
-   * Gets the major JDBC version number supported by JDBC driver.
-   *
-   * @return JDBC version major number
-   * @exception SQLException if a database access error occurs
-   * @deprecated
-   */
-  @Deprecated
-  int getJdbcMajorVersion();
-
-  /**
-   * Gets the minor JDBC version number supported by JDBC driver.
-   *
-   * @return JDBC version major number
-   * @exception SQLException if a database access error occurs
-   * @deprecated
-   */
-  @Deprecated
-  int getJdbcMinorVersion();
 
   /**
    * Gets the JDBC version number supported by JDBC driver.

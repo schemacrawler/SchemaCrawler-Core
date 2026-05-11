@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,7 +29,7 @@ import org.junit.jupiter.api.TestInstance;
 @TestInstance(PER_CLASS)
 public class UtilityArchitectureTest {
 
-  private JavaClasses classes;
+  protected JavaClasses classes;
 
   @BeforeAll
   public void _classes() {
@@ -62,36 +60,6 @@ public class UtilityArchitectureTest {
         .should()
         .beFreeOfCycles()
         .because("packages should have a clear, acyclic dependency structure")
-        .check(classes);
-  }
-
-  @Test
-  public void reflectiveAccessOverride() {
-    noClasses()
-        .that(are(not(simpleName("ObjectToString"))))
-        .should()
-        .callMethod(AccessibleObject.class, "setAccessible", boolean.class)
-        .orShould()
-        .callMethod(
-            AccessibleObject.class, "setAccessible", AccessibleObject[].class, boolean.class)
-        .because("avoid reflective access override")
-        .check(classes);
-  }
-
-  @Test
-  public void reflectiveClassLoading() {
-    noClasses()
-        .should()
-        .callMethod(Class.class, "forName", String.class)
-        .orShould()
-        .callMethod(Class.class, "getDeclaredConstructors")
-        .orShould()
-        .callMethod(Class.class, "getDeclaredConstructor", Class[].class)
-        .orShould()
-        .callMethod(Class.class, "getConstructor", Class[].class)
-        .orShould()
-        .callMethod(Constructor.class, "newInstance")
-        .because("avoid reflective class loading")
         .check(classes);
   }
 }

@@ -122,15 +122,6 @@ public interface ColumnDataType extends DatabaseObject, TypedObject<DataTypeType
    * Gets the Java class mapped to the type.
    *
    * @return The Java class mapped to the type
-   * @deprecated
-   */
-  @Deprecated(forRemoval = true)
-  Class<?> getTypeMappedClass();
-
-  /**
-   * Gets the Java class mapped to the type.
-   *
-   * @return The Java class mapped to the type
    */
   String getTypeMappedClassName();
 

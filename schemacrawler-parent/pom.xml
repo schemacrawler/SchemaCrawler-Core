@@ -414,6 +414,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <argLine>@{argLine} -javaagent:${project.build.directory}/byte-buddy-agent.jar</argLine>
           <useModulePath>true</useModulePath>
           <systemPropertyVariables>

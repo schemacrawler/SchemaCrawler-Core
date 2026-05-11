@@ -39,6 +39,18 @@
       <version>5.23.0</version>
     </dependency>
     <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <version>1.4.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>3.20.0</version>
@@ -141,6 +153,7 @@
       <artifactId>schemacrawler-testdb</artifactId>
       <version>${project.version}</version>
     </dependency>
+
   </dependencies>
 
 </project>
