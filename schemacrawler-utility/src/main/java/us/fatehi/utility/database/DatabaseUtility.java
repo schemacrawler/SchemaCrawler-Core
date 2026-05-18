@@ -20,6 +20,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -124,7 +125,9 @@ public final class DatabaseUtility {
       for (final Driver driver : serviceLoader) {
         drivers.add(driver);
       }
-    } catch (final Throwable e) {
+    } catch (final Exception | ServiceConfigurationError | LinkageError e) {
+      // Catch errors for missing third-party jars;
+      // other errors (e.g. OutOfMemoryError) are intentionally not caught here
       throw new SQLException("Could not load database drivers: %s".formatted(e.getMessage()), e);
     }
     if (drivers.isEmpty()) {

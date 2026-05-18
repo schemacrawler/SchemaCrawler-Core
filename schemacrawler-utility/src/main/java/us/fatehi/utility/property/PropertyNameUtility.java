@@ -42,7 +42,7 @@ public abstract class PropertyNameUtility {
                     index, registeredPlugin.getName(), registeredPlugin.getDescription()))
             .append(System.lineSeparator());
       }
-    } catch (final Throwable e) {
+    } catch (final Exception e) {
       // Log the error and continue
       LOGGER.log(Level.INFO, "Could not list " + title, e);
     }

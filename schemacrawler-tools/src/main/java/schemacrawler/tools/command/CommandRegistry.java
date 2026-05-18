@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -79,7 +80,9 @@ public final class CommandRegistry extends BasePluginCommandRegistry<SchemaCrawl
                 schemaCrawlerCommandProvider.getClass().getName()));
         schemaCrawlerCommandProviders.add(schemaCrawlerCommandProvider);
       }
-    } catch (final Throwable e) {
+    } catch (final Exception | ServiceConfigurationError | LinkageError e) {
+      // Catch errors for missing third-party jars;
+      // other errors (e.g. OutOfMemoryError) are intentionally not caught here
       throw new InternalRuntimeException("Could not load extended command registry", e);
     }
 
@@ -118,9 +121,9 @@ public final class CommandRegistry extends BasePluginCommandRegistry<SchemaCrawl
     } catch (final SchemaCrawlerException e) {
       LOGGER.log(Level.SEVERE, e.getMessage(), e);
       throw new ExecutionRuntimeException(errorMessage, e);
-    } catch (final Throwable e) {
-      // Mainly catch NoClassDefFoundError, which is a Throwable,
-      // for missing third-party jars
+    } catch (final Exception | ServiceConfigurationError | LinkageError e) {
+      // Catch errors for missing third-party jars;
+      // other errors (e.g. OutOfMemoryError) are intentionally not caught here
       LOGGER.log(Level.CONFIG, e.getMessage(), e);
       throw new InternalRuntimeException(errorMessage);
     }

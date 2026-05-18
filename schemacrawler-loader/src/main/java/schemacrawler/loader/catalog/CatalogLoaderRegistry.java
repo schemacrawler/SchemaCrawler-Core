@@ -10,6 +10,7 @@ package schemacrawler.loader.catalog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -75,9 +76,9 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
         LOGGER.log(Level.SEVERE, e.getMessage(), e);
         throw new ExecutionRuntimeException(
             "Catalog loader <%s> not instantiated".formatted(catalogLoaderProvider), e);
-      } catch (final Throwable e) {
-        // Mainly catch NoClassDefFoundError, which is a Throwable,
-        // for missing third-party jars
+      } catch (final Exception | ServiceConfigurationError | LinkageError e) {
+        // Catch errors for missing third-party jars;
+        // other errors (e.g. OutOfMemoryError) are intentionally not caught here
         LOGGER.log(Level.CONFIG, e.getMessage(), e);
         throw new InternalRuntimeException(
             "Catalog loader <%s> not instantiated".formatted(catalogLoaderProvider));

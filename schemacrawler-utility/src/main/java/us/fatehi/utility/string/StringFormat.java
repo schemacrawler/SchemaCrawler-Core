@@ -35,7 +35,7 @@ public final class StringFormat implements Supplier<String> {
 
     try (final Formatter formatter = new Formatter()) {
       return formatter.format(format, args).toString();
-    } catch (final Throwable e) {
+    } catch (final Exception e) {
       // NOTE: Do not output arguments, since the toString on argument may throw an exception
       // obscuring this one
       LOGGER.log(Level.FINEST, "Error logging message <%s>".formatted(format));
