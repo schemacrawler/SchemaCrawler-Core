@@ -116,9 +116,9 @@ public class SqlScript implements Runnable {
       }
     } catch (final Exception e) {
       final Throwable throwable = getCause(e);
-      System.err.println(throwable.getMessage());
+      System.err.println(throwable.toString());
       System.err.println(sql);
-      LOGGER.log(Level.WARNING, throwable.getMessage(), throwable);
+      LOGGER.log(Level.WARNING, throwable.toString(), throwable);
       throw new SQLRuntimeException(e);
     }
   }

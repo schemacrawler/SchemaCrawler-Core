@@ -71,9 +71,9 @@ public final class ERModelLoaderRegistry extends BasePluginCommandRegistry<ERMod
           continue;
         }
         erModelLoaders.add(erModelLoader);
-      } catch (final Throwable e) {
-        // Mainly catch NoClassDefFoundError, which is a Throwable,
-        // for missing third-party jars
+      } catch (final Exception | LinkageError e) {
+        // Catch LinkageError (includes NoClassDefFoundError) for missing third-party jars;
+        // other Errors (e.g. OutOfMemoryError) are intentionally not caught here
         LOGGER.log(Level.CONFIG, e.getMessage(), e);
         throw new InternalRuntimeException(
             "ERModel loader <%s> not instantiated".formatted(provider));

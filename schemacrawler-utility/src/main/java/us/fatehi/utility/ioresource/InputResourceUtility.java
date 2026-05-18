@@ -35,7 +35,10 @@ public class InputResourceUtility {
         final Path filePath = Path.of(inputResourceName);
         inputResource = new FileInputResource(filePath);
       } catch (final Exception e) {
-        // No-op
+        LOGGER.log(
+            Level.FINE,
+            e,
+            new StringFormat("Could not read file <%s>", inputResourceName));
       }
       try {
         if (inputResource == null) {
@@ -45,7 +48,10 @@ public class InputResourceUtility {
           inputResource = new ClasspathInputResource(inputResourceName);
         }
       } catch (final Exception e) {
-        // No-op
+        LOGGER.log(
+            Level.FINE,
+            e,
+            new StringFormat("Could not read classpath resource <%s>", inputResourceName));
       }
       if (inputResource == null) {
         LOGGER.log(

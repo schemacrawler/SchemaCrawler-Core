@@ -87,10 +87,8 @@ class DatabaseObjectReference<D extends DatabaseObject> implements Serializable 
    * @throws ClassNotFoundException
    */
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-    if (in != null) {
-      partial = (D) in.readObject();
-      databaseObjectRef = new WeakReference<>((D) in.readObject());
-    }
+    partial = (D) in.readObject();
+    databaseObjectRef = new WeakReference<>((D) in.readObject());
   }
 
   /**
@@ -99,9 +97,7 @@ class DatabaseObjectReference<D extends DatabaseObject> implements Serializable 
    * @throws java.io.IOException
    */
   private void writeObject(final ObjectOutputStream out) throws IOException {
-    if (out != null) {
-      out.writeObject(partial);
-      out.writeObject(databaseObjectRef.get());
-    }
+    out.writeObject(partial);
+    out.writeObject(databaseObjectRef.get());
   }
 }
