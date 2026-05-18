@@ -70,7 +70,8 @@ public final class IOUtility {
 
       bufferedWriter.flush();
     } catch (final IOException e) {
-      LOGGER.log(Level.INFO, "Failed to copy input stream to output stream", e);
+      LOGGER.log(Level.INFO, e.getMessage());
+      LOGGER.log(Level.FINE, e.getMessage(), e);
     }
   }
 
@@ -199,7 +200,8 @@ public final class IOUtility {
       return writer.toString();
     } catch (final IOException e) {
       // This is the error thrown while closing the writer itself, not during copy
-      LOGGER.log(Level.CONFIG, "Error closing writer after reading stream", e);
+      LOGGER.log(Level.CONFIG, e.getMessage());
+      LOGGER.log(Level.FINE, e.getMessage(), e);
       return "";
     }
   }
@@ -209,7 +211,8 @@ public final class IOUtility {
       final InputResource inputResource = new ClasspathInputResource(resource);
       return readFully(inputResource.openNewInputReader(UTF_8));
     } catch (final IOException e) {
-      LOGGER.log(Level.CONFIG, "Error reading classpath resource <%s>".formatted(resource), e);
+      LOGGER.log(Level.CONFIG, e.getMessage());
+      LOGGER.log(Level.FINE, e.getMessage(), e);
       return "";
     }
   }
