@@ -12,6 +12,7 @@ import java.sql.Driver;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +48,9 @@ public class JDBCDriverRegistry extends BasePluginRegistry {
             "%2d.%d".formatted(driver.getMajorVersion(), driver.getMinorVersion());
         availableJDBCDrivers.add(new PropertyName(driverName, driverDescription));
       }
-    } catch (final Throwable e) {
+    } catch (final Exception | ServiceConfigurationError | LinkageError e) {
+      // Catch errors for missing third-party jars;
+      // other errors (e.g. OutOfMemoryError) are intentionally not caught here
       throw new InternalRuntimeException("Could not load JDBC drivers", e);
     }
     Collections.sort(availableJDBCDrivers);

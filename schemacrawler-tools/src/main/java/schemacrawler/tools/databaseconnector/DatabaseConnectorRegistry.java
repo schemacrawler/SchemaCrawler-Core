@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -69,7 +70,9 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
         // Put in map
         databaseConnectorRegistry.put(databaseSystemIdentifier, databaseConnector);
       }
-    } catch (final Throwable e) {
+    } catch (final Exception | ServiceConfigurationError | LinkageError e) {
+      // Catch errors for missing third-party jars;
+      // other errors (e.g. OutOfMemoryError) are intentionally not caught here
       throw new InternalRuntimeException("Could not load database connector registry", e);
     }
 
