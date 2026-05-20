@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.fatehi.utility.IOUtility.readFully;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ public class FileInputResourceTest {
 
   @Test
   public void badArgs() {
-    assertThrows(IOException.class, () -> new FileInputResource(Path.of("no_resource")));
+    assertThrows(UncheckedIOException.class, () -> new FileInputResource(Path.of("no_resource")));
   }
 
   @Test

@@ -10,6 +10,7 @@ package schemacrawler.loader.ermodel.attributes;
 
 import static schemacrawler.loader.catalog.model.CatalogAttributesUtility.readCatalogAttributes;
 
+import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -18,16 +19,15 @@ import schemacrawler.crawl.ImplicitAssociationBuilder.ImplicitAssociationColumn;
 import schemacrawler.ermodel.implementation.ImplicitRelationshipBuilder;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.TableReferenceRelationship;
-import schemacrawler.schema.Catalog;
-import schemacrawler.schema.Column;
-import schemacrawler.schema.Table;
-import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
-import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import schemacrawler.loader.catalog.model.CatalogAttributes;
 import schemacrawler.loader.catalog.model.ColumnAttributes;
 import schemacrawler.loader.catalog.model.ImplicitAssociationAttributes;
 import schemacrawler.loader.catalog.model.TableAttributes;
 import schemacrawler.loader.ermodel.AbstractERModelLoader;
+import schemacrawler.schema.Catalog;
+import schemacrawler.schema.Column;
+import schemacrawler.schema.Table;
+import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.ioresource.InputResource;
 import us.fatehi.utility.ioresource.InputResourceUtility;
 import us.fatehi.utility.property.PropertyName;
@@ -68,7 +68,7 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
                 resolveCatalogAttributesInputResource(catalogAttributesFile)
                     .orElseThrow(
                         () ->
-                            new IORuntimeException(
+                            new IOException(
                                 "Cannot locate catalog attributes file <%s>"
                                     .formatted(catalogAttributesFile)));
             final CatalogAttributes catalogAttributes = readCatalogAttributes(inputResource);
@@ -78,8 +78,6 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
       taskRunner.add(new TaskDefinition("retrieveCatalogAttributes", taskRunnable));
       taskRunner.submit();
       LOGGER.log(Level.INFO, taskRunner.report());
-    } catch (final IORuntimeException e) {
-      throw e;
     } catch (final Exception e) {
       throw new ExecutionRuntimeException("Exception loading catalog attributes", e);
     }

@@ -14,17 +14,18 @@ import static us.fatehi.utility.IOUtility.isFileReadable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 
 public class FileInputResource extends BaseInputResource {
 
   private final Path inputFile;
 
-  public FileInputResource(final Path filePath) throws IOException {
+  public FileInputResource(final Path filePath) {
     inputFile = requireNonNull(filePath, "No file path provided").normalize().toAbsolutePath();
     if (!isFileReadable(inputFile)) {
       final IOException e = new IOException("Cannot read file, <%s>".formatted(inputFile));
-      throw e;
+      throw new UncheckedIOException(e);
     }
   }
 

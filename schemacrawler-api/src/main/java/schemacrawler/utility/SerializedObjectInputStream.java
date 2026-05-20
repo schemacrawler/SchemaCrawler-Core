@@ -18,12 +18,12 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
-import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import us.fatehi.utility.string.StringFormat;
 
 public final class SerializedObjectInputStream extends ObjectInputStream {
@@ -48,7 +48,7 @@ public final class SerializedObjectInputStream extends ObjectInputStream {
     try (final ObjectOutputStream objOut = new ObjectOutputStream(out)) {
       objOut.writeObject(object);
     } catch (final IOException e) {
-      throw new IORuntimeException("Could not serialize object", e);
+      throw new UncheckedIOException("Could not serialize object", e);
     }
   }
 

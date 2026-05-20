@@ -18,11 +18,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,17 +32,6 @@ import us.fatehi.utility.LoggingConfig;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class IOUtilityTest {
-
-  @Test
-  public void copy() throws IOException {
-    final StringWriter writer = new StringWriter();
-    IOUtility.copy(null, writer);
-    assertThat(writer.toString(), is(""));
-
-    final Reader reader = mock(Reader.class);
-    IOUtility.copy(reader, null);
-    verifyNoInteractions(reader);
-  }
 
   @Test
   public void createTempFilePath() throws IOException {

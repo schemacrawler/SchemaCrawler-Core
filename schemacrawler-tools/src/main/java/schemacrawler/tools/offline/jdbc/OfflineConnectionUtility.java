@@ -11,6 +11,8 @@ package schemacrawler.tools.offline.jdbc;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -18,7 +20,6 @@ import java.sql.Connection;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.HashMap;
 import java.util.Map;
-import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import us.fatehi.utility.IOUtility;
 import us.fatehi.utility.UtilityMarker;
 
@@ -100,8 +101,10 @@ public class OfflineConnectionUtility {
 
     final Path absoluteOfflineDatabasePath = offlineDatabasePath.toAbsolutePath();
     if (!IOUtility.isFileReadable(absoluteOfflineDatabasePath)) {
-      throw new IORuntimeException(
-          "Cannot read offline database <%s>".formatted(absoluteOfflineDatabasePath));
+      final IOException cause =
+          new IOException(
+              "Cannot read offline database <%s>".formatted(absoluteOfflineDatabasePath));
+      throw new UncheckedIOException(cause);
     }
     final OfflineConnection offlineConnection =
         (OfflineConnection)

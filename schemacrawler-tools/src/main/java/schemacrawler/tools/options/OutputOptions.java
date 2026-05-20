@@ -14,10 +14,10 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.UUID;
-import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import us.fatehi.utility.ObjectToString;
 import us.fatehi.utility.Options;
 import us.fatehi.utility.ioresource.FileOutputResource;
@@ -111,7 +111,7 @@ public final class OutputOptions implements Options {
       return new PrintWriter(
           outputResource.openNewOutputWriter(getOutputCharset(), appendOutput), true);
     } catch (final IOException e) {
-      throw new IORuntimeException(
+      throw new UncheckedIOException(
           "Could not open output writer: <%s>".formatted(e.getMessage()), e);
     }
   }

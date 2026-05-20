@@ -13,6 +13,7 @@ import static us.fatehi.utility.IOUtility.locateResource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 
 /**
@@ -23,13 +24,13 @@ public class ClasspathInputResource extends BaseInputResource {
 
   private final URL url;
 
-  public ClasspathInputResource(final String classpathResource) throws IOException {
+  public ClasspathInputResource(final String classpathResource) {
     requireNonNull(classpathResource, "No classpath resource provided");
     url = locateResource(classpathResource);
     if (url == null) {
       final IOException e =
           new IOException("Cannot read classpath resource, <%s>".formatted(classpathResource));
-      throw e;
+      throw new UncheckedIOException(e);
     }
   }
 
