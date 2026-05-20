@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.fatehi.utility.IOUtility.readFully;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import org.junit.jupiter.api.Test;
 import us.fatehi.utility.ioresource.ClasspathInputResource;
 
@@ -23,7 +24,7 @@ public class ClasspathInputResourceTest {
 
   @Test
   public void badArgs() {
-    assertThrows(IOException.class, () -> new ClasspathInputResource("no_resource"));
+    assertThrows(UncheckedIOException.class, () -> new ClasspathInputResource("no_resource"));
   }
 
   @Test

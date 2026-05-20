@@ -11,6 +11,7 @@ package schemacrawler.loader.catalog.offline;
 import static schemacrawler.filter.ReducerFactory.getCatalogReducer;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,7 +22,6 @@ import schemacrawler.loader.catalog.offline.OfflineCatalogLoader.OfflineCatalogL
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.DatabaseAccessException;
-import schemacrawler.schemacrawler.exceptions.IORuntimeException;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.offline.jdbc.OfflineConnection;
 import schemacrawler.utility.SerializedCatalogUtility;
@@ -72,7 +72,7 @@ final class OfflineCatalogLoader extends AbstractCatalogLoader<OfflineCatalogLoa
       getCatalogReducer(schemaCrawlerOptions).reduce(catalog);
 
     } catch (final IOException e) {
-      throw new IORuntimeException("Could not load offline database", e);
+      throw new UncheckedIOException("Could not load offline database", e);
     } catch (final SQLException e) {
       throw new DatabaseAccessException("Could not load offline database", e);
     }
