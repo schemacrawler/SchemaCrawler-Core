@@ -18,10 +18,10 @@ import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.UUID;
-import us.fatehi.utility.ObjectToString;
 import us.fatehi.utility.Options;
 import us.fatehi.utility.ioresource.FileOutputResource;
 import us.fatehi.utility.ioresource.OutputResource;
+import us.fatehi.utility.string.ObjectToStringFormat;
 
 public final class OutputOptions implements Options {
 
@@ -118,7 +118,7 @@ public final class OutputOptions implements Options {
 
   @Override
   public String toString() {
-    return ObjectToString.toString(this);
+    return new ObjectToStringFormat(this).get();
   }
 
   OutputResource getOutputResource() {

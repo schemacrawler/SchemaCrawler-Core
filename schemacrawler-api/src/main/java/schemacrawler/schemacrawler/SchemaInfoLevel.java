@@ -15,8 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import us.fatehi.utility.ObjectToString;
 import us.fatehi.utility.Options;
+import us.fatehi.utility.string.ObjectToStringFormat;
 
 /** Descriptor for level of schema detail to be retrieved when crawling a schema. */
 public final class SchemaInfoLevel implements Options {
@@ -81,6 +81,6 @@ public final class SchemaInfoLevel implements Options {
     for (final SchemaInfoRetrieval schemaInfoRetrieval : values()) {
       values.put(schemaInfoRetrieval.name(), is(schemaInfoRetrieval));
     }
-    return ObjectToString.toString(values);
+    return new ObjectToStringFormat(values).get();
   }
 }

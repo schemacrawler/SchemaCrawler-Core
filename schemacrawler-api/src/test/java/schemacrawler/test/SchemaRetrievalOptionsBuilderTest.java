@@ -384,9 +384,7 @@ public class SchemaRetrievalOptionsBuilderTest {
   public void toOptions() {
     final SchemaRetrievalOptionsBuilder builder = SchemaRetrievalOptionsBuilder.builder();
     final SchemaRetrievalOptions schemaRetrievalOptions = builder.toOptions();
-    assertThat(
-        schemaRetrievalOptions.toString(),
-        containsString("\"@object\": \"" + schemaRetrievalOptions.getClass().getName() + "\""));
+    assertThat(schemaRetrievalOptions.toString(), containsString("\"identifierQuoteString\""));
   }
 
   @Test

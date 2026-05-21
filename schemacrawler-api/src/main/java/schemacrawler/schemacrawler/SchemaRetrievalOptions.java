@@ -18,9 +18,9 @@ import schemacrawler.plugin.EnumDataTypeHelper;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.TableTypes;
 import schemacrawler.utility.TypeMap;
-import us.fatehi.utility.ObjectToString;
 import us.fatehi.utility.Options;
 import us.fatehi.utility.datasource.DatabaseServerType;
+import us.fatehi.utility.string.ObjectToStringFormat;
 
 /**
  * Provides for database specific overrides for SchemaCrawler functionality. This can add or inject
@@ -109,7 +109,7 @@ public final class SchemaRetrievalOptions implements Options {
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return ObjectToString.toString(this);
+    return new ObjectToStringFormat(this).get();
   }
 
   Map<SchemaInfoMetadataRetrievalStrategy, MetadataRetrievalStrategy>

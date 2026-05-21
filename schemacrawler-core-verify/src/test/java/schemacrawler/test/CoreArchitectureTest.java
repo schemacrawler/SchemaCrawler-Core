@@ -12,6 +12,7 @@ import static com.tngtech.archunit.base.DescribedPredicate.not;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideOutsideOfPackages;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleName;
 import static com.tngtech.archunit.lang.conditions.ArchPredicates.are;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
@@ -21,6 +22,17 @@ public class CoreArchitectureTest extends BaseArchitectureTest {
   @Override
   protected String classesSpecification() {
     return "schemacrawler..";
+  }
+
+  @Override
+  public void notUseJackson() {
+    noClasses()
+        .that(are(not(simpleName("CatalogAttributesUtility"))))
+        .should()
+        .dependOnClassesThat()
+        .resideInAPackage("tools.jackson..")
+        .because("SchemaCrawler-Core must not depend on Jackson")
+        .check(classes);
   }
 
   @Override

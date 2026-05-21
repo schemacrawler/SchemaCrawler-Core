@@ -51,6 +51,16 @@ public abstract class BaseArchitectureTest {
   abstract String classesSpecification();
 
   @Test
+  public void notUseJackson() {
+    noClasses()
+        .should()
+        .dependOnClassesThat()
+        .resideInAPackage("tools.jackson..")
+        .because("SchemaCrawler-Core must not depend on Jackson")
+        .check(classes);
+  }
+
+  @Test
   public void lookupMethods() {
     final Optional<JavaMethod> anyMatchingMethod =
         classes.stream()

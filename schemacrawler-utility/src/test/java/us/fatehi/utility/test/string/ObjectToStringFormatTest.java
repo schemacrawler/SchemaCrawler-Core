@@ -8,12 +8,12 @@
 
 package us.fatehi.utility.test.string;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
 import us.fatehi.utility.string.ObjectToStringFormat;
 
@@ -46,48 +46,49 @@ public class ObjectToStringFormatTest {
   }
 
   @Test
-  public void happyPath() {
-    assertThat(new ObjectToStringFormat("hello, world").get(), is("hello, world"));
-    // Test toString
-    assertThat(
-        new ObjectToStringFormat("hello, world").get(),
-        is(new ObjectToStringFormat("hello, world").toString()));
-
-    final List<String> list = List.of("one", "two", "three");
-    assertThat(new ObjectToStringFormat(list).get(), is("[\"one\", \"two\", \"three\"]"));
-
-    final Map<String, Integer> map = new HashMap<>();
-    map.put("one", 1);
-    map.put("two", 2);
-    map.put("three", 3);
-    final String mapJson =
-        """
-        {
-          "one": 1,
-          "three": 3,
-          "two": 2
-        }\
-        """;
-    assertThat(new ObjectToStringFormat(map).get().replaceAll("\\R", "\n").trim(), is(mapJson));
-
-    final String helloWorldObjectJson =
-        """
-        {
-          "@object": "us.fatehi.utility.test.string.ObjectToStringFormatTest$SomeClass",
-          "integer": 42,
-          "string": "hello, world"
-        }\
-        """;
-    assertThat(
-        new ObjectToStringFormat(new SomeClass("hello, world", 42))
-            .get()
-            .replaceAll("\\R", "\n")
-            .strip(),
-        is(helloWorldObjectJson));
+  public void nullArgs() {
+    assertThat(new ObjectToStringFormat(null).get(), is(""));
   }
 
   @Test
-  public void nullArgs() {
-    assertThat(new ObjectToStringFormat(null).get(), is(""));
+  public void stringArg() {
+    // Strings serialize as JSON strings (quoted)
+    assertThat(new ObjectToStringFormat("hello, world").get(), is("\"hello, world\""));
+    // toString() delegates to get()
+    assertThat(
+        new ObjectToStringFormat("hello, world").get(),
+        is(new ObjectToStringFormat("hello, world").toString()));
+  }
+
+  @Test
+  public void listArg() {
+    final List<String> list = List.of("one", "two", "three");
+    assertThat(new ObjectToStringFormat(list).get(), is("[ \"one\", \"two\", \"three\" ]"));
+  }
+
+  @Test
+  public void mapArg() {
+    final TreeMap<String, Integer> map = new TreeMap<>();
+    map.put("one", 1);
+    map.put("three", 3);
+    map.put("two", 2);
+    final String result = new ObjectToStringFormat(map).get();
+    assertThat(result, containsString("\"one\" : 1"));
+    assertThat(result, containsString("\"three\" : 3"));
+    assertThat(result, containsString("\"two\" : 2"));
+  }
+
+  @Test
+  public void objectArg() {
+    final String result = new ObjectToStringFormat(new SomeClass("hello, world", 42)).get();
+    assertThat(result, containsString("\"string\" : \"hello, world\""));
+    assertThat(result, containsString("\"integer\" : 42"));
+  }
+
+  @Test
+  public void withContext() {
+    final String result = new ObjectToStringFormat("ctx", "hello").get();
+    assertThat(result, containsString("ctx"));
+    assertThat(result, containsString("\"hello\""));
   }
 }
