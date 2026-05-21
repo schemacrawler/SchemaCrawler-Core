@@ -21,7 +21,6 @@ import java.util.stream.IntStream;
 public final class ObjectToString {
 
   public static String toString(final Object object) {
-    object.getClass();
     if (object instanceof final Collection collection) {
       return formatCollection(collection);
     }
