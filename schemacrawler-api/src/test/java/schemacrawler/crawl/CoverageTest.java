@@ -8,8 +8,8 @@
 
 package schemacrawler.crawl;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -37,8 +37,16 @@ public class CoverageTest {
           private static final long serialVersionUID = 6176088733525976950L;
         });
     assertThat(list.size(), equalTo(2));
-    assertThat(list.toString(), containsString("\"name\" : \"name1\""));
-    assertThat(list.toString(), containsString("\"name\" : \"name2\""));
+    final String toString =
+        """
+        [
+          "name1",
+          "name2"
+        ]
+        """;
+    assertThat(
+        list.toString().replaceAll("\\R", "\n").strip(),
+        is(toString.replaceAll("\\R", "\n").strip()));
   }
 
   @Test

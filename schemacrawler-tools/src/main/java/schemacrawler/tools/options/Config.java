@@ -21,9 +21,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionRule;
+import us.fatehi.utility.ObjectToString;
 import us.fatehi.utility.Options;
 import us.fatehi.utility.readconfig.ReadConfig;
-import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
 
 /** Configuration properties. */
@@ -193,6 +193,6 @@ public final class Config implements Options, ReadConfig {
 
   @Override
   public String toString() {
-    return new ObjectToStringFormat(configMap).get();
+    return ObjectToString.toString(configMap);
   }
 }

@@ -10,19 +10,22 @@ package us.fatehi.utility.string;
 
 import static us.fatehi.utility.Utility.isBlank;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.json.JsonMapper;
 
 public final class ObjectToStringFormat implements Supplier<String> {
 
-  private static final JsonMapper MAPPER =
-      JsonMapper.builder()
-          .enable(SerializationFeature.INDENT_OUTPUT)
-          .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-          .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
-          .build();
+  private static final Function<Object, String> SERIALIZER;
+
+  static {
+    Function<Object, String> serializer;
+    try {
+      serializer = JsonUtility.jsonSerializer();
+    } catch (final NoClassDefFoundError | ExceptionInInitializerError e) {
+      serializer = String::valueOf;
+    }
+    SERIALIZER = serializer;
+  }
 
   private final String context;
   private final Object args;
@@ -43,11 +46,7 @@ public final class ObjectToStringFormat implements Supplier<String> {
       buffer.append(context).append(System.lineSeparator());
     }
     if (args != null) {
-      try {
-        buffer.append(MAPPER.writeValueAsString(args));
-      } catch (final JacksonException e) {
-        buffer.append(String.valueOf(args));
-      }
+      buffer.append(SERIALIZER.apply(args));
     }
     return buffer.toString();
   }

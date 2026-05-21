@@ -21,7 +21,6 @@ import java.util.UUID;
 import us.fatehi.utility.Options;
 import us.fatehi.utility.ioresource.FileOutputResource;
 import us.fatehi.utility.ioresource.OutputResource;
-import us.fatehi.utility.string.ObjectToStringFormat;
 
 public final class OutputOptions implements Options {
 
@@ -118,7 +117,7 @@ public final class OutputOptions implements Options {
 
   @Override
   public String toString() {
-    return new ObjectToStringFormat(this).get();
+    return outputFormatValue;
   }
 
   OutputResource getOutputResource() {

@@ -46,7 +46,7 @@ public class UtilityArchitectureTest {
   @Test
   public void notUseJackson() {
     noClasses()
-        .that(are(not(simpleName("ObjectToStringFormat"))))
+        .that(are(not(simpleName("JsonUtility"))))
         .should()
         .dependOnClassesThat()
         .resideInAPackage("tools.jackson..")

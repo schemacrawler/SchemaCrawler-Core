@@ -26,7 +26,7 @@ import schemacrawler.schema.AttributedObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.ReducibleCollection;
-import us.fatehi.utility.string.ObjectToStringFormat;
+import us.fatehi.utility.ObjectToString;
 
 /**
  * Ordered list of named objects, that can be searched associatively. NamedObjectList has the
@@ -135,7 +135,7 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return new ObjectToStringFormat(values()).get();
+    return ObjectToString.toString(values());
   }
 
   /**

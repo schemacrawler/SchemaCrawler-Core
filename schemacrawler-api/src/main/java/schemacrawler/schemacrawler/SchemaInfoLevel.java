@@ -12,11 +12,11 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.schemacrawler.SchemaInfoRetrieval.values;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
+import us.fatehi.utility.ObjectToString;
 import us.fatehi.utility.Options;
-import us.fatehi.utility.string.ObjectToStringFormat;
 
 /** Descriptor for level of schema detail to be retrieved when crawling a schema. */
 public final class SchemaInfoLevel implements Options {
@@ -44,10 +44,7 @@ public final class SchemaInfoLevel implements Options {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof SchemaInfoLevel)) {
+    if ((obj == null) || !(obj instanceof SchemaInfoLevel)) {
       return false;
     }
     final SchemaInfoLevel other = (SchemaInfoLevel) obj;
@@ -77,10 +74,10 @@ public final class SchemaInfoLevel implements Options {
 
   @Override
   public String toString() {
-    final Map<String, Boolean> values = new HashMap<>();
+    final Map<String, Boolean> values = new TreeMap<>();
     for (final SchemaInfoRetrieval schemaInfoRetrieval : values()) {
       values.put(schemaInfoRetrieval.name(), is(schemaInfoRetrieval));
     }
-    return new ObjectToStringFormat(values).get();
+    return ObjectToString.toString(values);
   }
 }
