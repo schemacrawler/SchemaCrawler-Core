@@ -8,11 +8,13 @@
 
 package us.fatehi.utility.string;
 
+import java.lang.reflect.Array;
 import java.util.Formatter;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import us.fatehi.utility.Utility;
 
 public final class StringFormatFunction implements Function<Object, String> {
@@ -38,6 +40,12 @@ public final class StringFormatFunction implements Function<Object, String> {
         return format;
       }
       args = list.toArray();
+    } else if (arg != null && arg.getClass().isArray()) {
+      final int len = Array.getLength(arg);
+      if (len == 0) {
+        return format;
+      }
+      args = IntStream.range(0, len).mapToObj(i -> Array.get(arg, i)).toArray();
     } else {
       if (arg == null) {
         return format;

@@ -70,4 +70,23 @@ public class StringFormatFunctionTest {
     // empty list returns format unchanged, just like no-arg StringFormat
     assertThat(new StringFormatFunction("%s").apply(List.of()), is("%s"));
   }
+
+  @Test
+  public void objectArrayArg() {
+    assertThat(
+        new StringFormatFunction("%s and %s").apply(new String[] {"hello", "world"}),
+        is("hello and world"));
+  }
+
+  @Test
+  public void intArrayArg() {
+    // primitive arrays are boxed via Array.get()
+    assertThat(new StringFormatFunction("%d + %d").apply(new int[] {1, 2}), is("1 + 2"));
+  }
+
+  @Test
+  public void emptyArray() {
+    // empty array returns format unchanged
+    assertThat(new StringFormatFunction("%s").apply(new String[] {}), is("%s"));
+  }
 }

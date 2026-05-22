@@ -25,7 +25,7 @@ import tools.jackson.databind.cfg.MapperBuilder;
 import tools.jackson.databind.json.JsonMapper;
 
 /** Jackson-backed serializer. Isolated so that Jackson classes are only loaded on demand. */
-public final class JsonFormatFunction implements Function<Object, String> {
+final class JsonFormatFunction implements Function<Object, String> {
 
   private static final ObjectMapper MAPPER = newConfiguredObjectMapper(JsonMapper.builder());
 
