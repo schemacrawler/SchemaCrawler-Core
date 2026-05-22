@@ -16,9 +16,10 @@ public final class JsonStringFormat implements Supplier<String> {
   private static final Function<Object, String> SERIALIZER;
 
   static {
+    // NOTE: This block handles the situation if Jackson is not available on the classpath
     Function<Object, String> serializer;
     try {
-      serializer = JsonUtility.jsonSerializer();
+      serializer = new JsonFormatFunction();
     } catch (final NoClassDefFoundError | ExceptionInInitializerError e) {
       serializer = String::valueOf;
     }

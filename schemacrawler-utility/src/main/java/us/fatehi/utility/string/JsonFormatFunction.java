@@ -23,22 +23,19 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.cfg.MapperBuilder;
 import tools.jackson.databind.json.JsonMapper;
-import us.fatehi.utility.UtilityMarker;
 
 /** Jackson-backed serializer. Isolated so that Jackson classes are only loaded on demand. */
-@UtilityMarker
-public final class JsonUtility {
+public final class JsonFormatFunction implements Function<Object, String> {
 
-  public static final ObjectMapper mapper = newConfiguredObjectMapper(JsonMapper.builder());
+  private static final ObjectMapper MAPPER = newConfiguredObjectMapper(JsonMapper.builder());
 
-  static Function<Object, String> jsonSerializer() {
-    return args -> {
-      try {
-        return mapper.writeValueAsString(args);
-      } catch (final JacksonException e) {
-        return String.valueOf(args);
-      }
-    };
+  @Override
+  public String apply(final Object object) {
+    try {
+      return MAPPER.writeValueAsString(object);
+    } catch (final JacksonException e) {
+      return String.valueOf(object);
+    }
   }
 
   private static ObjectMapper newConfiguredObjectMapper(
@@ -47,12 +44,10 @@ public final class JsonUtility {
     requireNonNull(mapperBuilder, "No mapper builder provided");
     mapperBuilder.enable(INCLUDE_SOURCE_IN_LOCATION, IGNORE_UNDEFINED);
     mapperBuilder.disable(FAIL_ON_NULL_FOR_PRIMITIVES);
-    //
     mapperBuilder.enable(IGNORE_UNKNOWN);
     mapperBuilder.enable(ORDER_MAP_ENTRIES_BY_KEYS, INDENT_OUTPUT, USE_EQUALITY_FOR_OBJECT_ID);
     mapperBuilder.enable(ACCEPT_CASE_INSENSITIVE_ENUMS);
 
-    final ObjectMapper objectMapper = mapperBuilder.build();
-    return objectMapper;
+    return mapperBuilder.build();
   }
 }
