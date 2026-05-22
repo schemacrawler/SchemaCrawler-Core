@@ -36,11 +36,10 @@ public final class ObjectToString {
   private static String formatArray(final Object array) {
     requireNonNull(array, "No array provided");
 
-    if (!array.getClass().isArray()) {
-      throw new IllegalArgumentException("No array provided");
-    }
-
     final int len = Array.getLength(array);
+    if (len == 0) {
+      return "[ ]";
+    }
     return IntStream.range(0, len)
         .mapToObj(i -> "  " + quoted(Array.get(array, i)))
         .collect(
@@ -52,7 +51,9 @@ public final class ObjectToString {
 
   private static String formatCollection(final Collection<?> collection) {
     requireNonNull(collection, "No collection provided");
-
+    if (collection.isEmpty()) {
+      return "[ ]";
+    }
     return collection.stream()
         .map(item -> "  " + quoted(item))
         .collect(
@@ -64,7 +65,9 @@ public final class ObjectToString {
 
   private static String formatMap(final Map<?, ?> map) {
     requireNonNull(map, "No map provided");
-
+    if (map.isEmpty()) {
+      return "{ }";
+    }
     return map.entrySet().stream()
         .map(e -> "  " + quoted(e.getKey()) + " : " + quoted(e.getValue()))
         .collect(
@@ -75,10 +78,6 @@ public final class ObjectToString {
   }
 
   private static boolean isPrimitive(final Object object) {
-    if (object == null) {
-      return false;
-    }
-
     final Class<?> objectClass = object.getClass();
     return objectClass.isPrimitive()
         || List.of(

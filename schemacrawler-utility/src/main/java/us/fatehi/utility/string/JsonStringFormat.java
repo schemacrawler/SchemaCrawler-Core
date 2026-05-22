@@ -13,7 +13,7 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public final class ObjectToStringFormat implements Supplier<String> {
+public final class JsonStringFormat implements Supplier<String> {
 
   private static final Function<Object, String> SERIALIZER;
 
@@ -30,11 +30,11 @@ public final class ObjectToStringFormat implements Supplier<String> {
   private final String context;
   private final Object args;
 
-  public ObjectToStringFormat(final Object args) {
+  public JsonStringFormat(final Object args) {
     this(null, args);
   }
 
-  public ObjectToStringFormat(final String context, final Object args) {
+  public JsonStringFormat(final String context, final Object args) {
     this.context = context;
     this.args = args;
   }

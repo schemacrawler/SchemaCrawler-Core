@@ -16,21 +16,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.ResultsCrawler;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.loader.catalog.CatalogLoader;
+import schemacrawler.loader.catalog.CatalogLoaderRegistry;
+import schemacrawler.loader.ermodel.ChainedERModelLoader;
+import schemacrawler.loader.ermodel.ERModelLoaderRegistry;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ResultsColumns;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.exceptions.DatabaseAccessException;
-import schemacrawler.loader.catalog.CatalogLoader;
-import schemacrawler.loader.catalog.CatalogLoaderRegistry;
-import schemacrawler.loader.ermodel.ChainedERModelLoader;
-import schemacrawler.loader.ermodel.ERModelLoaderRegistry;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
-import us.fatehi.utility.string.ObjectToStringFormat;
+import us.fatehi.utility.string.JsonStringFormat;
 import us.fatehi.utility.string.StringFormat;
 
 /** SchemaCrawler utility methods. */
@@ -82,7 +82,7 @@ public final class SchemaCrawlerUtility {
       final SchemaCrawlerOptions schemaCrawlerOptions,
       final Config additionalConfig) {
 
-    LOGGER.log(Level.CONFIG, new ObjectToStringFormat(schemaCrawlerOptions));
+    LOGGER.log(Level.CONFIG, new JsonStringFormat(schemaCrawlerOptions));
 
     DatabaseConnectorUtility.updateConnectionDataSource(connectionSource, schemaRetrievalOptions);
 
