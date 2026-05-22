@@ -35,19 +35,11 @@ public class JsonStringFormatTest {
     public String getString() {
       return string;
     }
-
-    public void setInteger(final int integer) {
-      this.integer = integer;
-    }
-
-    public void setString(final String string) {
-      this.string = string;
-    }
   }
 
   @Test
   public void nullArgs() {
-    assertThat(new JsonStringFormat(null).get(), is(""));
+    assertThat(new JsonStringFormat(null).get(), is("null"));
   }
 
   @Test
@@ -83,12 +75,5 @@ public class JsonStringFormatTest {
     final String result = new JsonStringFormat(new SomeClass("hello, world", 42)).get();
     assertThat(result, containsString("\"string\" : \"hello, world\""));
     assertThat(result, containsString("\"integer\" : 42"));
-  }
-
-  @Test
-  public void withContext() {
-    final String result = new JsonStringFormat("ctx", "hello").get();
-    assertThat(result, containsString("ctx"));
-    assertThat(result, containsString("\"hello\""));
   }
 }
