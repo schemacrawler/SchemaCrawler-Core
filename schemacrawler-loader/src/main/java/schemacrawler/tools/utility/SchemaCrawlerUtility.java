@@ -30,7 +30,7 @@ import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
-import us.fatehi.utility.string.JsonStringFormat;
+import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
 
 /** SchemaCrawler utility methods. */
@@ -82,7 +82,7 @@ public final class SchemaCrawlerUtility {
       final SchemaCrawlerOptions schemaCrawlerOptions,
       final Config additionalConfig) {
 
-    LOGGER.log(Level.CONFIG, new JsonStringFormat(schemaCrawlerOptions));
+    LOGGER.log(Level.CONFIG, new ObjectToStringFormat(schemaCrawlerOptions));
 
     DatabaseConnectorUtility.updateConnectionDataSource(connectionSource, schemaRetrievalOptions);
 

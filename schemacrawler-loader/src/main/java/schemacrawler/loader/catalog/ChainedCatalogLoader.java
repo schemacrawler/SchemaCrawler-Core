@@ -20,7 +20,7 @@ import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
-import us.fatehi.utility.string.JsonStringFormat;
+import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
 
 public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLoaderOptions> {
@@ -51,7 +51,7 @@ public class ChainedCatalogLoader extends AbstractCatalogLoader<ChainedCatalogLo
 
       // Execute
       LOGGER.log(Level.INFO, new StringFormat("Executing catalog loader <%s>", command));
-      LOGGER.log(Level.CONFIG, new JsonStringFormat(catalogLoader.getCommandOptions()));
+      LOGGER.log(Level.CONFIG, new ObjectToStringFormat(catalogLoader.getCommandOptions()));
       catalogLoader.execute();
 
       catalogLoader.transferState(this);

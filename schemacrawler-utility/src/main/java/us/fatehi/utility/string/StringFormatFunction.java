@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import us.fatehi.utility.Utility;
 
-public final class StringFormatFunction implements Function<Object, String> {
+final class StringFormatFunction implements Function<Object, String> {
 
   private static final Logger LOGGER = Logger.getLogger(StringFormatFunction.class.getName());
 

@@ -11,7 +11,7 @@ package us.fatehi.utility.string;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public final class JsonStringFormat implements Supplier<String> {
+public final class ObjectToStringFormat implements Supplier<String> {
 
   private static final Function<Object, String> SERIALIZER;
 
@@ -21,14 +21,14 @@ public final class JsonStringFormat implements Supplier<String> {
     try {
       serializer = new JsonFormatFunction();
     } catch (final NoClassDefFoundError | ExceptionInInitializerError e) {
-      serializer = String::valueOf;
+      serializer = new ObjectToStringFunction();
     }
     SERIALIZER = serializer;
   }
 
   private final Object args;
 
-  public JsonStringFormat(final Object args) {
+  public ObjectToStringFormat(final Object args) {
     this.args = args;
   }
 
