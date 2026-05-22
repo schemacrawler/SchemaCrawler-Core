@@ -8,39 +8,22 @@
 
 package us.fatehi.utility.string;
 
-import java.util.Formatter;
+import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import us.fatehi.utility.Utility;
 
 public final class StringFormat implements Supplier<String> {
 
-  private static final Logger LOGGER = Logger.getLogger(StringFormat.class.getName());
-
+  private final Function<Object, String> serializer;
   private final Object[] args;
-  private final String format;
 
   public StringFormat(final String format, final Object... args) {
-    // Be tolerant - allow null or blank format strings
-    this.format = format;
+    serializer = new StringFormatFunction(format);
     this.args = args;
   }
 
   @Override
   public String get() {
-    if (Utility.isBlank(format) || args == null || args.length == 0) {
-      return format;
-    }
-
-    try (final Formatter formatter = new Formatter()) {
-      return formatter.format(format, args).toString();
-    } catch (final Exception e) {
-      // NOTE: Do not output arguments, since the toString on argument may throw an exception
-      // obscuring this one
-      LOGGER.log(Level.FINEST, "Error logging message <%s>".formatted(format));
-      return "";
-    }
+    return serializer.apply(args);
   }
 
   @Override
