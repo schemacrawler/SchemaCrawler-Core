@@ -37,16 +37,7 @@ public class CoverageTest {
           private static final long serialVersionUID = 6176088733525976950L;
         });
     assertThat(list.size(), equalTo(2));
-    final String toString =
-        """
-        [
-          "name1",
-          "name2"
-        ]
-        """;
-    assertThat(
-        list.toString().replaceAll("\\R", "\n").strip(),
-        is(toString.replaceAll("\\R", "\n").strip()));
+    assertThat(list.toString(), is("name1, name2"));
   }
 
   @Test

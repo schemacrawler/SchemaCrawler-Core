@@ -10,6 +10,7 @@ package us.fatehi.utility.test.string;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,10 +25,6 @@ public class ObjectToStringFunctionTest {
     public String toString() {
       return "some-object";
     }
-  }
-
-  private static String normalize(final String s) {
-    return s.strip().replaceAll("\\R", "\n");
   }
 
   private final ObjectToStringFunction function = new ObjectToStringFunction();
@@ -56,8 +53,8 @@ public class ObjectToStringFunctionTest {
   @Test
   public void collectionArg() {
     assertThat(
-        normalize(function.apply(List.of("one", "two", "three"))),
-        is(
+        function.apply(List.of("one", "two", "three")),
+        equalToCompressingWhiteSpace(
             """
             [
               "one",
@@ -71,8 +68,8 @@ public class ObjectToStringFunctionTest {
   public void collectionWithMixedTypes() {
     // strings and Character are quoted inside a collection; Integer is not
     assertThat(
-        normalize(function.apply(Arrays.asList(null, "text", 42))),
-        is(
+        function.apply(Arrays.asList(null, "text", 42)),
+        equalToCompressingWhiteSpace(
             """
             [
               null,
@@ -93,8 +90,8 @@ public class ObjectToStringFunctionTest {
     map.put("alpha", 1);
     map.put("beta", 2);
     assertThat(
-        normalize(function.apply(map)),
-        is(
+        function.apply(map),
+        equalToCompressingWhiteSpace(
             """
             {
               "alpha" : 1,
@@ -111,8 +108,8 @@ public class ObjectToStringFunctionTest {
   @Test
   public void arrayArg() {
     assertThat(
-        normalize(function.apply(new String[] {"a", "b", "c"})),
-        is(
+        function.apply(new String[] {"a", "b", "c"}),
+        equalToCompressingWhiteSpace(
             """
             [
               "a",
@@ -126,8 +123,8 @@ public class ObjectToStringFunctionTest {
   public void intArray() {
     // Array.get() boxes int to Integer — unquoted
     assertThat(
-        normalize(function.apply(new int[] {1, 2, 3})),
-        is(
+        function.apply(new int[] {1, 2, 3}),
+        equalToCompressingWhiteSpace(
             """
             [
               1,

@@ -11,6 +11,7 @@ package us.fatehi.utility.string;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -36,10 +37,6 @@ public class JsonFormatFunctionTest {
     }
   }
 
-  private static String normalize(final String s) {
-    return s.strip().replaceAll("\\R", "\n");
-  }
-
   private final JsonFormatFunction function = new JsonFormatFunction();
 
   @Test
@@ -56,8 +53,8 @@ public class JsonFormatFunctionTest {
   @Test
   public void listArg() {
     assertThat(
-        normalize(function.apply(List.of("one", "two", "three"))),
-        is(
+        function.apply(List.of("one", "two", "three")),
+        equalToCompressingWhiteSpace(
             """
             [ "one", "two", "three" ]\
             """));
@@ -70,8 +67,8 @@ public class JsonFormatFunctionTest {
     map.put("three", 3);
     map.put("two", 2);
     assertThat(
-        normalize(function.apply(map)),
-        is(
+        function.apply(map),
+        equalToCompressingWhiteSpace(
             """
             {
               "one" : 1,
