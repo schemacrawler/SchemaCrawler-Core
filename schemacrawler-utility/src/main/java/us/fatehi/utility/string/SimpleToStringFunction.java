@@ -34,7 +34,7 @@ import java.util.stream.IntStream;
  *       other types fall through to {@link String#valueOf(Object)}, which calls the object's own
  *       {@code toString()}.
  *   <li><b>Fallback serializer</b> — intended as a backup when Jackson is not available on the
- *       classpath. For richer, schema-aware serialization prefer {@link ObjectToJsonString}.
+ *       classpath. For richer, schema-aware serialization prefer {@link ObjectToStringFunction}.
  * </ol>
  */
 public final class SimpleToStringFunction implements Function<Object, String> {
@@ -45,7 +45,7 @@ public final class SimpleToStringFunction implements Function<Object, String> {
     this(false);
   }
 
-  public SimpleToStringFunction(boolean isData) {
+  public SimpleToStringFunction(final boolean isData) {
     this.isData = isData;
   }
 
