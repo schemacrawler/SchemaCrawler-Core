@@ -23,7 +23,7 @@ import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionRule;
 import us.fatehi.utility.Options;
 import us.fatehi.utility.readconfig.ReadConfig;
-import us.fatehi.utility.string.ObjectToJsonFunction;
+import us.fatehi.utility.string.ObjectToStringFunction;
 import us.fatehi.utility.string.StringFormat;
 
 /** Configuration properties. */
@@ -193,6 +193,6 @@ public final class Config implements Options, ReadConfig {
 
   @Override
   public String toString() {
-    return new ObjectToJsonFunction().apply(configMap);
+    return new ObjectToStringFunction().apply(configMap);
   }
 }

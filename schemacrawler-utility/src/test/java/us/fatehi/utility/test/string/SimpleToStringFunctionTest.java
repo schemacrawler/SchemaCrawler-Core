@@ -12,14 +12,48 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.string.ObjectToStringFunction;
+import us.fatehi.utility.string.SimpleToStringFunction;
 
-public class ObjectToStringFunctionTest {
+public class SimpleToStringFunctionTest {
+
+  /** Object that directly recurses back into SimpleToStringFunction from toString(). */
+  static class SelfReferencing {
+    private final SimpleToStringFunction fn = new SimpleToStringFunction();
+
+    @Override
+    public String toString() {
+      return fn.apply(this);
+    }
+  }
+
+  /**
+   * Pair of objects that form an indirect cycle: A.toString() → apply(B) → B.toString() → apply(A).
+   */
+  static class CycleA {
+    CycleB partner;
+    private final SimpleToStringFunction fn = new SimpleToStringFunction();
+
+    @Override
+    public String toString() {
+      return fn.apply(partner);
+    }
+  }
+
+  static class CycleB {
+    CycleA partner;
+    private final SimpleToStringFunction fn = new SimpleToStringFunction();
+
+    @Override
+    public String toString() {
+      return fn.apply(partner);
+    }
+  }
 
   static class SomeClass {
     @Override
@@ -28,7 +62,7 @@ public class ObjectToStringFunctionTest {
     }
   }
 
-  private final ObjectToStringFunction function = new ObjectToStringFunction();
+  private final SimpleToStringFunction function = new SimpleToStringFunction();
 
   @Test
   public void arbitraryObject() {
@@ -101,11 +135,29 @@ public class ObjectToStringFunctionTest {
   @Test
   public void nullArg() {
     assertThat(function.apply(null), is(""));
-    assertThat(new ObjectToStringFunction(true).apply(null), is("NULL"));
+    assertThat(new SimpleToStringFunction(true).apply(null), is("NULL"));
   }
 
   @Test
   public void stringArg() {
     assertThat(function.apply("hello"), is("hello"));
+  }
+
+  @Test
+  public void directCycle() {
+    // SelfReferencing.toString() calls apply(this) — should cause StackOverflow
+    final SelfReferencing obj = new SelfReferencing();
+    assertThrows(StackOverflowError.class, () -> obj.toString());
+  }
+
+  @Test
+  public void indirectCycle() {
+    // A.toString() → apply(B), B.toString() → apply(A) — second hop causes StackOverflow
+    final CycleA a = new CycleA();
+    final CycleB b = new CycleB();
+    a.partner = b;
+    b.partner = a;
+    // a.toString() calls fn.apply(b) which calls b.toString() which calls fn.apply(a)
+    assertThrows(StackOverflowError.class, () -> a.toString());
   }
 }

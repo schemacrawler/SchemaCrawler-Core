@@ -31,11 +31,11 @@ import tools.jackson.databind.json.JsonMapper;
  * <p><b>Caveats:</b>
  *
  * <ol>
- *   <li><b>Package-private by design</b> — callers should use {@link ObjectToJsonFunction}, which
+ *   <li><b>Package-private by design</b> — callers should use {@link ObjectToStringFunction}, which
  *       guards against Jackson being absent from the classpath.
  *   <li><b>Static initializer risk</b> — if Jackson is not on the classpath, instantiating this
  *       class throws {@link NoClassDefFoundError} or {@link ExceptionInInitializerError}. This is
- *       intentional and is caught by {@link ObjectToJsonFunction}.
+ *       intentional and is caught by {@link ObjectToStringFunction}.
  *   <li><b>Serialization fallback</b> — if Jackson throws a {@code JacksonException} during
  *       serialization, falls back to {@link String#valueOf(Object)}.
  * </ol>

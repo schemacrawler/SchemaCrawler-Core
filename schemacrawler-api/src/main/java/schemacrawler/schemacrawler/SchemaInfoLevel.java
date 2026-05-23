@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import us.fatehi.utility.Options;
-import us.fatehi.utility.string.ObjectToJsonFunction;
+import us.fatehi.utility.string.ObjectToStringFunction;
 
 /** Descriptor for level of schema detail to be retrieved when crawling a schema. */
 public final class SchemaInfoLevel implements Options {
@@ -78,6 +78,6 @@ public final class SchemaInfoLevel implements Options {
     for (final SchemaInfoRetrieval schemaInfoRetrieval : values()) {
       values.put(schemaInfoRetrieval.name(), is(schemaInfoRetrieval));
     }
-    return new ObjectToJsonFunction().apply(values);
+    return new ObjectToStringFunction().apply(values);
   }
 }

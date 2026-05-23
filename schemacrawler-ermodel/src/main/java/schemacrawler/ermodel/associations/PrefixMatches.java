@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.Inflection;
 import us.fatehi.utility.Multimap;
-import us.fatehi.utility.string.ObjectToJsonFormat;
+import us.fatehi.utility.string.ObjectToStringFormat;
 import us.fatehi.utility.string.StringFormat;
 
 /**
@@ -95,7 +95,7 @@ final class PrefixMatches {
 
     LOGGER.log(Level.FINE, new StringFormat("Key prefixes=%s", prefixes));
     LOGGER.log(
-        Level.FINE, new StringFormat("Key matches map: %s", new ObjectToJsonFormat(keyPrefixes)));
+        Level.FINE, new StringFormat("Key matches map: %s", new ObjectToStringFormat(keyPrefixes)));
   }
 
   private Map<String, Integer> countPrefixKeyOccurrences(final List<String> keys) {

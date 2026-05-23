@@ -22,19 +22,19 @@ import java.util.function.Supplier;
  *   <li><b>Pass the target object, not {@code this}</b> — construct with the object you want to
  *       serialize. Passing {@code this} from inside that object's own {@code toString()} will
  *       recurse infinitely and cause a {@link StackOverflowError}.
- *   <li><b>Output format varies</b> — delegates to {@link ObjectToJsonFunction}, so output is JSON
- *       when Jackson is on the classpath and plain-text otherwise.
+ *   <li><b>Output format varies</b> — delegates to {@link ObjectToStringFunction}, so output is
+ *       JSON when Jackson is on the classpath and plain-text otherwise.
  *   <li><b>{@code toString()} delegates to {@code get()}</b> — this makes instances directly usable
  *       wherever a {@link String} representation is needed, such as log message arguments.
  * </ol>
  */
-public final class ObjectToJsonFormat implements Supplier<String> {
+public final class ObjectToStringFormat implements Supplier<String> {
 
   private final Function<Object, String> serializer;
   private final Object args;
 
-  public ObjectToJsonFormat(final Object args) {
-    serializer = new ObjectToJsonFunction();
+  public ObjectToStringFormat(final Object args) {
+    serializer = new ObjectToStringFunction();
     this.args = args;
   }
 
