@@ -19,6 +19,24 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Converts an object to a human-readable string, handling primitives, arrays, collections, and maps
+ * with structured formatting.
+ *
+ * <p><b>Caveats:</b>
+ *
+ * <ol>
+ *   <li><b>Do not call from {@code toString()}</b> — passing {@code this} inside a class's own
+ *       {@code toString()} will recurse infinitely and cause a {@link StackOverflowError}. This
+ *       function is intended to be called <em>on</em> an object from outside that object.
+ *   <li><b>Limited type support</b> — only primitives, primitive wrappers, {@link String}, {@link
+ *       BigDecimal}, arrays, {@link Collection}, and {@link Map} receive structured formatting. All
+ *       other types fall through to {@link String#valueOf(Object)}, which calls the object's own
+ *       {@code toString()}.
+ *   <li><b>Fallback serializer</b> — intended as a backup when Jackson is not available on the
+ *       classpath. For richer, schema-aware serialization prefer {@link ObjectToJsonString}.
+ * </ol>
+ */
 public final class ObjectToStringFunction implements Function<Object, String> {
 
   private final boolean isData;

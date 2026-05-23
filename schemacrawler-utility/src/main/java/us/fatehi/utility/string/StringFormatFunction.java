@@ -17,6 +17,23 @@ import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import us.fatehi.utility.Utility;
 
+/**
+ * Formats a single object, a {@link List}, or an array using a {@link java.util.Formatter
+ * printf-style} format string. Package-private; use {@link StringFormat} for public access.
+ *
+ * <p><b>Caveats:</b>
+ *
+ * <ol>
+ *   <li><b>Null or blank format returns the format string unchanged</b> — no exception is thrown;
+ *       the raw format string is returned as-is.
+ *   <li><b>Empty {@link List} or empty array returns the format string unchanged</b> — consistent
+ *       with the null-arg behavior above.
+ *   <li><b>Formatting errors are swallowed</b> — if {@link java.util.Formatter} throws (e.g. a type
+ *       mismatch), the error is logged at {@code FINEST} and an empty string is returned.
+ *   <li><b>Primitive arrays are auto-boxed</b> — elements of {@code int[]}, {@code double[]}, etc.
+ *       are boxed via {@link java.lang.reflect.Array#get Array.get()} before formatting.
+ * </ol>
+ */
 final class StringFormatFunction implements Function<Object, String> {
 
   private static final Logger LOGGER = Logger.getLogger(StringFormatFunction.class.getName());
