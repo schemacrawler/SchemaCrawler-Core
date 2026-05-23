@@ -15,7 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.List;
 import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.string.ObjectToStringFormat;
+import us.fatehi.utility.string.ObjectToJsonFormat;
 
 public class ObjectToStringFormatTest {
 
@@ -39,23 +39,23 @@ public class ObjectToStringFormatTest {
 
   @Test
   public void nullArgs() {
-    assertThat(new ObjectToStringFormat(null).get(), is("null"));
+    assertThat(new ObjectToJsonFormat(null).get(), is("null"));
   }
 
   @Test
   public void stringArg() {
     // Strings serialize as JSON strings (quoted)
-    assertThat(new ObjectToStringFormat("hello, world").get(), is("\"hello, world\""));
+    assertThat(new ObjectToJsonFormat("hello, world").get(), is("\"hello, world\""));
     // toString() delegates to get()
     assertThat(
-        new ObjectToStringFormat("hello, world").get(),
-        is(new ObjectToStringFormat("hello, world").toString()));
+        new ObjectToJsonFormat("hello, world").get(),
+        is(new ObjectToJsonFormat("hello, world").toString()));
   }
 
   @Test
   public void listArg() {
     final List<String> list = List.of("one", "two", "three");
-    assertThat(new ObjectToStringFormat(list).get(), is("[ \"one\", \"two\", \"three\" ]"));
+    assertThat(new ObjectToJsonFormat(list).get(), is("[ \"one\", \"two\", \"three\" ]"));
   }
 
   @Test
@@ -64,7 +64,7 @@ public class ObjectToStringFormatTest {
     map.put("one", 1);
     map.put("three", 3);
     map.put("two", 2);
-    final String result = new ObjectToStringFormat(map).get();
+    final String result = new ObjectToJsonFormat(map).get();
     assertThat(result, containsString("\"one\" : 1"));
     assertThat(result, containsString("\"three\" : 3"));
     assertThat(result, containsString("\"two\" : 2"));
@@ -72,7 +72,7 @@ public class ObjectToStringFormatTest {
 
   @Test
   public void objectArg() {
-    final String result = new ObjectToStringFormat(new SomeClass("hello, world", 42)).get();
+    final String result = new ObjectToJsonFormat(new SomeClass("hello, world", 42)).get();
     assertThat(result, containsString("\"string\" : \"hello, world\""));
     assertThat(result, containsString("\"integer\" : 42"));
   }

@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.EnumMap;
 import java.util.Map;
 import us.fatehi.utility.Options;
-import us.fatehi.utility.string.ObjectToStringFormat;
+import us.fatehi.utility.string.ObjectToJsonFunction;
 
 /** The database specific views to get additional database metadata in a standard format. */
 public final class InformationSchemaViews implements Options {
@@ -62,7 +62,7 @@ public final class InformationSchemaViews implements Options {
 
   @Override
   public String toString() {
-    return new ObjectToStringFormat(informationSchemaQueries).get();
+    return new ObjectToJsonFunction().apply(informationSchemaQueries);
   }
 
   protected Map<InformationSchemaKey, String> getAllInformationSchemaViews() {

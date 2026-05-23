@@ -9,14 +9,14 @@
 package us.fatehi.utility.string;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-public final class ObjectToStringFormat implements Supplier<String> {
+public final class ObjectToJsonFunction implements Function<Object, String> {
 
   private static final Function<Object, String> SERIALIZER;
 
   static {
-    // NOTE: This block handles the situation if Jackson is not available on the classpath
+    // NOTE: This block handles the situation if Jackson is not available on the
+    // classpath
     Function<Object, String> serializer;
     try {
       serializer = new JsonFormatFunction();
@@ -26,19 +26,8 @@ public final class ObjectToStringFormat implements Supplier<String> {
     SERIALIZER = serializer;
   }
 
-  private final Object args;
-
-  public ObjectToStringFormat(final Object args) {
-    this.args = args;
-  }
-
   @Override
-  public String get() {
-    return SERIALIZER.apply(args);
-  }
-
-  @Override
-  public String toString() {
-    return get();
+  public String apply(final Object object) {
+    return SERIALIZER.apply(object);
   }
 }

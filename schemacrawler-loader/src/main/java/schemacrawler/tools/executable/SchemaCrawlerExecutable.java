@@ -31,7 +31,7 @@ import schemacrawler.tools.state.AbstractExecutionState;
 import schemacrawler.tools.utility.DatabaseConnectorUtility;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
-import us.fatehi.utility.string.ObjectToStringFormat;
+import us.fatehi.utility.string.ObjectToJsonFormat;
 import us.fatehi.utility.string.StringFormat;
 
 /**
@@ -106,8 +106,8 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
 
       // Execute
       LOGGER.log(Level.INFO, new StringFormat("Executing SchemaCrawler command <%s>", command));
-      LOGGER.log(Level.CONFIG, new ObjectToStringFormat(scCommand.getIdentifiers()));
-      LOGGER.log(Level.CONFIG, new ObjectToStringFormat(scCommand.getCommandOptions()));
+      LOGGER.log(Level.CONFIG, new ObjectToJsonFormat(scCommand.getIdentifiers()));
+      LOGGER.log(Level.CONFIG, new ObjectToJsonFormat(scCommand.getCommandOptions()));
       scCommand.execute();
     } catch (final SchemaCrawlerException e) {
       throw e;
