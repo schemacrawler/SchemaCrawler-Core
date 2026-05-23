@@ -57,7 +57,7 @@ public class ObjectToStringFunctionTest {
 
   @Test
   public void decimals() {
-    assertThat(function.apply(1.0), is("1"));
+    assertThat(function.apply(1.0), is("1.0"));
     assertThat(function.apply(2.99), is("2.99"));
     assertThat(function.apply(Math.PI), is("3.14"));
   }

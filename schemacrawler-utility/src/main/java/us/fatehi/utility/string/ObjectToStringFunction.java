@@ -46,15 +46,7 @@ public final class ObjectToStringFunction implements Function<Object, String> {
       return formatArray(value);
     }
     if (value instanceof final Number number) {
-      final double d = number.doubleValue();
-      if (Double.isFinite(d) && d == Math.rint(d)) {
-        return String.valueOf(number.longValue());
-      }
-      // Avoid floating-point imprecision across operating systems
-      final int scale = 2;
-      final BigDecimal roundedNumber =
-          new BigDecimal(number.toString()).setScale(scale, RoundingMode.HALF_UP);
-      return roundedNumber.toString();
+      return formatNumber(number);
     }
     return String.valueOf(value);
   }
@@ -88,5 +80,17 @@ public final class ObjectToStringFunction implements Function<Object, String> {
                 "," + System.lineSeparator(),
                 "{" + System.lineSeparator(),
                 System.lineSeparator() + "}"));
+  }
+
+  private String formatNumber(Number number) {
+    final double d = number.doubleValue();
+    if (Double.isFinite(d) && d == Math.rint(d)) {
+      return number.toString();
+    }
+    // Avoid floating-point imprecision across operating systems
+    final int scale = 2;
+    final BigDecimal roundedNumber =
+        new BigDecimal(number.toString()).setScale(scale, RoundingMode.HALF_UP);
+    return roundedNumber.toString();
   }
 }
