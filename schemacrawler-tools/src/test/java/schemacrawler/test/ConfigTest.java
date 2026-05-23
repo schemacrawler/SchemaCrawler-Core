@@ -187,7 +187,7 @@ public class ConfigTest {
 
   private void assertEmptyConfig(final Config config) {
     assertThat(config.size(), is(0));
-    assertThat(config.toString().replaceAll("\\R", ""), is("{}"));
+    assertThat(config.toString().replaceAll("\\R", ""), is("{ }"));
 
     assertThat(config.containsKey("key"), is(false));
     assertThat(config.getStringValue("key", null), is(nullValue()));
@@ -195,7 +195,7 @@ public class ConfigTest {
 
   private void assertNotEmptyConfig(final Config config) {
     assertThat(config.size(), is(1));
-    assertThat(config.toString().replaceAll("\\R", ""), is("{  \"key\": \"value\"}"));
+    assertThat(config.toString().replaceAll("\\R", ""), is("{  \"key\" : \"value\"}"));
 
     assertThat(config.containsKey("key"), is(true));
     assertThat(config.getStringValue("key", null), is("value"));

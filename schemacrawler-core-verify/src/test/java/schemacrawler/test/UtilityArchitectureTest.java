@@ -44,6 +44,17 @@ public class UtilityArchitectureTest {
   }
 
   @Test
+  public void notUseJackson() {
+    noClasses()
+        .that(are(not(simpleName("JsonFormatFunction"))))
+        .should()
+        .dependOnClassesThat()
+        .resideInAPackage("tools.jackson..")
+        .because("SchemaCrawler-Core must not depend on Jackson")
+        .check(classes);
+  }
+
+  @Test
   public void notAccessStandardStreams() {
     noClasses()
         .that(are(not(simpleName("SqlScript"))).and(are(not(simpleName("ConsoleOutputResource")))))

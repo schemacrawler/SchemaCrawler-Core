@@ -10,6 +10,7 @@ package schemacrawler.test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
@@ -93,6 +94,15 @@ public class InformationSchemaViewsBuilderTest {
     assertThat(
         builder.toOptions().getQuery(InformationSchemaKey.ADDITIONAL_TABLE_ATTRIBUTES).query(),
         is("SOME value SUBSTITUTE SQL SELECT"));
+
+    final String json =
+        """
+        {
+          "ADDITIONAL_COLUMN_ATTRIBUTES" : "SOME SQL SELECT",
+          "ADDITIONAL_TABLE_ATTRIBUTES" : "SOME value SUBSTITUTE SQL SELECT"
+        }
+        """;
+    assertThat(builder.toOptions().toString(), equalToCompressingWhiteSpace(json));
   }
 
   @Test

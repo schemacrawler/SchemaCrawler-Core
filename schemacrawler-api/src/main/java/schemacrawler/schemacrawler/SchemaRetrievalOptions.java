@@ -18,7 +18,6 @@ import schemacrawler.plugin.EnumDataTypeHelper;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.TableTypes;
 import schemacrawler.utility.TypeMap;
-import us.fatehi.utility.ObjectToString;
 import us.fatehi.utility.Options;
 import us.fatehi.utility.datasource.DatabaseServerType;
 
@@ -109,7 +108,7 @@ public final class SchemaRetrievalOptions implements Options {
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return ObjectToString.toString(this);
+    return dbServerType.toString();
   }
 
   Map<SchemaInfoMetadataRetrievalStrategy, MetadataRetrievalStrategy>

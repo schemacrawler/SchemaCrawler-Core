@@ -8,11 +8,11 @@
 
 package schemacrawler.test;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -385,8 +385,8 @@ public class SchemaRetrievalOptionsBuilderTest {
     final SchemaRetrievalOptionsBuilder builder = SchemaRetrievalOptionsBuilder.builder();
     final SchemaRetrievalOptions schemaRetrievalOptions = builder.toOptions();
     assertThat(
-        schemaRetrievalOptions.toString(),
-        containsString("\"@object\": \"" + schemaRetrievalOptions.getClass().getName() + "\""));
+        schemaRetrievalOptions.getDatabaseServerType().getDatabaseSystemIdentifier(),
+        is(nullValue()));
   }
 
   @Test
