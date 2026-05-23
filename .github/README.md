@@ -2,7 +2,6 @@
 **:star: Star it :arrow_heading_up: if you love it!**
 
 [![Quick Build](https://github.com/schemacrawler/SchemaCrawler-Core/actions/workflows/quick-build.yml/badge.svg)](https://github.com/schemacrawler/SchemaCrawler-Core/actions/workflows/quick-build.yml)
-[![Codacy Grade](https://app.codacy.com/project/badge/Grade/22bc201bb8474e98b4da023fc30b0306)](https://app.codacy.com/gh/schemacrawler/SchemaCrawler-Core/dashboard)
 [![Codacy Coverage](https://app.codacy.com/project/badge/Coverage/22bc201bb8474e98b4da023fc30b0306)](https://app.codacy.com/gh/schemacrawler/SchemaCrawler-Core/dashboard)
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/schemacrawler/schemacrawler?color=FFDAB9)](https://hub.docker.com/r/schemacrawler/schemacrawler/)
