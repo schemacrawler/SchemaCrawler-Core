@@ -11,8 +11,9 @@ package us.fatehi.utility.string;
 import static java.util.Objects.requireNonNull;
 
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,84 +21,72 @@ import java.util.stream.IntStream;
 
 public final class ObjectToStringFunction implements Function<Object, String> {
 
+  private final boolean isData;
+
+  public ObjectToStringFunction() {
+    this(false);
+  }
+
+  public ObjectToStringFunction(boolean isData) {
+    this.isData = isData;
+  }
+
   @Override
-  public String apply(final Object object) {
-    if (object instanceof final Collection<?> collection) {
+  public String apply(final Object value) {
+    if (value == null) {
+      return isData ? "NULL" : "";
+    }
+    if (value instanceof final Collection<?> collection) {
       return formatCollection(collection);
     }
-    if (object instanceof final Map<?, ?> map) {
+    if (value instanceof final Map<?, ?> map) {
       return formatMap(map);
     }
-    if (object != null && object.getClass().isArray()) {
-      return formatArray(object);
+    if (value != null && value.getClass().isArray()) {
+      return formatArray(value);
     }
-    return String.valueOf(object);
+    if (value instanceof final Number number) {
+      final double d = number.doubleValue();
+      if (Double.isFinite(d) && d == Math.rint(d)) {
+        return String.valueOf(number.longValue());
+      }
+      // Avoid floating-point imprecision across operating systems
+      final int scale = 2;
+      final BigDecimal roundedNumber =
+          new BigDecimal(number.toString()).setScale(scale, RoundingMode.HALF_UP);
+      return roundedNumber.toString();
+    }
+    return String.valueOf(value);
   }
 
-  private static String formatArray(final Object array) {
-    requireNonNull(array, "No array provided");
-
+  private String formatArray(final Object array) {
     final int len = Array.getLength(array);
     if (len == 0) {
-      return "[ ]";
+      return "";
     }
     return IntStream.range(0, len)
-        .mapToObj(i -> "  " + quoted(Array.get(array, i)))
-        .collect(
-            Collectors.joining(
-                "," + System.lineSeparator(),
-                "[" + System.lineSeparator(),
-                System.lineSeparator() + "]"));
+        .mapToObj(i -> String.valueOf(Array.get(array, i)))
+        .collect(Collectors.joining(", "));
   }
 
-  private static String formatCollection(final Collection<?> collection) {
-    requireNonNull(collection, "No collection provided");
+  private String formatCollection(final Collection<?> collection) {
     if (collection.isEmpty()) {
-      return "[ ]";
+      return "";
     }
-    return collection.stream()
-        .map(item -> "  " + quoted(item))
-        .collect(
-            Collectors.joining(
-                "," + System.lineSeparator(),
-                "[" + System.lineSeparator(),
-                System.lineSeparator() + "]"));
+    return collection.stream().map(String::valueOf).collect(Collectors.joining(", "));
   }
 
-  private static String formatMap(final Map<?, ?> map) {
+  private String formatMap(final Map<?, ?> map) {
     requireNonNull(map, "No map provided");
     if (map.isEmpty()) {
       return "{ }";
     }
     return map.entrySet().stream()
-        .map(e -> "  " + quoted(e.getKey()) + " : " + quoted(e.getValue()))
+        .map("  %s"::formatted)
         .collect(
             Collectors.joining(
                 "," + System.lineSeparator(),
                 "{" + System.lineSeparator(),
                 System.lineSeparator() + "}"));
-  }
-
-  private static boolean isPrimitive(final Object object) {
-    final Class<?> objectClass = object.getClass();
-    return objectClass.isPrimitive()
-        || List.of(
-                Integer.class,
-                Long.class,
-                Double.class,
-                Float.class,
-                Boolean.class,
-                Byte.class,
-                Void.class,
-                Short.class)
-            .contains(objectClass);
-  }
-
-  private static String quoted(final Object object) {
-    final String stringValue = String.valueOf(object);
-    if (object == null || isPrimitive(object)) {
-      return stringValue;
-    }
-    return "\"" + stringValue + "\"";
   }
 }
