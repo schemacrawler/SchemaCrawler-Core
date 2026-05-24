@@ -144,9 +144,13 @@ public final class Config implements Options, ReadConfig {
     return value.toString();
   }
 
+  public Map<String, Object> getMap() {
+    return getSubMap("");
+  }
+
   public Map<String, Object> getSubMap(final String propertyName) {
     if (isBlank(propertyName)) {
-      return new HashMap<>(configMap);
+      return Map.copyOf(configMap);
     }
     final Map<String, Object> subMap = new HashMap<>();
     for (final Entry<String, Object> configEntry : configMap.entrySet()) {
@@ -159,7 +163,7 @@ public final class Config implements Options, ReadConfig {
       final Object value = configEntry.getValue();
       subMap.put(key, value);
     }
-    return subMap;
+    return Map.copyOf(subMap);
   }
 
   public void merge(final Config config) {

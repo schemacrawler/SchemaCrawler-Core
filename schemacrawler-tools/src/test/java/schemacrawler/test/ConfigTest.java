@@ -12,6 +12,7 @@ import static com.github.npathai.hamcrestopt.OptionalMatchers.isEmpty;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.isPresentAndIs;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.time.DayOfWeek;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.RegularExpressionRule;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
+import us.fatehi.utility.string.ObjectToStringFunction;
 
 public class ConfigTest {
 
@@ -183,6 +185,32 @@ public class ConfigTest {
     config.put("key", null);
 
     assertThat(config.containsKey("key"), is(false));
+  }
+
+  @Test
+  public void toStringValue() {
+    final Config config = ConfigUtility.newConfig();
+    config.put("key", "value");
+
+    assertThat(
+        config.toString(),
+        equalToCompressingWhiteSpace(
+            """
+            {
+              "key" : "value"
+            }
+            """));
+
+    assertThat(
+        new ObjectToStringFunction().apply(config),
+        equalToCompressingWhiteSpace(
+            """
+            {
+              "map" : {
+                "key" : "value"
+              }
+            }
+            """));
   }
 
   private void assertEmptyConfig(final Config config) {
