@@ -11,6 +11,10 @@ module us.fatehi.schemacrawler.schemacrawler {
   requires java.sql;
   requires java.logging;
 
+  // Optional Jackson dependency
+  requires static tools.jackson.core;
+  requires static tools.jackson.databind;
+
   // Export public API packages from schemacrawler-utility
   exports us.fatehi.utility;
   exports us.fatehi.utility.database;
@@ -51,7 +55,7 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.tools.state;
   exports schemacrawler.tools.utility;
 
-    // Export public API packages from schemacrawler-loader
+  // Export public API packages from schemacrawler-loader
   exports schemacrawler.loader.utility;
   exports schemacrawler.loader.catalog.model;
 
@@ -62,5 +66,7 @@ module us.fatehi.schemacrawler.schemacrawler {
 
   // Allow reflection of schema model
   opens schemacrawler.schema to
+      tools.jackson.databind;
+  opens schemacrawler.schemacrawler to
       tools.jackson.databind;
 }
