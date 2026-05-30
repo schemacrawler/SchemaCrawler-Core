@@ -8,6 +8,8 @@
 
 package us.fatehi.utility;
 
+import static us.fatehi.utility.Utility.isBlank;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.sql.DriverManager;
@@ -39,7 +41,10 @@ class DriverManagerLogWriter extends Writer {
     }
 
     if (!buffer.isEmpty()) {
-      LOGGER.log(LOG_LEVEL, buffer.toString());
+      final String logLine = buffer.toString().strip();
+      if (!isBlank(logLine)) {
+        LOGGER.log(LOG_LEVEL, logLine);
+      }
       buffer.setLength(0);
     }
   }
@@ -52,7 +57,7 @@ class DriverManagerLogWriter extends Writer {
 
     for (int i = off; i < off + len; i++) {
       final char c = cbuf[i];
-      if (c == '\n') {
+      if (c == '\n' || c == '\r') {
         flush();
       } else {
         buffer.append(c);
