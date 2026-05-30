@@ -35,7 +35,7 @@
     <!-- SchemaCrawler jars -->
     <module>schemacrawler</module>
     <module>schemacrawler-tests</module>
-    <module>schemacrawler-core-verify</module>
+    <module>schemacrawler-verify-core</module>
   </modules>
 
 </project>

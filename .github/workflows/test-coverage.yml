@@ -44,7 +44,7 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: coverage-test-results
-        path: ./schemacrawler-core-verify/target/site/jacoco-aggregate
+        path: ./schemacrawler-verify-core/target/site/jacoco-aggregate
         retention-days: 5
     - id: publish-coverage-codacy
       name: Upload coverage report to Codacy
