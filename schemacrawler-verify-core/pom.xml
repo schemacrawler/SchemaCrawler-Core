@@ -11,7 +11,7 @@
     <version>17.11.2</version>
     <relativePath>../schemacrawler-parent/pom.xml</relativePath>
   </parent>
-  <artifactId>schemacrawler-core-verify</artifactId>
+  <artifactId>schemacrawler-verify-core</artifactId>
   <packaging>jar</packaging>
 
   <name>SchemaCrawler - Verify Uber Jar</name>
