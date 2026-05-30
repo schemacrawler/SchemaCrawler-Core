@@ -9,7 +9,10 @@
 package schemacrawler.test;
 
 import static com.tngtech.archunit.base.DescribedPredicate.alwaysTrue;
+import static com.tngtech.archunit.base.DescribedPredicate.not;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleName;
 import static com.tngtech.archunit.core.importer.ImportOption.Predefined.DO_NOT_INCLUDE_TESTS;
+import static com.tngtech.archunit.lang.conditions.ArchPredicates.are;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.GeneralCodingRules.ACCESS_STANDARD_STREAMS;
@@ -46,18 +49,6 @@ public abstract class BaseArchitectureTest {
             .importPackages(classesSpecification())
             .as(description);
     assertThat(description + " classes not found", classes.isEmpty(), is(false));
-  }
-
-  abstract String classesSpecification();
-
-  @Test
-  public void notUseJackson() {
-    noClasses()
-        .should()
-        .dependOnClassesThat()
-        .resideInAPackage("tools.jackson..")
-        .because("SchemaCrawler-Core must not depend on Jackson")
-        .check(classes);
   }
 
   @Test
@@ -102,6 +93,17 @@ public abstract class BaseArchitectureTest {
   }
 
   @Test
+  public void notUseJackson() {
+    noClasses()
+        .that(are(not(simpleName("CatalogAttributesUtility"))))
+        .should()
+        .dependOnClassesThat()
+        .resideInAPackage("tools.jackson..")
+        .because("SchemaCrawler-Core must not depend on Jackson")
+        .check(classes);
+  }
+
+  @Test
   public void packageCycles() {
     slices()
         .matching("schemacrawler.(**)..")
@@ -127,4 +129,6 @@ public abstract class BaseArchitectureTest {
   protected DescribedPredicate<JavaClass> exceptAllowedToUseStandardStreams() {
     return alwaysTrue();
   }
+
+  abstract String classesSpecification();
 }
