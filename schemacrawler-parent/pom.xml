@@ -366,9 +366,12 @@
           <compilerArgs>
             <arg>-parameters</arg>
             <arg>-g</arg>
+            <arg>-Xlint:deprecation</arg>
           </compilerArgs>
           <encoding>UTF-8</encoding>
+          <failOnWarning>true</failOnWarning>
           <release>${java.version}</release>
+          <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
       <plugin>
