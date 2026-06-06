@@ -57,7 +57,7 @@
     <java.version>17</java.version>
     <skip.signing.artifacts>true</skip.signing.artifacts>
     <maven.javadoc.skip>true</maven.javadoc.skip>
-    <jacoco.version>0.8.14</jacoco.version>
+    <jacoco.version>0.8.15</jacoco.version>
     <!-- byte-buddy-agent version must align with Mockito's version; update together -->
     <byte.buddy.version>1.18.8</byte.buddy.version>
     <!-- Empty default; JaCoCo prepends its agent when the test-coverage-build profile is active -->
