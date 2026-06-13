@@ -3,6 +3,12 @@
 SchemaCrawler Core release notes.
 
 
+<a name="v17.11.3"></a>
+## Release 17.11.3 - 2026-06-12
+
+- Correct cardinality display in Mermaid diagrams
+
+
 <a name="v17.11.2"></a>
 ## Release 17.11.2 - 2026-05-31
 
