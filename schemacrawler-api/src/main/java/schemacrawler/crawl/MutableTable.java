@@ -38,6 +38,7 @@ import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.Trigger;
+import schemacrawler.utility.MetaDataUtility;
 
 sealed class MutableTable extends AbstractDatabaseObject implements Table permits MutableView {
 
@@ -210,7 +211,14 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public Collection<DatabaseObject> getUsedByObjects() {
-    return Set.copyOf(usedByObjects);
+    final List<DatabaseObject> usedByObjectsSorted = new ArrayList<>(usedByObjects);
+    Collections.sort(
+        usedByObjectsSorted,
+        Comparator.comparing(
+                (final DatabaseObject databaseObject) ->
+                    MetaDataUtility.getSimpleTypeName(databaseObject))
+            .thenComparing(DatabaseObject::getFullName));
+    return List.copyOf(usedByObjectsSorted);
   }
 
   @Override
