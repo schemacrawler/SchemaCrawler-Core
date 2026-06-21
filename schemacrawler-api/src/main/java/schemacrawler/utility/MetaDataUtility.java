@@ -18,6 +18,7 @@ import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.DependantObject;
 import schemacrawler.schema.Function;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
@@ -94,8 +95,14 @@ public final class MetaDataUtility {
     return joinColumns(columns, false, identifiers);
   }
 
+  /**
+   * Returns the type of database object. Does not support dependant database objects like columns.
+   *
+   * @param databaseObject Database object
+   * @return Simple database object type
+   */
   public static SimpleDatabaseObjectType getSimpleTypeName(final DatabaseObject databaseObject) {
-    if (databaseObject == null) {
+    if (databaseObject == null || databaseObject instanceof DependantObject<?>) {
       return SimpleDatabaseObjectType.unknown;
     }
     if (databaseObject instanceof Synonym) {
