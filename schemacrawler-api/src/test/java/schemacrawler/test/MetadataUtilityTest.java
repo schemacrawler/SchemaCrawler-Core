@@ -30,12 +30,18 @@ import schemacrawler.filter.ReducerFactory;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.CatalogReducer;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.DependantObject;
+import schemacrawler.schema.Function;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.PrimaryKey;
+import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Schema;
+import schemacrawler.schema.Sequence;
+import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.View;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -123,6 +129,37 @@ public class MetadataUtilityTest {
 
     final Table table = catalog.lookupTable(schema, "BOOKS").get();
     assertThat("BOOKS Table not found", table, notNullValue());
+  }
+
+  @Test
+  public void simpleTypeName() {
+    assertThat(
+        MetaDataUtility.getSimpleTypeName(null),
+        is(MetaDataUtility.SimpleDatabaseObjectType.unknown));
+    assertThat(
+        MetaDataUtility.getSimpleTypeName(mock(DatabaseObject.class)),
+        is(MetaDataUtility.SimpleDatabaseObjectType.unknown));
+    assertThat(
+        MetaDataUtility.getSimpleTypeName(mock(DependantObject.class)),
+        is(MetaDataUtility.SimpleDatabaseObjectType.unknown));
+    assertThat(
+        MetaDataUtility.getSimpleTypeName(mock(Synonym.class)),
+        is(MetaDataUtility.SimpleDatabaseObjectType.synonym));
+    assertThat(
+        MetaDataUtility.getSimpleTypeName(mock(Sequence.class)),
+        is(MetaDataUtility.SimpleDatabaseObjectType.sequence));
+    assertThat(
+        MetaDataUtility.getSimpleTypeName(mock(Function.class)),
+        is(MetaDataUtility.SimpleDatabaseObjectType.function));
+    assertThat(
+        MetaDataUtility.getSimpleTypeName(mock(Procedure.class)),
+        is(MetaDataUtility.SimpleDatabaseObjectType.procedure));
+    assertThat(
+        MetaDataUtility.getSimpleTypeName(mock(View.class)),
+        is(MetaDataUtility.SimpleDatabaseObjectType.view));
+    assertThat(
+        MetaDataUtility.getSimpleTypeName(mock(Table.class)),
+        is(MetaDataUtility.SimpleDatabaseObjectType.table));
   }
 
   @ParameterizedTest(name = "[{index}] {0}: Check database object name is system-generated")
