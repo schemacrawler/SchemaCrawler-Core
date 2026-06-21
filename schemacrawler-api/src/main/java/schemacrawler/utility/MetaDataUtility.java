@@ -23,6 +23,7 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.JavaSqlTypeGroup;
+import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Sequence;
@@ -93,10 +94,13 @@ public final class MetaDataUtility {
     return joinColumns(columns, false, identifiers);
   }
 
+  /**
+   * Returns the type of database object. Does not support dependant database objects like columns.
+   *
+   * @param databaseObject Database object
+   * @return Simple database object type
+   */
   public static SimpleDatabaseObjectType getSimpleTypeName(final DatabaseObject databaseObject) {
-    if (databaseObject == null) {
-      return SimpleDatabaseObjectType.unknown;
-    }
     if (databaseObject instanceof Synonym) {
       return SimpleDatabaseObjectType.synonym;
     }
@@ -116,12 +120,16 @@ public final class MetaDataUtility {
     if (databaseObject instanceof Table) {
       return SimpleDatabaseObjectType.table;
     }
+    // Handle null, DependantObject, and unknown subclasses
     return SimpleDatabaseObjectType.unknown;
   }
 
-  public static String getTypeName(final DatabaseObject databaseObject) {
-    if (databaseObject instanceof final TypedObject<?> typedObject) {
+  public static String getTypeName(final NamedObject namedObject) {
+    if (namedObject instanceof final TypedObject<?> typedObject) {
       return typedObject.getType().toString();
+    }
+    if (!(namedObject instanceof final DatabaseObject databaseObject)) {
+      return "";
     }
     final SimpleDatabaseObjectType simpleTypeName = getSimpleTypeName(databaseObject);
     if (simpleTypeName == SimpleDatabaseObjectType.unknown) {
