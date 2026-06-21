@@ -23,6 +23,7 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.JavaSqlTypeGroup;
+import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Sequence;
@@ -119,9 +120,12 @@ public final class MetaDataUtility {
     return SimpleDatabaseObjectType.unknown;
   }
 
-  public static String getTypeName(final DatabaseObject databaseObject) {
-    if (databaseObject instanceof final TypedObject<?> typedObject) {
+  public static String getTypeName(final NamedObject namedObject) {
+    if (namedObject instanceof final TypedObject<?> typedObject) {
       return typedObject.getType().toString();
+    }
+    if (!(namedObject instanceof final DatabaseObject databaseObject)) {
+      return "";
     }
     final SimpleDatabaseObjectType simpleTypeName = getSimpleTypeName(databaseObject);
     if (simpleTypeName == SimpleDatabaseObjectType.unknown) {
