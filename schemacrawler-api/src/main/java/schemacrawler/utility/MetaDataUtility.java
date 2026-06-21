@@ -18,7 +18,6 @@ import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
-import schemacrawler.schema.DependantObject;
 import schemacrawler.schema.Function;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
@@ -102,9 +101,6 @@ public final class MetaDataUtility {
    * @return Simple database object type
    */
   public static SimpleDatabaseObjectType getSimpleTypeName(final DatabaseObject databaseObject) {
-    if (databaseObject == null || databaseObject instanceof DependantObject<?>) {
-      return SimpleDatabaseObjectType.unknown;
-    }
     if (databaseObject instanceof Synonym) {
       return SimpleDatabaseObjectType.synonym;
     }
@@ -124,6 +120,7 @@ public final class MetaDataUtility {
     if (databaseObject instanceof Table) {
       return SimpleDatabaseObjectType.table;
     }
+    // Handle null, DependantObject, and unknown subclasses
     return SimpleDatabaseObjectType.unknown;
   }
 
