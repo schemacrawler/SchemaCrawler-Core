@@ -41,8 +41,13 @@ final class ImplicitAssociationsLoader
 
   @Override
   public void execute() {
+    if (!hasCatalog()) {
+      LOGGER.log(Level.INFO, "Catalog not available; not loading implicit association information");
+      return;
+    }
     if (!hasERModel()) {
-      LOGGER.log(Level.INFO, "ER model not available; skipping implicit association loading");
+      LOGGER.log(
+          Level.INFO, "ER model not available; not loading implicit association information");
       return;
     }
 

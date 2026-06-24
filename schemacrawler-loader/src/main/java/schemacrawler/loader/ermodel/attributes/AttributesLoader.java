@@ -46,6 +46,11 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
   @Override
   public void execute() {
     if (!hasCatalog()) {
+      LOGGER.log(Level.INFO, "Catalog not available; not loading catalog attributes");
+      return;
+    }
+    if (!hasERModel()) {
+      LOGGER.log(Level.INFO, "ER model not available; not loading catalog attributes");
       return;
     }
 
