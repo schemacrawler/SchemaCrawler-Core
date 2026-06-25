@@ -12,9 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.loader.ermodel.PrimaryERModelLoader.PrimaryERModelLoaderLoaderOptions;
 import schemacrawler.schema.Catalog;
 import schemacrawler.tools.command.CommandOptions;
-import schemacrawler.loader.ermodel.PrimaryERModelLoader.PrimaryERModelLoaderLoaderOptions;
 import us.fatehi.utility.property.PropertyName;
 
 /**
@@ -40,8 +40,12 @@ class PrimaryERModelLoader extends AbstractERModelLoader<PrimaryERModelLoaderLoa
 
     LOGGER.log(Level.INFO, "Building ER model");
 
-    final Catalog catalog = getCatalog();
-    final ERModel eRModel = ERModelBuilder.builder(catalog).build();
-    setERModel(eRModel);
+    try {
+      final Catalog catalog = getCatalog();
+      final ERModel eRModel = ERModelBuilder.builder(catalog).build();
+      setERModel(eRModel);
+    } catch (final Exception e) {
+      LOGGER.log(Level.WARNING, "Could not load ER model", e);
+    }
   }
 }

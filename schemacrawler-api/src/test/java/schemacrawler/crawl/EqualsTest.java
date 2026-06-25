@@ -98,6 +98,7 @@ public class EqualsTest {
 
     EqualsVerifier.forClass(MutablePrivilege.class)
         .withIgnoredFields("key", "grants", "attributeMap")
+        .withNonnullFields("parent")
         .withPrefabValues(
             DatabaseObjectReference.class, new TablePointer(table1), new TablePointer(table2))
         .suppress(Warning.STRICT_INHERITANCE)

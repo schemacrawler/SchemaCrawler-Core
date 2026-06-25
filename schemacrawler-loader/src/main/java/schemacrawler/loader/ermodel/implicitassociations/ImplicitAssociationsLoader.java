@@ -15,10 +15,9 @@ import schemacrawler.ermodel.associations.ImplicitAssociationAnalyzer;
 import schemacrawler.ermodel.associations.ImplicitAssociationAnalyzerBuilder;
 import schemacrawler.ermodel.implementation.ImplicitRelationshipBuilder;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.loader.ermodel.AbstractERModelLoader;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
-import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
-import schemacrawler.loader.ermodel.AbstractERModelLoader;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.scheduler.TaskDefinition;
 import us.fatehi.utility.scheduler.TaskRunner;
@@ -42,8 +41,13 @@ final class ImplicitAssociationsLoader
 
   @Override
   public void execute() {
+    if (!hasCatalog()) {
+      LOGGER.log(Level.INFO, "Catalog not available; not loading implicit association information");
+      return;
+    }
     if (!hasERModel()) {
-      LOGGER.log(Level.INFO, "ER model not available; skipping implicit association loading");
+      LOGGER.log(
+          Level.INFO, "ER model not available; not loading implicit association information");
       return;
     }
 
@@ -62,8 +66,8 @@ final class ImplicitAssociationsLoader
       taskRunner.submit();
       LOGGER.log(Level.INFO, taskRunner.report());
     } catch (final Exception e) {
-      throw new ExecutionRuntimeException(
-          "Exception loading implicit association information into ER model", e);
+      LOGGER.log(
+          Level.WARNING, "Exception loading implicit association information into ER model", e);
     }
   }
 

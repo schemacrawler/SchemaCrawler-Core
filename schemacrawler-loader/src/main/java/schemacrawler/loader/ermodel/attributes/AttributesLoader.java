@@ -27,7 +27,6 @@ import schemacrawler.loader.ermodel.AbstractERModelLoader;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
-import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.ioresource.InputResource;
 import us.fatehi.utility.ioresource.InputResourceUtility;
 import us.fatehi.utility.property.PropertyName;
@@ -47,6 +46,11 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
   @Override
   public void execute() {
     if (!hasCatalog()) {
+      LOGGER.log(Level.INFO, "Catalog not available; not loading catalog attributes");
+      return;
+    }
+    if (!hasERModel()) {
+      LOGGER.log(Level.INFO, "ER model not available; not loading catalog attributes");
       return;
     }
 
@@ -79,7 +83,7 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
       taskRunner.submit();
       LOGGER.log(Level.INFO, taskRunner.report());
     } catch (final Exception e) {
-      throw new ExecutionRuntimeException("Exception loading catalog attributes", e);
+      LOGGER.log(Level.WARNING, "Exception loading catalog attributes", e);
     }
   }
 

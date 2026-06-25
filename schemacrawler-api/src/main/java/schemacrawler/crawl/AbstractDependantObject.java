@@ -15,8 +15,8 @@ import java.io.Serial;
 import java.util.Objects;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DependantObject;
-import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Identifiers;
+import schemacrawler.schema.NamedObjectKey;
 
 /**
  * Represents the dependant of a database object, such as a column or an index, which are dependants
@@ -66,11 +66,6 @@ abstract class AbstractDependantObject<D extends DatabaseObject> extends Abstrac
   /** {@inheritDoc} */
   @Override
   public final D getParent() {
-    // Check if parent is null - this can happen if the object is in an
-    // incomplete state during deserialization
-    if (parent == null) {
-      return null;
-    }
     return parent.get();
   }
 

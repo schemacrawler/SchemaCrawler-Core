@@ -56,4 +56,90 @@ public class SerializationTest {
         clonedCatalog.getTables(clonedSchema),
         hasSize(11));
   }
+
+  @Test
+  public void columnParentsAfterDeserialization(final Connection connection) throws Exception {
+    final Catalog catalog =
+        getCatalog(connection, DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel);
+    final Catalog cloned = SerializationUtils.clone(catalog);
+
+    final Schema schema = cloned.lookupSchema("PUBLIC.BOOKS").orElseThrow();
+    cloned
+        .getTables(schema)
+        .forEach(
+            table ->
+                table
+                    .getColumns()
+                    .forEach(
+                        column -> {
+                          assertThat(
+                              "Column parent is null after deserialization",
+                              column.getParent(),
+                              notNullValue());
+                          assertThat(
+                              "Column parent name is wrong after deserialization",
+                              column.getParent().getName(),
+                              equalTo(table.getName()));
+                        }));
+  }
+
+  @Test
+  public void indexColumnMethodsAfterDeserialization(final Connection connection) throws Exception {
+    final Catalog catalog =
+        getCatalog(connection, DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel);
+    final Catalog cloned = SerializationUtils.clone(catalog);
+
+    final Schema schema = cloned.lookupSchema("PUBLIC.BOOKS").orElseThrow();
+    cloned
+        .getTables(schema)
+        .forEach(
+            table ->
+                table
+                    .getIndexes()
+                    .forEach(
+                        index ->
+                            index
+                                .getColumns()
+                                .forEach(
+                                    indexColumn -> {
+                                      assertThat(
+                                          "Index column parent is null after deserialization",
+                                          indexColumn.getParent(),
+                                          notNullValue());
+                                      assertThat(
+                                          "Index column data type is null after deserialization",
+                                          indexColumn.isColumnDataTypeKnown(),
+                                          is(true));
+                                    })));
+  }
+
+  @Test
+  public void foreignKeyColumnReferencesAfterDeserialization(final Connection connection)
+      throws Exception {
+    final Catalog catalog =
+        getCatalog(connection, DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel);
+    final Catalog cloned = SerializationUtils.clone(catalog);
+
+    final Schema schema = cloned.lookupSchema("PUBLIC.BOOKS").orElseThrow();
+    cloned
+        .getTables(schema)
+        .forEach(
+            table ->
+                table
+                    .getForeignKeys()
+                    .forEach(
+                        fk ->
+                            fk.getColumnReferences()
+                                .forEach(
+                                    ref -> {
+                                      assertThat(
+                                          "FK column parent null after deserialization",
+                                          ref.getForeignKeyColumn().getParent(),
+                                          notNullValue());
+                                      assertThat(
+                                          "PK column parent null after deserialization",
+                                          ref.getPrimaryKeyColumn().getParent(),
+                                          notNullValue());
+                                    })));
+  }
 }

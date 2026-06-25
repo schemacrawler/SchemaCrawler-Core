@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
@@ -32,6 +33,11 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.ermodel.model.Entity;
+import schemacrawler.ermodel.model.EntityAttribute;
+import schemacrawler.ermodel.model.EntitySubtype;
+import schemacrawler.ermodel.model.EntityType;
+import schemacrawler.ermodel.model.ManyToManyRelationship;
 import schemacrawler.ermodel.utility.SerializedERModelUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -59,6 +65,7 @@ public class ERModelJavaSerializationTest {
     final ERModel erModelDeser =
         SerializedERModelUtility.readERModel(newInputStream(testOutputFile, READ));
     validateERModel(erModelDeser);
+    validateDeserializedERModel(erModelDeser);
   }
 
   @BeforeEach
@@ -85,5 +92,37 @@ public class ERModelJavaSerializationTest {
         erModel.getEntities().stream()
             .collect(Collectors.summingInt(entity -> entity.getImplicitRelationships().size()));
     assertThat(numImplicitRelationships, is(3));
+  }
+
+  private void validateDeserializedERModel(final ERModel erModel) {
+    final Entity books = erModel.lookupEntity("PUBLIC.BOOKS.BOOKS").orElseThrow();
+    assertThat(books.getType(), is(EntityType.strong_entity));
+    assertThat(books.getRelationships(), hasSize(3));
+    assertThat(books.getImplicitRelationships(), hasSize(1));
+    assertThat(books.getEntityAttributes(), hasSize(5));
+    for (final EntityAttribute entityAttribute : books.getEntityAttributes()) {
+      assertThat(entityAttribute.getParent(), is(books));
+      assertThat(entityAttribute.getDatabaseObject(), is(notNullValue()));
+    }
+
+    final EntitySubtype celebrityUpdates =
+        (EntitySubtype) erModel.lookupEntity("PUBLIC.BOOKS.\"Celebrity Updates\"").orElseThrow();
+    assertThat(celebrityUpdates.hasSupertype(), is(true));
+    assertThat(celebrityUpdates.getSupertype().getFullName(), is("PUBLIC.BOOKS.\"Celebrities\""));
+    assertThat(celebrityUpdates.getIdentifyingRelationship().getName(), is("SYS_FK_10131"));
+
+    final ManyToManyRelationship bookAuthors =
+        (ManyToManyRelationship)
+            erModel.lookupRelationship("PUBLIC.BOOKS.BOOKAUTHORS").orElseThrow();
+    assertThat(bookAuthors.getLeftEntity().getFullName(), is("PUBLIC.BOOKS.AUTHORS"));
+    assertThat(bookAuthors.getRightEntity().getFullName(), is("PUBLIC.BOOKS.BOOKS"));
+    assertThat(bookAuthors.getBridgeTable().getFullName(), is("PUBLIC.BOOKS.BOOKAUTHORS"));
+    assertThat(erModel.lookupByBridgeTable(bookAuthors.getBridgeTable()).isPresent(), is(true));
+
+    for (final Entity entity : erModel.getEntities()) {
+      for (final EntityAttribute entityAttribute : entity.getEntityAttributes()) {
+        assertThat(entityAttribute.getParent().getTable(), is(entity.getTable()));
+      }
+    }
   }
 }

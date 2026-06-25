@@ -18,7 +18,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import schemacrawler.schema.DatabaseObject;
 
 class DatabaseObjectReference<D extends DatabaseObject> implements Serializable {
@@ -89,7 +88,7 @@ class DatabaseObjectReference<D extends DatabaseObject> implements Serializable 
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     requireNonNull(in, "No input stream provided");
     partial = (D) in.readObject();
-    databaseObjectRef = new WeakReference<>((D) in.readObject());
+    databaseObjectRef = new SoftReference<>((D) in.readObject());
   }
 
   /**
@@ -100,6 +99,6 @@ class DatabaseObjectReference<D extends DatabaseObject> implements Serializable 
   private void writeObject(final ObjectOutputStream out) throws IOException {
     requireNonNull(out, "No output stream provided");
     out.writeObject(partial);
-    out.writeObject(databaseObjectRef.get());
+    out.writeObject(get());
   }
 }
