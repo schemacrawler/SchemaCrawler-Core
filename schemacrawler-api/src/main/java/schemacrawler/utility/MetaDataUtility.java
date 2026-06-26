@@ -26,6 +26,7 @@ import schemacrawler.schema.JavaSqlTypeGroup;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Procedure;
+import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
@@ -127,6 +128,9 @@ public final class MetaDataUtility {
   public static String getTypeName(final NamedObject namedObject) {
     if (namedObject instanceof final TypedObject<?> typedObject) {
       return typedObject.getType().toString();
+    }
+    if (namedObject instanceof Schema) {
+      return "schema";
     }
     if (!(namedObject instanceof final DatabaseObject databaseObject)) {
       return "";

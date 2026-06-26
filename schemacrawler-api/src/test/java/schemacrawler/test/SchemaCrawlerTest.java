@@ -526,6 +526,7 @@ public class SchemaCrawlerTest {
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(5));
       for (final Schema schema : schemas) {
+        assertThat(MetaDataUtility.getTypeName(schema), is("schema"));
         final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
         Arrays.sort(tables, NamedObjectSort.alphabetical);
         for (final Table table : tables) {
