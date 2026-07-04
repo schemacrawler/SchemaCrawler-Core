@@ -14,6 +14,7 @@ import static schemacrawler.ermodel.model.RelationshipCardinality.one_many;
 import static schemacrawler.ermodel.model.RelationshipCardinality.zero_many;
 import static schemacrawler.utility.MetaDataUtility.getSimpleTypeName;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -126,7 +127,7 @@ public abstract class AbstractTextSupport extends AbstractExecutionState {
     if (namedObject == null) {
       return "";
     }
-    return namedObject.getName().replace("\"", "");
+    return trimToEmpty(namedObject.getName()).replace("\"", "");
   }
 
   /**
