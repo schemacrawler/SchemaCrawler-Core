@@ -131,21 +131,6 @@ public abstract class AbstractTextSupport extends AbstractExecutionState {
   }
 
   /**
-   * Gets the column references of a foreign key.
-   *
-   * @param foreignKey Foreign key
-   * @return Column references, or an empty list when none are available
-   */
-  public List<ColumnReference> columnReferences(final ForeignKey foreignKey) {
-    final List<ColumnReference> refs = new ArrayList<>();
-    if (foreignKey == null || foreignKey.getColumnReferences() == null) {
-      return refs;
-    }
-    refs.addAll(foreignKey.getColumnReferences());
-    return refs;
-  }
-
-  /**
    * Gets the columns of an index as a quoted, comma-separated string.
    *
    * @param index Index
@@ -231,7 +216,7 @@ public abstract class AbstractTextSupport extends AbstractExecutionState {
    * @param dbObject Database object
    * @return {@code true} when the object has a user-visible name
    */
-  public boolean hasName(final DatabaseObject dbObject) {
+  public boolean hasUserDefinedName(final DatabaseObject dbObject) {
     return !MetaDataUtility.hasSystemGeneratedName(dbObject);
   }
 
@@ -297,12 +282,23 @@ public abstract class AbstractTextSupport extends AbstractExecutionState {
   }
 
   /**
-   * Puts remarks on a single line.
+   * Gets the simple type name of a database object (for example, {@code TABLE} or {@code VIEW}).
+   *
+   * @param dbObject Database object
+   * @return Simple type name
+   */
+  public String simpleTypeName(final DatabaseObject dbObject) {
+    return MetaDataUtility.getSimpleTypeName(dbObject).toString();
+  }
+
+  /**
+   * Puts remarks on a single line, normalizing line breaks to spaces and replacing double quotes
+   * with single quotes.
    *
    * @param describedObject Object with remarks
    * @return Remarks on a single line
    */
-  public String remarks(final DescribedObject describedObject) {
+  public String singleLineRemarks(final DescribedObject describedObject) {
     if (describedObject == null || !describedObject.hasRemarks()) {
       return "";
     }
@@ -319,7 +315,7 @@ public abstract class AbstractTextSupport extends AbstractExecutionState {
     if (namedObject == null) {
       return "";
     }
-    return namedObject.getName().replace("[^\\d\\w\\-]", "");
+    return namedObject.getName().replaceAll("(?U)[^\\d\\w\\-]", "");
   }
 
   /**
@@ -342,16 +338,6 @@ public abstract class AbstractTextSupport extends AbstractExecutionState {
       }
     }
     return null;
-  }
-
-  /**
-   * Gets the simple type name of a table (for example, {@code TABLE} or {@code VIEW}).
-   *
-   * @param table Table
-   * @return Simple type name
-   */
-  public String type(final DatabaseObject table) {
-    return MetaDataUtility.getSimpleTypeName(table).toString();
   }
 
   /**
