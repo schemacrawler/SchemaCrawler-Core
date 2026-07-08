@@ -14,7 +14,6 @@ import static schemacrawler.ermodel.model.RelationshipCardinality.one_many;
 import static schemacrawler.ermodel.model.RelationshipCardinality.zero_many;
 import static schemacrawler.utility.MetaDataUtility.getSimpleTypeName;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
-import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +23,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static us.fatehi.utility.Utility.trimToEmpty;
+
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.Relationship;
@@ -338,6 +340,16 @@ public abstract class AbstractTextSupport extends AbstractExecutionState {
       }
     }
     return null;
+  }
+
+  /**
+   * Gets the type name of a database object (for example, {@code TABLE} or {@code VIEW}).
+   *
+   * @param dbObject Database object
+   * @return Simple type name
+   */
+  public String typeName(final DatabaseObject dbObject) {
+    return MetaDataUtility.getTypeName(dbObject).toString();
   }
 
   /**
