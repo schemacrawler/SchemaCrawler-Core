@@ -350,7 +350,7 @@ public abstract class AbstractTextSupport extends AbstractExecutionState {
    * @param table Table
    * @return Simple type name
    */
-  public String type(final Table table) {
+  public String type(final DatabaseObject table) {
     return MetaDataUtility.getSimpleTypeName(table).toString();
   }
 
