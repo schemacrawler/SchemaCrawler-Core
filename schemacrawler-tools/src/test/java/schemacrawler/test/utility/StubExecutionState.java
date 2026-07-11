@@ -16,13 +16,13 @@ import schemacrawler.schema.Catalog;
 import schemacrawler.tools.state.AbstractExecutionState;
 
 /** Minimal execution state, holding just a catalog and an optional ER model, for tests. */
-final class StubExecutionState extends AbstractExecutionState {
+public final class StubExecutionState extends AbstractExecutionState {
 
-  StubExecutionState(final Catalog catalog) {
+  public StubExecutionState(final Catalog catalog) {
     this(catalog, ERModelBuilder.builder(catalog).build());
   }
 
-  StubExecutionState(final Catalog catalog, final ERModel erModel) {
+  public StubExecutionState(final Catalog catalog, final ERModel erModel) {
     requireNonNull(catalog, "No catalog provided");
     requireNonNull(erModel, "No ER model provided");
     setCatalog(catalog);
