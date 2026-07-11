@@ -16,11 +16,11 @@ import us.fatehi.utility.string.StringFormat;
 public enum IndexColumnSortSequence {
 
   /** Unknown */
-  unknown("unknown"),
+  unknown("unknown", ""),
   /** Ascending. */
-  ascending("A"),
+  ascending("A", "ASC"),
   /** Descending. */
-  descending("D");
+  descending("D", "DESC");
 
   private static final Logger LOGGER = Logger.getLogger(IndexColumnSortSequence.class.getName());
 
@@ -41,9 +41,20 @@ public enum IndexColumnSortSequence {
   }
 
   private final String code;
+  private final String keyword;
 
-  IndexColumnSortSequence(final String code) {
+  IndexColumnSortSequence(final String code, final String keyword) {
     this.code = code;
+    this.keyword = keyword;
+  }
+
+  /**
+   * Index sort sequence keyword.
+   *
+   * @return Index sort sequence keyword
+   */
+  public String getKeyword() {
+    return keyword;
   }
 
   /**

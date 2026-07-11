@@ -29,7 +29,6 @@ import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObject;
@@ -178,31 +177,6 @@ public class AbstractTextSupportTest {
   }
 
   @Test
-  public void columnReferences() {
-    assertThat(support.columnReferences(null).isEmpty(), is(true));
-
-    // FK with null column references list (via mock)
-    final ForeignKey foreignKeyNullReferences = mock(ForeignKey.class);
-    when(foreignKeyNullReferences.getColumnReferences()).thenReturn(null);
-    assertThat(support.columnReferences(foreignKeyNullReferences).isEmpty(), is(true));
-
-    // LightForeignKey with no column references (table-level constructor)
-    final LightTable fkTable = new LightTable("fk_table");
-    final LightTable pkTable = new LightTable("pk_table");
-    final LightForeignKey emptyFk = new LightForeignKey("FK_NAME", fkTable, pkTable);
-    assertThat(support.columnReferences(emptyFk).isEmpty(), is(true));
-
-    // LightForeignKey with a column reference
-    final LightColumn fkColumn = fkTable.addColumn("fk_col");
-    final LightColumn pkColumn = pkTable.addColumn("pk_col");
-    final LightForeignKey fkWithRef = new LightForeignKey("FK_NAME", fkColumn, pkColumn);
-    final List<ColumnReference> refs = support.columnReferences(fkWithRef);
-    assertThat(refs.size(), is(1));
-    assertThat(refs.get(0).getForeignKeyColumn().getName(), is("fk_col"));
-    assertThat(refs.get(0).getPrimaryKeyColumn().getName(), is("pk_col"));
-  }
-
-  @Test
   public void columns() {
     assertThat(support.columns((Index) null), is(""));
     assertThat(support.columns((PrimaryKey) null), is(""));
@@ -282,21 +256,21 @@ public class AbstractTextSupportTest {
     final LightTable fkTable = new LightTable("fk_table");
     final LightTable pkTable = new LightTable("pk_table");
     final LightForeignKey systemFk = new LightForeignKey("SYS_C00001", fkTable, pkTable);
-    assertThat(support.hasName(systemFk), is(false));
+    assertThat(support.hasUserDefinedName(systemFk), is(false));
   }
 
   @Test
-  public void hasName() {
+  public void hasUserDefinedName() {
 
     final ForeignKey fk = mock(ForeignKey.class);
     when(fk.getName()).thenReturn("FK_TABLE_OTHER");
 
-    assertThat(support.hasName(fk), is(true));
+    assertThat(support.hasUserDefinedName(fk), is(true));
 
     final LightTable table = new LightTable("PK_TABLE");
     final PrimaryKey pk = new LightPrimaryKey(table.addColumn("PKCOL"));
 
-    assertThat(support.hasName(pk), is(true));
+    assertThat(support.hasUserDefinedName(pk), is(true));
   }
 
   @Test
@@ -410,22 +384,26 @@ public class AbstractTextSupportTest {
 
   @Test
   public void remarks() {
-    assertThat(support.remarks(null), is(""));
+    assertThat(support.singleLineRemarks(null), is(""));
 
     final LightTable noRemarksTable = new LightTable("t");
-    assertThat(support.remarks(noRemarksTable), is(""));
+    assertThat(support.singleLineRemarks(noRemarksTable), is(""));
 
     final LightTable tableWithRemarks = new LightTable("t");
     tableWithRemarks.setRemarks("  line1\n\"line2\"  ");
-    assertThat(support.remarks(tableWithRemarks), is("line1 'line2'"));
+    assertThat(support.singleLineRemarks(tableWithRemarks), is("line1 'line2'"));
   }
 
   @Test
   public void stripName() {
     assertThat(support.stripName(null), is(""));
 
-    final NamedObject namedObject = lightNamedObject(NamedObject.class, "abc[^\\d\\w\\-]xyz");
-    assertThat(support.stripName(namedObject), is("abcxyz"));
+    final NamedObject namedObject = lightNamedObject(NamedObject.class, "abc xyz.123");
+    assertThat(support.stripName(namedObject), is("abcxyz123"));
+
+    // Unicode word characters (Greek) should be preserved
+    final NamedObject greekObject = lightNamedObject(NamedObject.class, "ΤΊΤΛΟΣ");
+    assertThat(support.stripName(greekObject), is("ΤΊΤΛΟΣ"));
   }
 
   @Test
@@ -461,9 +439,9 @@ public class AbstractTextSupportTest {
   @Test
   public void type() {
     // getSimpleTypeName(null) returns "unknown", no NPE
-    assertThat(support.type(null), is("unknown"));
+    assertThat(support.simpleTypeName(null), is("unknown"));
 
     final LightTable lightTable = new LightTable("t");
-    assertThat(support.type(lightTable), is("table"));
+    assertThat(support.simpleTypeName(lightTable), is("table"));
   }
 }

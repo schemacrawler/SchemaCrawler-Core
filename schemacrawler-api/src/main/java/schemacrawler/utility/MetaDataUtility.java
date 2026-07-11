@@ -149,7 +149,7 @@ public final class MetaDataUtility {
    * @return true if the name matches any of the patterns, false otherwise
    */
   public static boolean hasSystemGeneratedName(final DatabaseObject dbObject) {
-    if (dbObject == null || dbObject.getName().isEmpty()) {
+    if (dbObject == null || isBlank(dbObject.getName())) {
       return false;
     }
     for (final Pattern pattern : SYSTEM_GENERATED_NAME_PATTERNS) {
