@@ -2,6 +2,16 @@
 
 SchemaCrawler Core release notes.
 
+
+<a name="v17.11.6"></a>
+## Release 17.11.6 - 2026-07-15
+
+- Set better default title for SchemaCrawler Scribe
+- Add Portuguese translation to SchemaCrawler Scribe
+- Show SchemaCrawler Scribe lints report sorted by severity
+- Show table lints in SchemaCrawler Scribe
+
+
 <a name="v17.11.4"></a>
 ## Release 17.11.4 - 2026-06-24
 
