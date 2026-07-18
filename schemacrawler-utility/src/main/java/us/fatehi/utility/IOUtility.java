@@ -26,6 +26,7 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.ioresource.ClasspathInputResource;
@@ -99,6 +100,17 @@ public final class IOUtility {
         && exists(parentPath)
         && isDirectory(parentPath)
         && isWritable(parentPath);
+  }
+
+  /**
+   * Returns true if dir refers to a directory that is outside the current working directory (i.e.
+   * not the CWD itself and not any subdirectory of it).
+   */
+  public static boolean isOutsideWorkingDirectory(final Path dir) {
+    final Path cwd = normalize(Paths.get(""));
+    final Path absDir = normalize(dir);
+    final boolean inside = absDir.equals(cwd) || absDir.startsWith(cwd);
+    return !inside;
   }
 
   /**
@@ -193,19 +205,24 @@ public final class IOUtility {
     if (isBlank(filename)) {
       throw new IllegalArgumentException("Bad filename <%s>".formatted(filename));
     }
-
-    final Path absoluteParentPath = parentPath.normalize().toAbsolutePath();
-    if (!isDirectory(absoluteParentPath) && !isWritable(absoluteParentPath)) {
-      throw new IllegalArgumentException("Bad parent path <%s>".formatted(absoluteParentPath));
+    if (isOutsideWorkingDirectory(parentPath)) {
+      LOGGER.log(
+          Level.SEVERE,
+          "Attempt to write outside current working directory to path <%s>".formatted(parentPath));
     }
 
-    final Path filePath = parentPath.resolve(filename).normalize().toAbsolutePath();
+    final Path absoluteParentPath = normalize(parentPath);
+    final Path filePath = normalize(parentPath.resolve(filename));
     if (!filePath.startsWith(absoluteParentPath)) {
       throw new UncheckedIOException(
           new IOException("Resolved output path escapes parent <%s>".formatted(filePath)));
     }
 
     return filePath;
+  }
+
+  private static Path normalize(final Path parentPath) {
+    return parentPath.toAbsolutePath().normalize();
   }
 
   private IOUtility() {

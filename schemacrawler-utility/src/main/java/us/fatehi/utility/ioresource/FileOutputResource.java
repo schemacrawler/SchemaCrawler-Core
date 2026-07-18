@@ -22,6 +22,7 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import us.fatehi.utility.IOUtility;
 import us.fatehi.utility.string.StringFormat;
 
 public final class FileOutputResource implements OutputResource {
@@ -47,6 +48,12 @@ public final class FileOutputResource implements OutputResource {
       openOptions = new OpenOption[] {WRITE, CREATE, APPEND};
     } else {
       openOptions = new OpenOption[] {WRITE, CREATE, TRUNCATE_EXISTING};
+    }
+    if (IOUtility.isOutsideWorkingDirectory(outputFile)) {
+      LOGGER.log(
+          Level.SEVERE,
+          new StringFormat(
+              "Attempt to write file outside of current working directory <%s>", outputFile));
     }
     final Writer writer = newBufferedWriter(outputFile, charset, openOptions);
     LOGGER.log(Level.FINE, new StringFormat("Opened output writer to file <%s>", outputFile));
