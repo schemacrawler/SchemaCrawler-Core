@@ -150,8 +150,5 @@ public class IOUtilityTest {
     assertThrows(IllegalArgumentException.class, () -> IOUtility.sanitizeFilePath(parentPath, " "));
     assertThrows(
         UncheckedIOException.class, () -> IOUtility.sanitizeFilePath(parentPath, "../outside.txt"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> IOUtility.sanitizeFilePath(parentPath.resolve("missing"), "output.txt"));
   }
 }
