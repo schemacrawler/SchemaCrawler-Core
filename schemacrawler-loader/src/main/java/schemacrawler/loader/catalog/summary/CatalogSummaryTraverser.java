@@ -10,18 +10,11 @@ package schemacrawler.loader.catalog.summary;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import schemacrawler.loader.catalog.summary.CatalogSummaryHandler.CatalogCounts;
-import schemacrawler.loader.catalog.summary.CatalogSummaryHandler.SchemaCounts;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.Schema;
 
 /**
- * Drives a {@link CatalogSummaryHandler} over every schema in a catalog. Pre-computes {@link
- * SchemaCounts} for each schema in a single pass, derives {@link CatalogCounts} from those totals,
- * then invokes the handler methods in order.
+ * Drives a {@link CatalogSummaryHandler} over every schema in a catalog using precomputed {@link
+ * CatalogStats}.
  */
 final class CatalogSummaryTraverser {
 
@@ -50,18 +43,12 @@ final class CatalogSummaryTraverser {
     requireNonNull(catalog, "No catalog provided");
     requireNonNull(handler, "No handler provided");
 
-    final Collection<Schema> schemas = catalog.getSchemas();
-    final List<Schema> schemaList = new ArrayList<>(schemas);
-    final List<SchemaCounts> allCounts = new ArrayList<>(schemaList.size());
-    for (final Schema schema : schemaList) {
-      allCounts.add(SchemaCounts.from(catalog, schema));
-    }
-    final CatalogCounts catalogCounts = CatalogCounts.from(allCounts);
+    final CatalogStats catalogStats = CatalogStatsUtility.from(catalog);
 
     handler.begin();
-    handler.handleHeader(catalog.getName(), catalog.getCrawlInfo(), catalogCounts);
-    for (int i = 0; i < schemaList.size(); i++) {
-      handler.handleSchema(schemaList.get(i), allCounts.get(i));
+    handler.handleHeader(catalogStats);
+    for (final CatalogStats.SchemaStats schemaStats : catalogStats.schemas()) {
+      handler.handleSchema(schemaStats);
     }
     handler.end();
   }

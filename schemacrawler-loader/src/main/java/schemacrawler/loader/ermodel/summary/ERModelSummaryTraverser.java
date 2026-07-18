@@ -11,12 +11,9 @@ package schemacrawler.loader.ermodel.summary;
 import static java.util.Objects.requireNonNull;
 
 import schemacrawler.ermodel.model.ERModel;
-import schemacrawler.loader.ermodel.summary.ERModelSummaryHandler.EntityCounts;
-import schemacrawler.loader.ermodel.summary.ERModelSummaryHandler.RelationshipCounts;
 
 /**
- * Drives an {@link ERModelSummaryHandler} over an ER model. Iterates entities and relationships
- * once each, derives aggregate counts, then invokes the handler methods in order.
+ * Drives an {@link ERModelSummaryHandler} over an ER model using precomputed {@link ERModelStats}.
  */
 public final class ERModelSummaryTraverser {
 
@@ -45,14 +42,10 @@ public final class ERModelSummaryTraverser {
     requireNonNull(erModel, "No ER model provided");
     requireNonNull(handler, "No handler provided");
 
-    final EntityCounts entityCounts = EntityCounts.from(erModel.getEntities());
-    final RelationshipCounts relationshipCounts =
-        RelationshipCounts.from(erModel.getRelationships());
-    final int implicitCount = erModel.getImplicitRelationships().size();
-    final int unmodeledCount = erModel.getUnmodeledTables().size();
+    final ERModelStats erModelStats = ERModelStatsUtility.from(erModel);
 
     handler.begin();
-    handler.handleERModel(entityCounts, relationshipCounts, implicitCount, unmodeledCount);
+    handler.handleERModel(erModelStats);
     handler.end();
   }
 

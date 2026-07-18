@@ -24,11 +24,10 @@ final class YamlERModelSummaryHandler implements ERModelSummaryHandler {
   }
 
   @Override
-  public void handleERModel(
-      final EntityCounts entityCounts,
-      final RelationshipCounts relationshipCounts,
-      final int implicitRelationshipCount,
-      final int unmodeledTableCount) {
+  public void handleERModel(final ERModelStats erModelStats) {
+    final ERModelStats.EntityCounts entityCounts = erModelStats.entityCounts();
+    final ERModelStats.RelationshipCounts relationshipCounts = erModelStats.relationshipCounts();
+
     sb.append("ermodel:\n");
     sb.append("  entities:\n");
     count("    ", "count", entityCounts.count());
@@ -46,9 +45,9 @@ final class YamlERModelSummaryHandler implements ERModelSummaryHandler {
     count("    ", "many-to-many", relationshipCounts.manyMany());
     count("    ", "unknown", relationshipCounts.unknown());
     sb.append("  implicit-relationships:\n");
-    count("    ", "count", implicitRelationshipCount);
+    count("    ", "count", erModelStats.implicitRelationshipCount());
     sb.append("  unmodeled-tables:\n");
-    count("    ", "count", unmodeledTableCount);
+    count("    ", "count", erModelStats.unmodeledTableCount());
   }
 
   String getYaml() {
