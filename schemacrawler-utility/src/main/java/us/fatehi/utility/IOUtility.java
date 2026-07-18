@@ -16,12 +16,14 @@ import static java.nio.file.Files.isReadable;
 import static java.nio.file.Files.isRegularFile;
 import static java.nio.file.Files.isWritable;
 import static java.nio.file.Files.size;
+import static java.util.Objects.requireNonNull;
 import static java.util.UUID.randomUUID;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.logging.Level;
@@ -171,6 +173,39 @@ public final class IOUtility {
       LOGGER.log(Level.FINE, e.getMessage(), e);
       return "";
     }
+  }
+
+  /**
+   * Resolves a candidate output path under a trusted parent directory and blocks path traversal.
+   *
+   * <p>This method is used to enforce a write boundary. If the resolved path escapes {@code
+   * parentPath} (for example via {@code ../}), it throws {@link UncheckedIOException} immediately
+   * because this is a security violation, not a recoverable formatting issue.
+   *
+   * @param parentPath Trusted parent directory for output files
+   * @param filename Candidate file path relative to {@code parentPath}
+   * @return Absolute normalized path, guaranteed to remain under {@code parentPath}
+   * @throws IllegalArgumentException If the parent path or filename is invalid
+   * @throws UncheckedIOException If the resolved path escapes {@code parentPath}
+   */
+  public static Path sanitizeFilePath(final Path parentPath, final String filename) {
+    requireNonNull(parentPath, "No parent path provided");
+    if (isBlank(filename)) {
+      throw new IllegalArgumentException("Bad filename <%s>".formatted(filename));
+    }
+
+    final Path absoluteParentPath = parentPath.normalize().toAbsolutePath();
+    if (!isDirectory(absoluteParentPath) && !isWritable(absoluteParentPath)) {
+      throw new IllegalArgumentException("Bad parent path <%s>".formatted(absoluteParentPath));
+    }
+
+    final Path filePath = parentPath.resolve(filename).normalize().toAbsolutePath();
+    if (!filePath.startsWith(absoluteParentPath)) {
+      throw new UncheckedIOException(
+          new IOException("Resolved output path escapes parent <%s>".formatted(filePath)));
+    }
+
+    return filePath;
   }
 
   private IOUtility() {

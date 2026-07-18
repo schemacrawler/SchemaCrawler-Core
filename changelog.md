@@ -3,13 +3,16 @@
 SchemaCrawler Core release notes.
 
 
-<a name="v17.11.6"></a>
-## Release 17.11.6 - 2026-07-15
+<a name="v17.12.2"></a>
+## Release v17.12.2 - 2026-07-18
 
-- Set better default title for SchemaCrawler Scribe
-- Add Portuguese translation to SchemaCrawler Scribe
-- Show SchemaCrawler Scribe lints report sorted by severity
-- Show table lints in SchemaCrawler Scribe
+- Add a security check to make sure that output files cannot be created outside of the current working directory
+
+
+<a name="v17.12.1"></a>
+## Release v17.12.1 - 2026-07-10
+
+- Support SchemaCrawler Scribe release
 
 
 <a name="v17.11.4"></a>

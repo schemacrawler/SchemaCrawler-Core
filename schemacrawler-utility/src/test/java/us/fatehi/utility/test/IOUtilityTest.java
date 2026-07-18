@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,6 +34,14 @@ import us.fatehi.utility.LoggingConfig;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class IOUtilityTest {
+
+  @Test
+  public void classpathResourceAvailable() throws IOException {
+    final String classpathResource = "/test-resource.txt";
+    assertThat(IOUtility.locateResource(classpathResource), is(not(nullValue())));
+    assertThat(
+        IOUtility.locateResource(classpathResource).toExternalForm(), endsWith(classpathResource));
+  }
 
   @Test
   public void createTempFilePath() throws IOException {
@@ -107,6 +117,12 @@ public class IOUtilityTest {
   }
 
   @Test
+  public void noClasspathResource() {
+    assertThat(IOUtility.locateResource("no_resource"), is(nullValue()));
+    assertThat(IOUtility.locateResource(null), is(nullValue()));
+  }
+
+  @Test
   public void readFully() throws IOException {
     assertThat(IOUtility.readFully((Reader) null), is(""));
 
@@ -125,16 +141,17 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void noClasspathResource() {
-    assertThat(IOUtility.locateResource("no_resource"), is(nullValue()));
-    assertThat(IOUtility.locateResource(null), is(nullValue()));
-  }
+  public void sanitizeFilePath() throws IOException {
+    final Path parentPath = Files.createTempDirectory("sc-parent");
 
-  @Test
-  public void classpathResourceAvailable() throws IOException {
-    final String classpathResource = "/test-resource.txt";
-    assertThat(IOUtility.locateResource(classpathResource), is(not(nullValue())));
-    assertThat(
-        IOUtility.locateResource(classpathResource).toExternalForm(), endsWith(classpathResource));
+    final Path filePath = IOUtility.sanitizeFilePath(parentPath, "nested/output.txt");
+    assertThat(filePath, is(parentPath.resolve("nested/output.txt").normalize().toAbsolutePath()));
+
+    assertThrows(IllegalArgumentException.class, () -> IOUtility.sanitizeFilePath(parentPath, " "));
+    assertThrows(
+        UncheckedIOException.class, () -> IOUtility.sanitizeFilePath(parentPath, "../outside.txt"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> IOUtility.sanitizeFilePath(parentPath.resolve("missing"), "output.txt"));
   }
 }
