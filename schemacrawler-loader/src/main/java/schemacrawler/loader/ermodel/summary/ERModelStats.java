@@ -42,6 +42,17 @@ public record ERModelStats(
       int nonEntities,
       int unknown) {}
 
+  /**
+   * Counts of relationships by cardinality.
+   *
+   * @param count total number of relationships
+   * @param oneOne one-to-one relationships
+   * @param oneMany one-to-many relationships
+   * @param zeroOne zero-or-one (optional-one) relationships
+   * @param zeroMany zero-or-many (optional-many) relationships
+   * @param manyMany many-to-many relationships
+   * @param unknown relationships whose cardinality could not be determined
+   */
   public record RelationshipCounts(
       int count, int oneOne, int oneMany, int zeroOne, int zeroMany, int manyMany, int unknown) {}
 }
