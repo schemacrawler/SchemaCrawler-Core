@@ -9,7 +9,6 @@
 package schemacrawler.loader.catalog.summary;
 
 import schemacrawler.schema.CrawlInfo;
-import schemacrawler.schema.Schema;
 
 /** Produces a valid, parseable YAML summary of a catalog. */
 final class YamlCatalogSummaryHandler implements CatalogSummaryHandler {
@@ -41,9 +40,11 @@ final class YamlCatalogSummaryHandler implements CatalogSummaryHandler {
   }
 
   @Override
-  public void handleHeader(
-      final String catalogName, final CrawlInfo crawlInfo, final CatalogCounts counts) {
-    sb.append("catalog: ").append(catalogName).append("\n");
+  public void handleHeader(final CatalogStats catalogStats) {
+    final CrawlInfo crawlInfo = catalogStats.crawlInfo();
+    final CatalogStats.CatalogCounts counts = catalogStats.counts();
+
+    sb.append("catalog: ").append(catalogStats.catalogName()).append("\n");
     sb.append("crawl-info:\n");
     entry("  ", "generated-by", crawlInfo.getSchemaCrawlerVersion());
     entry("  ", "generated-on", crawlInfo.getCrawlTimestamp());
@@ -63,9 +64,11 @@ final class YamlCatalogSummaryHandler implements CatalogSummaryHandler {
   }
 
   @Override
-  public void handleSchema(final Schema schema, final SchemaCounts c) {
-    sb.append("  - id: ").append(schema.key().slug()).append("\n");
-    entry("    ", "name", schema.getFullName());
+  public void handleSchema(final CatalogStats.SchemaStats schemaStats) {
+    final CatalogStats.SchemaCounts c = schemaStats.counts();
+
+    sb.append("  - id: ").append(schemaStats.schema().key().slug()).append("\n");
+    entry("    ", "name", schemaStats.schema().getFullName());
     sb.append("    data-types:\n");
     count("      ", "count", c.dataTypes().count());
     appendTableCounts(c.tables());
@@ -80,7 +83,7 @@ final class YamlCatalogSummaryHandler implements CatalogSummaryHandler {
     return sb.toString();
   }
 
-  private void appendRoutineCounts(final RoutineCounts routines) {
+  private void appendRoutineCounts(final CatalogStats.RoutineCounts routines) {
     sb.append("    routines:\n");
     count("      ", "count", routines.count());
     if (routines.count() > 0) {
@@ -90,7 +93,7 @@ final class YamlCatalogSummaryHandler implements CatalogSummaryHandler {
     }
   }
 
-  private void appendTableCounts(final TableCounts tables) {
+  private void appendTableCounts(final CatalogStats.TableCounts tables) {
     sb.append("    tables:\n");
     count("      ", "count", tables.count());
     if (tables.count() > 0) {
