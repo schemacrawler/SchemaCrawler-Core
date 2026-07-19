@@ -16,7 +16,7 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class TableRowCountsUtility {
 
-  private static final int UNKNOWN_TABLE_ROW_COUNT = -1;
+  private static final long UNKNOWN_TABLE_ROW_COUNT = -1L;
   public static final String TABLE_ROW_COUNT_KEY = "schemacrawler.table.row_count";
 
   public static long getRowCount(final Table table) {
@@ -24,7 +24,7 @@ public final class TableRowCountsUtility {
       return UNKNOWN_TABLE_ROW_COUNT;
     }
 
-    return table.getAttribute(TABLE_ROW_COUNT_KEY, (long) UNKNOWN_TABLE_ROW_COUNT);
+    return table.getAttribute(TABLE_ROW_COUNT_KEY, UNKNOWN_TABLE_ROW_COUNT);
   }
 
   /**
