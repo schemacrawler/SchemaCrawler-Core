@@ -10,8 +10,6 @@ package us.fatehi.utility.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A lightweight wrapper around a JDBC {@link ResultSet} that iterates over rows and returns each
@@ -57,25 +55,6 @@ public final class DataResultSet extends AbstractDataResultSet {
       return false;
     }
     return advanceNext();
-  }
-
-  /**
-   * Reads all columns of the current row and returns data as a list.
-   *
-   * @return a list whose entries are {@code null} (SQL NULL), {@link
-   *     ColumnDataIndicator.BINARY_DATA} (unread binary/LOB), {@link
-   *     ColumnDataIndicator.ERROR_DATA} (read error), or the column value
-   * @throws SQLException if advancing within the result set fails (individual column errors are
-   *     caught and represented as {@link ErrorDataIndicator#INSTANCE})
-   */
-  @Override
-  public List<Object> row() throws SQLException {
-    final int columnCount = getColumnNames().size();
-    final List<Object> currentRow = new ArrayList<>(columnCount);
-    for (int i = 1; i <= columnCount; i++) {
-      currentRow.add(readColumnData(i));
-    }
-    return currentRow;
   }
 
   public void setMaxRows(final int maxRows) {

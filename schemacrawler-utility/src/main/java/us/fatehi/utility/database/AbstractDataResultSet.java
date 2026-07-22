@@ -87,8 +87,7 @@ public abstract class AbstractDataResultSet implements AutoCloseable {
    * @return a list whose entries are {@code null} (SQL NULL), {@link
    *     ColumnDataIndicator.BINARY_DATA} (unread binary/LOB), {@link
    *     ColumnDataIndicator.ERROR_DATA} (read error), or the column value
-   * @throws SQLException if advancing within the result set fails (individual column errors are
-   *     caught and represented as {@link ErrorDataIndicator#INSTANCE})
+   * @throws SQLException if accessing the result set fails
    */
   public List<Object> row() throws SQLException {
     final int columnCount = columnNames.size();
