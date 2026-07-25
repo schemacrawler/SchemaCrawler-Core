@@ -99,6 +99,7 @@ public class SnowflakeContainer extends JdbcDatabaseContainer<SnowflakeContainer
     }
     addEnv("SERVICES", "snowflake");
     addEnv("EAGER_SERVICE_LOADING", "1");
+    addEnv("DEBUG", "1");
     addEnv("LOCALSTACK_AUTH_TOKEN", requireAuthToken());
     waitingFor(
         new LogMessageWaitStrategy()
