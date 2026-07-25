@@ -18,6 +18,7 @@ import org.testcontainers.utility.DockerImageName;
 
 public class SnowflakeContainer extends JdbcDatabaseContainer<SnowflakeContainer> {
 
+  private static final String LOCALSTACK_AUTH_TOKEN = "LOCALSTACK_AUTH_TOKEN";
   private static final int EDGE_PORT = 4566;
   private static final int HTTPS_PORT = 443;
   private static final int SERVICE_PORT_START = 4510;
@@ -43,7 +44,7 @@ public class SnowflakeContainer extends JdbcDatabaseContainer<SnowflakeContainer
   @Override
   public String getJdbcUrl() {
     return "jdbc:snowflake://%s:%d/?account=localstack"
-        .formatted(localstackSnowflakeHost(), getMappedPort(HTTPS_PORT));
+        .formatted(localstackSnowflakeHost(), getMappedPort(EDGE_PORT));
   }
 
   @Override
@@ -100,7 +101,7 @@ public class SnowflakeContainer extends JdbcDatabaseContainer<SnowflakeContainer
     addEnv("SERVICES", "snowflake");
     addEnv("EAGER_SERVICE_LOADING", "1");
     addEnv("DEBUG", "1");
-    addEnv("LOCALSTACK_AUTH_TOKEN", requireAuthToken());
+    addEnv(LOCALSTACK_AUTH_TOKEN, requireAuthToken());
     waitingFor(
         new LogMessageWaitStrategy()
             .withRegEx(".*Ready\\..*")
@@ -140,11 +141,11 @@ public class SnowflakeContainer extends JdbcDatabaseContainer<SnowflakeContainer
       return systemPropertyToken;
     }
 
-    final String localstackPropertyToken = System.getProperty("LOCALSTACK_AUTH_TOKEN");
+    final String localstackPropertyToken = System.getProperty(LOCALSTACK_AUTH_TOKEN);
     if (localstackPropertyToken != null && !localstackPropertyToken.isBlank()) {
       return localstackPropertyToken;
     }
 
-    return System.getenv("LOCALSTACK_AUTH_TOKEN");
+    return System.getenv(LOCALSTACK_AUTH_TOKEN);
   }
 }
