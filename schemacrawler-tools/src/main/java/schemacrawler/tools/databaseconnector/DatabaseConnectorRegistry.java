@@ -53,27 +53,60 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
 
     // Use thread-safe map
     final Map<String, DatabaseConnector> databaseConnectorRegistry = new ConcurrentHashMap<>();
+    final List<DatabaseConnector> databaseConnectors = new ArrayList<>();
+    final List<DatabaseConnectorBundle> databaseConnectorBundles = new ArrayList<>();
 
     try {
       final ServiceLoader<DatabaseConnector> serviceLoader =
           ServiceLoader.load(
               DatabaseConnector.class, DatabaseConnectorRegistry.class.getClassLoader());
       for (final DatabaseConnector databaseConnector : serviceLoader) {
+        if (databaseConnector instanceof final DatabaseConnectorBundle databaseConnectorBundle) {
+          databaseConnectorBundles.add(databaseConnectorBundle);
+        } else {
+          databaseConnectors.add(databaseConnector);
+        }
+      }
+    } catch (final Exception | ServiceConfigurationError | LinkageError e) {
+      // Catch errors for missing third-party jars;
+      // other errors (e.g. OutOfMemoryError) are intentionally not caught here
+      throw new InternalRuntimeException("Could not load database connector registry", e);
+    }
+
+    for (final DatabaseConnector databaseConnector : databaseConnectors) {
+      final String databaseSystemIdentifier =
+          databaseConnector.getDatabaseServerType().getDatabaseSystemIdentifier();
+
+      LOGGER.log(
+          Level.CONFIG,
+          new StringFormat(
+              "Loading database connector, %s=%s",
+              databaseSystemIdentifier, databaseConnector.getClass().getName()));
+      databaseConnectorRegistry.put(databaseSystemIdentifier, databaseConnector);
+    }
+
+    for (final DatabaseConnectorBundle databaseConnectorBundle : databaseConnectorBundles) {
+      for (final DatabaseConnector databaseConnector :
+          databaseConnectorBundle.getDatabaseConnectors()) {
         final String databaseSystemIdentifier =
             databaseConnector.getDatabaseServerType().getDatabaseSystemIdentifier();
+
+        if (databaseConnectorRegistry.containsKey(databaseSystemIdentifier)) {
+          LOGGER.log(
+              Level.WARNING,
+              new StringFormat(
+                  "Skipping database connector, %s=%s (already registered)",
+                  databaseSystemIdentifier, databaseConnector.getClass().getName()));
+          continue;
+        }
 
         LOGGER.log(
             Level.CONFIG,
             new StringFormat(
                 "Loading database connector, %s=%s",
                 databaseSystemIdentifier, databaseConnector.getClass().getName()));
-        // Put in map
         databaseConnectorRegistry.put(databaseSystemIdentifier, databaseConnector);
       }
-    } catch (final Exception | ServiceConfigurationError | LinkageError e) {
-      // Catch errors for missing third-party jars;
-      // other errors (e.g. OutOfMemoryError) are intentionally not caught here
-      throw new InternalRuntimeException("Could not load database connector registry", e);
     }
 
     LOGGER.log(

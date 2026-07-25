@@ -47,7 +47,7 @@ public class AvailableRegistryPluginsTest {
   public void availableServers() {
     assertThat(
         getRegisteredPlugins(DatabaseConnectorRegistry.getDatabaseConnectorRegistry()),
-        arrayContainingInAnyOrder("test-db"));
+        arrayContainingInAnyOrder("test-db", "test-bundle-db"));
   }
 
   private String[] getRegisteredPlugins(final PluginRegistry registry) {
