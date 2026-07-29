@@ -46,7 +46,7 @@ public final class TestDatabaseConnector extends DatabaseConnector {
         .build();
   }
 
-  public TestDatabaseConnector() throws Exception {
+  public TestDatabaseConnector() {
     super(databaseConnectorOptions());
     forceInstantiationFailureIfConfigured();
   }

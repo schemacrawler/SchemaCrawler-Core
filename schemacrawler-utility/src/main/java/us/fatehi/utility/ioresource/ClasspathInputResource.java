@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.IOUtility.locateResource;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 
@@ -20,28 +19,20 @@ import java.net.URL;
  * Converts a provided classpath resource into an input resource. NOTE: Always assumes that
  * resources are absolute. Leading slashes are not required, but ignored if provided.
  */
-public class ClasspathInputResource extends BaseInputResource {
+public class ClasspathInputResource extends URLInputResource {
 
-  private final URL url;
-
-  public ClasspathInputResource(final String classpathResource) {
+  private static URL locateClasspathResource(final String classpathResource) {
     requireNonNull(classpathResource, "No classpath resource provided");
-    url = locateResource(classpathResource);
+    final URL url = locateResource(classpathResource);
     if (url == null) {
       final IOException e =
           new IOException("Cannot read classpath resource, <%s>".formatted(classpathResource));
       throw new UncheckedIOException(e);
     }
+    return url;
   }
 
-  @Override
-  public InputStream openNewInputStream() throws IOException {
-    final InputStream inputStream = url.openStream();
-    return inputStream;
-  }
-
-  @Override
-  public String toString() {
-    return url.toExternalForm();
+  public ClasspathInputResource(final String classpathResource) {
+    super(locateClasspathResource(classpathResource));
   }
 }

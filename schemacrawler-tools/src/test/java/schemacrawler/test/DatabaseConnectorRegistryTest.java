@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -24,6 +25,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.test.utility.TestDatabaseConnector;
+import schemacrawler.test.utility.TestDatabaseConnectorBundle;
 import schemacrawler.tools.databaseconnector.DatabaseConnector;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
 import schemacrawler.tools.executable.commandline.PluginCommand;
@@ -40,15 +42,25 @@ public class DatabaseConnectorRegistryTest {
     final List<DatabaseServerType> databaseServerTypes =
         databaseConnectorRegistry.getDatabaseServerTypes();
 
-    assertThat(databaseServerTypes, hasSize(1));
+    assertThat(databaseServerTypes, hasSize(2));
     assertThat(databaseConnectorRegistry.hasDatabaseSystemIdentifier("test-db"), is(true));
-    assertThat(databaseConnectorRegistry.getHelpCommands(), hasSize(1));
+    assertThat(databaseConnectorRegistry.hasDatabaseSystemIdentifier("bundle-db"), is(false));
+    assertThat(databaseConnectorRegistry.hasDatabaseSystemIdentifier("test-bundle-db"), is(true));
+    assertThat(databaseConnectorRegistry.getHelpCommands(), hasSize(2));
 
     final DatabaseConnector testDbConnector =
         databaseConnectorRegistry.findDatabaseConnectorFromDatabaseSystemIdentifier("test-db");
     assertThat(testDbConnector, is(notNullValue()));
     assertThat(
         testDbConnector.getDatabaseServerType().getDatabaseSystemIdentifier(), is("test-db"));
+
+    final DatabaseConnector bundleDbConnector =
+        databaseConnectorRegistry.findDatabaseConnectorFromDatabaseSystemIdentifier(
+            "test-bundle-db");
+    assertThat(bundleDbConnector, is(notNullValue()));
+    assertThat(
+        bundleDbConnector.getDatabaseServerType().getDatabaseSystemIdentifier(),
+        is("test-bundle-db"));
 
     final DatabaseConnector unknownConnector =
         databaseConnectorRegistry.findDatabaseConnectorFromDatabaseSystemIdentifier("newdb");
@@ -95,13 +107,28 @@ public class DatabaseConnectorRegistryTest {
   public void helpCommands() throws Exception {
 
     final TestDatabaseConnector testDatabaseConnector = new TestDatabaseConnector();
+    final TestDatabaseConnectorBundle testDatabaseConnectorBundle =
+        new TestDatabaseConnectorBundle();
+    final DatabaseConnector bundleDatabaseConnector =
+        testDatabaseConnectorBundle.getDatabaseConnectors().stream()
+            .filter(
+                databaseConnector ->
+                    "test-bundle-db"
+                        .equals(
+                            databaseConnector
+                                .getDatabaseServerType()
+                                .getDatabaseSystemIdentifier()))
+            .findFirst()
+            .orElseThrow();
 
     final DatabaseConnectorRegistry databaseConnectorRegistry =
         DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
     final Collection<PluginCommand> commandLineCommands =
         databaseConnectorRegistry.getHelpCommands();
-    assertThat(commandLineCommands, hasSize(1));
-    assertThat(commandLineCommands, hasItem(testDatabaseConnector.getHelpCommand()));
+    assertThat(commandLineCommands, hasSize(2));
+    assertThat(
+        commandLineCommands,
+        hasItems(testDatabaseConnector.getHelpCommand(), bundleDatabaseConnector.getHelpCommand()));
   }
 
   @Test
@@ -118,8 +145,8 @@ public class DatabaseConnectorRegistryTest {
         DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
     final Collection<PropertyName> commandLineCommands =
         databaseConnectorRegistry.getRegisteredPlugins();
-    assertThat(commandLineCommands, hasSize(1));
-    assertThat(commandLineCommands.stream().findFirst().get(), is(serverDescription));
+    assertThat(commandLineCommands, hasSize(2));
+    assertThat(commandLineCommands, hasItem(serverDescription));
   }
 
   @Test
