@@ -33,6 +33,22 @@ public enum SchemaInfoMetadataRetrievalStrategy {
   viewTableUsageRetrievalStrategy("view-table-usage"),
   ;
 
+  /**
+   * Find the enumeration value corresponding to the string.
+   *
+   * @param key Retrieval strategy key.
+   * @return Enumeration value
+   */
+  public static SchemaInfoMetadataRetrievalStrategy valueOfFromKey(final String key) {
+    for (final SchemaInfoMetadataRetrievalStrategy retrievalStrategy :
+        SchemaInfoMetadataRetrievalStrategy.values()) {
+      if (retrievalStrategy.getKey().equalsIgnoreCase(key)) {
+        return retrievalStrategy;
+      }
+    }
+    return null;
+  }
+
   private final String key;
 
   SchemaInfoMetadataRetrievalStrategy(final String key) {
