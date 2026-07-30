@@ -72,7 +72,7 @@
           <artifactId>commons-codec</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>commons.io</groupId>
+          <groupId>commons-io</groupId>
           <artifactId>commons-io</artifactId>
         </exclusion>
         <exclusion>
