@@ -15,8 +15,8 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static java.util.Objects.requireNonNull;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -40,7 +40,7 @@ public final class FileOutputResource implements OutputResource {
   }
 
   @Override
-  public Writer openNewOutputWriter(final Charset charset, final boolean appendOutput)
+  public BufferedWriter openNewOutputWriter(final Charset charset, final boolean appendOutput)
       throws IOException {
     requireNonNull(charset, "No output charset provided");
     final OpenOption[] openOptions;
@@ -55,7 +55,15 @@ public final class FileOutputResource implements OutputResource {
           new StringFormat(
               "Attempt to write file outside of current working directory <%s>", outputFile));
     }
-    final Writer writer = newBufferedWriter(outputFile, charset, openOptions);
+    final String resourceDescription = getDescription();
+    final BufferedWriter writer =
+        new BufferedWriter(newBufferedWriter(outputFile, charset, openOptions)) {
+
+          @Override
+          public String toString() {
+            return "<writer for <%s>>".formatted(resourceDescription);
+          }
+        };
     LOGGER.log(Level.FINE, new StringFormat("Opened output writer to file <%s>", outputFile));
     return writer;
   }

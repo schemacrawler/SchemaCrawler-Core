@@ -20,7 +20,8 @@ public class NonCloseableWriterTest {
   @Test
   public void testClose() throws IOException {
     final StringWriter stringWriter = new StringWriter();
-    final NonCloseableWriter nonCloseableWriter = new NonCloseableWriter(stringWriter);
+    final NonCloseableWriter nonCloseableWriter =
+        new NonCloseableWriter(stringWriter, "test-writer");
 
     nonCloseableWriter.write("test");
     nonCloseableWriter.close();
@@ -37,18 +38,20 @@ public class NonCloseableWriterTest {
   @Test
   public void testToString() throws IOException {
     final StringWriter stringWriter = new StringWriter();
-    final NonCloseableWriter nonCloseableWriter = new NonCloseableWriter(stringWriter);
+    final NonCloseableWriter nonCloseableWriter =
+        new NonCloseableWriter(stringWriter, "test-writer");
 
     nonCloseableWriter.write("test");
     nonCloseableWriter.close();
 
-    assertThat(nonCloseableWriter.toString(), is("test"));
+    assertThat(nonCloseableWriter.toString(), is("test-writer"));
   }
 
   @Test
   public void testWrite() throws IOException {
     final StringWriter stringWriter = new StringWriter();
-    final NonCloseableWriter nonCloseableWriter = new NonCloseableWriter(stringWriter);
+    final NonCloseableWriter nonCloseableWriter =
+        new NonCloseableWriter(stringWriter, "test-writer");
 
     nonCloseableWriter.write("test");
     nonCloseableWriter.flush();

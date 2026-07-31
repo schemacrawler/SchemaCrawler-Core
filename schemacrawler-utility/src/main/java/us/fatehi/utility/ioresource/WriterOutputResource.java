@@ -10,6 +10,7 @@ package us.fatehi.utility.ioresource;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.BufferedWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
@@ -26,11 +27,11 @@ public final class WriterOutputResource implements OutputResource {
   }
 
   @Override
-  public Writer openNewOutputWriter(final Charset charset, final boolean appendOutput) {
+  public BufferedWriter openNewOutputWriter(final Charset charset, final boolean appendOutput) {
     LOGGER.log(Level.FINE, "Output to provided writer");
     // Since the original write was provided to us,
     // we should not allow it to be closed
-    return new NonCloseableWriter(writer);
+    return new NonCloseableWriter(writer, getDescription());
   }
 
   @Override

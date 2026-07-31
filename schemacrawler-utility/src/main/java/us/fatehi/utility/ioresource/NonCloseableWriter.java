@@ -8,14 +8,19 @@
 
 package us.fatehi.utility.ioresource;
 
-import java.io.FilterWriter;
+import static us.fatehi.utility.Utility.requireNotBlank;
+
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-final class NonCloseableWriter extends FilterWriter {
+final class NonCloseableWriter extends BufferedWriter {
 
-  NonCloseableWriter(final Writer out) {
+  private final String description;
+
+  NonCloseableWriter(final Writer out, final String description) {
     super(out);
+    this.description = requireNotBlank(description, "No writer description provided");
   }
 
   /** Flush but do not close. */
@@ -26,6 +31,6 @@ final class NonCloseableWriter extends FilterWriter {
 
   @Override
   public String toString() {
-    return out.toString();
+    return description;
   }
 }
