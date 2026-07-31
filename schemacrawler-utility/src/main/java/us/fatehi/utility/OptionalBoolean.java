@@ -29,6 +29,26 @@ public enum OptionalBoolean {
     return fromBoolean(value.get());
   }
 
+  public boolean isKnown() {
+    return this != unknown;
+  }
+
+  public boolean toBoolean() {
+    return switch (this) {
+      case true_value -> true;
+      case false_value -> false;
+      default -> throw new IllegalStateException("Connot convert to boolean: " + this);
+    };
+  }
+
+  public boolean toBoolean(final boolean defaultvalue) {
+    return switch (this) {
+      case true_value -> true;
+      case false_value -> false;
+      default -> defaultvalue;
+    };
+  }
+
   public Optional<Boolean> toOptional() {
     return switch (this) {
       case true_value -> Optional.of(true);

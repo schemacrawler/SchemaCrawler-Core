@@ -16,10 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import us.fatehi.utility.Builder;
 import us.fatehi.utility.TemplatingUtility;
 
 public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnectionSource> {
+
+  private static Predicate<Integer> validPort = port -> port >= 1024 && port <= 65535;
 
   /**
    * Builds a database connection based on a JDBC connection template provided by a database
@@ -29,7 +32,8 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
    * @return Builder
    */
   public static DatabaseConnectionSourceBuilder builder(final String connectionUrlTemplate) {
-    // NOTE: No check is done for a blank template. This exception is handled downstream,
+    // NOTE: No check is done for a blank template. This exception is handled
+    // downstream,
     // and a database exception is thrown instead of a generic exception.
     return new DatabaseConnectionSourceBuilder(connectionUrlTemplate);
   }
@@ -107,7 +111,9 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
   }
 
   public DatabaseConnectionSourceBuilder withDefaultPort(final int defaultPort) {
-    this.defaultPort = defaultPort;
+    if (validPort.test(defaultPort)) {
+      this.defaultPort = defaultPort;
+    }
     return this;
   }
 
@@ -136,7 +142,7 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
   }
 
   public DatabaseConnectionSourceBuilder withPort(final Integer port) {
-    if (port != null && (port < 1024 || port > 65535)) {
+    if (port == null || !validPort.test(port)) {
       // Port is out of range
       providedPort = null;
     } else {
