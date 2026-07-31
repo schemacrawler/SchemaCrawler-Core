@@ -189,6 +189,8 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
     map.put("host", host);
     map.put("port", String.valueOf(port));
     map.put("database", database);
+    // Also substitute using provided URL properties
+    map.putAll(toUrlx());
 
     final String url = TemplatingUtility.expandTemplate(connectionUrlTemplate, map);
 
