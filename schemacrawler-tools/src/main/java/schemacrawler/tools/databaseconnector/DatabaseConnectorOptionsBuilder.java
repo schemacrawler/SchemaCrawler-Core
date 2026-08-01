@@ -47,7 +47,7 @@ public class DatabaseConnectorOptionsBuilder
 
   private DatabaseConnectorOptionsBuilder(final DatabaseServerType dbServerType) {
     this.dbServerType = requireNonNull(dbServerType, "No database server type provided");
-    supportsUrl = url -> false;
+    supportsUrl = null;
     informationSchemaViewsBuildProcess = (builder, conn) -> {};
     schemaRetrievalOptionsBuildProcess = (builder, conn) -> {};
     limitOptionsBuildProcess = builder -> {};
@@ -76,6 +76,9 @@ public class DatabaseConnectorOptionsBuilder
 
   @Override
   public DatabaseConnectorOptions toOptions() {
+    if (supportsUrl == null) {
+      buildDefaultSupportsUrlPredicate();
+    }
     return new DatabaseConnectorOptions(
         dbServerType,
         supportsUrl,
@@ -148,5 +151,19 @@ public class DatabaseConnectorOptionsBuilder
       this.supportsUrl = supportsUrl;
     }
     return this;
+  }
+
+  private void buildDefaultSupportsUrlPredicate() {
+    final String template = dbConnectionSourceBuildProcess.get().getConnectionUrlTemplate();
+    if (!isBlank(template)) {
+      final int secondColon = template.indexOf(':', "jdbc:".length());
+      if (secondColon > 0) {
+        final String prefix = template.substring(0, secondColon + 1);
+        supportsUrl = url -> url != null && url.startsWith(prefix);
+      }
+    }
+    if (supportsUrl == null) {
+      supportsUrl = url -> false;
+    }
   }
 }
