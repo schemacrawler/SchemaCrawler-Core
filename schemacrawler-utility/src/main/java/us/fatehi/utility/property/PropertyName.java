@@ -17,7 +17,9 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
+import us.fatehi.utility.Utility;
 
 public final class PropertyName implements Serializable, Comparable<PropertyName> {
 
@@ -35,12 +37,7 @@ public final class PropertyName implements Serializable, Comparable<PropertyName
 
   public PropertyName(final String name, final String description) {
     this.name = requireNotBlank(name, "Property name not provided").strip();
-
-    if (isBlank(description)) {
-      this.description = null;
-    } else {
-      this.description = description.strip();
-    }
+    this.description = Utility.trimToEmpty(description);
   }
 
   @Override
@@ -53,18 +50,14 @@ public final class PropertyName implements Serializable, Comparable<PropertyName
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || !(obj instanceof PropertyName)) {
-      return false;
+    if (obj instanceof final PropertyName other) {
+      return name.equalsIgnoreCase(other.name);
     }
-    final PropertyName other = (PropertyName) obj;
-    if (!Objects.equals(name, other.name)) {
-      return false;
-    }
-    return true;
+    return false;
   }
 
   public String getDescription() {
-    return description == null ? "" : description;
+    return description;
   }
 
   public String getName() {
@@ -73,14 +66,14 @@ public final class PropertyName implements Serializable, Comparable<PropertyName
 
   @Override
   public int hashCode() {
-    return Objects.hash(name);
+    return Objects.hash(name.toLowerCase(Locale.ROOT));
   }
 
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();
     builder.append(name);
-    if (description != null) {
+    if (!isBlank(description)) {
       builder.append(" - ").append(description);
     }
     return builder.toString();

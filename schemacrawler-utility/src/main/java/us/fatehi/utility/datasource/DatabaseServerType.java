@@ -8,91 +8,68 @@
 
 package us.fatehi.utility.datasource;
 
-import static us.fatehi.utility.Utility.isBlank;
+import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
-import java.io.Serializable;
-import java.util.Objects;
+import us.fatehi.utility.property.PropertyName;
 
 /**
  * Class that represents an id for SchemaCrawler plugin that allows for crawl customizations for a
  * particular database. The "server" id is used on the SchemaCrawler command-line. It also allows
  * for customizations for the behavior of a particular database driver.
  */
-public final class DatabaseServerType implements Serializable, Comparable<DatabaseServerType> {
+public record DatabaseServerType(PropertyName propertyName)
+    implements Comparable<DatabaseServerType> {
 
   @Serial private static final long serialVersionUID = 2160456864554076419L;
 
-  public static final DatabaseServerType UNKNOWN = new DatabaseServerType();
-
-  private final String databaseSystemIdentifier;
-  private final String databaseSystemName;
+  public static final DatabaseServerType UNKNOWN = new DatabaseServerType("unknown", "Unknown");
 
   public DatabaseServerType(
       final String databaseSystemIdentifier, final String databaseSystemName) {
-    this.databaseSystemIdentifier =
-        requireNotBlank(databaseSystemIdentifier, "No database system identifier provided");
-    this.databaseSystemName =
-        requireNotBlank(databaseSystemName, "No database system name provided");
+    this(new PropertyName(databaseSystemIdentifier, databaseSystemName));
   }
 
-  private DatabaseServerType() {
-    databaseSystemIdentifier = null;
-    databaseSystemName = null;
+  public DatabaseServerType {
+    propertyName = requireNonNull(propertyName, "No property name provided");
+    requireNotBlank(propertyName.getDescription(), "No database system name provided");
   }
 
   /** {@inheritDoc} */
   @Override
-  public int compareTo(final DatabaseServerType other) {
-    if (this == other) {
+  public int compareTo(final DatabaseServerType o) {
+    if (o == null) {
+      return -1;
+    }
+    if (equals(o)) {
       return 0;
     }
-    if (other == null) {
-      return -1;
-    }
-
-    final boolean thisUnknown = databaseSystemIdentifier == null;
-    final boolean otherUnknown = other.databaseSystemIdentifier == null;
-    if (otherUnknown && !thisUnknown) {
+    if (o.isUnknownDatabaseSystem()) {
       return 1;
     }
-    if (!otherUnknown && thisUnknown) {
+    if (isUnknownDatabaseSystem()) {
       return -1;
     }
-    return databaseSystemIdentifier.compareTo(other.databaseSystemIdentifier);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if ((obj == null) || (getClass() != obj.getClass())) {
-      return false;
-    }
-    final DatabaseServerType other = (DatabaseServerType) obj;
-    if (databaseSystemIdentifier == null) {
-      return other.databaseSystemIdentifier == null;
-    }
-    return databaseSystemIdentifier.equals(other.databaseSystemIdentifier);
+    return propertyName.compareTo(o.propertyName);
   }
 
   public String getDatabaseSystemIdentifier() {
-    return databaseSystemIdentifier;
+    if (isUnknownDatabaseSystem()) {
+      return null;
+    }
+    return propertyName.getName();
   }
 
   public String getDatabaseSystemName() {
-    return databaseSystemName;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(databaseSystemIdentifier);
+    if (isUnknownDatabaseSystem()) {
+      return null;
+    }
+    return propertyName.getDescription();
   }
 
   public boolean isUnknownDatabaseSystem() {
-    return isBlank(databaseSystemIdentifier);
+    return equals(UNKNOWN);
   }
 
   @Override
@@ -100,6 +77,6 @@ public final class DatabaseServerType implements Serializable, Comparable<Databa
     if (isUnknownDatabaseSystem()) {
       return "";
     }
-    return "%s - %s".formatted(databaseSystemIdentifier, databaseSystemName);
+    return propertyName.toString();
   }
 }
