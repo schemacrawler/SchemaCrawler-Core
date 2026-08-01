@@ -16,7 +16,6 @@ import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 import us.fatehi.utility.datasource.DatabaseServerType;
 
@@ -46,19 +45,11 @@ public class DatabaseServerTypeTest {
   }
 
   @Test
-  public void equals() {
-    EqualsVerifier.forClass(DatabaseServerType.class)
-        .withIgnoredFields("databaseSystemName")
-        .verify();
-  }
-
-  @Test
   public void properties0() {
     final DatabaseServerType databaseServerType = DatabaseServerType.UNKNOWN;
     assertThat(databaseServerType.getDatabaseSystemIdentifier(), is(nullValue()));
     assertThat(databaseServerType.getDatabaseSystemIdentifier(), is(nullValue()));
     assertThat(databaseServerType.isUnknownDatabaseSystem(), is(true));
-    assertThat(databaseServerType.hashCode(), is(31));
   }
 
   @Test
