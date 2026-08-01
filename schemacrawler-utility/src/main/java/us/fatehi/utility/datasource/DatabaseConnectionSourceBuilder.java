@@ -71,6 +71,10 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
     return connectionSource;
   }
 
+  public String getConnectionUrlTemplate() {
+    return connectionUrlTemplate;
+  }
+
   public Consumer<Connection> getConnectionInitializer() {
     return connectionInitializer;
   }
