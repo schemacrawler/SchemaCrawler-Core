@@ -26,9 +26,16 @@ abstract class BaseInputResource implements InputResource {
   public final BufferedReader openNewInputReader(final Charset charset) throws IOException {
     requireNonNull(charset, "No input charset provided");
 
+    final String resourceDescription = getDescription();
     final InputStream inputStream = openNewInputStream();
+    final BufferedReader reader =
+        new BufferedReader(new InputStreamReader(inputStream, charset)) {
 
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, charset));
+          @Override
+          public String toString() {
+            return "<reader for <%s>>".formatted(resourceDescription);
+          }
+        };
     LOGGER.log(Level.FINE, "Opened resource <%s> for reading".formatted(getDescription()));
 
     return reader;

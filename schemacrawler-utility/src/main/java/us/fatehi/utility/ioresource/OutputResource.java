@@ -8,8 +8,8 @@
 
 package us.fatehi.utility.ioresource;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.Charset;
 
 @FunctionalInterface
@@ -19,5 +19,5 @@ public interface OutputResource {
     return toString();
   }
 
-  Writer openNewOutputWriter(Charset charset, boolean appendOutput) throws IOException;
+  BufferedWriter openNewOutputWriter(Charset charset, boolean appendOutput) throws IOException;
 }

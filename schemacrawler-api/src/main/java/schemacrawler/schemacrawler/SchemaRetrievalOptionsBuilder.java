@@ -25,6 +25,7 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.TableTypes;
 import schemacrawler.utility.TypeMap;
+import us.fatehi.utility.OptionalBoolean;
 import us.fatehi.utility.OptionsBuilder;
 import us.fatehi.utility.datasource.DatabaseServerType;
 
@@ -47,8 +48,8 @@ public final class SchemaRetrievalOptionsBuilder
   String identifierQuoteString;
   Identifiers identifiers;
   InformationSchemaViews informationSchemaViews;
-  Optional<Boolean> overridesSupportsSchemas;
-  Optional<Boolean> overridesSupportsCatalogs;
+  OptionalBoolean overridesSupportsSchemas;
+  OptionalBoolean overridesSupportsCatalogs;
   Optional<TypeMap> overridesTypeMap;
   TableTypes tableTypes;
   boolean supportsCatalogs;
@@ -60,8 +61,8 @@ public final class SchemaRetrievalOptionsBuilder
   private SchemaRetrievalOptionsBuilder() {
     dbServerType = DatabaseServerType.UNKNOWN;
     informationSchemaViews = InformationSchemaViewsBuilder.newInformationSchemaViews();
-    overridesSupportsSchemas = Optional.empty();
-    overridesSupportsCatalogs = Optional.empty();
+    overridesSupportsSchemas = OptionalBoolean.unknown;
+    overridesSupportsCatalogs = OptionalBoolean.unknown;
     supportsCatalogs = true;
     supportsSchemas = true;
     identifierQuoteString = "";
@@ -119,8 +120,8 @@ public final class SchemaRetrievalOptionsBuilder
 
     dbServerType = options.getDatabaseServerType();
     informationSchemaViews = options.getInformationSchemaViews();
-    overridesSupportsSchemas = Optional.empty();
-    overridesSupportsCatalogs = Optional.empty();
+    overridesSupportsSchemas = OptionalBoolean.unknown;
+    overridesSupportsCatalogs = OptionalBoolean.unknown;
     supportsCatalogs = options.isSupportsCatalogs();
     supportsSchemas = options.isSupportsSchemas();
     identifierQuoteString = options.getIdentifierQuoteString();
@@ -179,13 +180,13 @@ public final class SchemaRetrievalOptionsBuilder
    * Overrides the JDBC driver provided information about whether the database supports catalogs.
    */
   public SchemaRetrievalOptionsBuilder withDoesNotSupportCatalogs() {
-    overridesSupportsCatalogs = Optional.of(false);
+    overridesSupportsCatalogs = OptionalBoolean.false_value;
     return this;
   }
 
   /** Overrides the JDBC driver provided information about whether the database supports schema. */
   public SchemaRetrievalOptionsBuilder withDoesNotSupportSchemas() {
-    overridesSupportsSchemas = Optional.of(false);
+    overridesSupportsSchemas = OptionalBoolean.false_value;
     return this;
   }
 
@@ -228,12 +229,12 @@ public final class SchemaRetrievalOptionsBuilder
   }
 
   public SchemaRetrievalOptionsBuilder withoutSupportsCatalogs() {
-    overridesSupportsCatalogs = Optional.empty();
+    overridesSupportsCatalogs = OptionalBoolean.unknown;
     return this;
   }
 
   public SchemaRetrievalOptionsBuilder withoutSupportsSchemas() {
-    overridesSupportsSchemas = Optional.empty();
+    overridesSupportsSchemas = OptionalBoolean.unknown;
     return this;
   }
 
@@ -241,13 +242,13 @@ public final class SchemaRetrievalOptionsBuilder
    * Overrides the JDBC driver provided information about whether the database supports catalogs.
    */
   public SchemaRetrievalOptionsBuilder withSupportsCatalogs() {
-    overridesSupportsCatalogs = Optional.of(true);
+    overridesSupportsCatalogs = OptionalBoolean.true_value;
     return this;
   }
 
   /** Overrides the JDBC driver provided information about whether the database supports schema. */
   public SchemaRetrievalOptionsBuilder withSupportsSchemas() {
-    overridesSupportsSchemas = Optional.of(true);
+    overridesSupportsSchemas = OptionalBoolean.true_value;
     return this;
   }
 
@@ -279,8 +280,8 @@ public final class SchemaRetrievalOptionsBuilder
 
   private boolean lookupSupportsCatalogs(final DatabaseMetaData metaData) {
     boolean supportsCatalogs = true;
-    if (overridesSupportsCatalogs.isPresent()) {
-      supportsCatalogs = overridesSupportsCatalogs.get();
+    if (overridesSupportsCatalogs.isKnown()) {
+      supportsCatalogs = overridesSupportsCatalogs.toBoolean();
     } else if (metaData != null) {
       try {
         supportsCatalogs = metaData.supportsCatalogsInTableDefinitions();
@@ -293,8 +294,8 @@ public final class SchemaRetrievalOptionsBuilder
 
   private boolean lookupSupportsSchemas(final DatabaseMetaData metaData) {
     boolean supportsSchemas = true;
-    if (overridesSupportsSchemas.isPresent()) {
-      supportsSchemas = overridesSupportsSchemas.get();
+    if (overridesSupportsSchemas.isKnown()) {
+      supportsSchemas = overridesSupportsSchemas.toBoolean();
     } else if (metaData != null) {
       try {
         supportsSchemas = metaData.supportsSchemasInTableDefinitions();
