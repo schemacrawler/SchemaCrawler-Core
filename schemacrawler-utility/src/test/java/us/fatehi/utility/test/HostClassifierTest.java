@@ -30,6 +30,13 @@ public class HostClassifierTest {
     assertThat(
         new HostClassifier("mydb.us-east-1.rds.amazonaws.com").getCloudProvider(),
         is(CloudProvider.AWS));
+    assertThat(new HostClassifier("mydb-aurora-cluster").getCloudProvider(), is(CloudProvider.AWS));
+    assertThat(
+        new HostClassifier("mydb.cloudsql.google.internal").getCloudProvider(),
+        is(CloudProvider.GCP));
+    assertThat(
+        new HostClassifier("adb.uk-london-1.oraclecloud.com").getCloudProvider(),
+        is(CloudProvider.ORACLE));
     assertThat(new HostClassifier("localhost").getCloudProvider(), is(CloudProvider.LOCAL));
     assertThat(new HostClassifier("db.example.com").getCloudProvider(), is(CloudProvider.UNKNOWN));
   }
@@ -38,8 +45,12 @@ public class HostClassifierTest {
   public void cloudRegionDetection() {
     assertThat(
         new HostClassifier("mydb.us-east-1.rds.amazonaws.com").getCloudRegion(), is("us-east-1"));
+    assertThat(
+        new HostClassifier("adb.uk-london-1.oraclecloud.com").getCloudRegion(), is("uk-london-1"));
     assertThat(new HostClassifier("mydb.database.windows.net").getCloudRegion(), is("global"));
     assertThat(new HostClassifier("localhost").getCloudRegion(), is("local"));
+    assertThat(new HostClassifier("127.2.3.4").getCloudRegion(), is("local"));
+    assertThat(new HostClassifier(null).getCloudRegion(), is((String) null));
     assertThat(new HostClassifier("db.example.com").getCloudRegion(), is((String) null));
   }
 
@@ -49,6 +60,8 @@ public class HostClassifierTest {
     assertThat(new HostClassifier("db.corp").isInternalDomain(), is(true));
     assertThat(new HostClassifier("dev.local").isInternalDomain(), is(true));
     assertThat(new HostClassifier("cache.lan").isInternalDomain(), is(true));
+    assertThat(new HostClassifier("db.EXAMPLE.com").isInternalDomain(), is(true));
+    assertThat(new HostClassifier("LOCALHOST").isInternalDomain(), is(true));
     assertThat(new HostClassifier("example.com").isInternalDomain(), is(false));
   }
 
@@ -77,13 +90,17 @@ public class HostClassifierTest {
     assertThat(new HostClassifier("127.0.0.1").isLocalhost(), is(true));
     assertThat(new HostClassifier("127.12.34.56").isLocalhost(), is(true));
     assertThat(new HostClassifier("::1").isLocalhost(), is(true));
+    assertThat(new HostClassifier("[::1]").isLocalhost(), is(true));
     assertThat(new HostClassifier("0:0:0:0:0:0:0:1").isLocalhost(), is(true));
     assertThat(new HostClassifier("10.0.0.1").isLocalhost(), is(false));
     assertThat(new HostClassifier("example.com").isLocalhost(), is(false));
   }
 
   @Test
-  public void nonPublic() {
+  public void hostNameMatching() {
+    assertThat(new HostClassifier("prod.mycompany.com").isHostName(), is(true));
+    assertThat(new HostClassifier("  prod.mycompany.com  ").isHostName(), is(true));
+    assertThat(new HostClassifier("[2001:db8::1]").isHostName(), is(false));
     assertThat(new HostClassifier("10.0.0.1").isHostName(), is(false));
     assertThat(new HostClassifier("2001:db8::1").isHostName(), is(false));
     assertThat(new HostClassifier("db.internal").isHostName(), is(false));
@@ -94,9 +111,12 @@ public class HostClassifierTest {
   @Test
   public void sanitizedHostName() {
     assertThat(new HostClassifier("localhost").getSanitizedHostName(), is("localhost"));
+    assertThat(new HostClassifier("  localhost  ").getSanitizedHostName(), is("localhost"));
     assertThat(new HostClassifier("10.0.0.1").getSanitizedHostName(), is(""));
     assertThat(new HostClassifier("db.internal").getSanitizedHostName(), is(""));
     assertThat(new HostClassifier("db.example.com").getSanitizedHostName(), is(""));
+    assertThat(
+        new HostClassifier("prod.mycompany.com").getSanitizedHostName(), is("prod.mycompany.com"));
     assertThat(new HostClassifier(null).getSanitizedHostName(), is(""));
   }
 }
