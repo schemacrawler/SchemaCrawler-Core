@@ -331,4 +331,28 @@ public class DatabaseInfoRetrieverTest {
     assertThat(serverInfoProperty, is(new ImmutableServerInfoProperty(name, value, description)));
     assertThat(serverInfoProperty.getDescription(), is(description));
   }
+
+  @Test
+  @DisplayName("Retrieve server identity independently")
+  public void serverIdentity(
+      final TestContext testContext, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+
+    final SchemaRetrievalOptions schemaRetrievalOptions =
+        SchemaRetrievalOptionsBuilder.builder()
+            .withServerIdentityExtractor(new SafeServerIdentityExtractor())
+            .toOptions();
+    final RetrieverConnection retrieverConnection =
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
+
+    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
+
+    final DatabaseInfoRetriever databaseInfoRetriever =
+        new DatabaseInfoRetriever(retrieverConnection, catalog, options);
+    databaseInfoRetriever.retrieveServerIdentity();
+
+    assertThat(catalog.getDatabaseInfo().getServerIdentity(), is(notNullValue()));
+    assertThat(catalog.getDatabaseInfo().getServerIdentity().cloudProvider().name(), is("UNKNOWN"));
+    assertThat(catalog.getDatabaseInfo().getServerIdentity().region(), is("unknown"));
+  }
 }

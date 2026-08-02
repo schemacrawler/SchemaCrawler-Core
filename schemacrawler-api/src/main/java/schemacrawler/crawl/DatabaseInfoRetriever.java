@@ -32,9 +32,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.schema.ServerIdentity;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.schemacrawler.ServerIdentityExtractor;
 import us.fatehi.utility.UtilityLogger;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.property.Property;
@@ -284,6 +286,25 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
     } catch (final Exception e) {
       LOGGER.log(Level.WARNING, "Could not retrieve server information", e);
     }
+  }
+
+  void retrieveServerIdentity() {
+    final MutableDatabaseInfo dbInfo = catalog.getDatabaseInfo();
+    if (dbInfo == null) {
+      return;
+    }
+
+    final ServerIdentityExtractor extractor = getRetrieverConnection().getServerIdentityExtractor();
+
+    ServerIdentity serverIdentity = ServerIdentity.unknown();
+    try (final Connection connection =
+        getRetrieverConnection().getConnection("server identity information")) {
+      serverIdentity = extractor.extract(connection);
+    } catch (final Exception e) {
+      LOGGER.log(Level.FINE, "Could not retrieve server identity", e);
+    }
+
+    dbInfo.setServerIdentity(serverIdentity);
   }
 
   private Collection<ImmutableDatabaseProperty> retrieveResultSetTypesProperties(

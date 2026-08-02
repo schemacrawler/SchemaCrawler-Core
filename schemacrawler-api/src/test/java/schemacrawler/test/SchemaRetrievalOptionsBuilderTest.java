@@ -24,8 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import schemacrawler.crawl.SafeServerIdentityExtractor;
 import schemacrawler.plugin.EnumDataTypeInfo;
 import schemacrawler.plugin.EnumDataTypeInfo.EnumDataTypeTypes;
+import schemacrawler.schema.ServerIdentity;
 import schemacrawler.schemacrawler.InformationSchemaKey;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
@@ -387,6 +389,26 @@ public class SchemaRetrievalOptionsBuilderTest {
     assertThat(
         schemaRetrievalOptions.getDatabaseServerType().getDatabaseSystemIdentifier(),
         is(nullValue()));
+  }
+
+  @Test
+  public void serverIdentityExtractor() {
+    final SchemaRetrievalOptionsBuilder builder = SchemaRetrievalOptionsBuilder.builder();
+
+    assertThat(builder.toOptions().getServerIdentityExtractor(), is(nullValue()));
+
+    final SafeServerIdentityExtractor customExtractor =
+        new SafeServerIdentityExtractor() {
+          @Override
+          public ServerIdentity extract(final Connection connection) {
+            return ServerIdentity.unknown();
+          }
+        };
+    builder.withServerIdentityExtractor(customExtractor);
+    assertThat(builder.toOptions().getServerIdentityExtractor(), is(customExtractor));
+
+    builder.withServerIdentityExtractor(null);
+    assertThat(builder.toOptions().getServerIdentityExtractor(), is(nullValue()));
   }
 
   @Test

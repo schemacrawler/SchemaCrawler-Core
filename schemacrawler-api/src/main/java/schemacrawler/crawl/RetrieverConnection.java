@@ -22,9 +22,11 @@ import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.MetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
+import schemacrawler.schemacrawler.ServerIdentityExtractor;
 import schemacrawler.utility.JavaSqlTypes;
 import schemacrawler.utility.TypeMap;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import us.fatehi.utility.datasource.DatabaseServerType;
 
 /** A connection for the retriever. Wraps a live database connection. */
 final class RetrieverConnection {
@@ -68,6 +70,18 @@ final class RetrieverConnection {
 
   EnumDataTypeHelper getEnumDataTypeHelper() {
     return schemaRetrievalOptions.getEnumDataTypeHelper();
+  }
+
+  DatabaseServerType getDatabaseServerType() {
+    return schemaRetrievalOptions.getDatabaseServerType();
+  }
+
+  ServerIdentityExtractor getServerIdentityExtractor() {
+    final ServerIdentityExtractor serverIdentityExtractor =
+        schemaRetrievalOptions.getServerIdentityExtractor();
+    return serverIdentityExtractor == null
+        ? new SafeServerIdentityExtractor()
+        : serverIdentityExtractor;
   }
 
   Identifiers getIdentifiers() {

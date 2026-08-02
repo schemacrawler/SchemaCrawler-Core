@@ -183,6 +183,7 @@ public final class SchemaCrawler {
         new DatabaseInfoRetriever(retrieverConnection, catalog, options);
 
     taskRunner
+        .add("retrieveServerIdentity", retriever::retrieveServerIdentity)
         .add(retrieveAdditionalDatabaseInfo, retriever::retrieveAdditionalDatabaseInfo)
         .add(retrieveServerInfo, retriever::retrieveServerInfo)
         .add(retrieveDatabaseUsers, retriever::retrieveDatabaseUsers)

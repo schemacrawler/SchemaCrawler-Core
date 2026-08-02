@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import schemacrawler.schema.DatabaseInfo;
+import schemacrawler.schema.ServerIdentity;
 import us.fatehi.utility.database.DatabaseInformation;
 import us.fatehi.utility.property.Property;
 
@@ -64,6 +65,11 @@ public class LightDatabaseInfo implements DatabaseInfo {
   @Override
   public Collection<Property> getServerInfo() {
     return List.of();
+  }
+
+  @Override
+  public ServerIdentity getServerIdentity() {
+    return ServerIdentity.unknown();
   }
 
   @Override

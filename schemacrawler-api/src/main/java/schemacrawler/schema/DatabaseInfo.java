@@ -48,6 +48,13 @@ public interface DatabaseInfo extends ProductVersion {
   Collection<Property> getServerInfo();
 
   /**
+   * Gets a canonical, safe server identity.
+   *
+   * @return Server identity
+   */
+  ServerIdentity getServerIdentity();
+
+  /**
    * Gets the user name as known to this database.
    *
    * @return Database user name
