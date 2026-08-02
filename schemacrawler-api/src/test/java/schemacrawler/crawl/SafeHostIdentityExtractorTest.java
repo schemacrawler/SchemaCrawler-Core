@@ -18,10 +18,11 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import schemacrawler.schema.ServerIdentity;
+import schemacrawler.schema.HostIdentity;
 import us.fatehi.utility.CloudProvider;
+import us.fatehi.utility.HostType;
 
-public class SafeServerIdentityExtractorTest {
+public class SafeHostIdentityExtractorTest {
 
   @Test
   @DisplayName("Extracts AWS provider and region from JDBC URL")
@@ -29,19 +30,19 @@ public class SafeServerIdentityExtractorTest {
     final Connection connection =
         mockConnection("jdbc:mysql://mydb.us-east-1.rds.amazonaws.com:3306/appdb");
 
-    final ServerIdentity serverIdentity = new SafeServerIdentityExtractor().extract(connection);
+    final HostIdentity hostIdentity = new SafeHostIdentityExtractor().extract(connection);
 
-    assertThat(serverIdentity, is(notNullValue()));
-    assertThat(serverIdentity.instanceName(), is("mydb.us-east-1.rds.amazonaws.com"));
-    assertThat(serverIdentity.cloudProvider(), is(CloudProvider.AWS));
-    assertThat(serverIdentity.region(), is("us-east-1"));
+    assertThat(hostIdentity, is(notNullValue()));
+    assertThat(hostIdentity.hostType(), is(HostType.public_host));
+    assertThat(hostIdentity.cloudProvider(), is(CloudProvider.AWS));
+    assertThat(hostIdentity.region(), is("us-east-1"));
   }
 
   @Test
   @DisplayName("Falls back to unknown identity for null connection")
   public void nullConnectionFallsBack() {
-    final ServerIdentity serverIdentity = new SafeServerIdentityExtractor().extract(null);
-    assertThat(serverIdentity, is(ServerIdentity.unknown()));
+    final HostIdentity hostIdentity = new SafeHostIdentityExtractor().extract(null);
+    assertThat(hostIdentity, is(HostIdentity.unknown()));
   }
 
   @Test
@@ -49,42 +50,42 @@ public class SafeServerIdentityExtractorTest {
   public void connectorSubclassExtractor() throws Exception {
     final Connection connection = mockConnection("jdbc:sqlite:C:\\temp\\sample.db");
 
-    final SafeServerIdentityExtractor extractor =
-        new SafeServerIdentityExtractor() {
+    final SafeHostIdentityExtractor extractor =
+        new SafeHostIdentityExtractor() {
           @Override
-          public ServerIdentity extract(final Connection connection) {
-            return new ServerIdentity("sqlite-local", CloudProvider.LOCAL, "local");
+          public HostIdentity extract(final Connection connection) {
+            return new HostIdentity(HostType.public_host, CloudProvider.UNKNOWN, "unknown");
           }
         };
-    final ServerIdentity serverIdentity = extractor.extract(connection);
+    final HostIdentity hostIdentity = extractor.extract(connection);
 
-    assertThat(serverIdentity.instanceName(), is("sqlite-local"));
-    assertThat(serverIdentity.cloudProvider(), is(CloudProvider.LOCAL));
-    assertThat(serverIdentity.region(), is("local"));
+    assertThat(hostIdentity.hostType(), is(HostType.public_host));
+    assertThat(hostIdentity.cloudProvider(), is(CloudProvider.UNKNOWN));
+    assertThat(hostIdentity.region(), is("unknown"));
   }
 
   @Test
-  @DisplayName("Identifies localhost hosts as local server identity")
+  @DisplayName("Identifies localhost hosts as local host identity")
   public void localhostIdentity() throws Exception {
     final Connection connection = mockConnection("jdbc:postgresql://127.0.0.1:5432/postgres");
 
-    final ServerIdentity serverIdentity = new SafeServerIdentityExtractor().extract(connection);
+    final HostIdentity hostIdentity = new SafeHostIdentityExtractor().extract(connection);
 
-    assertThat(serverIdentity.instanceName(), is("localhost"));
-    assertThat(serverIdentity.cloudProvider(), is(CloudProvider.LOCAL));
-    assertThat(serverIdentity.region(), is("local"));
+    assertThat(hostIdentity.hostType(), is(HostType.localhost));
+    assertThat(hostIdentity.cloudProvider(), is(CloudProvider.UNKNOWN));
+    assertThat(hostIdentity.region(), is("unknown"));
   }
 
   @Test
-  @DisplayName("Uses localhost as instance when host is local and database is absent")
+  @DisplayName("Uses localhost host type when host is local and database is absent")
   public void localhostAsInstanceFallback() throws Exception {
     final Connection connection = mockConnection("jdbc:mysql://localhost:3306");
 
-    final ServerIdentity serverIdentity = new SafeServerIdentityExtractor().extract(connection);
+    final HostIdentity hostIdentity = new SafeHostIdentityExtractor().extract(connection);
 
-    assertThat(serverIdentity.instanceName(), is("localhost"));
-    assertThat(serverIdentity.cloudProvider(), is(CloudProvider.LOCAL));
-    assertThat(serverIdentity.region(), is("local"));
+    assertThat(hostIdentity.hostType(), is(HostType.localhost));
+    assertThat(hostIdentity.cloudProvider(), is(CloudProvider.UNKNOWN));
+    assertThat(hostIdentity.region(), is("unknown"));
   }
 
   private Connection mockConnection(final String jdbcUrl) throws Exception {

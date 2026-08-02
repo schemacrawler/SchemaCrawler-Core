@@ -61,7 +61,7 @@ public class GettersSettersTest {
     "IdentifiersBuilder",
     "JavaSqlType",
     "NamedObjectKey",
-    "ServerIdentity",
+    "HostIdentity",
     "TableTypes",
     "Test",
   };

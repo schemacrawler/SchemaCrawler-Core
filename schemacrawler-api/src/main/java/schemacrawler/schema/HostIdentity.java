@@ -14,18 +14,19 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Locale;
 import us.fatehi.utility.CloudProvider;
+import us.fatehi.utility.HostType;
 
-public record ServerIdentity(String instanceName, CloudProvider cloudProvider, String region)
+public record HostIdentity(HostType hostType, CloudProvider cloudProvider, String region)
     implements Serializable {
 
   @Serial private static final long serialVersionUID = -4347254509135801162L;
 
-  public static ServerIdentity unknown() {
-    return new ServerIdentity("", CloudProvider.UNKNOWN, "");
+  public static HostIdentity unknown() {
+    return new HostIdentity(HostType.unknown, CloudProvider.UNKNOWN, "");
   }
 
-  public ServerIdentity {
-    instanceName = isBlank(instanceName) ? "unknown-instance" : instanceName;
+  public HostIdentity {
+    hostType = hostType == null ? HostType.unknown : hostType;
     cloudProvider = cloudProvider == null ? CloudProvider.UNKNOWN : cloudProvider;
     region = isBlank(region) ? "unknown" : region;
   }
@@ -33,6 +34,6 @@ public record ServerIdentity(String instanceName, CloudProvider cloudProvider, S
   @Override
   public String toString() {
     return "%s @ %s / %s"
-        .formatted(instanceName, cloudProvider.name().toLowerCase(Locale.ROOT), region);
+        .formatted(hostType.name(), cloudProvider.name().toLowerCase(Locale.ROOT), region);
   }
 }

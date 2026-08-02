@@ -18,11 +18,11 @@ import java.util.logging.Logger;
 import schemacrawler.plugin.EnumDataTypeHelper;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.TableTypes;
+import schemacrawler.schemacrawler.HostIdentityExtractor;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.MetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
-import schemacrawler.schemacrawler.ServerIdentityExtractor;
 import schemacrawler.utility.JavaSqlTypes;
 import schemacrawler.utility.TypeMap;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
@@ -76,12 +76,10 @@ final class RetrieverConnection {
     return schemaRetrievalOptions.getDatabaseServerType();
   }
 
-  ServerIdentityExtractor getServerIdentityExtractor() {
-    final ServerIdentityExtractor serverIdentityExtractor =
-        schemaRetrievalOptions.getServerIdentityExtractor();
-    return serverIdentityExtractor == null
-        ? new SafeServerIdentityExtractor()
-        : serverIdentityExtractor;
+  HostIdentityExtractor getHostIdentityExtractor() {
+    final HostIdentityExtractor hostIdentityExtractor =
+        schemaRetrievalOptions.getHostIdentityExtractor();
+    return hostIdentityExtractor == null ? new SafeHostIdentityExtractor() : hostIdentityExtractor;
   }
 
   Identifiers getIdentifiers() {

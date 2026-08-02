@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import schemacrawler.crawl.SafeServerIdentityExtractor;
+import schemacrawler.crawl.SafeHostIdentityExtractor;
 import schemacrawler.plugin.EnumDataTypeInfo;
 import schemacrawler.plugin.EnumDataTypeInfo.EnumDataTypeTypes;
-import schemacrawler.schema.ServerIdentity;
+import schemacrawler.schema.HostIdentity;
 import schemacrawler.schemacrawler.InformationSchemaKey;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
@@ -392,23 +392,23 @@ public class SchemaRetrievalOptionsBuilderTest {
   }
 
   @Test
-  public void serverIdentityExtractor() {
+  public void hostIdentityExtractor() {
     final SchemaRetrievalOptionsBuilder builder = SchemaRetrievalOptionsBuilder.builder();
 
-    assertThat(builder.toOptions().getServerIdentityExtractor(), is(nullValue()));
+    assertThat(builder.toOptions().getHostIdentityExtractor(), is(nullValue()));
 
-    final SafeServerIdentityExtractor customExtractor =
-        new SafeServerIdentityExtractor() {
+    final SafeHostIdentityExtractor customExtractor =
+        new SafeHostIdentityExtractor() {
           @Override
-          public ServerIdentity extract(final Connection connection) {
-            return ServerIdentity.unknown();
+          public HostIdentity extract(final Connection connection) {
+            return HostIdentity.unknown();
           }
         };
-    builder.withServerIdentityExtractor(customExtractor);
-    assertThat(builder.toOptions().getServerIdentityExtractor(), is(customExtractor));
+    builder.withHostIdentityExtractor(customExtractor);
+    assertThat(builder.toOptions().getHostIdentityExtractor(), is(customExtractor));
 
-    builder.withServerIdentityExtractor(null);
-    assertThat(builder.toOptions().getServerIdentityExtractor(), is(nullValue()));
+    builder.withHostIdentityExtractor(null);
+    assertThat(builder.toOptions().getHostIdentityExtractor(), is(nullValue()));
   }
 
   @Test

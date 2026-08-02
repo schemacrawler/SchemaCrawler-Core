@@ -27,9 +27,6 @@ public final class HostClassifier {
   }
 
   public CloudProvider getCloudProvider() {
-    if (isLocalhost()) {
-      return CloudProvider.LOCAL;
-    }
     return CloudProvider.fromHost(host);
   }
 
@@ -56,20 +53,25 @@ public final class HostClassifier {
     if (cloudProvider == CloudProvider.AZURE) {
       return "global";
     }
-    if (cloudProvider == CloudProvider.LOCAL) {
-      return "local";
-    }
     return null;
   }
 
-  public String getSanitizedHostName() {
+  public HostType getHostType() {
     if (isLocalhost()) {
-      return "localhost";
+      return HostType.localhost;
     }
-    if (!isHostName()) {
-      return "";
+    if (isHostName()) {
+      return HostType.public_host;
     }
-    return host;
+    return HostType.unknown;
+  }
+
+  public String getSanitizedHostName() {
+    return switch (getHostType()) {
+      case localhost -> HostType.localhost.name();
+      case public_host -> HostType.public_host.name();
+      default -> "";
+    };
   }
 
   public boolean isHostName() {

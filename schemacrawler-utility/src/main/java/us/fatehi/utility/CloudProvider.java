@@ -17,7 +17,6 @@ public enum CloudProvider {
   AZURE,
   GCP,
   ORACLE,
-  LOCAL,
   UNKNOWN;
 
   public static CloudProvider fromHost(final String host) {
@@ -25,15 +24,6 @@ public enum CloudProvider {
       return UNKNOWN;
     }
     final String h = host.trim().toLowerCase(Locale.ROOT);
-    if ("localhost".equals(h) || "localhost.localdomain".equals(h) || h.endsWith(".localhost")) {
-      return LOCAL;
-    }
-    if (h.startsWith("127.")) {
-      return LOCAL;
-    }
-    if ("::1".equals(h) || "0:0:0:0:0:0:0:1".equals(h)) {
-      return LOCAL;
-    }
     if (h.contains("rds.amazonaws.com") || h.contains("aurora")) {
       return AWS;
     }

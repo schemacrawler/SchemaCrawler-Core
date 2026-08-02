@@ -57,7 +57,7 @@ public final class SchemaRetrievalOptionsBuilder
   EnumDataTypeHelper enumDataTypeHelper;
   Map<SchemaInfoMetadataRetrievalStrategy, MetadataRetrievalStrategy> metadataRetrievalStrategyMap;
   Consumer<Connection> connectionInitializer;
-  ServerIdentityExtractor serverIdentityExtractor;
+  HostIdentityExtractor hostIdentityExtractor;
 
   private SchemaRetrievalOptionsBuilder() {
     dbServerType = DatabaseServerType.UNKNOWN;
@@ -73,7 +73,7 @@ public final class SchemaRetrievalOptionsBuilder
         TableTypes.from("TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY");
     enumDataTypeHelper = NO_OP_ENUM_DATA_TYPE_HELPER;
     connectionInitializer = connection -> {};
-    serverIdentityExtractor = null;
+    hostIdentityExtractor = null;
 
     metadataRetrievalStrategyMap = new EnumMap<>(SchemaInfoMetadataRetrievalStrategy.class);
     for (final SchemaInfoMetadataRetrievalStrategy key :
@@ -131,7 +131,7 @@ public final class SchemaRetrievalOptionsBuilder
     overridesTypeMap = Optional.empty();
     metadataRetrievalStrategyMap = options.getMetadataRetrievalStrategyMap();
     connectionInitializer = options.getConnectionInitializer();
-    serverIdentityExtractor = options.getServerIdentityExtractor();
+    hostIdentityExtractor = options.getHostIdentityExtractor();
 
     return this;
   }
@@ -169,9 +169,9 @@ public final class SchemaRetrievalOptionsBuilder
     return this;
   }
 
-  public SchemaRetrievalOptionsBuilder withServerIdentityExtractor(
-      final ServerIdentityExtractor serverIdentityExtractor) {
-    this.serverIdentityExtractor = serverIdentityExtractor;
+  public SchemaRetrievalOptionsBuilder withHostIdentityExtractor(
+      final HostIdentityExtractor hostIdentityExtractor) {
+    this.hostIdentityExtractor = hostIdentityExtractor;
     return this;
   }
 

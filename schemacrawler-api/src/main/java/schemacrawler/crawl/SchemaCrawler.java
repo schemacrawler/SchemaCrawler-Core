@@ -182,8 +182,13 @@ public final class SchemaCrawler {
     final DatabaseInfoRetriever retriever =
         new DatabaseInfoRetriever(retrieverConnection, catalog, options);
 
+    if (infoLevel.is(retrieveServerInfo)) {
+      taskRunner.add("retrieveHostIdentity", retriever::retrieveHostIdentity);
+    } else {
+      LOGGER.log(Level.INFO, "Not retrieving host identity, since maximum level was not requested");
+    }
+
     taskRunner
-        .add("retrieveServerIdentity", retriever::retrieveServerIdentity)
         .add(retrieveAdditionalDatabaseInfo, retriever::retrieveAdditionalDatabaseInfo)
         .add(retrieveServerInfo, retriever::retrieveServerInfo)
         .add(retrieveDatabaseUsers, retriever::retrieveDatabaseUsers)

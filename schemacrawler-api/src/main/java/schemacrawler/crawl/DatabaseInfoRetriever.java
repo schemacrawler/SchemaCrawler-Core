@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.schema.ServerIdentity;
+import schemacrawler.schema.HostIdentity;
+import schemacrawler.schemacrawler.HostIdentityExtractor;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
-import schemacrawler.schemacrawler.ServerIdentityExtractor;
 import us.fatehi.utility.UtilityLogger;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.property.Property;
@@ -289,23 +289,23 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
     }
   }
 
-  void retrieveServerIdentity() {
+  void retrieveHostIdentity() {
     final MutableDatabaseInfo dbInfo = catalog.getDatabaseInfo();
     if (dbInfo == null) {
       return;
     }
 
-    final ServerIdentityExtractor extractor = getRetrieverConnection().getServerIdentityExtractor();
+    final HostIdentityExtractor extractor = getRetrieverConnection().getHostIdentityExtractor();
 
-    ServerIdentity serverIdentity = ServerIdentity.unknown();
+    HostIdentity hostIdentity = HostIdentity.unknown();
     try (final Connection connection =
-        getRetrieverConnection().getConnection("server identity information")) {
-      serverIdentity = extractor.extract(connection);
+        getRetrieverConnection().getConnection("host identity information")) {
+      hostIdentity = extractor.extract(connection);
     } catch (final Exception e) {
-      LOGGER.log(Level.FINE, "Could not retrieve server identity", e);
+      LOGGER.log(Level.FINE, "Could not retrieve host identity", e);
     }
 
-    dbInfo.setServerIdentity(serverIdentity);
+    dbInfo.setHostIdentity(hostIdentity);
   }
 
   private Collection<ImmutableDatabaseProperty> retrieveResultSetTypesProperties(

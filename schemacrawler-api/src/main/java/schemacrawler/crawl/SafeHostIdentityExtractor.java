@@ -14,22 +14,22 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.schema.ServerIdentity;
-import schemacrawler.schemacrawler.ServerIdentityExtractor;
+import schemacrawler.schema.HostIdentity;
+import schemacrawler.schemacrawler.HostIdentityExtractor;
 import us.fatehi.utility.CloudProvider;
 import us.fatehi.utility.HostClassifier;
+import us.fatehi.utility.HostType;
 import us.fatehi.utility.datasource.JdbcUrl;
 import us.fatehi.utility.datasource.JdbcUrlParser;
 
-public class SafeServerIdentityExtractor implements ServerIdentityExtractor {
+public class SafeHostIdentityExtractor implements HostIdentityExtractor {
 
-  private static final Logger LOGGER =
-      Logger.getLogger(SafeServerIdentityExtractor.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(SafeHostIdentityExtractor.class.getName());
 
   @Override
-  public ServerIdentity extract(final Connection connection) {
+  public HostIdentity extract(final Connection connection) {
     if (connection == null) {
-      return ServerIdentity.unknown();
+      return HostIdentity.unknown();
     }
     try {
       final DatabaseMetaData metaData = connection.getMetaData();
@@ -37,23 +37,24 @@ public class SafeServerIdentityExtractor implements ServerIdentityExtractor {
       final JdbcUrl jdbcUrl = JdbcUrlParser.parse(url);
       final HostClassifier hostClassifier = jdbcUrl.hostClassifier();
 
-      final String extractedInstance = tryExtractInstance(connection, jdbcUrl);
-      String instanceName = new HostClassifier(extractedInstance).getSanitizedHostName();
-      if (isBlank(instanceName)) {
-        instanceName = hostClassifier.getSanitizedHostName();
-      }
-
+      final HostClassifier extractedHostClassifier =
+          new HostClassifier(obtainInstanceName(connection, jdbcUrl));
+      final HostClassifier effectiveHostClassifier =
+          isBlank(extractedHostClassifier.getSanitizedHostName())
+              ? hostClassifier
+              : extractedHostClassifier;
+      final HostType hostType = effectiveHostClassifier.getHostType();
       final CloudProvider cloudProvider = hostClassifier.getCloudProvider();
       final String region = hostClassifier.getCloudRegion();
 
-      return new ServerIdentity(instanceName, cloudProvider, region);
+      return new HostIdentity(hostType, cloudProvider, region);
     } catch (final Exception e) {
-      LOGGER.log(Level.FINE, "Could not extract server identity", e);
-      return ServerIdentity.unknown();
+      LOGGER.log(Level.FINE, "Could not extract host identity", e);
+      return HostIdentity.unknown();
     }
   }
 
-  protected String tryExtractInstance(final Connection connection, final JdbcUrl jdbcUrl) {
+  protected String obtainInstanceName(final Connection connection, final JdbcUrl jdbcUrl) {
     return null;
   }
 }

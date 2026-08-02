@@ -333,14 +333,14 @@ public class DatabaseInfoRetrieverTest {
   }
 
   @Test
-  @DisplayName("Retrieve server identity independently")
-  public void serverIdentity(
+  @DisplayName("Retrieve host identity independently")
+  public void hostIdentity(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
       throws Exception {
 
     final SchemaRetrievalOptions schemaRetrievalOptions =
         SchemaRetrievalOptionsBuilder.builder()
-            .withServerIdentityExtractor(new SafeServerIdentityExtractor())
+            .withHostIdentityExtractor(new SafeHostIdentityExtractor())
             .toOptions();
     final RetrieverConnection retrieverConnection =
         new RetrieverConnection(connectionSource, schemaRetrievalOptions);
@@ -349,10 +349,10 @@ public class DatabaseInfoRetrieverTest {
 
     final DatabaseInfoRetriever databaseInfoRetriever =
         new DatabaseInfoRetriever(retrieverConnection, catalog, options);
-    databaseInfoRetriever.retrieveServerIdentity();
+    databaseInfoRetriever.retrieveHostIdentity();
 
-    assertThat(catalog.getDatabaseInfo().getServerIdentity(), is(notNullValue()));
-    assertThat(catalog.getDatabaseInfo().getServerIdentity().cloudProvider().name(), is("UNKNOWN"));
-    assertThat(catalog.getDatabaseInfo().getServerIdentity().region(), is("unknown"));
+    assertThat(catalog.getDatabaseInfo().getHostIdentity(), is(notNullValue()));
+    assertThat(catalog.getDatabaseInfo().getHostIdentity().cloudProvider().name(), is("UNKNOWN"));
+    assertThat(catalog.getDatabaseInfo().getHostIdentity().region(), is("unknown"));
   }
 }

@@ -9,10 +9,10 @@
 package schemacrawler.schemacrawler;
 
 import java.sql.Connection;
-import schemacrawler.schema.ServerIdentity;
+import schemacrawler.schema.HostIdentity;
 
 @FunctionalInterface
-public interface ServerIdentityExtractor {
+public interface HostIdentityExtractor {
 
-  ServerIdentity extract(Connection connection);
+  HostIdentity extract(Connection connection);
 }

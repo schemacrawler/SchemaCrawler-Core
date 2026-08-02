@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.Test;
 import us.fatehi.utility.CloudProvider;
 import us.fatehi.utility.HostClassifier;
+import us.fatehi.utility.HostType;
 
 public class HostClassifierTest {
 
@@ -37,7 +38,7 @@ public class HostClassifierTest {
     assertThat(
         new HostClassifier("adb.uk-london-1.oraclecloud.com").getCloudProvider(),
         is(CloudProvider.ORACLE));
-    assertThat(new HostClassifier("localhost").getCloudProvider(), is(CloudProvider.LOCAL));
+    assertThat(new HostClassifier("localhost").getCloudProvider(), is(CloudProvider.UNKNOWN));
     assertThat(new HostClassifier("db.example.com").getCloudProvider(), is(CloudProvider.UNKNOWN));
   }
 
@@ -48,10 +49,19 @@ public class HostClassifierTest {
     assertThat(
         new HostClassifier("adb.uk-london-1.oraclecloud.com").getCloudRegion(), is("uk-london-1"));
     assertThat(new HostClassifier("mydb.database.windows.net").getCloudRegion(), is("global"));
-    assertThat(new HostClassifier("localhost").getCloudRegion(), is("local"));
-    assertThat(new HostClassifier("127.2.3.4").getCloudRegion(), is("local"));
+    assertThat(new HostClassifier("localhost").getCloudRegion(), is((String) null));
+    assertThat(new HostClassifier("127.2.3.4").getCloudRegion(), is((String) null));
     assertThat(new HostClassifier(null).getCloudRegion(), is((String) null));
     assertThat(new HostClassifier("db.example.com").getCloudRegion(), is((String) null));
+  }
+
+  @Test
+  public void hostTypeDetection() {
+    assertThat(new HostClassifier("localhost").getHostType(), is(HostType.localhost));
+    assertThat(new HostClassifier("127.0.0.1").getHostType(), is(HostType.localhost));
+    assertThat(new HostClassifier("db.internal").getHostType(), is(HostType.unknown));
+    assertThat(new HostClassifier("db.example.com").getHostType(), is(HostType.unknown));
+    assertThat(new HostClassifier("prod.mycompany.com").getHostType(), is(HostType.public_host));
   }
 
   @Test
@@ -115,8 +125,7 @@ public class HostClassifierTest {
     assertThat(new HostClassifier("10.0.0.1").getSanitizedHostName(), is(""));
     assertThat(new HostClassifier("db.internal").getSanitizedHostName(), is(""));
     assertThat(new HostClassifier("db.example.com").getSanitizedHostName(), is(""));
-    assertThat(
-        new HostClassifier("prod.mycompany.com").getSanitizedHostName(), is("prod.mycompany.com"));
+    assertThat(new HostClassifier("prod.mycompany.com").getSanitizedHostName(), is("public_host"));
     assertThat(new HostClassifier(null).getSanitizedHostName(), is(""));
   }
 }

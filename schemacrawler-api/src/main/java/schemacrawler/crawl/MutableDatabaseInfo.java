@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import schemacrawler.schema.DatabaseInfo;
-import schemacrawler.schema.ServerIdentity;
+import schemacrawler.schema.HostIdentity;
 import schemacrawler.schemacrawler.ModelImplementation;
 import us.fatehi.utility.database.DatabaseInformation;
 import us.fatehi.utility.property.BaseProductVersion;
@@ -37,7 +37,7 @@ final class MutableDatabaseInfo extends BaseProductVersion implements DatabaseIn
   // Mutable properties collection
   private final Set<Property> serverInfo;
   private final Set<Property> databaseProperties;
-  private ServerIdentity serverIdentity;
+  private HostIdentity hostIdentity;
 
   public MutableDatabaseInfo(final DatabaseInformation databaseInformation) {
     super(databaseInformation);
@@ -45,7 +45,7 @@ final class MutableDatabaseInfo extends BaseProductVersion implements DatabaseIn
 
     serverInfo = new HashSet<>();
     databaseProperties = new HashSet<>();
-    serverIdentity = ServerIdentity.unknown();
+    hostIdentity = HostIdentity.unknown();
   }
 
   /** {@inheritDoc} */
@@ -62,8 +62,8 @@ final class MutableDatabaseInfo extends BaseProductVersion implements DatabaseIn
   }
 
   @Override
-  public ServerIdentity getServerIdentity() {
-    return serverIdentity;
+  public HostIdentity getHostIdentity() {
+    return hostIdentity;
   }
 
   /** {@inheritDoc} */
@@ -90,11 +90,11 @@ final class MutableDatabaseInfo extends BaseProductVersion implements DatabaseIn
     }
   }
 
-  void setServerIdentity(final ServerIdentity serverIdentity) {
-    if (serverIdentity != null) {
-      this.serverIdentity = serverIdentity;
+  void setHostIdentity(final HostIdentity hostIdentity) {
+    if (hostIdentity != null) {
+      this.hostIdentity = hostIdentity;
     } else {
-      this.serverIdentity = ServerIdentity.unknown();
+      this.hostIdentity = HostIdentity.unknown();
     }
   }
 }

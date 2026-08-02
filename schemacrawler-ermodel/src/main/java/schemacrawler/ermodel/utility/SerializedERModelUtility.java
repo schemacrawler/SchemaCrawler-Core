@@ -25,6 +25,7 @@ public final class SerializedERModelUtility {
   private static final List<Pattern> ERMODEL_CLASS_PATTERNS =
       Arrays.asList(
           Pattern.compile("us\\.fatehi\\.utility\\.CloudProvider"),
+          Pattern.compile("us\\.fatehi\\.utility\\.HostType"),
           Pattern.compile("us\\.fatehi\\.utility\\.property\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.database\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.Multimap"),
