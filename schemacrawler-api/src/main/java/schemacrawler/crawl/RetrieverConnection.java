@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import schemacrawler.plugin.EnumDataTypeHelper;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.TableTypes;
-import schemacrawler.schemacrawler.HostIdentityExtractor;
+import schemacrawler.schemacrawler.HostLocationExtractor;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.MetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy;
@@ -76,10 +76,10 @@ final class RetrieverConnection {
     return schemaRetrievalOptions.getDatabaseServerType();
   }
 
-  HostIdentityExtractor getHostIdentityExtractor() {
-    final HostIdentityExtractor hostIdentityExtractor =
-        schemaRetrievalOptions.getHostIdentityExtractor();
-    return hostIdentityExtractor == null ? new SafeHostIdentityExtractor() : hostIdentityExtractor;
+  HostLocationExtractor getHostLocationExtractor() {
+    final HostLocationExtractor hostLocationExtractor =
+        schemaRetrievalOptions.getHostLocationExtractor();
+    return hostLocationExtractor == null ? new SafeHostLocationExtractor() : hostLocationExtractor;
   }
 
   Identifiers getIdentifiers() {

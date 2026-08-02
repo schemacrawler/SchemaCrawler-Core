@@ -40,7 +40,7 @@ public final class SchemaRetrievalOptions implements Options {
   private final EnumMap<SchemaInfoMetadataRetrievalStrategy, MetadataRetrievalStrategy>
       metadataRetrievalStrategyMap;
   private final Consumer<Connection> connectionInitializer;
-  private final HostIdentityExtractor hostIdentityExtractor;
+  private final HostLocationExtractor hostLocationExtractor;
 
   protected SchemaRetrievalOptions(final SchemaRetrievalOptionsBuilder builder) {
     final SchemaRetrievalOptionsBuilder bldr =
@@ -57,7 +57,7 @@ public final class SchemaRetrievalOptions implements Options {
     enumDataTypeHelper = bldr.enumDataTypeHelper;
     metadataRetrievalStrategyMap = new EnumMap<>(bldr.metadataRetrievalStrategyMap);
     connectionInitializer = bldr.connectionInitializer;
-    hostIdentityExtractor = bldr.hostIdentityExtractor;
+    hostLocationExtractor = bldr.hostLocationExtractor;
   }
 
   public MetadataRetrievalStrategy get(
@@ -75,8 +75,8 @@ public final class SchemaRetrievalOptions implements Options {
     return dbServerType;
   }
 
-  public HostIdentityExtractor getHostIdentityExtractor() {
-    return hostIdentityExtractor;
+  public HostLocationExtractor getHostLocationExtractor() {
+    return hostLocationExtractor;
   }
 
   public EnumDataTypeHelper getEnumDataTypeHelper() {

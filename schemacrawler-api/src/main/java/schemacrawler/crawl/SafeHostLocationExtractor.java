@@ -14,22 +14,22 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.schema.HostIdentity;
-import schemacrawler.schemacrawler.HostIdentityExtractor;
+import schemacrawler.schema.HostLocation;
+import schemacrawler.schemacrawler.HostLocationExtractor;
 import us.fatehi.utility.CloudProvider;
 import us.fatehi.utility.HostClassifier;
 import us.fatehi.utility.HostType;
 import us.fatehi.utility.datasource.JdbcUrl;
 import us.fatehi.utility.datasource.JdbcUrlParser;
 
-public class SafeHostIdentityExtractor implements HostIdentityExtractor {
+public class SafeHostLocationExtractor implements HostLocationExtractor {
 
-  private static final Logger LOGGER = Logger.getLogger(SafeHostIdentityExtractor.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(SafeHostLocationExtractor.class.getName());
 
   @Override
-  public HostIdentity extract(final Connection connection) {
+  public HostLocation extract(final Connection connection) {
     if (connection == null) {
-      return HostIdentity.unknown();
+      return HostLocation.unknown();
     }
     try {
       final DatabaseMetaData metaData = connection.getMetaData();
@@ -47,10 +47,10 @@ public class SafeHostIdentityExtractor implements HostIdentityExtractor {
       final CloudProvider cloudProvider = hostClassifier.getCloudProvider();
       final String region = hostClassifier.getCloudRegion();
 
-      return new HostIdentity(hostType, cloudProvider, region);
+      return new HostLocation(hostType, cloudProvider, region);
     } catch (final Exception e) {
-      LOGGER.log(Level.FINE, "Could not extract host identity", e);
-      return HostIdentity.unknown();
+      LOGGER.log(Level.FINE, "Could not extract host location", e);
+      return HostLocation.unknown();
     }
   }
 

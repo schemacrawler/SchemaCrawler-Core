@@ -59,9 +59,13 @@ public class HostClassifierTest {
   public void hostTypeDetection() {
     assertThat(new HostClassifier("localhost").getHostType(), is(HostType.localhost));
     assertThat(new HostClassifier("127.0.0.1").getHostType(), is(HostType.localhost));
-    assertThat(new HostClassifier("db.internal").getHostType(), is(HostType.unknown));
-    assertThat(new HostClassifier("db.example.com").getHostType(), is(HostType.unknown));
-    assertThat(new HostClassifier("prod.mycompany.com").getHostType(), is(HostType.public_host));
+    assertThat(new HostClassifier("db.internal").getHostType(), is(HostType.on_premises));
+    assertThat(new HostClassifier("10.20.30.40").getHostType(), is(HostType.on_premises));
+    assertThat(
+        new HostClassifier("mydb.us-east-1.rds.amazonaws.com").getHostType(),
+        is(HostType.remote_host));
+    assertThat(new HostClassifier("prod.mycompany.com").getHostType(), is(HostType.remote_host));
+    assertThat(new HostClassifier("2001:db8::8a2e:370:7334").getHostType(), is(HostType.unknown));
   }
 
   @Test
@@ -122,10 +126,10 @@ public class HostClassifierTest {
   public void sanitizedHostName() {
     assertThat(new HostClassifier("localhost").getSanitizedHostName(), is("localhost"));
     assertThat(new HostClassifier("  localhost  ").getSanitizedHostName(), is("localhost"));
-    assertThat(new HostClassifier("10.0.0.1").getSanitizedHostName(), is(""));
-    assertThat(new HostClassifier("db.internal").getSanitizedHostName(), is(""));
-    assertThat(new HostClassifier("db.example.com").getSanitizedHostName(), is(""));
-    assertThat(new HostClassifier("prod.mycompany.com").getSanitizedHostName(), is("public_host"));
+    assertThat(new HostClassifier("10.0.0.1").getSanitizedHostName(), is("on_premises"));
+    assertThat(new HostClassifier("db.internal").getSanitizedHostName(), is("on_premises"));
+    assertThat(new HostClassifier("db.example.com").getSanitizedHostName(), is("on_premises"));
+    assertThat(new HostClassifier("prod.mycompany.com").getSanitizedHostName(), is("remote_host"));
     assertThat(new HostClassifier(null).getSanitizedHostName(), is(""));
   }
 }

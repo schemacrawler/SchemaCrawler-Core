@@ -18,11 +18,11 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import schemacrawler.schema.HostIdentity;
+import schemacrawler.schema.HostLocation;
 import us.fatehi.utility.CloudProvider;
 import us.fatehi.utility.HostType;
 
-public class SafeHostIdentityExtractorTest {
+public class SafeHostLocationExtractorTest {
 
   @Test
   @DisplayName("Extracts AWS provider and region from JDBC URL")
@@ -30,19 +30,19 @@ public class SafeHostIdentityExtractorTest {
     final Connection connection =
         mockConnection("jdbc:mysql://mydb.us-east-1.rds.amazonaws.com:3306/appdb");
 
-    final HostIdentity hostIdentity = new SafeHostIdentityExtractor().extract(connection);
+    final HostLocation hostLocation = new SafeHostLocationExtractor().extract(connection);
 
-    assertThat(hostIdentity, is(notNullValue()));
-    assertThat(hostIdentity.hostType(), is(HostType.public_host));
-    assertThat(hostIdentity.cloudProvider(), is(CloudProvider.AWS));
-    assertThat(hostIdentity.region(), is("us-east-1"));
+    assertThat(hostLocation, is(notNullValue()));
+    assertThat(hostLocation.hostType(), is(HostType.remote_host));
+    assertThat(hostLocation.cloudProvider(), is(CloudProvider.AWS));
+    assertThat(hostLocation.region(), is("us-east-1"));
   }
 
   @Test
   @DisplayName("Falls back to unknown identity for null connection")
   public void nullConnectionFallsBack() {
-    final HostIdentity hostIdentity = new SafeHostIdentityExtractor().extract(null);
-    assertThat(hostIdentity, is(HostIdentity.unknown()));
+    final HostLocation hostLocation = new SafeHostLocationExtractor().extract(null);
+    assertThat(hostLocation, is(HostLocation.unknown()));
   }
 
   @Test
@@ -50,30 +50,30 @@ public class SafeHostIdentityExtractorTest {
   public void connectorSubclassExtractor() throws Exception {
     final Connection connection = mockConnection("jdbc:sqlite:C:\\temp\\sample.db");
 
-    final SafeHostIdentityExtractor extractor =
-        new SafeHostIdentityExtractor() {
+    final SafeHostLocationExtractor extractor =
+        new SafeHostLocationExtractor() {
           @Override
-          public HostIdentity extract(final Connection connection) {
-            return new HostIdentity(HostType.public_host, CloudProvider.UNKNOWN, "unknown");
+          public HostLocation extract(final Connection connection) {
+            return new HostLocation(HostType.remote_host, CloudProvider.UNKNOWN, "unknown");
           }
         };
-    final HostIdentity hostIdentity = extractor.extract(connection);
+    final HostLocation hostLocation = extractor.extract(connection);
 
-    assertThat(hostIdentity.hostType(), is(HostType.public_host));
-    assertThat(hostIdentity.cloudProvider(), is(CloudProvider.UNKNOWN));
-    assertThat(hostIdentity.region(), is("unknown"));
+    assertThat(hostLocation.hostType(), is(HostType.remote_host));
+    assertThat(hostLocation.cloudProvider(), is(CloudProvider.UNKNOWN));
+    assertThat(hostLocation.region(), is("unknown"));
   }
 
   @Test
-  @DisplayName("Identifies localhost hosts as local host identity")
+  @DisplayName("Identifies localhost hosts as local host location")
   public void localhostIdentity() throws Exception {
     final Connection connection = mockConnection("jdbc:postgresql://127.0.0.1:5432/postgres");
 
-    final HostIdentity hostIdentity = new SafeHostIdentityExtractor().extract(connection);
+    final HostLocation hostLocation = new SafeHostLocationExtractor().extract(connection);
 
-    assertThat(hostIdentity.hostType(), is(HostType.localhost));
-    assertThat(hostIdentity.cloudProvider(), is(CloudProvider.UNKNOWN));
-    assertThat(hostIdentity.region(), is("unknown"));
+    assertThat(hostLocation.hostType(), is(HostType.localhost));
+    assertThat(hostLocation.cloudProvider(), is(CloudProvider.UNKNOWN));
+    assertThat(hostLocation.region(), is("unknown"));
   }
 
   @Test
@@ -81,11 +81,11 @@ public class SafeHostIdentityExtractorTest {
   public void localhostAsInstanceFallback() throws Exception {
     final Connection connection = mockConnection("jdbc:mysql://localhost:3306");
 
-    final HostIdentity hostIdentity = new SafeHostIdentityExtractor().extract(connection);
+    final HostLocation hostLocation = new SafeHostLocationExtractor().extract(connection);
 
-    assertThat(hostIdentity.hostType(), is(HostType.localhost));
-    assertThat(hostIdentity.cloudProvider(), is(CloudProvider.UNKNOWN));
-    assertThat(hostIdentity.region(), is("unknown"));
+    assertThat(hostLocation.hostType(), is(HostType.localhost));
+    assertThat(hostLocation.cloudProvider(), is(CloudProvider.UNKNOWN));
+    assertThat(hostLocation.region(), is("unknown"));
   }
 
   private Connection mockConnection(final String jdbcUrl) throws Exception {

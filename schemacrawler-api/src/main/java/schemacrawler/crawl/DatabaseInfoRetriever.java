@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.schema.HostIdentity;
-import schemacrawler.schemacrawler.HostIdentityExtractor;
+import schemacrawler.schema.HostLocation;
+import schemacrawler.schemacrawler.HostLocationExtractor;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -289,23 +289,23 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
     }
   }
 
-  void retrieveHostIdentity() {
+  void retrieveHostLocation() {
     final MutableDatabaseInfo dbInfo = catalog.getDatabaseInfo();
     if (dbInfo == null) {
       return;
     }
 
-    final HostIdentityExtractor extractor = getRetrieverConnection().getHostIdentityExtractor();
+    final HostLocationExtractor extractor = getRetrieverConnection().getHostLocationExtractor();
 
-    HostIdentity hostIdentity = HostIdentity.unknown();
+    HostLocation hostLocation = HostLocation.unknown();
     try (final Connection connection =
-        getRetrieverConnection().getConnection("host identity information")) {
-      hostIdentity = extractor.extract(connection);
+        getRetrieverConnection().getConnection("host location information")) {
+      hostLocation = extractor.extract(connection);
     } catch (final Exception e) {
-      LOGGER.log(Level.FINE, "Could not retrieve host identity", e);
+      LOGGER.log(Level.FINE, "Could not retrieve host location", e);
     }
 
-    dbInfo.setHostIdentity(hostIdentity);
+    dbInfo.setHostLocation(hostLocation);
   }
 
   private Collection<ImmutableDatabaseProperty> retrieveResultSetTypesProperties(

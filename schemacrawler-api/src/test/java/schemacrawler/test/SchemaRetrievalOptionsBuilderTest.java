@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import schemacrawler.crawl.SafeHostIdentityExtractor;
+import schemacrawler.crawl.SafeHostLocationExtractor;
 import schemacrawler.plugin.EnumDataTypeInfo;
 import schemacrawler.plugin.EnumDataTypeInfo.EnumDataTypeTypes;
-import schemacrawler.schema.HostIdentity;
+import schemacrawler.schema.HostLocation;
 import schemacrawler.schemacrawler.InformationSchemaKey;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
@@ -392,23 +392,23 @@ public class SchemaRetrievalOptionsBuilderTest {
   }
 
   @Test
-  public void hostIdentityExtractor() {
+  public void hostLocationExtractor() {
     final SchemaRetrievalOptionsBuilder builder = SchemaRetrievalOptionsBuilder.builder();
 
-    assertThat(builder.toOptions().getHostIdentityExtractor(), is(nullValue()));
+    assertThat(builder.toOptions().getHostLocationExtractor(), is(nullValue()));
 
-    final SafeHostIdentityExtractor customExtractor =
-        new SafeHostIdentityExtractor() {
+    final SafeHostLocationExtractor customExtractor =
+        new SafeHostLocationExtractor() {
           @Override
-          public HostIdentity extract(final Connection connection) {
-            return HostIdentity.unknown();
+          public HostLocation extract(final Connection connection) {
+            return HostLocation.unknown();
           }
         };
-    builder.withHostIdentityExtractor(customExtractor);
-    assertThat(builder.toOptions().getHostIdentityExtractor(), is(customExtractor));
+    builder.withHostLocationExtractor(customExtractor);
+    assertThat(builder.toOptions().getHostLocationExtractor(), is(customExtractor));
 
-    builder.withHostIdentityExtractor(null);
-    assertThat(builder.toOptions().getHostIdentityExtractor(), is(nullValue()));
+    builder.withHostLocationExtractor(null);
+    assertThat(builder.toOptions().getHostLocationExtractor(), is(nullValue()));
   }
 
   @Test

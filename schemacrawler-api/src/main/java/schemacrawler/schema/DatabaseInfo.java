@@ -48,11 +48,11 @@ public interface DatabaseInfo extends ProductVersion {
   Collection<Property> getServerInfo();
 
   /**
-   * Gets a canonical, safe host identity.
+   * Gets a canonical, safe host location.
    *
-   * @return Host identity
+   * @return Host location
    */
-  HostIdentity getHostIdentity();
+  HostLocation getHostLocation();
 
   /**
    * Gets the user name as known to this database.

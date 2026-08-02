@@ -16,16 +16,16 @@ import java.util.Locale;
 import us.fatehi.utility.CloudProvider;
 import us.fatehi.utility.HostType;
 
-public record HostIdentity(HostType hostType, CloudProvider cloudProvider, String region)
+public record HostLocation(HostType hostType, CloudProvider cloudProvider, String region)
     implements Serializable {
 
   @Serial private static final long serialVersionUID = -4347254509135801162L;
 
-  public static HostIdentity unknown() {
-    return new HostIdentity(HostType.unknown, CloudProvider.UNKNOWN, "");
+  public static HostLocation unknown() {
+    return new HostLocation(HostType.unknown, CloudProvider.UNKNOWN, "");
   }
 
-  public HostIdentity {
+  public HostLocation {
     hostType = hostType == null ? HostType.unknown : hostType;
     cloudProvider = cloudProvider == null ? CloudProvider.UNKNOWN : cloudProvider;
     region = isBlank(region) ? "unknown" : region;

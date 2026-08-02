@@ -60,8 +60,14 @@ public final class HostClassifier {
     if (isLocalhost()) {
       return HostType.localhost;
     }
+    if (isInternalDomain() || isInternalIpRange()) {
+      return HostType.on_premises;
+    }
+    if (getCloudProvider() != CloudProvider.UNKNOWN) {
+      return HostType.remote_host;
+    }
     if (isHostName()) {
-      return HostType.public_host;
+      return HostType.remote_host;
     }
     return HostType.unknown;
   }
@@ -69,7 +75,8 @@ public final class HostClassifier {
   public String getSanitizedHostName() {
     return switch (getHostType()) {
       case localhost -> HostType.localhost.name();
-      case public_host -> HostType.public_host.name();
+      case on_premises -> HostType.on_premises.name();
+      case remote_host -> HostType.remote_host.name();
       default -> "";
     };
   }
@@ -146,5 +153,28 @@ public final class HostClassifier {
       value = value.substring(1, value.length() - 1);
     }
     return value;
+  }
+
+  private boolean isInternalIpRange() {
+    if (isBlank(host)) {
+      return false;
+    }
+
+    if (isIpV4()) {
+      return host.startsWith("10.")
+          || host.startsWith("192.168.")
+          || host.matches("^172\\.(1[6-9]|2\\d|3[0-1])\\..*");
+    }
+
+    if (isIpV6()) {
+      try {
+        final InetAddress ipV6Address = InetAddress.getByName(host);
+        return ipV6Address.isSiteLocalAddress() || ipV6Address.isLinkLocalAddress();
+      } catch (final Exception e) {
+        return false;
+      }
+    }
+
+    return false;
   }
 }

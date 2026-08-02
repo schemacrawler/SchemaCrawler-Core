@@ -11,5 +11,6 @@ package us.fatehi.utility;
 public enum HostType {
   unknown,
   localhost,
-  public_host
+  on_premises,
+  remote_host
 }
