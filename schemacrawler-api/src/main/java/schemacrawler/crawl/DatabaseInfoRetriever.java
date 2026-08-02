@@ -277,7 +277,8 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
         LOGGER.log(
             Level.FINER,
             new StringFormat(
-                "Retrieving server information property: %s=%s", propertyName, propertyValue));
+                "Retrieving server information property: %s (value is %bblank)",
+                propertyName, isBlank(propertyValue) ? "" : "not "));
 
         final Property serverInfoProperty =
             new ImmutableServerInfoProperty(propertyName, propertyValue, propertyDescription);
