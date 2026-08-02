@@ -26,13 +26,6 @@ public final class HostClassifier {
     this.host = normalize(host);
   }
 
-  public String asHostName() {
-    if (isBlank(host) || isNotHostName()) {
-      return null;
-    }
-    return host;
-  }
-
   public CloudProvider getCloudProvider() {
     if (isLocalhost()) {
       return CloudProvider.LOCAL;
@@ -70,27 +63,32 @@ public final class HostClassifier {
   }
 
   public String getSanitizedHostName() {
-    if (isBlank(host)) {
-      return null;
-    }
     if (isLocalhost()) {
       return "localhost";
     }
-    if (isNotHostName()) {
-      return "masked-instance";
+    if (!isHostName()) {
+      return "";
     }
     return host;
+  }
+
+  public boolean isHostName() {
+    return !isBlank(host) && !isIpV4() && !isIpV6() && !isInternalDomain();
   }
 
   public boolean isInternalDomain() {
     if (isBlank(host)) {
       return false;
     }
+    if (isLocalhost()) {
+      return true;
+    }
     final String value = host.toLowerCase(Locale.ROOT);
     return value.endsWith(".internal")
         || value.endsWith(".corp")
         || value.endsWith(".local")
-        || value.endsWith(".lan");
+        || value.endsWith(".lan")
+        || value.endsWith(".example.com");
   }
 
   public boolean isIpV4() {
@@ -135,10 +133,6 @@ public final class HostClassifier {
     }
 
     return false;
-  }
-
-  public boolean isNotHostName() {
-    return isIpV4() || isIpV6() || isInternalDomain();
   }
 
   private String normalize(final String host) {

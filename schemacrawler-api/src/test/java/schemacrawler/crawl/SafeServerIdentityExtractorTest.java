@@ -32,7 +32,7 @@ public class SafeServerIdentityExtractorTest {
     final ServerIdentity serverIdentity = new SafeServerIdentityExtractor().extract(connection);
 
     assertThat(serverIdentity, is(notNullValue()));
-    assertThat(serverIdentity.instanceName(), is("appdb"));
+    assertThat(serverIdentity.instanceName(), is("mydb.us-east-1.rds.amazonaws.com"));
     assertThat(serverIdentity.cloudProvider(), is(CloudProvider.AWS));
     assertThat(serverIdentity.region(), is("us-east-1"));
   }
@@ -70,7 +70,7 @@ public class SafeServerIdentityExtractorTest {
 
     final ServerIdentity serverIdentity = new SafeServerIdentityExtractor().extract(connection);
 
-    assertThat(serverIdentity.instanceName(), is("postgres"));
+    assertThat(serverIdentity.instanceName(), is("localhost"));
     assertThat(serverIdentity.cloudProvider(), is(CloudProvider.LOCAL));
     assertThat(serverIdentity.region(), is("local"));
   }

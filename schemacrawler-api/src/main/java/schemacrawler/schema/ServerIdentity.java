@@ -21,7 +21,7 @@ public record ServerIdentity(String instanceName, CloudProvider cloudProvider, S
   @Serial private static final long serialVersionUID = -4347254509135801162L;
 
   public static ServerIdentity unknown() {
-    return new ServerIdentity("unknown-instance", CloudProvider.UNKNOWN, "unknown");
+    return new ServerIdentity("", CloudProvider.UNKNOWN, "");
   }
 
   public ServerIdentity {

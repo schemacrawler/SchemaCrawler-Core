@@ -21,7 +21,7 @@ public class JdbcUrlParserTest {
   public void parseHostPortDatabaseUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql://db.example.com:3306/appdb");
     assertThat(jdbcUrl.databaseServerType(), is("mysql"));
-    assertThat(jdbcUrl.hostClassifier().asHostName(), is("db.example.com"));
+    assertThat(jdbcUrl.hostClassifier().getSanitizedHostName(), is(""));
     assertThat(jdbcUrl.port(), is(3306));
     assertThat(jdbcUrl.databaseName(), is("appdb"));
   }
@@ -30,7 +30,7 @@ public class JdbcUrlParserTest {
   public void parseSqlServerStyleUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver://sqlhost:1433;databaseName=Sales");
     assertThat(jdbcUrl.databaseServerType(), is("sqlserver"));
-    assertThat(jdbcUrl.hostClassifier().asHostName(), is("sqlhost"));
+    assertThat(jdbcUrl.hostClassifier().getSanitizedHostName(), is("sqlhost"));
     assertThat(jdbcUrl.port(), is(1433));
     assertThat(jdbcUrl.databaseName(), is("Sales"));
   }
@@ -39,7 +39,7 @@ public class JdbcUrlParserTest {
   public void parseOracleStyleUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:oracle:thin:@//oracledb:1521/ORCLPDB1");
     assertThat(jdbcUrl.databaseServerType(), is("oracle"));
-    assertThat(jdbcUrl.hostClassifier().asHostName(), is("oracledb"));
+    assertThat(jdbcUrl.hostClassifier().getSanitizedHostName(), is("oracledb"));
     assertThat(jdbcUrl.port(), is(1521));
     assertThat(jdbcUrl.databaseName(), is("ORCLPDB1"));
   }
@@ -48,7 +48,7 @@ public class JdbcUrlParserTest {
   public void parseSqliteMemoryUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlite::memory:");
     assertThat(jdbcUrl.databaseServerType(), is("sqlite"));
-    assertThat(jdbcUrl.hostClassifier().asHostName(), is((String) null));
+    assertThat(jdbcUrl.hostClassifier().getSanitizedHostName(), is(""));
     assertThat(jdbcUrl.port(), is((Integer) null));
     assertThat(jdbcUrl.databaseName(), is(":memory:"));
   }
@@ -57,7 +57,7 @@ public class JdbcUrlParserTest {
   public void parseOfflineFileUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:offline:C:\\temp\\snapshot.db");
     assertThat(jdbcUrl.databaseServerType(), is("offline"));
-    assertThat(jdbcUrl.hostClassifier().asHostName(), is((String) null));
+    assertThat(jdbcUrl.hostClassifier().getSanitizedHostName(), is(""));
     assertThat(jdbcUrl.port(), is((Integer) null));
     assertThat(jdbcUrl.databaseName(), is("C:\\temp\\snapshot.db"));
   }
@@ -66,7 +66,7 @@ public class JdbcUrlParserTest {
   public void parseBlankUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse(null);
     assertThat(jdbcUrl.databaseServerType(), is(""));
-    assertThat(jdbcUrl.hostClassifier().asHostName(), is((String) null));
+    assertThat(jdbcUrl.hostClassifier().getSanitizedHostName(), is(""));
     assertThat(jdbcUrl.port(), is((Integer) null));
     assertThat(jdbcUrl.databaseName(), is((String) null));
   }

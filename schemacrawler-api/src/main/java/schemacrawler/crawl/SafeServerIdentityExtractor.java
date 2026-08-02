@@ -12,7 +12,6 @@ import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.ServerIdentity;
@@ -27,6 +26,7 @@ public class SafeServerIdentityExtractor implements ServerIdentityExtractor {
   private static final Logger LOGGER =
       Logger.getLogger(SafeServerIdentityExtractor.class.getName());
 
+  @Override
   public ServerIdentity extract(final Connection connection) {
     if (connection == null) {
       return ServerIdentity.unknown();
@@ -36,28 +36,15 @@ public class SafeServerIdentityExtractor implements ServerIdentityExtractor {
       final String url = metaData == null ? null : metaData.getURL();
       final JdbcUrl jdbcUrl = JdbcUrlParser.parse(url);
       final HostClassifier hostClassifier = jdbcUrl.hostClassifier();
-      final String host = maskHost(hostClassifier);
 
-      String instanceName = sanitizeInstance(tryExtractInstance(connection, jdbcUrl));
+      final String extractedInstance = tryExtractInstance(connection, jdbcUrl);
+      String instanceName = new HostClassifier(extractedInstance).getSanitizedHostName();
       if (isBlank(instanceName)) {
-        instanceName = sanitizeInstance(jdbcUrl.databaseName());
-      }
-      if (isBlank(instanceName)) {
-        instanceName = sanitizeInstance(firstHostSegment(host));
-      }
-      if (isBlank(instanceName)) {
-        instanceName = "unknown-instance";
+        instanceName = hostClassifier.getSanitizedHostName();
       }
 
-      CloudProvider cloudProvider = hostClassifier.getCloudProvider();
-      if (cloudProvider == null) {
-        cloudProvider = CloudProvider.UNKNOWN;
-      }
-
-      String region = sanitizeRegion(hostClassifier.getCloudRegion());
-      if (isBlank(region)) {
-        region = "unknown";
-      }
+      final CloudProvider cloudProvider = hostClassifier.getCloudProvider();
+      final String region = hostClassifier.getCloudRegion();
 
       return new ServerIdentity(instanceName, cloudProvider, region);
     } catch (final Exception e) {
@@ -68,41 +55,5 @@ public class SafeServerIdentityExtractor implements ServerIdentityExtractor {
 
   protected String tryExtractInstance(final Connection connection, final JdbcUrl jdbcUrl) {
     return null;
-  }
-
-  protected String sanitizeInstance(final String rawValue) {
-    return new HostClassifier(rawValue).getSanitizedHostName();
-  }
-
-  private String firstHostSegment(final String host) {
-    if (isBlank(host)) {
-      return null;
-    }
-    final String value = host.trim();
-    final int dot = value.indexOf('.');
-    if (dot > 0) {
-      return value.substring(0, dot);
-    }
-    return value;
-  }
-
-  private String maskHost(final HostClassifier hostClassifier) {
-    if (hostClassifier == null) {
-      return null;
-    }
-    if (hostClassifier.isLocalhost()) {
-      return "localhost";
-    }
-    if (hostClassifier.isNotHostName()) {
-      return null;
-    }
-    return hostClassifier.asHostName();
-  }
-
-  private String sanitizeRegion(final String rawValue) {
-    if (isBlank(rawValue)) {
-      return null;
-    }
-    return rawValue.trim().toLowerCase(Locale.ROOT);
   }
 }

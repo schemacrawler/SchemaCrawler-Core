@@ -18,57 +18,9 @@ import us.fatehi.utility.HostClassifier;
 public class HostClassifierTest {
 
   @Test
-  public void ipV4Matching() {
-    assertThat(new HostClassifier("127.0.0.1").isIpV4(), is(true));
-    assertThat(new HostClassifier("10.20.30.40").isIpV4(), is(true));
-    assertThat(new HostClassifier("256.1.1.1").isIpV4(), is(false));
-    assertThat(new HostClassifier("db.example.com").isIpV4(), is(false));
-  }
-
-  @Test
-  public void ipV6Matching() {
-    assertThat(new HostClassifier("::1").isIpV6(), is(true));
-    assertThat(new HostClassifier("2001:db8::8a2e:370:7334").isIpV6(), is(true));
-    assertThat(new HostClassifier("127.0.0.1").isIpV6(), is(false));
-    assertThat(new HostClassifier("db.example.com").isIpV6(), is(false));
-  }
-
-  @Test
-  public void internalDomainMatching() {
-    assertThat(new HostClassifier("app.internal").isInternalDomain(), is(true));
-    assertThat(new HostClassifier("db.corp").isInternalDomain(), is(true));
-    assertThat(new HostClassifier("dev.local").isInternalDomain(), is(true));
-    assertThat(new HostClassifier("cache.lan").isInternalDomain(), is(true));
-    assertThat(new HostClassifier("example.com").isInternalDomain(), is(false));
-  }
-
-  @Test
-  public void localhostMatching() {
-    assertThat(new HostClassifier("localhost").isLocalhost(), is(true));
-    assertThat(new HostClassifier("LOCALHOST").isLocalhost(), is(true));
-    assertThat(new HostClassifier("localhost.localdomain").isLocalhost(), is(true));
-    assertThat(new HostClassifier("api.localhost").isLocalhost(), is(true));
-    assertThat(new HostClassifier("127.0.0.1").isLocalhost(), is(true));
-    assertThat(new HostClassifier("127.12.34.56").isLocalhost(), is(true));
-    assertThat(new HostClassifier("::1").isLocalhost(), is(true));
-    assertThat(new HostClassifier("0:0:0:0:0:0:0:1").isLocalhost(), is(true));
-    assertThat(new HostClassifier("10.0.0.1").isLocalhost(), is(false));
-    assertThat(new HostClassifier("example.com").isLocalhost(), is(false));
-  }
-
-  @Test
-  public void nonPublicPredicate() {
-    assertThat(new HostClassifier("10.0.0.1").isNotHostName(), is(true));
-    assertThat(new HostClassifier("2001:db8::1").isNotHostName(), is(true));
-    assertThat(new HostClassifier("db.internal").isNotHostName(), is(true));
-    assertThat(new HostClassifier("localhost").isNotHostName(), is(false));
-    assertThat(new HostClassifier("db.example.com").isNotHostName(), is(false));
-  }
-
-  @Test
   public void blankInput() {
-    assertThat(new HostClassifier(null).isNotHostName(), is(false));
-    assertThat(new HostClassifier("  ").isNotHostName(), is(false));
+    assertThat(new HostClassifier(null).isHostName(), is(false));
+    assertThat(new HostClassifier("  ").isHostName(), is(false));
     assertThat(new HostClassifier(null).isLocalhost(), is(false));
     assertThat(new HostClassifier("").isLocalhost(), is(false));
   }
@@ -92,11 +44,59 @@ public class HostClassifierTest {
   }
 
   @Test
+  public void internalDomainMatching() {
+    assertThat(new HostClassifier("app.internal").isInternalDomain(), is(true));
+    assertThat(new HostClassifier("db.corp").isInternalDomain(), is(true));
+    assertThat(new HostClassifier("dev.local").isInternalDomain(), is(true));
+    assertThat(new HostClassifier("cache.lan").isInternalDomain(), is(true));
+    assertThat(new HostClassifier("example.com").isInternalDomain(), is(false));
+  }
+
+  @Test
+  public void ipV4Matching() {
+    assertThat(new HostClassifier("127.0.0.1").isIpV4(), is(true));
+    assertThat(new HostClassifier("10.20.30.40").isIpV4(), is(true));
+    assertThat(new HostClassifier("256.1.1.1").isIpV4(), is(false));
+    assertThat(new HostClassifier("db.example.com").isIpV4(), is(false));
+  }
+
+  @Test
+  public void ipV6Matching() {
+    assertThat(new HostClassifier("::1").isIpV6(), is(true));
+    assertThat(new HostClassifier("2001:db8::8a2e:370:7334").isIpV6(), is(true));
+    assertThat(new HostClassifier("127.0.0.1").isIpV6(), is(false));
+    assertThat(new HostClassifier("db.example.com").isIpV6(), is(false));
+  }
+
+  @Test
+  public void localhostMatching() {
+    assertThat(new HostClassifier("localhost").isLocalhost(), is(true));
+    assertThat(new HostClassifier("LOCALHOST").isLocalhost(), is(true));
+    assertThat(new HostClassifier("localhost.localdomain").isLocalhost(), is(true));
+    assertThat(new HostClassifier("api.localhost").isLocalhost(), is(true));
+    assertThat(new HostClassifier("127.0.0.1").isLocalhost(), is(true));
+    assertThat(new HostClassifier("127.12.34.56").isLocalhost(), is(true));
+    assertThat(new HostClassifier("::1").isLocalhost(), is(true));
+    assertThat(new HostClassifier("0:0:0:0:0:0:0:1").isLocalhost(), is(true));
+    assertThat(new HostClassifier("10.0.0.1").isLocalhost(), is(false));
+    assertThat(new HostClassifier("example.com").isLocalhost(), is(false));
+  }
+
+  @Test
+  public void nonPublic() {
+    assertThat(new HostClassifier("10.0.0.1").isHostName(), is(false));
+    assertThat(new HostClassifier("2001:db8::1").isHostName(), is(false));
+    assertThat(new HostClassifier("db.internal").isHostName(), is(false));
+    assertThat(new HostClassifier("localhost").isHostName(), is(false));
+    assertThat(new HostClassifier("db.example.com").isHostName(), is(false));
+  }
+
+  @Test
   public void sanitizedHostName() {
     assertThat(new HostClassifier("localhost").getSanitizedHostName(), is("localhost"));
-    assertThat(new HostClassifier("10.0.0.1").getSanitizedHostName(), is("masked-instance"));
-    assertThat(new HostClassifier("db.internal").getSanitizedHostName(), is("masked-instance"));
-    assertThat(new HostClassifier("db.example.com").getSanitizedHostName(), is("db.example.com"));
-    assertThat(new HostClassifier(null).getSanitizedHostName(), is((String) null));
+    assertThat(new HostClassifier("10.0.0.1").getSanitizedHostName(), is(""));
+    assertThat(new HostClassifier("db.internal").getSanitizedHostName(), is(""));
+    assertThat(new HostClassifier("db.example.com").getSanitizedHostName(), is(""));
+    assertThat(new HostClassifier(null).getSanitizedHostName(), is(""));
   }
 }
