@@ -32,6 +32,7 @@ public final class SerializedCatalogUtility {
       List.of(
           Pattern.compile("us\\.fatehi\\.utility\\.CloudProvider"),
           Pattern.compile("us\\.fatehi\\.utility\\.HostType"),
+          Pattern.compile("us\\.fatehi\\.utility\\.HostLocation"),
           Pattern.compile("us\\.fatehi\\.utility\\.property\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.database\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"),

@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.crawl.SafeHostLocationExtractor;
 import schemacrawler.plugin.EnumDataTypeInfo;
 import schemacrawler.plugin.EnumDataTypeInfo.EnumDataTypeTypes;
-import schemacrawler.schema.HostLocation;
 import schemacrawler.schemacrawler.InformationSchemaKey;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
@@ -36,6 +35,7 @@ import schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import us.fatehi.test.utility.TestObjectUtility;
+import us.fatehi.utility.HostLocation;
 import us.fatehi.utility.datasource.DatabaseServerType;
 
 public class SchemaRetrievalOptionsBuilderTest {

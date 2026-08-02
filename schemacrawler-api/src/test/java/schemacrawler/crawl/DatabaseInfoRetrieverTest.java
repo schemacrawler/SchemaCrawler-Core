@@ -353,6 +353,6 @@ public class DatabaseInfoRetrieverTest {
 
     assertThat(catalog.getDatabaseInfo().getHostLocation(), is(notNullValue()));
     assertThat(catalog.getDatabaseInfo().getHostLocation().cloudProvider().name(), is("UNKNOWN"));
-    assertThat(catalog.getDatabaseInfo().getHostLocation().region(), is("unknown"));
+    assertThat(catalog.getDatabaseInfo().getHostLocation().cloudRegion(), is(""));
   }
 }

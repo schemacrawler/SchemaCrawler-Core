@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import schemacrawler.schema.DatabaseInfo;
-import schemacrawler.schema.HostLocation;
+import us.fatehi.utility.HostLocation;
 import us.fatehi.utility.database.DatabaseInformation;
 import us.fatehi.utility.property.Property;
 

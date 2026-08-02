@@ -9,6 +9,7 @@
 package schemacrawler.schema;
 
 import java.util.Collection;
+import us.fatehi.utility.HostLocation;
 import us.fatehi.utility.property.ProductVersion;
 import us.fatehi.utility.property.Property;
 

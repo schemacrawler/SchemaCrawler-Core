@@ -12,5 +12,9 @@ public enum HostType {
   unknown,
   localhost,
   on_premises,
-  remote_host
+  remote_host;
+
+  public String getDescription() {
+    return name().replace('_', ' ');
+  }
 }

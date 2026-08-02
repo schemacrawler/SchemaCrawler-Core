@@ -26,59 +26,8 @@ public final class HostClassifier {
     this.host = normalize(host);
   }
 
-  public CloudProvider getCloudProvider() {
-    return CloudProvider.fromHost(host);
-  }
-
-  public String getCloudRegion() {
-    if (isBlank(host)) {
-      return null;
-    }
-    final CloudProvider cloudProvider = getCloudProvider();
-    final String[] hostParts = host.toLowerCase(Locale.ROOT).split("\\.");
-    if (cloudProvider == CloudProvider.AWS) {
-      for (final String hostPart : hostParts) {
-        if (hostPart.matches("[a-z]{2}-[a-z]+-\\d+")) {
-          return hostPart;
-        }
-      }
-    }
-    if (cloudProvider == CloudProvider.ORACLE) {
-      for (final String hostPart : hostParts) {
-        if (hostPart.matches("[a-z]+-[a-z]+-\\d+")) {
-          return hostPart;
-        }
-      }
-    }
-    if (cloudProvider == CloudProvider.AZURE) {
-      return "global";
-    }
-    return null;
-  }
-
-  public HostType getHostType() {
-    if (isLocalhost()) {
-      return HostType.localhost;
-    }
-    if (isInternalDomain() || isInternalIpRange()) {
-      return HostType.on_premises;
-    }
-    if (getCloudProvider() != CloudProvider.UNKNOWN) {
-      return HostType.remote_host;
-    }
-    if (isHostName()) {
-      return HostType.remote_host;
-    }
-    return HostType.unknown;
-  }
-
-  public String getSanitizedHostName() {
-    return switch (getHostType()) {
-      case localhost -> HostType.localhost.name();
-      case on_premises -> HostType.on_premises.name();
-      case remote_host -> HostType.remote_host.name();
-      default -> "";
-    };
+  public HostLocation getHostLocation() {
+    return new HostLocation(getHostType(), getCloudProvider(), getCloudRegion());
   }
 
   public boolean isHostName() {
@@ -144,15 +93,47 @@ public final class HostClassifier {
     return false;
   }
 
-  private String normalize(final String host) {
+  private CloudProvider getCloudProvider() {
+    return CloudProvider.fromHost(host);
+  }
+
+  private String getCloudRegion() {
     if (isBlank(host)) {
       return null;
     }
-    String value = host.trim();
-    if (value.startsWith("[") && value.endsWith("]") && value.length() > 2) {
-      value = value.substring(1, value.length() - 1);
+    final CloudProvider cloudProvider = getCloudProvider();
+    final String[] hostParts = host.toLowerCase(Locale.ROOT).split("\\.");
+    if (cloudProvider == CloudProvider.AWS) {
+      for (final String hostPart : hostParts) {
+        if (hostPart.matches("[a-z]{2}-[a-z]+-\\d+")) {
+          return hostPart;
+        }
+      }
     }
-    return value;
+    if (cloudProvider == CloudProvider.OCI) {
+      for (final String hostPart : hostParts) {
+        if (hostPart.matches("[a-z]+-[a-z]+-\\d+")) {
+          return hostPart;
+        }
+      }
+    }
+    if (cloudProvider == CloudProvider.AZURE) {
+      return "global";
+    }
+    return null;
+  }
+
+  private HostType getHostType() {
+    if (isLocalhost()) {
+      return HostType.localhost;
+    }
+    if (isInternalDomain() || isInternalIpRange()) {
+      return HostType.on_premises;
+    }
+    if (getCloudProvider() != CloudProvider.UNKNOWN || isHostName()) {
+      return HostType.remote_host;
+    }
+    return HostType.unknown;
   }
 
   private boolean isInternalIpRange() {
@@ -171,10 +152,20 @@ public final class HostClassifier {
         final InetAddress ipV6Address = InetAddress.getByName(host);
         return ipV6Address.isSiteLocalAddress() || ipV6Address.isLinkLocalAddress();
       } catch (final Exception e) {
-        return false;
       }
     }
 
     return false;
+  }
+
+  private String normalize(final String host) {
+    if (isBlank(host)) {
+      return null;
+    }
+    String value = host.trim();
+    if (value.startsWith("[") && value.endsWith("]") && value.length() > 2) {
+      value = value.substring(1, value.length() - 1);
+    }
+    return value;
   }
 }

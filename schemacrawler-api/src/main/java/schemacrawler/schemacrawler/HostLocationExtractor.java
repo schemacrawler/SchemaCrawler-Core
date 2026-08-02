@@ -9,7 +9,7 @@
 package schemacrawler.schemacrawler;
 
 import java.sql.Connection;
-import schemacrawler.schema.HostLocation;
+import us.fatehi.utility.HostLocation;
 
 @FunctionalInterface
 public interface HostLocationExtractor {

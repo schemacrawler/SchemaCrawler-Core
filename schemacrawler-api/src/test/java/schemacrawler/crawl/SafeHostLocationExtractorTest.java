@@ -18,8 +18,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import schemacrawler.schema.HostLocation;
 import us.fatehi.utility.CloudProvider;
+import us.fatehi.utility.HostLocation;
 import us.fatehi.utility.HostType;
 
 public class SafeHostLocationExtractorTest {
@@ -35,7 +35,7 @@ public class SafeHostLocationExtractorTest {
     assertThat(hostLocation, is(notNullValue()));
     assertThat(hostLocation.hostType(), is(HostType.remote_host));
     assertThat(hostLocation.cloudProvider(), is(CloudProvider.AWS));
-    assertThat(hostLocation.region(), is("us-east-1"));
+    assertThat(hostLocation.cloudRegion(), is("us-east-1"));
   }
 
   @Test
@@ -61,7 +61,7 @@ public class SafeHostLocationExtractorTest {
 
     assertThat(hostLocation.hostType(), is(HostType.remote_host));
     assertThat(hostLocation.cloudProvider(), is(CloudProvider.UNKNOWN));
-    assertThat(hostLocation.region(), is("unknown"));
+    assertThat(hostLocation.cloudRegion(), is("unknown"));
   }
 
   @Test
@@ -73,7 +73,7 @@ public class SafeHostLocationExtractorTest {
 
     assertThat(hostLocation.hostType(), is(HostType.localhost));
     assertThat(hostLocation.cloudProvider(), is(CloudProvider.UNKNOWN));
-    assertThat(hostLocation.region(), is("unknown"));
+    assertThat(hostLocation.cloudRegion(), is(""));
   }
 
   @Test
@@ -85,7 +85,7 @@ public class SafeHostLocationExtractorTest {
 
     assertThat(hostLocation.hostType(), is(HostType.localhost));
     assertThat(hostLocation.cloudProvider(), is(CloudProvider.UNKNOWN));
-    assertThat(hostLocation.region(), is("unknown"));
+    assertThat(hostLocation.cloudRegion(), is(""));
   }
 
   private Connection mockConnection(final String jdbcUrl) throws Exception {

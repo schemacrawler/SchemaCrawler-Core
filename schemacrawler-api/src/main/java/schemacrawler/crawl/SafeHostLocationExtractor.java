@@ -14,11 +14,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.schema.HostLocation;
 import schemacrawler.schemacrawler.HostLocationExtractor;
-import us.fatehi.utility.CloudProvider;
 import us.fatehi.utility.HostClassifier;
-import us.fatehi.utility.HostType;
+import us.fatehi.utility.HostLocation;
 import us.fatehi.utility.datasource.JdbcUrl;
 import us.fatehi.utility.datasource.JdbcUrlParser;
 
@@ -35,19 +33,14 @@ public class SafeHostLocationExtractor implements HostLocationExtractor {
       final DatabaseMetaData metaData = connection.getMetaData();
       final String url = metaData == null ? null : metaData.getURL();
       final JdbcUrl jdbcUrl = JdbcUrlParser.parse(url);
-      final HostClassifier hostClassifier = jdbcUrl.hostClassifier();
+      HostClassifier hostClassifier = jdbcUrl.hostClassifier();
 
-      final HostClassifier extractedHostClassifier =
-          new HostClassifier(obtainInstanceName(connection, jdbcUrl));
-      final HostClassifier effectiveHostClassifier =
-          isBlank(extractedHostClassifier.getSanitizedHostName())
-              ? hostClassifier
-              : extractedHostClassifier;
-      final HostType hostType = effectiveHostClassifier.getHostType();
-      final CloudProvider cloudProvider = hostClassifier.getCloudProvider();
-      final String region = hostClassifier.getCloudRegion();
+      final String instanceName = obtainInstanceName(connection, jdbcUrl);
+      if (!isBlank(instanceName)) {
+        hostClassifier = new HostClassifier(instanceName);
+      }
 
-      return new HostLocation(hostType, cloudProvider, region);
+      return hostClassifier.getHostLocation();
     } catch (final Exception e) {
       LOGGER.log(Level.FINE, "Could not extract host location", e);
       return HostLocation.unknown();

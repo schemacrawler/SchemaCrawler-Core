@@ -29,43 +29,61 @@ public class HostClassifierTest {
   @Test
   public void cloudProviderDetection() {
     assertThat(
-        new HostClassifier("mydb.us-east-1.rds.amazonaws.com").getCloudProvider(),
+        new HostClassifier("mydb.us-east-1.rds.amazonaws.com").getHostLocation().cloudProvider(),
         is(CloudProvider.AWS));
-    assertThat(new HostClassifier("mydb-aurora-cluster").getCloudProvider(), is(CloudProvider.AWS));
     assertThat(
-        new HostClassifier("mydb.cloudsql.google.internal").getCloudProvider(),
+        new HostClassifier("mydb-aurora-cluster").getHostLocation().cloudProvider(),
+        is(CloudProvider.AWS));
+    assertThat(
+        new HostClassifier("mydb.cloudsql.google.internal").getHostLocation().cloudProvider(),
         is(CloudProvider.GCP));
     assertThat(
-        new HostClassifier("adb.uk-london-1.oraclecloud.com").getCloudProvider(),
-        is(CloudProvider.ORACLE));
-    assertThat(new HostClassifier("localhost").getCloudProvider(), is(CloudProvider.UNKNOWN));
-    assertThat(new HostClassifier("db.example.com").getCloudProvider(), is(CloudProvider.UNKNOWN));
+        new HostClassifier("adb.uk-london-1.oraclecloud.com").getHostLocation().cloudProvider(),
+        is(CloudProvider.OCI));
+    assertThat(
+        new HostClassifier("localhost").getHostLocation().cloudProvider(),
+        is(CloudProvider.UNKNOWN));
+    assertThat(
+        new HostClassifier("db.example.com").getHostLocation().cloudProvider(),
+        is(CloudProvider.UNKNOWN));
   }
 
   @Test
   public void cloudRegionDetection() {
     assertThat(
-        new HostClassifier("mydb.us-east-1.rds.amazonaws.com").getCloudRegion(), is("us-east-1"));
+        new HostClassifier("mydb.us-east-1.rds.amazonaws.com").getHostLocation().cloudRegion(),
+        is("us-east-1"));
     assertThat(
-        new HostClassifier("adb.uk-london-1.oraclecloud.com").getCloudRegion(), is("uk-london-1"));
-    assertThat(new HostClassifier("mydb.database.windows.net").getCloudRegion(), is("global"));
-    assertThat(new HostClassifier("localhost").getCloudRegion(), is((String) null));
-    assertThat(new HostClassifier("127.2.3.4").getCloudRegion(), is((String) null));
-    assertThat(new HostClassifier(null).getCloudRegion(), is((String) null));
-    assertThat(new HostClassifier("db.example.com").getCloudRegion(), is((String) null));
+        new HostClassifier("adb.uk-london-1.oraclecloud.com").getHostLocation().cloudRegion(),
+        is("uk-london-1"));
+    assertThat(
+        new HostClassifier("mydb.database.windows.net").getHostLocation().cloudRegion(),
+        is("global"));
+    assertThat(new HostClassifier("localhost").getHostLocation().cloudRegion(), is(""));
+    assertThat(new HostClassifier("127.2.3.4").getHostLocation().cloudRegion(), is(""));
+    assertThat(new HostClassifier(null).getHostLocation().cloudRegion(), is(""));
+    assertThat(new HostClassifier("db.example.com").getHostLocation().cloudRegion(), is(""));
   }
 
   @Test
   public void hostTypeDetection() {
-    assertThat(new HostClassifier("localhost").getHostType(), is(HostType.localhost));
-    assertThat(new HostClassifier("127.0.0.1").getHostType(), is(HostType.localhost));
-    assertThat(new HostClassifier("db.internal").getHostType(), is(HostType.on_premises));
-    assertThat(new HostClassifier("10.20.30.40").getHostType(), is(HostType.on_premises));
     assertThat(
-        new HostClassifier("mydb.us-east-1.rds.amazonaws.com").getHostType(),
+        new HostClassifier("localhost").getHostLocation().hostType(), is(HostType.localhost));
+    assertThat(
+        new HostClassifier("127.0.0.1").getHostLocation().hostType(), is(HostType.localhost));
+    assertThat(
+        new HostClassifier("db.internal").getHostLocation().hostType(), is(HostType.on_premises));
+    assertThat(
+        new HostClassifier("10.20.30.40").getHostLocation().hostType(), is(HostType.on_premises));
+    assertThat(
+        new HostClassifier("mydb.us-east-1.rds.amazonaws.com").getHostLocation().hostType(),
         is(HostType.remote_host));
-    assertThat(new HostClassifier("prod.mycompany.com").getHostType(), is(HostType.remote_host));
-    assertThat(new HostClassifier("2001:db8::8a2e:370:7334").getHostType(), is(HostType.unknown));
+    assertThat(
+        new HostClassifier("prod.mycompany.com").getHostLocation().hostType(),
+        is(HostType.remote_host));
+    assertThat(
+        new HostClassifier("2001:db8::8a2e:370:7334").getHostLocation().hostType(),
+        is(HostType.unknown));
   }
 
   @Test
@@ -120,16 +138,5 @@ public class HostClassifierTest {
     assertThat(new HostClassifier("db.internal").isHostName(), is(false));
     assertThat(new HostClassifier("localhost").isHostName(), is(false));
     assertThat(new HostClassifier("db.example.com").isHostName(), is(false));
-  }
-
-  @Test
-  public void sanitizedHostName() {
-    assertThat(new HostClassifier("localhost").getSanitizedHostName(), is("localhost"));
-    assertThat(new HostClassifier("  localhost  ").getSanitizedHostName(), is("localhost"));
-    assertThat(new HostClassifier("10.0.0.1").getSanitizedHostName(), is("on_premises"));
-    assertThat(new HostClassifier("db.internal").getSanitizedHostName(), is("on_premises"));
-    assertThat(new HostClassifier("db.example.com").getSanitizedHostName(), is("on_premises"));
-    assertThat(new HostClassifier("prod.mycompany.com").getSanitizedHostName(), is("remote_host"));
-    assertThat(new HostClassifier(null).getSanitizedHostName(), is(""));
   }
 }

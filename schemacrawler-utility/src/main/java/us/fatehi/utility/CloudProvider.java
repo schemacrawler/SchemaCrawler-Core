@@ -13,11 +13,11 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.util.Locale;
 
 public enum CloudProvider {
-  AWS,
-  AZURE,
-  GCP,
-  ORACLE,
-  UNKNOWN;
+  UNKNOWN("Unknown"),
+  AWS("Amazon Web Services"),
+  AZURE("Microsoft Azure"),
+  GCP("Google Cloud Platform"),
+  OCI("Oracle Cloud Infrastructure");
 
   public static CloudProvider fromHost(final String host) {
     if (isBlank(host)) {
@@ -34,8 +34,18 @@ public enum CloudProvider {
       return GCP;
     }
     if (h.contains("oraclecloud.com")) {
-      return ORACLE;
+      return OCI;
     }
     return UNKNOWN;
+  }
+
+  private final String description;
+
+  CloudProvider(final String description) {
+    this.description = description;
+  }
+
+  public String getDescription() {
+    return description;
   }
 }
