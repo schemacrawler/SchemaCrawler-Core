@@ -32,9 +32,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.schemacrawler.HostLocationExtractor;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import us.fatehi.utility.HostLocation;
 import us.fatehi.utility.UtilityLogger;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.property.Property;
@@ -275,7 +277,8 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
         LOGGER.log(
             Level.FINER,
             new StringFormat(
-                "Retrieving server information property: %s=%s", propertyName, propertyValue));
+                "Retrieving server information property: %s (value is %bblank)",
+                propertyName, isBlank(propertyValue) ? "" : "not "));
 
         final Property serverInfoProperty =
             new ImmutableServerInfoProperty(propertyName, propertyValue, propertyDescription);
@@ -284,6 +287,25 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
     } catch (final Exception e) {
       LOGGER.log(Level.WARNING, "Could not retrieve server information", e);
     }
+  }
+
+  void retrieveHostLocation() {
+    final MutableDatabaseInfo dbInfo = catalog.getDatabaseInfo();
+    if (dbInfo == null) {
+      return;
+    }
+
+    final HostLocationExtractor extractor = getRetrieverConnection().getHostLocationExtractor();
+
+    HostLocation hostLocation = HostLocation.unknown();
+    try (final Connection connection =
+        getRetrieverConnection().getConnection("host location information")) {
+      hostLocation = extractor.extract(connection);
+    } catch (final Exception e) {
+      LOGGER.log(Level.FINE, "Could not retrieve host location", e);
+    }
+
+    dbInfo.setHostLocation(hostLocation);
   }
 
   private Collection<ImmutableDatabaseProperty> retrieveResultSetTypesProperties(

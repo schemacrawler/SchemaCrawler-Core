@@ -24,6 +24,7 @@ import schemacrawler.tools.executable.commandline.PluginCommand;
 import us.fatehi.utility.OptionsBuilder;
 import us.fatehi.utility.datasource.DatabaseConnectionSourceBuilder;
 import us.fatehi.utility.datasource.DatabaseServerType;
+import us.fatehi.utility.datasource.JdbcUrlParser;
 
 public class DatabaseConnectorOptionsBuilder
     implements OptionsBuilder<DatabaseConnectorOptionsBuilder, DatabaseConnectorOptions> {
@@ -35,13 +36,9 @@ public class DatabaseConnectorOptionsBuilder
   private final DatabaseServerType dbServerType;
   private Predicate<String> supportsUrl;
 
-  private BiConsumer<InformationSchemaViewsBuilder, Connection> informationSchemaViewsBuildProcess =
-      (builder, conn) -> {};
-
-  private BiConsumer<SchemaRetrievalOptionsBuilder, Connection> schemaRetrievalOptionsBuildProcess =
-      (builder, conn) -> {};
-
-  private Consumer<LimitOptionsBuilder> limitOptionsBuildProcess = builder -> {};
+  private BiConsumer<InformationSchemaViewsBuilder, Connection> informationSchemaViewsBuildProcess;
+  private BiConsumer<SchemaRetrievalOptionsBuilder, Connection> schemaRetrievalOptionsBuildProcess;
+  private Consumer<LimitOptionsBuilder> limitOptionsBuildProcess;
   private Supplier<DatabaseConnectionSourceBuilder> dbConnectionSourceBuildProcess;
   private PluginCommand helpCommand;
 
@@ -156,9 +153,9 @@ public class DatabaseConnectorOptionsBuilder
   private void buildDefaultSupportsUrlPredicate() {
     final String template = dbConnectionSourceBuildProcess.get().getConnectionUrlTemplate();
     if (!isBlank(template)) {
-      final int secondColon = template.indexOf(':', "jdbc:".length());
-      if (secondColon > 0) {
-        final String prefix = template.substring(0, secondColon + 1);
+      final String databaseServerType = JdbcUrlParser.parse(template).databaseServerType();
+      if (!isBlank(databaseServerType)) {
+        final String prefix = "jdbc:%s:".formatted(databaseServerType);
         supportsUrl = url -> url != null && url.startsWith(prefix);
       }
     }

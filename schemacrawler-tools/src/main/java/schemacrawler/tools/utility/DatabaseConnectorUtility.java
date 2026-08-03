@@ -16,8 +16,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
@@ -28,6 +26,7 @@ import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseServerType;
+import us.fatehi.utility.datasource.JdbcUrlParser;
 import us.fatehi.utility.readconfig.SystemPropertiesConfig;
 
 /** SchemaCrawler utility methods. */
@@ -66,24 +65,12 @@ public final class DatabaseConnectorUtility {
   }
 
   private static String extractDatabaseServerTypeFromUrl(final String url) {
-    final Pattern urlPattern = Pattern.compile("jdbc:(.*?):.*");
-    final Matcher matcher = urlPattern.matcher(url);
-    if (!matcher.matches()) {
-      return "";
-    }
-    final String urlDBServerType;
-    if (matcher.groupCount() == 1) {
-      final String matchedDBServerType = matcher.group(1);
-      if (List.of(
-              "db2", "hsqldb", "mariadb", "mysql", "oracle", "postgresql", "sqlite", "sqlserver")
-          .contains(matchedDBServerType)) {
-        urlDBServerType = matchedDBServerType;
-      } else {
-        urlDBServerType = null;
-      }
-    } else {
-      urlDBServerType = null;
-    }
+    final String matchedDBServerType = JdbcUrlParser.parse(url).databaseServerType();
+    final String urlDBServerType =
+        List.of("db2", "hsqldb", "mariadb", "mysql", "oracle", "postgresql", "sqlite", "sqlserver")
+                .contains(matchedDBServerType)
+            ? matchedDBServerType
+            : null;
     if (isBlank(urlDBServerType)) {
       return "";
     }

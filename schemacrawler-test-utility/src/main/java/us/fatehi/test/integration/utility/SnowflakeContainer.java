@@ -44,7 +44,7 @@ public class SnowflakeContainer extends JdbcDatabaseContainer<SnowflakeContainer
   @Override
   public String getJdbcUrl() {
     return "jdbc:snowflake://%s:%d/?account=localstack"
-        .formatted(localstackSnowflakeHost(), getMappedPort(EDGE_PORT));
+        .formatted(getHost(), getMappedPort(EDGE_PORT));
   }
 
   @Override
@@ -118,8 +118,9 @@ public class SnowflakeContainer extends JdbcDatabaseContainer<SnowflakeContainer
     getWaitStrategy().waitUntilReady(this);
   }
 
-  private String localstackSnowflakeHost() {
-    final String host = getHost();
+  @Override
+  public String getHost() {
+    final String host = super.getHost();
     if ("localhost".equalsIgnoreCase(host) || "127.0.0.1".equals(host)) {
       return "snowflake.localhost.localstack.cloud";
     }

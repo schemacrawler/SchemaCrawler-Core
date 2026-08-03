@@ -182,6 +182,12 @@ public final class SchemaCrawler {
     final DatabaseInfoRetriever retriever =
         new DatabaseInfoRetriever(retrieverConnection, catalog, options);
 
+    if (infoLevel.is(retrieveServerInfo)) {
+      taskRunner.add("retrieveHostLocation", retriever::retrieveHostLocation);
+    } else {
+      LOGGER.log(Level.INFO, "Not retrieving host location, since maximum level was not requested");
+    }
+
     taskRunner
         .add(retrieveAdditionalDatabaseInfo, retriever::retrieveAdditionalDatabaseInfo)
         .add(retrieveServerInfo, retriever::retrieveServerInfo)

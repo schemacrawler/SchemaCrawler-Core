@@ -2,6 +2,14 @@
 
 SchemaCrawler Core release notes.
 
+<a name="v17.12.3"></a>
+## Release v17.12.3 - 2026-08-02
+
+- Rename server identity to host location and add host type (`unknown`, `localhost`, `on_premises`, `remote_host`)
+- Retrieve host location only at maximum info level
+- Remove local from cloud provider classification and derive localhost through host type
+- Sanitize server information logging to avoid value leakage; logs now contain property name and whether value is blank
+
 
 <a name="v17.12.2"></a>
 ## Release v17.12.2 - 2026-07-18

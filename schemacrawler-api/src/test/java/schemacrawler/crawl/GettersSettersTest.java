@@ -54,15 +54,16 @@ public class GettersSettersTest {
 
   private static final String PACKAGE_SCHEMACRAWLER_SCHEMA = "schemacrawler.schema";
 
-  // Classes that should be excluded from accessor validation (value objects, enums, etc.)
+  // Classes that should be excluded from accessor validation (value objects, records, enums, etc.)
   private static final String[] EXCLUDED_CLASSES = {
-    "NamedObjectKey",
-    "JavaSqlType",
-    "TableTypes",
+    "IdentifierQuotingStrategy",
     "Identifiers",
     "IdentifiersBuilder",
-    "IdentifierQuotingStrategy",
-    "Test"
+    "JavaSqlType",
+    "NamedObjectKey",
+    "HostLocation",
+    "TableTypes",
+    "Test",
   };
 
   @Test

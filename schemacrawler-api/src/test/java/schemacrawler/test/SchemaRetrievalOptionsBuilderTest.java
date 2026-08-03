@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import schemacrawler.crawl.SafeHostLocationExtractor;
 import schemacrawler.plugin.EnumDataTypeInfo;
 import schemacrawler.plugin.EnumDataTypeInfo.EnumDataTypeTypes;
 import schemacrawler.schemacrawler.InformationSchemaKey;
@@ -34,6 +35,7 @@ import schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import us.fatehi.test.utility.TestObjectUtility;
+import us.fatehi.utility.HostLocation;
 import us.fatehi.utility.datasource.DatabaseServerType;
 
 public class SchemaRetrievalOptionsBuilderTest {
@@ -387,6 +389,26 @@ public class SchemaRetrievalOptionsBuilderTest {
     assertThat(
         schemaRetrievalOptions.getDatabaseServerType().getDatabaseSystemIdentifier(),
         is(nullValue()));
+  }
+
+  @Test
+  public void hostLocationExtractor() {
+    final SchemaRetrievalOptionsBuilder builder = SchemaRetrievalOptionsBuilder.builder();
+
+    assertThat(builder.toOptions().getHostLocationExtractor(), is(nullValue()));
+
+    final SafeHostLocationExtractor customExtractor =
+        new SafeHostLocationExtractor() {
+          @Override
+          public HostLocation extract(final Connection connection) {
+            return HostLocation.unknown();
+          }
+        };
+    builder.withHostLocationExtractor(customExtractor);
+    assertThat(builder.toOptions().getHostLocationExtractor(), is(customExtractor));
+
+    builder.withHostLocationExtractor(null);
+    assertThat(builder.toOptions().getHostLocationExtractor(), is(nullValue()));
   }
 
   @Test

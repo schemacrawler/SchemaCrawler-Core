@@ -9,6 +9,7 @@
 package schemacrawler.schema;
 
 import java.util.Collection;
+import us.fatehi.utility.HostLocation;
 import us.fatehi.utility.property.ProductVersion;
 import us.fatehi.utility.property.Property;
 
@@ -46,6 +47,13 @@ public interface DatabaseInfo extends ProductVersion {
    * @return Schema
    */
   Collection<Property> getServerInfo();
+
+  /**
+   * Gets a canonical, safe host location.
+   *
+   * @return Host location
+   */
+  HostLocation getHostLocation();
 
   /**
    * Gets the user name as known to this database.
