@@ -11,7 +11,6 @@ package schemacrawler.test.utility;
 import static org.junit.jupiter.api.Assertions.fail;
 import static us.fatehi.test.utility.TestUtility.failTestSetup;
 
-import java.io.Closeable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
@@ -24,16 +23,22 @@ import us.fatehi.utility.datasource.DatabaseConnectionSources;
 
 public abstract class BaseAdditionalDatabaseTest {
 
-  private DataSource dataSource;
+  private DatabaseConnectionSource connectionSource;
 
   protected void closeDataSource() {
     try {
-      if (dataSource instanceof final Closeable closeable) {
-        closeable.close();
-      }
+      connectionSource.close();
     } catch (final Exception e) {
       failTestSetup("Could not close data source", e);
     }
+  }
+
+  protected final void createConnectionSource(final Connection connection) {
+    createConnectionSource(DatabaseConnectionSources.fromConnection(connection));
+  }
+
+  protected final void createConnectionSource(final DatabaseConnectionSource connectionSource) {
+    this.connectionSource = connectionSource;
   }
 
   protected void createDatabase(final String scriptsResource) {
@@ -57,21 +62,22 @@ public abstract class BaseAdditionalDatabaseTest {
       final String password,
       final Map<String, String> connectionProperties) {
 
-    dataSource =
+    final DataSource dataSource =
         DataSourceTestUtility.createDataSource(connectionUrl, user, password, connectionProperties);
+    createConnectionSource(DatabaseConnectionSources.fromDataSource(dataSource));
   }
 
   protected final Connection getConnection() {
     try {
-      return dataSource.getConnection();
-    } catch (final SQLException e) {
+      return connectionSource.get();
+    } catch (final RuntimeException e) {
       fail("Could not get database connection", e);
       return null; // Appeasing the compiler - this line will never be executed.
     }
   }
 
   protected final DatabaseConnectionSource getConnectionSource() {
-    return DatabaseConnectionSources.fromDataSource(dataSource);
+    return connectionSource;
   }
 
   protected void runScript(final String databaseSqlResource) throws Exception {
