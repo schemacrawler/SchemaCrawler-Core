@@ -36,13 +36,9 @@ public class DatabaseConnectorOptionsBuilder
   private final DatabaseServerType dbServerType;
   private Predicate<String> supportsUrl;
 
-  private BiConsumer<InformationSchemaViewsBuilder, Connection> informationSchemaViewsBuildProcess =
-      (builder, conn) -> {};
-
-  private BiConsumer<SchemaRetrievalOptionsBuilder, Connection> schemaRetrievalOptionsBuildProcess =
-      (builder, conn) -> {};
-
-  private Consumer<LimitOptionsBuilder> limitOptionsBuildProcess = builder -> {};
+  private BiConsumer<InformationSchemaViewsBuilder, Connection> informationSchemaViewsBuildProcess;
+  private BiConsumer<SchemaRetrievalOptionsBuilder, Connection> schemaRetrievalOptionsBuildProcess;
+  private Consumer<LimitOptionsBuilder> limitOptionsBuildProcess;
   private Supplier<DatabaseConnectionSourceBuilder> dbConnectionSourceBuildProcess;
   private PluginCommand helpCommand;
 
