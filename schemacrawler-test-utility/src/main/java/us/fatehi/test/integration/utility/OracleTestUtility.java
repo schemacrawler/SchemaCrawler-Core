@@ -31,6 +31,7 @@ public final class OracleTestUtility {
 
   public static Map<String, String> urlx() {
     final Map<String, String> urlx = new HashMap<>();
+    urlx.put("remarksReporting", "true");
     urlx.put("restrictGetTables", "true");
     urlx.put("useFetchSizeWithLongColumn", "true");
     return urlx;
