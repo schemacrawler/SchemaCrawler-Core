@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schemacrawler.ModelImplementation;
-import us.fatehi.utility.HostLocation;
 import us.fatehi.utility.database.DatabaseInformation;
 import us.fatehi.utility.property.BaseProductVersion;
 import us.fatehi.utility.property.Property;
@@ -37,7 +36,6 @@ final class MutableDatabaseInfo extends BaseProductVersion implements DatabaseIn
   // Mutable properties collection
   private final Set<Property> serverInfo;
   private final Set<Property> databaseProperties;
-  private HostLocation hostLocation;
 
   public MutableDatabaseInfo(final DatabaseInformation databaseInformation) {
     super(databaseInformation);
@@ -45,7 +43,6 @@ final class MutableDatabaseInfo extends BaseProductVersion implements DatabaseIn
 
     serverInfo = new HashSet<>();
     databaseProperties = new HashSet<>();
-    hostLocation = HostLocation.unknown();
   }
 
   /** {@inheritDoc} */
@@ -59,11 +56,6 @@ final class MutableDatabaseInfo extends BaseProductVersion implements DatabaseIn
   @Override
   public Collection<Property> getServerInfo() {
     return new TreeSet<>(serverInfo);
-  }
-
-  @Override
-  public HostLocation getHostLocation() {
-    return hostLocation;
   }
 
   /** {@inheritDoc} */
@@ -87,14 +79,6 @@ final class MutableDatabaseInfo extends BaseProductVersion implements DatabaseIn
   void addServerInfo(final Property property) {
     if (property != null) {
       serverInfo.add(property);
-    }
-  }
-
-  void setHostLocation(final HostLocation hostLocation) {
-    if (hostLocation != null) {
-      this.hostLocation = hostLocation;
-    } else {
-      this.hostLocation = HostLocation.unknown();
     }
   }
 }

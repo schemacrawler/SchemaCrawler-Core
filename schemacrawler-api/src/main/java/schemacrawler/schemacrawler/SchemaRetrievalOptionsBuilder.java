@@ -57,7 +57,6 @@ public final class SchemaRetrievalOptionsBuilder
   EnumDataTypeHelper enumDataTypeHelper;
   Map<SchemaInfoMetadataRetrievalStrategy, MetadataRetrievalStrategy> metadataRetrievalStrategyMap;
   Consumer<Connection> connectionInitializer;
-  HostLocationExtractor hostLocationExtractor;
 
   private SchemaRetrievalOptionsBuilder() {
     dbServerType = DatabaseServerType.UNKNOWN;
@@ -73,7 +72,6 @@ public final class SchemaRetrievalOptionsBuilder
         TableTypes.from("TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY");
     enumDataTypeHelper = NO_OP_ENUM_DATA_TYPE_HELPER;
     connectionInitializer = connection -> {};
-    hostLocationExtractor = null;
 
     metadataRetrievalStrategyMap = new EnumMap<>(SchemaInfoMetadataRetrievalStrategy.class);
     for (final SchemaInfoMetadataRetrievalStrategy key :
@@ -131,7 +129,6 @@ public final class SchemaRetrievalOptionsBuilder
     overridesTypeMap = Optional.empty();
     metadataRetrievalStrategyMap = options.getMetadataRetrievalStrategyMap();
     connectionInitializer = options.getConnectionInitializer();
-    hostLocationExtractor = options.getHostLocationExtractor();
 
     return this;
   }
@@ -166,12 +163,6 @@ public final class SchemaRetrievalOptionsBuilder
     } else {
       this.connectionInitializer = connectionInitializer;
     }
-    return this;
-  }
-
-  public SchemaRetrievalOptionsBuilder withHostLocationExtractor(
-      final HostLocationExtractor hostLocationExtractor) {
-    this.hostLocationExtractor = hostLocationExtractor;
     return this;
   }
 
