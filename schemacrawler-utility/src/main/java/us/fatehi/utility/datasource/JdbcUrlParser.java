@@ -10,15 +10,14 @@ package us.fatehi.utility.datasource;
 
 import static us.fatehi.utility.Utility.isBlank;
 
-import us.fatehi.utility.HostClassifier;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
 public final class JdbcUrlParser {
 
-  private record ParsedAuthority(String host, Integer port, String databaseName, String options) {}
+  private record ParsedAuthority(Integer port, String databaseName, String options) {}
 
-  private record ParsedHostPort(String host, Integer port) {}
+  private record ParsedHostPort(Integer port) {}
 
   public static JdbcUrl parse(final String url) {
     if (isBlank(url)) {
@@ -31,7 +30,7 @@ public final class JdbcUrlParser {
 
     final int subprotocolEnd = jdbc.indexOf(':', "jdbc:".length());
     if (subprotocolEnd < 0) {
-      return new JdbcUrl(jdbc.substring("jdbc:".length()), new HostClassifier(null), null, null);
+      return new JdbcUrl(jdbc.substring("jdbc:".length()), null, null);
     }
 
     final String databaseServerType = jdbc.substring("jdbc:".length(), subprotocolEnd);
@@ -41,7 +40,6 @@ public final class JdbcUrlParser {
     final boolean hasAuthority = hasAuthorityPrefix(body);
     final String normalizedBody = stripAuthorityPrefix(body);
 
-    String host = null;
     Integer port = null;
     String databaseName = null;
 
@@ -53,7 +51,6 @@ public final class JdbcUrlParser {
       // - jdbc:sqlserver://sqlhost:1433;databaseName=Sales
       // - jdbc:oracle:thin:@//oracledb:1521/ORCLPDB1
       final ParsedAuthority parsed = parseAuthority(normalizedBody);
-      host = parsed.host();
       port = parsed.port();
       databaseName = parsed.databaseName();
       if (isBlank(databaseName)) {
@@ -69,7 +66,6 @@ public final class JdbcUrlParser {
       final String head = headAndOptions[0];
       final String options = headAndOptions.length > 1 ? headAndOptions[1] : "";
       final ParsedHostPort parsedHostPort = parseHostPort(head);
-      host = parsedHostPort.host();
       port = parsedHostPort.port();
       databaseName = databaseNameFromOptions(options);
       if (isBlank(databaseName)) {
@@ -85,7 +81,7 @@ public final class JdbcUrlParser {
       databaseName = firstToken(normalizedBody);
     }
 
-    return new JdbcUrl(databaseServerType, new HostClassifier(host), port, databaseName);
+    return new JdbcUrl(databaseServerType, port, databaseName);
   }
 
   private static String databaseNameFromOptions(final String options) {
@@ -109,7 +105,7 @@ public final class JdbcUrlParser {
   }
 
   private static boolean hasAuthorityPrefix(final String value) {
-    return value.startsWith("//") || value.startsWith("@//") || value.startsWith("@");
+    return value.startsWith("//") || value.startsWith("@");
   }
 
   private static String normalizeOracleAuthorityMarker(final String value) {
@@ -147,12 +143,12 @@ public final class JdbcUrlParser {
     final String[] parts = hostAndDb.split("/", 2);
     final ParsedHostPort parsedHostPort = parseHostPort(parts[0]);
     final String databaseName = parts.length > 1 ? firstToken(parts[1]) : null;
-    return new ParsedAuthority(parsedHostPort.host(), parsedHostPort.port(), databaseName, options);
+    return new ParsedAuthority(parsedHostPort.port(), databaseName, options);
   }
 
   private static ParsedHostPort parseHostPort(final String hostPort) {
     if (isBlank(hostPort)) {
-      return new ParsedHostPort(null, null);
+      return new ParsedHostPort(null);
     }
     String value = hostPort.trim();
     if (value.contains(",")) {
@@ -162,22 +158,20 @@ public final class JdbcUrlParser {
     if (value.startsWith("[")) {
       final int end = value.indexOf(']');
       if (end > 0) {
-        final String host = value.substring(1, end);
         Integer port = null;
         if (end + 2 <= value.length() && value.charAt(end + 1) == ':') {
           port = parsePort(value.substring(end + 2));
         }
-        return new ParsedHostPort(host, port);
+        return new ParsedHostPort(port);
       }
     }
 
     final int firstColon = value.indexOf(':');
     final int lastColon = value.lastIndexOf(':');
     if (firstColon > 0 && firstColon == lastColon) {
-      return new ParsedHostPort(
-          value.substring(0, firstColon), parsePort(value.substring(firstColon + 1)));
+      return new ParsedHostPort(parsePort(value.substring(firstColon + 1)));
     }
-    return new ParsedHostPort(value, null);
+    return new ParsedHostPort(null);
   }
 
   private static Integer parsePort(final String value) {
@@ -192,9 +186,6 @@ public final class JdbcUrlParser {
   }
 
   private static String stripAuthorityPrefix(final String value) {
-    if (value.startsWith("@//")) {
-      return value.substring(3);
-    }
     if (value.startsWith("//")) {
       return value.substring(2);
     }

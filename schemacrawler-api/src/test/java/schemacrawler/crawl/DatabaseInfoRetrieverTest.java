@@ -331,28 +331,4 @@ public class DatabaseInfoRetrieverTest {
     assertThat(serverInfoProperty, is(new ImmutableServerInfoProperty(name, value, description)));
     assertThat(serverInfoProperty.getDescription(), is(description));
   }
-
-  @Test
-  @DisplayName("Retrieve host location independently")
-  public void hostLocation(
-      final TestContext testContext, final DatabaseConnectionSource connectionSource)
-      throws Exception {
-
-    final SchemaRetrievalOptions schemaRetrievalOptions =
-        SchemaRetrievalOptionsBuilder.builder()
-            .withHostLocationExtractor(new SafeHostLocationExtractor())
-            .toOptions();
-    final RetrieverConnection retrieverConnection =
-        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
-
-    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
-
-    final DatabaseInfoRetriever databaseInfoRetriever =
-        new DatabaseInfoRetriever(retrieverConnection, catalog, options);
-    databaseInfoRetriever.retrieveHostLocation();
-
-    assertThat(catalog.getDatabaseInfo().getHostLocation(), is(notNullValue()));
-    assertThat(catalog.getDatabaseInfo().getHostLocation().cloudProvider().name(), is("UNKNOWN"));
-    assertThat(catalog.getDatabaseInfo().getHostLocation().cloudRegion(), is(""));
-  }
 }

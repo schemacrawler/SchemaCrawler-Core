@@ -10,18 +10,14 @@ package us.fatehi.utility.datasource;
 
 import static us.fatehi.utility.Utility.isBlank;
 
-import us.fatehi.utility.HostClassifier;
-
-public record JdbcUrl(
-    String databaseServerType, HostClassifier hostClassifier, Integer port, String databaseName) {
+public record JdbcUrl(String databaseServerType, Integer port, String databaseName) {
 
   public JdbcUrl {
     databaseServerType = isBlank(databaseServerType) ? "" : databaseServerType.strip();
-    hostClassifier = hostClassifier == null ? new HostClassifier(null) : hostClassifier;
     databaseName = isBlank(databaseName) ? null : databaseName.strip();
   }
 
   public static JdbcUrl empty() {
-    return new JdbcUrl("", new HostClassifier(null), null, null);
+    return new JdbcUrl("", null, null);
   }
 }
