@@ -130,7 +130,7 @@ public class DatabaseConnectorOptionsBuilder
   public DatabaseConnectorOptionsBuilder withSchemaRetrievalOptionsBuilder(
       final BiConsumer<SchemaRetrievalOptionsBuilder, Connection> process) {
     if (process != null) {
-      schemaRetrievalOptionsBuildProcess.andThen(process);
+      schemaRetrievalOptionsBuildProcess = schemaRetrievalOptionsBuildProcess.andThen(process);
     }
     return this;
   }
