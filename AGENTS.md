@@ -76,6 +76,9 @@ When introducing new structural patterns or constraints, update `CoreArchitectur
 
 - Prefer **immutability**: use `final` on fields, parameters, and local variables.
 - Use `Optional`, streams, and functional programming idioms.
+- Sort methods based on whether they are static, then by visibility, and then alphabetically.
+- Format code using Google Java style guidelines.
+- Do not use `var` - instead use the interface or class name.
 - Ensure **thread safety**: avoid mutable shared state.
 - Write meaningful **Javadoc** for all public API.
 - Tests use **JUnit 6** with **Hamcrest** matchers; mock with **Mockito**.
