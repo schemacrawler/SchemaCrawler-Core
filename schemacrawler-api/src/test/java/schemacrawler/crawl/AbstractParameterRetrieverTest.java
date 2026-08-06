@@ -58,7 +58,7 @@ public abstract class AbstractParameterRetrieverTest {
     when(retrieverConnection.getIdentifiers()).thenReturn(identifiers);
 
     // Setup Catalog and Options
-    catalog = new MutableCatalog("testCatalog", databaseInfo, jdbcDriverInfo);
+    catalog = new MutableCatalog("", "testCatalog", databaseInfo, jdbcDriverInfo);
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     // Setup InformationSchemaViews

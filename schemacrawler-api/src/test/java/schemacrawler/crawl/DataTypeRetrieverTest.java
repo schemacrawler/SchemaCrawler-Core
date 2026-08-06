@@ -175,7 +175,7 @@ public class DataTypeRetrieverTest {
     final MutableJdbcDriverInfo jdbcDriverInfo =
         new MutableJdbcDriverInfo(connectionInfoBuilder.buildJdbcDriverInformation());
 
-    catalog = new MutableCatalog("datatype_test", databaseInfo, jdbcDriverInfo);
+    catalog = new MutableCatalog("", "datatype_test", databaseInfo, jdbcDriverInfo);
     assertThat(catalog.getColumnDataTypes(), is(empty()));
     assertThat(catalog.getSchemas(), is(empty()));
     assertThat(catalog.getDatabaseInfo().getServerInfo(), is(empty()));

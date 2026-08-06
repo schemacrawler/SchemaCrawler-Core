@@ -16,7 +16,7 @@ public final class SchemaCrawlerOptionsBuilder {
     final FilterOptions filterOptions = FilterOptionsBuilder.newFilterOptions();
     final GrepOptions grepOptions = GrepOptionsBuilder.newGrepOptions();
     final LoadOptions loadOptions = LoadOptionsBuilder.newLoadOptions();
-    return new SchemaCrawlerOptions(limitOptions, filterOptions, grepOptions, loadOptions);
+    return new SchemaCrawlerOptions("", limitOptions, filterOptions, grepOptions, loadOptions);
   }
 
   private SchemaCrawlerOptionsBuilder() {

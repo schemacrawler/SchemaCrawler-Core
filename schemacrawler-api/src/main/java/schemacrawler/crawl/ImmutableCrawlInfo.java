@@ -18,6 +18,7 @@ import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.time.temporal.ChronoField.YEAR;
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.io.Serial;
 import java.time.Instant;
@@ -55,15 +56,18 @@ final class ImmutableCrawlInfo implements CrawlInfo {
 
   private final UUID runId;
   private final Instant crawlTimestamp;
+  private final String title;
   private final ProductVersion jvmVersion;
   private final ProductVersion operatingSystemVersion;
   private final ProductVersion schemaCrawlerVersion;
   private final ProductVersion databaseVersion;
   private final ProductVersion jdbcDriverVersion;
 
-  ImmutableCrawlInfo(final ProductVersion databaseInfo, final ProductVersion jdbcDriverInfo) {
+  ImmutableCrawlInfo(
+      final String title, final ProductVersion databaseInfo, final ProductVersion jdbcDriverInfo) {
     requireNonNull(databaseInfo, "No database information provided");
     requireNonNull(jdbcDriverInfo, "No JDBC driver information provided");
+    this.title = trimToEmpty(title);
 
     schemaCrawlerVersion = Version.version();
     operatingSystemVersion = OperatingSystemInfo.operatingSystemInfo();
@@ -121,6 +125,11 @@ final class ImmutableCrawlInfo implements CrawlInfo {
   @Override
   public ProductVersion getSchemaCrawlerVersion() {
     return schemaCrawlerVersion;
+  }
+
+  @Override
+  public String getTitle() {
+    return title;
   }
 
   /** {@inheritDoc} */

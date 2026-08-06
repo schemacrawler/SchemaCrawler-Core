@@ -9,7 +9,6 @@
 package schemacrawler.tools.options;
 
 import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.io.IOException;
@@ -28,20 +27,17 @@ public final class OutputOptions implements Options {
   private final Charset outputEncodingCharset;
   private final String outputFormatValue;
   private final OutputResource outputResource;
-  private final String title;
 
   OutputOptions(
       final Charset inputEncodingCharset,
       final OutputResource outputResource,
       final Charset outputEncodingCharset,
-      final String outputFormatValue,
-      final String title) {
+      final String outputFormatValue) {
     this.inputEncodingCharset = requireNonNull(inputEncodingCharset, "No input encoding provided");
     this.outputResource = requireNonNull(outputResource, "No output resource provided");
     this.outputEncodingCharset =
         requireNonNull(outputEncodingCharset, "No output encoding provided");
     this.outputFormatValue = requireNonNull(outputFormatValue, "No output format value provided");
-    this.title = title;
   }
 
   /** Character encoding for input files, such as scripts and templates. */
@@ -74,24 +70,6 @@ public final class OutputOptions implements Options {
    */
   public String getOutputFormatValue() {
     return outputFormatValue;
-  }
-
-  /**
-   * Title for the output.
-   *
-   * @return Title for the output
-   */
-  public String getTitle() {
-    return title;
-  }
-
-  /**
-   * Checks whether there is a title for the output.
-   *
-   * @return Whether there is a title
-   */
-  public boolean hasTitle() {
-    return !isBlank(title);
   }
 
   /**
