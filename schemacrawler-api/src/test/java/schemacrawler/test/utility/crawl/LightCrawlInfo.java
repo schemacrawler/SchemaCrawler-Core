@@ -9,6 +9,7 @@ import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.time.temporal.ChronoField.YEAR;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -41,12 +42,18 @@ public class LightCrawlInfo implements CrawlInfo {
   private final UUID runId;
   private final Instant crawlTimestamp;
   private final ProductVersion jvmVersion;
+  private final String title;
   private final ProductVersion operatingSystemVersion;
   private final ProductVersion schemaCrawlerVersion;
   private final ProductVersion databaseVersion;
   private final ProductVersion jdbcDriverVersion;
 
   public LightCrawlInfo() {
+    this("");
+  }
+
+  public LightCrawlInfo(final String title) {
+    this.title = trimToEmpty(title);
 
     schemaCrawlerVersion = Version.version();
     operatingSystemVersion = new BaseProductVersion("OS", "0.0");
@@ -104,6 +111,11 @@ public class LightCrawlInfo implements CrawlInfo {
   @Override
   public ProductVersion getSchemaCrawlerVersion() {
     return schemaCrawlerVersion;
+  }
+
+  @Override
+  public String getTitle() {
+    return title;
   }
 
   /** {@inheritDoc} */

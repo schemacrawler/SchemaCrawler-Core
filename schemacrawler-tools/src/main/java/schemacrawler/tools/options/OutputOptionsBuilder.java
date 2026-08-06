@@ -12,7 +12,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.IOUtility.getFileExtension;
 import static us.fatehi.utility.Utility.isBlank;
-import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -51,7 +50,6 @@ public final class OutputOptionsBuilder
   private String outputFormatValue;
   private Charset inputEncodingCharset;
   private Charset outputEncodingCharset;
-  private String title;
 
   private OutputOptionsBuilder() {
     // Default values are set at the time of building options
@@ -67,15 +65,9 @@ public final class OutputOptionsBuilder
 
     withInputEncoding(options.getInputCharset())
         .withOutputEncoding(options.getOutputCharset())
-        .withOutputFormatValue(options.getOutputFormatValue())
-        .title(options.getTitle());
+        .withOutputFormatValue(options.getOutputFormatValue());
     outputResource = options.getOutputResource();
 
-    return this;
-  }
-
-  public OutputOptionsBuilder title(final String title) {
-    this.title = trimToEmpty(title);
     return this;
   }
 
@@ -99,12 +91,8 @@ public final class OutputOptionsBuilder
       outputFormatValue = isBlank(fileExtension) ? "text" : fileExtension;
     }
 
-    if (isBlank(title)) {
-      title = "";
-    }
-
     return new OutputOptions(
-        inputEncodingCharset, outputResource, outputEncodingCharset, outputFormatValue, title);
+        inputEncodingCharset, outputResource, outputEncodingCharset, outputFormatValue);
   }
 
   public OutputOptionsBuilder withConsoleOutput() {

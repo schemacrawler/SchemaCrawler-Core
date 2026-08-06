@@ -32,7 +32,6 @@ public class OutputOptionsTest {
         () -> assertThat(options.getInputCharset(), is(StandardCharsets.UTF_8)),
         () -> assertThat(options.getOutputCharset(), is(StandardCharsets.UTF_8)),
         () -> assertThat(options.getOutputFormatValue(), is("text")),
-        () -> assertThat(options.hasTitle(), is(false)),
         () -> assertThat(options.getOutputResource(), is(notNullValue())));
   }
 
@@ -40,15 +39,12 @@ public class OutputOptionsTest {
   public void testOutputOptionsBuilder() {
     final OutputOptions options =
         OutputOptionsBuilder.builder()
-            .title("Test Title")
             .withOutputFormatValue("json")
             .withInputEncoding(StandardCharsets.UTF_16)
             .withOutputEncoding(StandardCharsets.UTF_16LE)
             .toOptions();
 
     assertAll(
-        () -> assertThat(options.getTitle(), is("Test Title")),
-        () -> assertThat(options.hasTitle(), is(true)),
         () -> assertThat(options.getOutputFormatValue(), is("json")),
         () -> assertThat(options.getInputCharset(), is(StandardCharsets.UTF_16)),
         () -> assertThat(options.getOutputCharset(), is(StandardCharsets.UTF_16)));
@@ -103,7 +99,6 @@ public class OutputOptionsTest {
   public void testOutputOptionsBuilderFromOptions() {
     final OutputOptions original =
         OutputOptionsBuilder.builder()
-            .title("Original")
             .withOutputFormatValue("csv")
             .withInputEncoding(StandardCharsets.UTF_16)
             .toOptions();
@@ -111,7 +106,6 @@ public class OutputOptionsTest {
     final OutputOptions options = OutputOptionsBuilder.builder(original).toOptions();
 
     assertAll(
-        () -> assertThat(options.getTitle(), is("Original")),
         () -> assertThat(options.getOutputFormatValue(), is("csv")),
         () -> assertThat(options.getInputCharset(), is(StandardCharsets.UTF_16)));
   }

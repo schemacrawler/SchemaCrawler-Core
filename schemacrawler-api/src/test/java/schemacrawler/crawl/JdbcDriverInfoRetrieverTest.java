@@ -46,7 +46,7 @@ public class JdbcDriverInfoRetrieverTest {
     final MutableJdbcDriverInfo jdbcDriverInfo =
         new MutableJdbcDriverInfo(connectionInfoBuilder.buildJdbcDriverInformation());
 
-    catalog = new MutableCatalog("database_info_test", databaseInfo, jdbcDriverInfo);
+    catalog = new MutableCatalog("", "database_info_test", databaseInfo, jdbcDriverInfo);
     assertThat(catalog.getColumnDataTypes(), is(empty()));
     assertThat(catalog.getSchemas(), is(empty()));
     assertThat(catalog.getJdbcDriverInfo().getDriverClassName(), is("org.hsqldb.jdbc.JDBCDriver"));

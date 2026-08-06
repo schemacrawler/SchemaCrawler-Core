@@ -127,6 +127,7 @@ public final class SchemaCrawler {
                 "Making a database connection to:%n%s%s", databaseInfo, jdbcDriverInfo));
         catalog =
             new MutableCatalog(
+                options.title(),
                 "catalog",
                 new MutableDatabaseInfo(databaseInfo),
                 new MutableJdbcDriverInfo(jdbcDriverInfo));

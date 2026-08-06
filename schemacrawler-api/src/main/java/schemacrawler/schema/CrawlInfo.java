@@ -69,4 +69,11 @@ public interface CrawlInfo extends Serializable {
    * @return SchemaCrawler version
    */
   ProductVersion getSchemaCrawlerVersion();
+
+  /**
+   * Gets the crawl title.
+   *
+   * @return Crawl title
+   */
+  String getTitle();
 }
