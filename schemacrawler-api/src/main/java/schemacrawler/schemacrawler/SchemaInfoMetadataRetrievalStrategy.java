@@ -8,29 +8,31 @@
 
 package schemacrawler.schemacrawler;
 
+import us.fatehi.utility.Utility;
+
 public enum SchemaInfoMetadataRetrievalStrategy {
-  foreignKeysRetrievalStrategy("foreignkeys"),
-  functionParametersRetrievalStrategy("functionparameters"),
-  functionsRetrievalStrategy("functions"),
-  indexesRetrievalStrategy("indexes"),
-  primaryKeysRetrievalStrategy("primarykeys"),
-  routinesRetrievalStrategy("routines"),
-  routineReferencesRetrievalStrategy("routine-references"),
-  proceduresRetrievalStrategy("procedures"),
-  procedureParametersRetrievalStrategy("procedureparameters"),
-  tableColumnPrivilegesRetrievalStrategy("tablecolumnprivileges"),
-  tableColumnsRetrievalStrategy("tablecolumns"),
-  tableAdditionalAttributesRetrievalStrategy("table-additional-attributes"),
-  tableColumnAdditionalAttributesRetrievalStrategy("table-column-additional-attributes"),
-  tablePrivilegesRetrievalStrategy("tableprivileges"),
-  tablesRetrievalStrategy("tables"),
-  triggersRetrievalStrategy("triggers"),
-  tableConstraintsRetrievalStrategy("table-constraints"),
-  tableConstraintColumnsRetrievalStrategy("table-constraint-columns"),
-  tableCheckConstraintsRetrievalStrategy("table-check-constraints"),
-  typeInfoRetrievalStrategy("typeinfo"),
-  viewInformationRetrievalStrategy("view-information"),
-  viewTableUsageRetrievalStrategy("view-table-usage"),
+  foreignKeysRetrievalStrategy,
+  functionParametersRetrievalStrategy,
+  functionsRetrievalStrategy,
+  indexesRetrievalStrategy,
+  primaryKeysRetrievalStrategy,
+  routinesRetrievalStrategy,
+  routineReferencesRetrievalStrategy,
+  proceduresRetrievalStrategy,
+  procedureParametersRetrievalStrategy,
+  tableColumnPrivilegesRetrievalStrategy,
+  tableColumnsRetrievalStrategy,
+  tableAdditionalAttributesRetrievalStrategy,
+  tableColumnAdditionalAttributesRetrievalStrategy,
+  tablePrivilegesRetrievalStrategy,
+  tablesRetrievalStrategy,
+  triggersRetrievalStrategy,
+  tableConstraintsRetrievalStrategy,
+  tableConstraintColumnsRetrievalStrategy,
+  tableCheckConstraintsRetrievalStrategy,
+  typeInfoRetrievalStrategy,
+  viewInformationRetrievalStrategy,
+  viewTableUsageRetrievalStrategy,
   ;
 
   /**
@@ -49,13 +51,8 @@ public enum SchemaInfoMetadataRetrievalStrategy {
     return null;
   }
 
-  private final String key;
-
-  SchemaInfoMetadataRetrievalStrategy(final String key) {
-    this.key = key;
-  }
-
   public String getKey() {
-    return key;
+    final String identifier = name().replace("RetrievalStrategy", "");
+    return Utility.toKebabCase(identifier);
   }
 }

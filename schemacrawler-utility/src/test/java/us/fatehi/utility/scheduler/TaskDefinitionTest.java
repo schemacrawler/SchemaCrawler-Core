@@ -23,8 +23,8 @@ public class TaskDefinitionTest {
 
     final TaskDefinition taskDefinition = new TaskDefinition("Task definition");
     assertThat(taskDefinition, is(not(nullValue())));
-    assertThat(taskDefinition.getTaskName(), is("_task_definition"));
-    assertThat(taskDefinition.toString(), is("_task_definition"));
+    assertThat(taskDefinition.getTaskName(), is("task_definition"));
+    assertThat(taskDefinition.toString(), is("task_definition"));
   }
 
   @Test
@@ -39,8 +39,8 @@ public class TaskDefinitionTest {
 
     final TaskDefinition taskDefinition = new TaskDefinition("Task definition", taskRunnable);
     assertThat(taskDefinition, is(not(nullValue())));
-    assertThat(taskDefinition.getTaskName(), is("_task_definition"));
+    assertThat(taskDefinition.getTaskName(), is("task_definition"));
     assertThat(taskDefinition.getTask(), is(taskRunnable));
-    assertThat(taskDefinition.toString(), is("_task_definition"));
+    assertThat(taskDefinition.toString(), is("task_definition"));
   }
 }
