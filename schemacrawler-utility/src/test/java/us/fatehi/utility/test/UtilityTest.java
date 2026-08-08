@@ -18,6 +18,8 @@ import static us.fatehi.utility.Utility.hasNoUpperCase;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.isIntegral;
 import static us.fatehi.utility.Utility.join;
+import static us.fatehi.utility.Utility.toCamelCase;
+import static us.fatehi.utility.Utility.toKebabCase;
 import static us.fatehi.utility.Utility.toSnakeCase;
 
 import java.util.ArrayList;
@@ -125,13 +127,53 @@ public class UtilityTest {
   }
 
   @Test
-  public void snakeCaseTest() {
+  public void toCamelCaseTest() {
+    assertThat(toCamelCase(null), nullValue());
+    assertThat(toCamelCase(""), equalTo(""));
+    assertThat(toCamelCase(" "), equalTo(" "));
+
+    assertThat(toCamelCase("alreadycamel"), equalTo("alreadycamel"));
+    assertThat(toCamelCase("ALREADYCAMEL"), equalTo("alreadycamel"));
+    assertThat(toCamelCase("snake_case_identifier"), equalTo("snakeCaseIdentifier"));
+    assertThat(toCamelCase("kebab-case-identifier"), equalTo("kebabCaseIdentifier"));
+    assertThat(toCamelCase("MIXED_case-Identifier"), equalTo("mixedCaseIdentifier"));
+
+    assertThat(toCamelCase("_leading_separator"), equalTo("LeadingSeparator"));
+    assertThat(toCamelCase("trailing_separator_"), equalTo("trailingSeparator"));
+    assertThat(toCamelCase("multiple__separators"), equalTo("multipleSeparators"));
+  }
+
+  @Test
+  public void toKebabCaseTest() {
+    assertThat(toKebabCase(null), nullValue());
+    assertThat(toKebabCase(""), equalTo(""));
+    assertThat(toKebabCase(" "), equalTo(" "));
+
+    assertThat(toKebabCase("camelCaseIdentifier"), equalTo("camel-case-identifier"));
+    assertThat(toKebabCase("PascalCaseIdentifier"), equalTo("pascal-case-identifier"));
+    assertThat(toKebabCase("snake_case_identifier"), equalTo("snake-case-identifier"));
+    assertThat(toKebabCase("already-kebab"), equalTo("already-kebab"));
+    assertThat(toKebabCase("trailing-kebab-"), equalTo("trailing-kebab"));
+    assertThat(toKebabCase("contains spaces"), equalTo("contains-spaces"));
+    assertThat(toKebabCase("ABC"), equalTo("abc"));
+  }
+
+  @Test
+  public void toSnakeCaseTest() {
     assertThat(toSnakeCase(null), nullValue());
+    assertThat(toSnakeCase(""), equalTo(""));
+    assertThat(toSnakeCase(" "), equalTo(" "));
+
     assertThat(toSnakeCase("a b"), equalTo("a_b"));
     assertThat(toSnakeCase("ab"), equalTo("ab"));
     assertThat(toSnakeCase("abI"), equalTo("ab_i"));
-    assertThat(toSnakeCase("Ab"), equalTo("_ab"));
+    assertThat(toSnakeCase("Ab"), equalTo("ab"));
     assertThat(toSnakeCase("abIj"), equalTo("ab_ij"));
-    assertThat(toSnakeCase("ABC"), equalTo("_a_b_c"));
+    assertThat(toSnakeCase("ABC"), equalTo("abc"));
+    assertThat(toSnakeCase("ABC_"), equalTo("abc"));
+    assertThat(toSnakeCase("kebab-case"), equalTo("kebab_case"));
+    assertThat(toSnakeCase("kebab-Case"), equalTo("kebab_case"));
+    assertThat(toSnakeCase("-leading-kebab"), equalTo("leading_kebab"));
+    assertThat(toSnakeCase("trailing-kebab-"), equalTo("trailing_kebab"));
   }
 }

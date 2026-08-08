@@ -17,6 +17,10 @@ import java.util.regex.Pattern;
 @UtilityMarker
 public final class Utility {
 
+  private static final Pattern camelCaseBoundaryPattern = Pattern.compile("([a-z0-9])([A-Z])");
+  private static final Pattern acronymBoundaryPattern = Pattern.compile("([A-Z]+)([A-Z][a-z])");
+  private static final Pattern repeatedUnderscorePattern = Pattern.compile("_+");
+
   public static String commonPrefix(final String string1, final String string2) {
     if (string1 == null || string2 == null) {
       return "";
@@ -137,14 +141,48 @@ public final class Utility {
     return text;
   }
 
+  public static String toCamelCase(final String identifier) {
+    if (isBlank(identifier)) {
+      return identifier;
+    }
+
+    // Normalize all separators to a single delimiter
+    final String normalized = identifier.replace('-', '_').toLowerCase();
+
+    final String[] parts = normalized.split("_");
+    if (parts.length == 0) {
+      return normalized;
+    }
+
+    final StringBuilder camel = new StringBuilder(parts[0]);
+    for (int i = 1; i < parts.length; i++) {
+      final String part = parts[i];
+      if (!part.isEmpty()) {
+        camel.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
+      }
+    }
+
+    return camel.toString();
+  }
+
+  public static String toKebabCase(final String identifier) {
+    if (isBlank(identifier)) {
+      return identifier;
+    }
+    return toSnakeCase(identifier).replace('_', '-');
+  }
+
   public static String toSnakeCase(final String identifier) {
     if (isBlank(identifier)) {
       return identifier;
     }
-    final Pattern identifyCamelCase = Pattern.compile("([A-Z])");
-    final String snakeCaseIdentifier =
-        identifyCamelCase.matcher(identifier).replaceAll("_$1").toLowerCase().replace(' ', '_');
-    return snakeCaseIdentifier;
+    String normalizedIdentifier = identifier.replace('-', '_').replace(' ', '_');
+    normalizedIdentifier = acronymBoundaryPattern.matcher(normalizedIdentifier).replaceAll("$1_$2");
+    normalizedIdentifier =
+        camelCaseBoundaryPattern.matcher(normalizedIdentifier).replaceAll("$1_$2");
+    normalizedIdentifier = normalizedIdentifier.toLowerCase();
+    normalizedIdentifier = repeatedUnderscorePattern.matcher(normalizedIdentifier).replaceAll("_");
+    return normalizedIdentifier.replaceAll("^_+|_+$", "");
   }
 
   public static String trimToEmpty(final String text) {
