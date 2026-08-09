@@ -33,4 +33,9 @@ public class CoreArchitectureTest extends BaseArchitectureTest {
     return resideOutsideOfPackages("schemacrawler.testdb")
         .and(are(not(simpleName("GraphvizProcessExecutor"))));
   }
+
+  @Override
+  protected DescribedPredicate<JavaClass> exceptAllowedToPrintStackTrace() {
+    return resideOutsideOfPackages("schemacrawler.testdb");
+  }
 }
