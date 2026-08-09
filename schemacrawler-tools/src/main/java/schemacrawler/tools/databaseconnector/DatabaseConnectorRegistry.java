@@ -39,14 +39,14 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
 
   private static final Logger LOGGER = Logger.getLogger(DatabaseConnectorRegistry.class.getName());
 
-  private static DatabaseConnectorRegistry databaseConnectorRegistrySingleton;
+  private static DatabaseConnectorRegistry registrySingleton;
 
-  public static DatabaseConnectorRegistry getDatabaseConnectorRegistry() {
-    if (databaseConnectorRegistrySingleton == null) {
-      databaseConnectorRegistrySingleton = new DatabaseConnectorRegistry();
-      databaseConnectorRegistrySingleton.log();
+  public static DatabaseConnectorRegistry getRegistry() {
+    if (registrySingleton == null) {
+      registrySingleton = new DatabaseConnectorRegistry();
+      registrySingleton.log();
     }
-    return databaseConnectorRegistrySingleton;
+    return registrySingleton;
   }
 
   private static Map<String, DatabaseConnector> loadDatabaseConnectorRegistry() {

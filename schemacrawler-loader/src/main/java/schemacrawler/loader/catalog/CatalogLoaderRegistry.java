@@ -35,14 +35,14 @@ public final class CatalogLoaderRegistry extends BasePluginCommandRegistry<Catal
           "schemacrawler.loader.catalog.PrimaryCatalogLoaderProvider",
           "schemacrawler.loader.catalog.counts.TableRowCountsLoaderProvider");
 
-  private static CatalogLoaderRegistry catalogLoaderRegistrySingleton;
+  private static CatalogLoaderRegistry registrySingleton;
 
-  public static CatalogLoaderRegistry getCatalogLoaderRegistry() {
-    if (catalogLoaderRegistrySingleton == null) {
-      catalogLoaderRegistrySingleton = new CatalogLoaderRegistry();
-      catalogLoaderRegistrySingleton.log();
+  public static CatalogLoaderRegistry getRegistry() {
+    if (registrySingleton == null) {
+      registrySingleton = new CatalogLoaderRegistry();
+      registrySingleton.log();
     }
-    return catalogLoaderRegistrySingleton;
+    return registrySingleton;
   }
 
   private CatalogLoaderRegistry() {

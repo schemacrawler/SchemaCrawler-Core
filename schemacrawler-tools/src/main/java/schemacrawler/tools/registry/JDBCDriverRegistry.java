@@ -25,14 +25,14 @@ public class JDBCDriverRegistry extends BasePluginRegistry {
 
   private static final Logger LOGGER = Logger.getLogger(JDBCDriverRegistry.class.getName());
 
-  private static JDBCDriverRegistry jdbcDriverRegistrySingleton;
+  private static JDBCDriverRegistry registrySingleton;
 
-  public static JDBCDriverRegistry getJDBCDriverRegistry() {
-    if (jdbcDriverRegistrySingleton == null) {
-      jdbcDriverRegistrySingleton = new JDBCDriverRegistry();
-      jdbcDriverRegistrySingleton.log();
+  public static JDBCDriverRegistry getRegistry() {
+    if (registrySingleton == null) {
+      registrySingleton = new JDBCDriverRegistry();
+      registrySingleton.log();
     }
-    return jdbcDriverRegistrySingleton;
+    return registrySingleton;
   }
 
   private static List<PropertyName> loadJDBCDrivers() {

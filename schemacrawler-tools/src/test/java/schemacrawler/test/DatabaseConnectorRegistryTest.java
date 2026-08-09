@@ -37,7 +37,7 @@ public class DatabaseConnectorRegistryTest {
   @Test
   public void databaseConnectorRegistry() {
     final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
+        DatabaseConnectorRegistry.getRegistry();
 
     final List<DatabaseServerType> databaseServerTypes =
         databaseConnectorRegistry.getDatabaseServerTypes();
@@ -72,7 +72,7 @@ public class DatabaseConnectorRegistryTest {
   @Test
   public void findDatabaseConnectorFromUrl() {
     final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
+        DatabaseConnectorRegistry.getRegistry();
 
     DatabaseServerType databaseServerType;
 
@@ -97,7 +97,7 @@ public class DatabaseConnectorRegistryTest {
   public void commandLineCommands() throws Exception {
 
     final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
+        DatabaseConnectorRegistry.getRegistry();
     final Collection<PluginCommand> commandLineCommands =
         databaseConnectorRegistry.getCommandLineCommands();
     assertThat(commandLineCommands, is(empty()));
@@ -122,7 +122,7 @@ public class DatabaseConnectorRegistryTest {
             .orElseThrow();
 
     final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
+        DatabaseConnectorRegistry.getRegistry();
     final Collection<PluginCommand> commandLineCommands =
         databaseConnectorRegistry.getHelpCommands();
     assertThat(commandLineCommands, hasSize(2));
@@ -142,7 +142,7 @@ public class DatabaseConnectorRegistryTest {
             databaseServerType.getDatabaseSystemName());
 
     final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
+        DatabaseConnectorRegistry.getRegistry();
     final Collection<PropertyName> commandLineCommands =
         databaseConnectorRegistry.getRegisteredPlugins();
     assertThat(commandLineCommands, hasSize(2));
@@ -153,7 +153,7 @@ public class DatabaseConnectorRegistryTest {
   public void name() throws Exception {
 
     final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
+        DatabaseConnectorRegistry.getRegistry();
     assertThat(databaseConnectorRegistry.getName(), is("SchemaCrawler Database Server Plugins"));
   }
 

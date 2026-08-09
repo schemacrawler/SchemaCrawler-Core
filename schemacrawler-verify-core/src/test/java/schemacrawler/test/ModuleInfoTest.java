@@ -14,10 +14,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import schemacrawler.loader.catalog.CatalogLoaderRegistry;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.tools.command.CommandRegistry;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
-import schemacrawler.loader.catalog.CatalogLoaderRegistry;
 
 public class ModuleInfoTest {
 
@@ -45,8 +45,8 @@ public class ModuleInfoTest {
 
   @Test
   public void testRegistriesLoadable() {
-    assertThat(CatalogLoaderRegistry.getCatalogLoaderRegistry(), is(notNullValue()));
-    assertThat(DatabaseConnectorRegistry.getDatabaseConnectorRegistry(), is(notNullValue()));
-    assertThat(CommandRegistry.getCommandRegistry(), is(notNullValue()));
+    assertThat(CatalogLoaderRegistry.getRegistry(), is(notNullValue()));
+    assertThat(DatabaseConnectorRegistry.getRegistry(), is(notNullValue()));
+    assertThat(CommandRegistry.getRegistry(), is(notNullValue()));
   }
 }

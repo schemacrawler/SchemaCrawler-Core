@@ -31,14 +31,13 @@ public class AvailableRegistryPluginsTest {
   @Test
   public void availableCommands() {
     assertThat(
-        getRegisteredPlugins(CommandRegistry.getCommandRegistry()),
+        getRegisteredPlugins(CommandRegistry.getRegistry()),
         arrayContainingInAnyOrder("test-command"));
   }
 
   @Test
   public void availableJDBCDrivers() throws UnsupportedEncodingException {
-    final String[] availableJDBCDrivers =
-        getRegisteredPlugins(JDBCDriverRegistry.getJDBCDriverRegistry());
+    final String[] availableJDBCDrivers = getRegisteredPlugins(JDBCDriverRegistry.getRegistry());
     assertThat(availableJDBCDrivers.length, is(JDBC_DRIVER_COUNT));
     assertThat(availableJDBCDrivers, hasItemInArray(TestDatabaseDriver.class.getName()));
   }
@@ -46,7 +45,7 @@ public class AvailableRegistryPluginsTest {
   @Test
   public void availableServers() {
     assertThat(
-        getRegisteredPlugins(DatabaseConnectorRegistry.getDatabaseConnectorRegistry()),
+        getRegisteredPlugins(DatabaseConnectorRegistry.getRegistry()),
         arrayContainingInAnyOrder("test-db", "test-bundle-db"));
   }
 

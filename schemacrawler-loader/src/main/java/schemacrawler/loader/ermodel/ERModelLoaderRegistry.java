@@ -32,19 +32,19 @@ public final class ERModelLoaderRegistry extends BasePluginCommandRegistry<ERMod
           "schemacrawler.loader.ermodel.implicitassociations.ImplicitAssociationsLoaderProvider",
           "schemacrawler.loader.ermodel.attributes.AttributesLoaderProvider");
 
-  private static ERModelLoaderRegistry erModelLoaderRegistrySingleton;
+  private static ERModelLoaderRegistry registrySingleton;
 
   /**
    * Returns the singleton ERModel loader registry.
    *
    * @return ERModel loader registry
    */
-  public static ERModelLoaderRegistry getERModelLoaderRegistry() {
-    if (erModelLoaderRegistrySingleton == null) {
-      erModelLoaderRegistrySingleton = new ERModelLoaderRegistry();
-      erModelLoaderRegistrySingleton.log();
+  public static ERModelLoaderRegistry getRegistry() {
+    if (registrySingleton == null) {
+      registrySingleton = new ERModelLoaderRegistry();
+      registrySingleton.log();
     }
-    return erModelLoaderRegistrySingleton;
+    return registrySingleton;
   }
 
   private ERModelLoaderRegistry() {

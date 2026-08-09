@@ -64,7 +64,7 @@ public final class EnvironmentalDatabaseConnectionSourceBuilder {
     final String databaseSystemIdentifier = trimToEmpty(config.getStringValue(SERVER));
 
     final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
+        DatabaseConnectorRegistry.getRegistry();
     final DatabaseConnector databaseConnector =
         databaseConnectorRegistry.findDatabaseConnectorFromDatabaseSystemIdentifier(
             databaseSystemIdentifier);
@@ -93,7 +93,7 @@ public final class EnvironmentalDatabaseConnectionSourceBuilder {
     dbConnectionSourceBuilder = DatabaseConnectionSourceBuilder.builder(connectionUrl);
 
     final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
+        DatabaseConnectorRegistry.getRegistry();
     DatabaseConnector databaseConnector =
         databaseConnectorRegistry.findDatabaseConnectorFromUrl(connectionUrl);
     dbConnectionSourceBuilder.withConnectionInitializer(

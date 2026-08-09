@@ -27,14 +27,14 @@ public class JDBCDriverRegistryTest {
 
   @Test
   public void registeredPlugins() {
-    final JDBCDriverRegistry driverRegistry = JDBCDriverRegistry.getJDBCDriverRegistry();
+    final JDBCDriverRegistry driverRegistry = JDBCDriverRegistry.getRegistry();
     final Collection<PropertyName> commandLineCommands = driverRegistry.getRegisteredPlugins();
     assertThat(commandLineCommands, hasSize(JDBC_DRIVER_COUNT));
   }
 
   @Test
   public void name() {
-    final JDBCDriverRegistry driverRegistry = JDBCDriverRegistry.getJDBCDriverRegistry();
+    final JDBCDriverRegistry driverRegistry = JDBCDriverRegistry.getRegistry();
     assertThat(driverRegistry.getName(), is("JDBC Drivers"));
     assertThat(driverRegistry.getRegisteredPlugins(), hasSize(JDBC_DRIVER_COUNT));
   }
