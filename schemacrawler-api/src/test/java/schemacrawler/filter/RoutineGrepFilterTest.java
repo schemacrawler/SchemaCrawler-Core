@@ -18,8 +18,8 @@ import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Routine;
 import schemacrawler.schemacrawler.GrepOptions;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
-import schemacrawler.test.utility.crawl.LightRoutine;
-import schemacrawler.test.utility.crawl.LightRoutineParameter;
+import schemacrawler.test.utility.crawl.LightProcedure;
+import schemacrawler.test.utility.crawl.LightProcedureParameter;
 
 class RoutineGrepFilterTest {
 
@@ -27,11 +27,11 @@ class RoutineGrepFilterTest {
 
   @BeforeEach
   public void setUp() {
-    final LightRoutine routine = new LightRoutine("test_routine");
+    final LightProcedure routine = new LightProcedure("test_routine");
     routine.setDefinition("test_definition");
     routine.setRemarks("test_remarks");
 
-    final LightRoutineParameter parameter = new LightRoutineParameter(routine, "test_param");
+    final LightProcedureParameter parameter = new LightProcedureParameter(routine, "test_param");
     parameter.setRemarks("test_param_remarks");
     routine.addParameter(parameter);
 

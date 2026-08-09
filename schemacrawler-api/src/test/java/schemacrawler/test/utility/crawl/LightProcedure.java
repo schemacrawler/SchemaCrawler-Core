@@ -16,31 +16,30 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.Procedure;
+import schemacrawler.schema.ProcedureParameter;
 import schemacrawler.schema.ProcedureReturnType;
-import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineBodyType;
-import schemacrawler.schema.RoutineParameter;
-import schemacrawler.schema.RoutineReturnType;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.SchemaReference;
 
-public final class LightRoutine extends AbstractLightDatabaseObject implements Routine {
+public final class LightProcedure extends AbstractLightDatabaseObject implements Procedure {
 
   @Serial private static final long serialVersionUID = 1L;
 
-  private final List<RoutineParameter<?>> parameters = new ArrayList<>();
+  private final List<ProcedureParameter> parameters = new ArrayList<>();
   private String definition;
 
-  public LightRoutine(final Schema schema, final String name) {
+  public LightProcedure(final Schema schema, final String name) {
     super(schema, name);
   }
 
-  public LightRoutine(final String name) {
+  public LightProcedure(final String name) {
     this(new SchemaReference(), name);
   }
 
-  public void addParameter(final LightRoutineParameter parameter) {
+  public void addParameter(final LightProcedureParameter parameter) {
     if (parameter != null) {
       parameters.add(parameter);
     }
@@ -52,8 +51,8 @@ public final class LightRoutine extends AbstractLightDatabaseObject implements R
   }
 
   @Override
-  public <C extends RoutineParameter<? extends Routine>> List<C> getParameters() {
-    return (List<C>) List.copyOf(parameters);
+  public List<ProcedureParameter> getParameters() {
+    return List.copyOf(parameters);
   }
 
   @Override
@@ -62,7 +61,7 @@ public final class LightRoutine extends AbstractLightDatabaseObject implements R
   }
 
   @Override
-  public RoutineReturnType getReturnType() {
+  public ProcedureReturnType getReturnType() {
     return ProcedureReturnType.noResult;
   }
 
@@ -92,8 +91,7 @@ public final class LightRoutine extends AbstractLightDatabaseObject implements R
   }
 
   @Override
-  public <C extends RoutineParameter<? extends Routine>> Optional<C> lookupParameter(
-      final String name) {
+  public Optional<? extends ProcedureParameter> lookupParameter(final String name) {
     return Optional.empty();
   }
 
