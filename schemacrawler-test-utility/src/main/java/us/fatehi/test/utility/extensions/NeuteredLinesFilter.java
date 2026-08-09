@@ -40,6 +40,9 @@ final class NeuteredLinesFilter implements Predicate<String> {
     Pattern.compile("\\s+\"?linter-instance-id\"?\\s?: .*"),
     Pattern.compile("\\s+\"?product-version\"?\\s?: .*"),
     Pattern.compile("\\s+\"?value\"?\\s?: .*"),
+    // Scribe
+    Pattern.compile("\\sat:\\s*\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"),
+    Pattern.compile("\\sby:\\s*.*schemacrawler.*"),
     // Versions
     Pattern.compile(".*1[67]\\.\\d{1,2}\\.\\d{1,2}.*"),
     // Operating systems and environment
