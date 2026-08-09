@@ -174,7 +174,7 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
   }
 
   private SchemaCrawlerCommand<?> loadCommand() {
-    final CommandRegistry commandRegistry = CommandRegistry.getCommandRegistry();
+    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
     final SchemaCrawlerCommand<?> scCommand =
         commandRegistry.configureNewCommand(
             command, schemaCrawlerOptions, additionalConfig, outputOptions);

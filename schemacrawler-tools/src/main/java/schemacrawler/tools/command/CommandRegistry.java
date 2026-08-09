@@ -31,7 +31,7 @@ public final class CommandRegistry extends BasePluginCommandRegistry<SchemaCrawl
 
   private static final Logger LOGGER = Logger.getLogger(CommandRegistry.class.getName());
 
-  private static CommandRegistry commandRegistrySingleton;
+  private static CommandRegistry registrySingleton;
 
   public static final Comparator<? super SchemaCrawlerCommandProvider> commandProviderComparator =
       (commandProvider1, commandProvider2) -> {
@@ -53,12 +53,12 @@ public final class CommandRegistry extends BasePluginCommandRegistry<SchemaCrawl
         return typeName1.compareTo(typeName2);
       };
 
-  public static CommandRegistry getCommandRegistry() {
-    if (commandRegistrySingleton == null) {
-      commandRegistrySingleton = new CommandRegistry();
-      commandRegistrySingleton.log();
+  public static CommandRegistry getRegistry() {
+    if (registrySingleton == null) {
+      registrySingleton = new CommandRegistry();
+      registrySingleton.log();
     }
-    return commandRegistrySingleton;
+    return registrySingleton;
   }
 
   private static List<SchemaCrawlerCommandProvider> loadCommandRegistry() {

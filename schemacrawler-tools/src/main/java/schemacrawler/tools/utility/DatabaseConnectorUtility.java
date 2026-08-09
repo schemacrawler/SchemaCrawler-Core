@@ -39,8 +39,7 @@ public final class DatabaseConnectorUtility {
 
     requireNonNull(connection, "No database connection provided");
 
-    final DatabaseConnectorRegistry registry =
-        DatabaseConnectorRegistry.getDatabaseConnectorRegistry();
+    final DatabaseConnectorRegistry registry = DatabaseConnectorRegistry.getRegistry();
     DatabaseConnector dbConnector = registry.findDatabaseConnector(connection);
     final DatabaseServerType databaseServerType = dbConnector.getDatabaseServerType();
 

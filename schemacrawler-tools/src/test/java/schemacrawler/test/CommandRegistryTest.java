@@ -32,7 +32,7 @@ public class CommandRegistryTest {
   @Test
   public void configureNewCommand() {
 
-    final CommandRegistry commandRegistry = CommandRegistry.getCommandRegistry();
+    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
 
     assertThrows(
         ExecutionRuntimeException.class,
@@ -53,7 +53,7 @@ public class CommandRegistryTest {
 
     final TestCommandProvider testCommandProvider = new TestCommandProvider();
 
-    final CommandRegistry commandRegistry = CommandRegistry.getCommandRegistry();
+    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
     final Collection<PluginCommand> commandLineCommands = commandRegistry.getCommandLineCommands();
     assertThat(commandLineCommands, hasSize(1));
     assertThat(commandLineCommands, hasItem(testCommandProvider.getCommandLineCommand()));
@@ -64,7 +64,7 @@ public class CommandRegistryTest {
 
     final TestCommandProvider testCommandProvider = new TestCommandProvider();
 
-    final CommandRegistry commandRegistry = CommandRegistry.getCommandRegistry();
+    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
     final Collection<PluginCommand> commandLineCommands = commandRegistry.getHelpCommands();
     assertThat(commandLineCommands, hasSize(1));
     assertThat(commandLineCommands, hasItem(testCommandProvider.getHelpCommand()));
@@ -75,7 +75,7 @@ public class CommandRegistryTest {
 
     final TestCommandProvider testCommandProvider = new TestCommandProvider();
 
-    final CommandRegistry commandRegistry = CommandRegistry.getCommandRegistry();
+    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
     final Collection<PropertyName> commandLineCommands = commandRegistry.getRegisteredPlugins();
     assertThat(commandLineCommands, hasSize(1));
     assertThat(commandLineCommands, is(testCommandProvider.getSupportedCommands()));
@@ -83,7 +83,7 @@ public class CommandRegistryTest {
 
   @Test
   public void name() {
-    final CommandRegistry commandRegistry = CommandRegistry.getCommandRegistry();
+    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
     assertThat(commandRegistry.getName(), is("SchemaCrawler Commands"));
   }
 

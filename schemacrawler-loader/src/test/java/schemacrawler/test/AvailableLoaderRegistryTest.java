@@ -25,14 +25,14 @@ public class AvailableLoaderRegistryTest {
   @Test
   public void availableCatalogLoaders() {
     assertThat(
-        getRegisteredPlugins(CatalogLoaderRegistry.getCatalogLoaderRegistry()),
+        getRegisteredPlugins(CatalogLoaderRegistry.getRegistry()),
         arrayContainingInAnyOrder("countsloader", "offlineloader", "primarycatalogloader"));
   }
 
   @Test
   public void availableERModelLoaders() {
     assertThat(
-        getRegisteredPlugins(ERModelLoaderRegistry.getERModelLoaderRegistry()),
+        getRegisteredPlugins(ERModelLoaderRegistry.getRegistry()),
         arrayContainingInAnyOrder(
             "attributesloader", "implicitassociationsloader", "primarymodelloader"));
   }

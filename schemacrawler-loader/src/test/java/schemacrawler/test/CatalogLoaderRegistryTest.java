@@ -18,10 +18,10 @@ import static org.hamcrest.Matchers.hasSize;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
-import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.loader.catalog.CatalogLoaderRegistry;
 import schemacrawler.loader.catalog.ChainedCatalogLoader;
+import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
+import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.property.PropertyName;
 
@@ -32,7 +32,7 @@ public class CatalogLoaderRegistryTest {
   @Test
   public void chainedLoaders() {
     final ChainedCatalogLoader chainedLoaders =
-        CatalogLoaderRegistry.getCatalogLoaderRegistry()
+        CatalogLoaderRegistry.getRegistry()
             .newChainedCatalogLoader(
                 SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions(), ConfigUtility.newConfig());
 
@@ -42,7 +42,7 @@ public class CatalogLoaderRegistryTest {
   @Test
   public void commandLineCommands() throws Exception {
     final Collection<PluginCommand> commandLineCommands =
-        CatalogLoaderRegistry.getCatalogLoaderRegistry().getCommandLineCommands();
+        CatalogLoaderRegistry.getRegistry().getCommandLineCommands();
     assertThat(String.valueOf(commandLineCommands), commandLineCommands.size(), is(greaterThan(0)));
     final List<String> names =
         commandLineCommands.stream().map(PluginCommand::getName).collect(toList());
@@ -52,7 +52,7 @@ public class CatalogLoaderRegistryTest {
   @Test
   public void helpCommands() throws Exception {
     final Collection<PluginCommand> helpCommands =
-        CatalogLoaderRegistry.getCatalogLoaderRegistry().getHelpCommands();
+        CatalogLoaderRegistry.getRegistry().getHelpCommands();
     assertThat(String.valueOf(helpCommands), helpCommands.size(), is(greaterThan(0)));
     final List<String> names = helpCommands.stream().map(PluginCommand::getName).collect(toList());
     assertThat(names, containsInAnyOrder("loader:countsloader"));
@@ -60,14 +60,14 @@ public class CatalogLoaderRegistryTest {
 
   @Test
   public void name() throws Exception {
-    final CatalogLoaderRegistry registry = CatalogLoaderRegistry.getCatalogLoaderRegistry();
+    final CatalogLoaderRegistry registry = CatalogLoaderRegistry.getRegistry();
     assertThat(registry.getName(), is("SchemaCrawler Catalog Loaders"));
   }
 
   @Test
   public void registeredPlugins() throws Exception {
     final Collection<PropertyName> supportedLoaders =
-        CatalogLoaderRegistry.getCatalogLoaderRegistry().getRegisteredPlugins();
+        CatalogLoaderRegistry.getRegistry().getRegisteredPlugins();
     assertThat(supportedLoaders, hasSize(NUM_LOADERS));
     final List<String> names =
         supportedLoaders.stream().map(PropertyName::getName).collect(toList());

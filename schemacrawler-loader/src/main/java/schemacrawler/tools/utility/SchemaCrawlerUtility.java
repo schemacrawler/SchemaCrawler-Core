@@ -45,7 +45,7 @@ public final class SchemaCrawlerUtility {
 
   public static ERModel buildERModel(final Catalog catalog, final Config additionalConfig) {
     requireNonNull(catalog, "No catalog provided");
-    final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getERModelLoaderRegistry();
+    final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getRegistry();
     final ChainedERModelLoader chainedLoader = registry.newChainedERModelLoader(additionalConfig);
     chainedLoader.setCatalog(catalog);
     chainedLoader.initialize();
@@ -86,8 +86,7 @@ public final class SchemaCrawlerUtility {
 
     DatabaseConnectorUtility.updateConnectionDataSource(connectionSource, schemaRetrievalOptions);
 
-    final CatalogLoaderRegistry catalogLoaderRegistry =
-        CatalogLoaderRegistry.getCatalogLoaderRegistry();
+    final CatalogLoaderRegistry catalogLoaderRegistry = CatalogLoaderRegistry.getRegistry();
     final CatalogLoader<?> catalogLoader =
         catalogLoaderRegistry.newChainedCatalogLoader(schemaCrawlerOptions, additionalConfig);
 

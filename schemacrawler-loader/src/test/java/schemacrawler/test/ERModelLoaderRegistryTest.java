@@ -18,9 +18,9 @@ import static org.hamcrest.Matchers.hasSize;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.loader.ermodel.ChainedERModelLoader;
 import schemacrawler.loader.ermodel.ERModelLoaderRegistry;
+import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.ConfigUtility;
 import us.fatehi.utility.property.PropertyName;
 
@@ -31,8 +31,7 @@ public class ERModelLoaderRegistryTest {
   @Test
   public void chainedLoaders() {
     final ChainedERModelLoader chainedLoaders =
-        ERModelLoaderRegistry.getERModelLoaderRegistry()
-            .newChainedERModelLoader(ConfigUtility.newConfig());
+        ERModelLoaderRegistry.getRegistry().newChainedERModelLoader(ConfigUtility.newConfig());
 
     assertThat(chainedLoaders.size(), is(NUM_LOADERS));
   }
@@ -40,7 +39,7 @@ public class ERModelLoaderRegistryTest {
   @Test
   public void commandLineCommands() throws Exception {
     final Collection<PluginCommand> commandLineCommands =
-        ERModelLoaderRegistry.getERModelLoaderRegistry().getCommandLineCommands();
+        ERModelLoaderRegistry.getRegistry().getCommandLineCommands();
     assertThat(String.valueOf(commandLineCommands), commandLineCommands.size(), is(greaterThan(0)));
     final List<String> names =
         commandLineCommands.stream().map(PluginCommand::getName).collect(toList());
@@ -51,7 +50,7 @@ public class ERModelLoaderRegistryTest {
   @Test
   public void helpCommands() throws Exception {
     final Collection<PluginCommand> helpCommands =
-        ERModelLoaderRegistry.getERModelLoaderRegistry().getHelpCommands();
+        ERModelLoaderRegistry.getRegistry().getHelpCommands();
     assertThat(String.valueOf(helpCommands), helpCommands.size(), is(greaterThan(0)));
     final List<String> names = helpCommands.stream().map(PluginCommand::getName).collect(toList());
     assertThat(
@@ -60,14 +59,14 @@ public class ERModelLoaderRegistryTest {
 
   @Test
   public void name() {
-    final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getERModelLoaderRegistry();
+    final ERModelLoaderRegistry registry = ERModelLoaderRegistry.getRegistry();
     assertThat(registry.getName(), is("ER Model Loaders"));
   }
 
   @Test
   public void registeredPlugins() {
     final Collection<PropertyName> supportedLoaders =
-        ERModelLoaderRegistry.getERModelLoaderRegistry().getRegisteredPlugins();
+        ERModelLoaderRegistry.getRegistry().getRegisteredPlugins();
     assertThat(supportedLoaders, hasSize(NUM_LOADERS));
     final List<String> names =
         supportedLoaders.stream().map(PropertyName::getName).collect(toList());
