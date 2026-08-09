@@ -14,20 +14,20 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.ParameterModeType;
-import schemacrawler.schema.Routine;
-import schemacrawler.schema.RoutineParameter;
+import schemacrawler.schema.Procedure;
+import schemacrawler.schema.ProcedureParameter;
 import schemacrawler.schema.Schema;
 
-public final class LightRoutineParameter extends AbstractLightDatabaseObject
-    implements RoutineParameter<Routine> {
+public final class LightProcedureParameter extends AbstractLightDatabaseObject
+    implements ProcedureParameter {
 
   @Serial private static final long serialVersionUID = 1L;
 
-  private final Routine routine;
+  private final Procedure procedure;
 
-  public LightRoutineParameter(final Routine routine, final String name) {
-    super(routine.getSchema(), name);
-    this.routine = routine;
+  public LightProcedureParameter(final Procedure procedure, final String name) {
+    super(procedure.getSchema(), name);
+    this.procedure = procedure;
   }
 
   @Override
@@ -47,7 +47,7 @@ public final class LightRoutineParameter extends AbstractLightDatabaseObject
 
   @Override
   public String getFullName() {
-    return routine.getFullName() + "." + getName();
+    return procedure.getFullName() + "." + getName();
   }
 
   @Override
@@ -61,8 +61,8 @@ public final class LightRoutineParameter extends AbstractLightDatabaseObject
   }
 
   @Override
-  public Routine getParent() {
-    return routine;
+  public Procedure getParent() {
+    return procedure;
   }
 
   @Override
@@ -72,7 +72,7 @@ public final class LightRoutineParameter extends AbstractLightDatabaseObject
 
   @Override
   public Schema getSchema() {
-    return routine.getSchema();
+    return procedure.getSchema();
   }
 
   @Override
@@ -112,7 +112,7 @@ public final class LightRoutineParameter extends AbstractLightDatabaseObject
 
   @Override
   public NamedObjectKey key() {
-    return routine.key().with(getName());
+    return procedure.key().with(getName());
   }
 
   @Override
