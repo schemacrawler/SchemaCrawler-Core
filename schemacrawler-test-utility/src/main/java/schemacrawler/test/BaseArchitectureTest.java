@@ -28,6 +28,8 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaMethod;
 import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
@@ -93,6 +95,20 @@ public abstract class BaseArchitectureTest {
   }
 
   @Test
+  public void notPrintStackTrace() {
+    noClasses()
+        .that(exceptAllowedToPrintStackTrace())
+        .should()
+        .callMethod(Throwable.class, "printStackTrace")
+        .orShould()
+        .callMethod(Throwable.class, "printStackTrace", PrintStream.class)
+        .orShould()
+        .callMethod(Throwable.class, "printStackTrace", PrintWriter.class)
+        .because("production code should use structured logging and error propagation")
+        .check(classes);
+  }
+
+  @Test
   public void notUseJackson() {
     noClasses()
         .that(are(not(simpleName("CatalogAttributesUtility"))))
@@ -127,6 +143,14 @@ public abstract class BaseArchitectureTest {
    * to exclude specific packages or class names. Default: all classes.
    */
   protected DescribedPredicate<JavaClass> exceptAllowedToUseStandardStreams() {
+    return alwaysTrue();
+  }
+
+  /**
+   * Predicate to filter which classes are checked in {@link #notPrintStackTrace()}. Override to
+   * exclude specific packages or class names. Default: all classes.
+   */
+  protected DescribedPredicate<JavaClass> exceptAllowedToPrintStackTrace() {
     return alwaysTrue();
   }
 
