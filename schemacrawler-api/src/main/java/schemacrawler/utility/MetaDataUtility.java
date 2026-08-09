@@ -11,6 +11,8 @@ package schemacrawler.utility;
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -26,6 +28,7 @@ import schemacrawler.schema.JavaSqlTypeGroup;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Procedure;
+import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
@@ -93,6 +96,30 @@ public final class MetaDataUtility {
 
     final List<TableConstraintColumn> columns = tableConstraint.getConstrainedColumns();
     return joinColumns(columns, false, identifiers);
+  }
+
+  public static URI getDatabaseObjectUri(final DatabaseObject databaseObject) {
+    if (databaseObject == null) {
+      return null;
+    }
+
+    final String name = databaseObject.getName();
+    URI resource;
+    try {
+      final String context;
+      if (databaseObject instanceof Table) {
+        context = "tables";
+      } else if (databaseObject instanceof Routine) {
+        context = "routines";
+      } else {
+        return null;
+      }
+      final String path = "/" + String.join("/", databaseObject.getSchema().toString(), name);
+      resource = new URI("catalog", context, path, null);
+    } catch (final URISyntaxException e) {
+      resource = null;
+    }
+    return resource;
   }
 
   /**

@@ -11,6 +11,7 @@ package schemacrawler.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,6 +38,7 @@ import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Procedure;
+import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
@@ -92,6 +94,42 @@ public class MetadataUtilityTest {
     final String columnsListAsStringChild =
         MetaDataUtility.getColumnsListAsString(index, identifiers);
     assertThat(columnsListAsStringChild, is("'ID'"));
+  }
+
+  @Test
+  public void databaseObjectUri() {
+    final Schema schema = mock(Schema.class);
+    when(schema.toString()).thenReturn("PUBLIC.BOOKS");
+
+    final Table table = mock(Table.class);
+    when(table.getSchema()).thenReturn(schema);
+    when(table.getName()).thenReturn("order details");
+    assertThat(
+        MetaDataUtility.getDatabaseObjectUri(table).toString(),
+        is("catalog://tables/PUBLIC.BOOKS/order%20details"));
+
+    final Routine routine = mock(Routine.class);
+    when(routine.getSchema()).thenReturn(schema);
+    when(routine.getName()).thenReturn("find order");
+    assertThat(
+        MetaDataUtility.getDatabaseObjectUri(routine).toString(),
+        is("catalog://routines/PUBLIC.BOOKS/find%20order"));
+  }
+
+  @Test
+  public void databaseObjectUriMissingSchemaThrows() {
+    final Table table = mock(Table.class);
+    when(table.getSchema()).thenReturn(null);
+    when(table.getName()).thenReturn("order details");
+
+    assertThrows(NullPointerException.class, () -> MetaDataUtility.getDatabaseObjectUri(table));
+  }
+
+  @Test
+  public void databaseObjectUriUnknownTypeAndNull() {
+    assertThat(MetaDataUtility.getDatabaseObjectUri(null), is((java.net.URI) null));
+    assertThat(
+        MetaDataUtility.getDatabaseObjectUri(mock(DatabaseObject.class)), is((java.net.URI) null));
   }
 
   @BeforeAll
