@@ -15,6 +15,13 @@ import us.fatehi.utility.property.ProductVersion;
 public interface CrawlInfo extends Serializable {
 
   /**
+   * Gets the database server fingerprint.
+   *
+   * @return Database server fingerprint
+   */
+  DatabaseServerFingerprint getDatabaseServerFingerprint();
+
+  /**
    * Gets the timestamp of when the database was crawled, in UTC to the second.
    *
    * @return Timestamp

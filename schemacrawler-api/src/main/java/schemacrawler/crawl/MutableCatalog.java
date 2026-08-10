@@ -75,7 +75,13 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
     this.databaseInfo = requireNonNull(databaseInfo, "No database information provided");
     this.jdbcDriverInfo = requireNonNull(jdbcDriverInfo, "No JDBC driver information provided");
-    crawlInfo = new ImmutableCrawlInfo(title, databaseInfo, jdbcDriverInfo);
+    crawlInfo =
+        new ImmutableCrawlInfo(
+            title,
+            databaseInfo,
+            jdbcDriverInfo,
+            DatabaseServerFingerprintBuilder.build(
+                databaseInfo, jdbcDriverInfo.getConnectionUrl()));
   }
 
   /** {@inheritDoc} */

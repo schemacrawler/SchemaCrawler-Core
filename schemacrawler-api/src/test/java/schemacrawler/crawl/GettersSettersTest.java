@@ -56,6 +56,7 @@ public class GettersSettersTest {
 
   // Classes that should be excluded from accessor validation (value objects, records, enums, etc.)
   private static final String[] EXCLUDED_CLASSES = {
+    "DatabaseServerFingerprint",
     "IdentifierQuotingStrategy",
     "Identifiers",
     "IdentifiersBuilder",

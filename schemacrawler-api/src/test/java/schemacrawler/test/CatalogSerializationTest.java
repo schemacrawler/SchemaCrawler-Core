@@ -15,6 +15,7 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
@@ -28,6 +29,7 @@ import java.sql.Connection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.DatabaseServerFingerprint;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.utility.SerializedCatalogUtility;
@@ -56,6 +58,9 @@ public class CatalogSerializationTest {
       throws Exception {
 
     final Path testOutputFile = IOUtility.createTempFilePath("sc_ermodel_serialization", "ser");
+    final DatabaseServerFingerprint beforeFingerprint =
+        catalog.getCrawlInfo().getDatabaseServerFingerprint();
+    assertThat(beforeFingerprint, is(notNullValue()));
     SerializedCatalogUtility.saveCatalog(
         catalog, Files.newOutputStream(testOutputFile, WRITE, CREATE, TRUNCATE_EXISTING));
     assertThat("Catalog was not serialized", isFileReadable(testOutputFile), is(true));
@@ -65,5 +70,10 @@ public class CatalogSerializationTest {
     final Catalog catalogDeserialized =
         SerializedCatalogUtility.readCatalog(newInputStream(testOutputFile, READ));
     validateSchema(catalogDeserialized);
+    final DatabaseServerFingerprint afterFingerprint =
+        catalogDeserialized.getCrawlInfo().getDatabaseServerFingerprint();
+    assertThat(afterFingerprint, is(notNullValue()));
+    assertThat(afterFingerprint.fingerprint(), is(beforeFingerprint.fingerprint()));
+    assertThat(afterFingerprint.confidence(), is(beforeFingerprint.confidence()));
   }
 }
