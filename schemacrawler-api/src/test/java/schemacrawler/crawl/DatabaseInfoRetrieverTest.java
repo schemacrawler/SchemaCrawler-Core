@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import schemacrawler.schema.DatabaseServerFingerprint;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.JdbcDriverProperty;
@@ -144,6 +145,11 @@ public class DatabaseInfoRetrieverTest {
     assertThat(
         catalog.getDatabaseInfo().toString(),
         is("-- database: HSQL Database Engine 2.7.4" + System.lineSeparator()));
+    final DatabaseServerFingerprint fingerprint =
+        catalog.getCrawlInfo().getDatabaseServerFingerprint();
+    assertThat(fingerprint, is(notNullValue()));
+    assertThat(fingerprint.fingerprint(), containsString("sha-256:"));
+    assertThat(fingerprint.confidence(), is(notNullValue()));
   }
 
   @Test
@@ -238,6 +244,7 @@ public class DatabaseInfoRetrieverTest {
     assertThat(catalog.getColumnDataTypes(), is(empty()));
     assertThat(catalog.getSchemas(), is(empty()));
     assertThat(catalog.getDatabaseInfo().getServerInfo(), is(empty()));
+    assertThat(catalog.getCrawlInfo().getDatabaseServerFingerprint(), is(notNullValue()));
   }
 
   @Test

@@ -9,15 +9,49 @@
 package us.fatehi.utility.datasource;
 
 import static us.fatehi.utility.Utility.isBlank;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
-public record JdbcUrl(String databaseServerType, Integer port, String databaseName) {
+public record JdbcUrl(
+    String databaseServerType,
+    String hostHash,
+    Integer port,
+    String databaseName,
+    HostClassification hostClassification) {
 
   public JdbcUrl {
-    databaseServerType = isBlank(databaseServerType) ? "" : databaseServerType.strip();
-    databaseName = isBlank(databaseName) ? null : databaseName.strip();
+    databaseServerType = normalizeToken(databaseServerType);
+    hostHash = normalizeToken(hostHash);
+    databaseName = normalizeToken(databaseName);
+    if (hostClassification == null) {
+      hostClassification = HostClassification.UNKNOWN;
+    }
   }
 
-  public static JdbcUrl empty() {
-    return new JdbcUrl("", null, null);
+  public JdbcUrl() {
+    this(null, null, null, null, null);
+  }
+
+  public boolean hasDatabaseName() {
+    return !isBlank(databaseName);
+  }
+
+  public boolean hasDatabaseServerType() {
+    return !isBlank(databaseServerType);
+  }
+
+  public boolean hasHost() {
+    return !isBlank(hostHash);
+  }
+
+  public boolean hasPort() {
+    return port != null;
+  }
+
+  public boolean hasPublicHost() {
+    return hasHost() && hostClassification == HostClassification.PUBLIC;
+  }
+
+  private static String normalizeToken(final String value) {
+    return trimToEmpty(value).toLowerCase();
   }
 }

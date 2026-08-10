@@ -8,40 +8,58 @@
 
 package us.fatehi.utility.datasource;
 
+import static java.net.InetAddress.getByName;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static us.fatehi.utility.Utility.isBlank;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
 public final class JdbcUrlParser {
 
-  private record ParsedAuthority(Integer port, String databaseName, String options) {}
+  private record ParsedAuthority(
+      String host,
+      Integer port,
+      String databaseName,
+      String options,
+      HostClassification hostClassification) {}
 
-  private record ParsedHostPort(Integer port) {}
+  private record ParsedHostPort(String host, Integer port, HostClassification hostClassification) {}
 
   public static JdbcUrl parse(final String url) {
     if (isBlank(url)) {
-      return JdbcUrl.empty();
+      return new JdbcUrl();
     }
     final String jdbc = url.trim();
     if (!jdbc.startsWith("jdbc:")) {
-      return JdbcUrl.empty();
+      return new JdbcUrl();
     }
 
     final int subprotocolEnd = jdbc.indexOf(':', "jdbc:".length());
     if (subprotocolEnd < 0) {
-      return new JdbcUrl(jdbc.substring("jdbc:".length()), null, null);
+      return new JdbcUrl(
+          jdbc.substring("jdbc:".length()), null, null, null, HostClassification.PUBLIC);
     }
 
     final String databaseServerType = jdbc.substring("jdbc:".length(), subprotocolEnd);
     String body = stripQueryAndFragment(jdbc.substring(subprotocolEnd + 1));
     body = normalizeOracleAuthorityMarker(body);
+    if (!hasAuthorityPrefix(body) && body.contains("://")) {
+      body = body.substring(body.indexOf("://") + 1);
+    }
 
     final boolean hasAuthority = hasAuthorityPrefix(body);
     final String normalizedBody = stripAuthorityPrefix(body);
 
     Integer port = null;
+    String host = null;
     String databaseName = null;
+    HostClassification hostClassification = HostClassification.PUBLIC;
 
     if (hasAuthority) {
       // Branch A: authority form with host[:port][/db], optionally with properties.
@@ -51,8 +69,10 @@ public final class JdbcUrlParser {
       // - jdbc:sqlserver://sqlhost:1433;databaseName=Sales
       // - jdbc:oracle:thin:@//oracledb:1521/ORCLPDB1
       final ParsedAuthority parsed = parseAuthority(normalizedBody);
+      host = parsed.host();
       port = parsed.port();
       databaseName = parsed.databaseName();
+      hostClassification = parsed.hostClassification();
       if (isBlank(databaseName)) {
         databaseName = databaseNameFromOptions(parsed.options());
       }
@@ -66,7 +86,9 @@ public final class JdbcUrlParser {
       final String head = headAndOptions[0];
       final String options = headAndOptions.length > 1 ? headAndOptions[1] : "";
       final ParsedHostPort parsedHostPort = parseHostPort(head);
+      host = parsedHostPort.host();
       port = parsedHostPort.port();
+      hostClassification = parsedHostPort.hostClassification();
       databaseName = databaseNameFromOptions(options);
       if (isBlank(databaseName)) {
         databaseName = firstToken(head);
@@ -81,7 +103,46 @@ public final class JdbcUrlParser {
       databaseName = firstToken(normalizedBody);
     }
 
-    return new JdbcUrl(databaseServerType, port, databaseName);
+    return new JdbcUrl(
+        databaseServerType,
+        normalizeHost(host, hostClassification),
+        port,
+        databaseName,
+        hostClassification);
+  }
+
+  private static HostClassification classifyHost(final String host) {
+    if (isBlank(host)) {
+      return HostClassification.UNKNOWN;
+    }
+    final String normalizedHost = host.strip().toLowerCase();
+    if ("localhost".equals(normalizedHost)
+        || normalizedHost.endsWith(".local")
+        || normalizedHost.endsWith(".lan")) {
+      return HostClassification.LOCALHOST;
+    }
+    if (normalizedHost.endsWith(".corp") || normalizedHost.endsWith(".internal")) {
+      return HostClassification.INTERNAL;
+    }
+    final InetAddress hostAddress = hostAddress(normalizedHost);
+    if (hostAddress == null) {
+      return HostClassification.PUBLIC;
+    }
+    if (hostAddress.isLoopbackAddress()) {
+      return HostClassification.LOCALHOST;
+    }
+    if (hostAddress.isAnyLocalAddress()
+        || hostAddress.isLinkLocalAddress()
+        || hostAddress.isSiteLocalAddress()) {
+      return HostClassification.INTERNAL;
+    }
+    if (hostAddress.getAddress().length == 16) {
+      final byte[] address = hostAddress.getAddress();
+      if ((address[0] & 0xFE) == 0xFC) {
+        return HostClassification.INTERNAL;
+      }
+    }
+    return HostClassification.PUBLIC;
   }
 
   private static String databaseNameFromOptions(final String options) {
@@ -106,6 +167,48 @@ public final class JdbcUrlParser {
 
   private static boolean hasAuthorityPrefix(final String value) {
     return value.startsWith("//") || value.startsWith("@");
+  }
+
+  private static String hashHost(final String host) {
+    try {
+      final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      final byte[] hashed = digest.digest(host.getBytes(UTF_8));
+      return "sha-256:" + HexFormat.of().formatHex(hashed);
+    } catch (final NoSuchAlgorithmException e) {
+      throw new IllegalStateException("SHA-256 not available", e);
+    }
+  }
+
+  private static InetAddress hostAddress(final String host) {
+    if (isBlank(host)) {
+      return null;
+    }
+    final String normalizedHost = host.strip();
+    if (!looksLikeIpLiteral(normalizedHost)) {
+      return null;
+    }
+    try {
+      return getByName(normalizedHost);
+    } catch (final UnknownHostException e) {
+      return null;
+    }
+  }
+
+  private static boolean looksLikeIpLiteral(final String host) {
+    return host.matches("\\d{1,3}(?:\\.\\d{1,3}){3}")
+        || host.matches("\\[[0-9a-fA-F:]+\\]")
+        || host.contains(":");
+  }
+
+  private static String normalizeHost(
+      final String host, final HostClassification hostClassification) {
+    if (isBlank(host)) {
+      return null;
+    }
+    return switch (hostClassification) {
+      case PUBLIC -> hashHost(host.strip().toLowerCase());
+      default -> "<%s>".formatted(hostClassification).toLowerCase();
+    };
   }
 
   private static String normalizeOracleAuthorityMarker(final String value) {
@@ -143,12 +246,17 @@ public final class JdbcUrlParser {
     final String[] parts = hostAndDb.split("/", 2);
     final ParsedHostPort parsedHostPort = parseHostPort(parts[0]);
     final String databaseName = parts.length > 1 ? firstToken(parts[1]) : null;
-    return new ParsedAuthority(parsedHostPort.port(), databaseName, options);
+    return new ParsedAuthority(
+        parsedHostPort.host(),
+        parsedHostPort.port(),
+        databaseName,
+        options,
+        parsedHostPort.hostClassification());
   }
 
   private static ParsedHostPort parseHostPort(final String hostPort) {
     if (isBlank(hostPort)) {
-      return new ParsedHostPort(null);
+      return new ParsedHostPort(null, null, HostClassification.PUBLIC);
     }
     String value = hostPort.trim();
     if (value.contains(",")) {
@@ -158,20 +266,23 @@ public final class JdbcUrlParser {
     if (value.startsWith("[")) {
       final int end = value.indexOf(']');
       if (end > 0) {
+        final String host = value.substring(1, end);
         Integer port = null;
         if (end + 2 <= value.length() && value.charAt(end + 1) == ':') {
           port = parsePort(value.substring(end + 2));
         }
-        return new ParsedHostPort(port);
+        return new ParsedHostPort(host, port, classifyHost(host));
       }
     }
 
     final int firstColon = value.indexOf(':');
     final int lastColon = value.lastIndexOf(':');
     if (firstColon > 0 && firstColon == lastColon) {
-      return new ParsedHostPort(parsePort(value.substring(firstColon + 1)));
+      final String host = value.substring(0, firstColon);
+      return new ParsedHostPort(
+          host, parsePort(value.substring(firstColon + 1)), classifyHost(host));
     }
-    return new ParsedHostPort(null);
+    return new ParsedHostPort(value, null, classifyHost(value));
   }
 
   private static Integer parsePort(final String value) {
