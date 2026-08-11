@@ -33,7 +33,7 @@ public class PooledConnectionUtility {
 
     private final Connection connection;
     private final DatabaseConnectionSource connectionSource;
-    private volatile boolean isClosed;
+    private final CloseState closeState;
     private final Map<String, MethodHandler> handlers;
 
     PooledConnectionInvocationHandler(
@@ -50,7 +50,7 @@ public class PooledConnectionUtility {
       }
       this.connectionSource =
           requireNonNull(connectionSource, "No database connection source provided");
-      isClosed = false;
+      closeState = new CloseState();
       this.handlers = buildHandlers();
     }
 
@@ -58,7 +58,7 @@ public class PooledConnectionUtility {
     public Object invoke(final Object proxy, final Method method, final Object[] args)
         throws Exception {
       final String methodName = method.getName();
-      if (!CLOSED_EXEMPT_METHODS.contains(methodName) && isClosed) {
+      if (!CLOSED_EXEMPT_METHODS.contains(methodName) && closeState.isClosed()) {
         throw new SQLException("Cannot call <%s> since connection is closed".formatted(method));
       }
       final MethodHandler handler = handlers.get(methodName);
@@ -71,7 +71,7 @@ public class PooledConnectionUtility {
     private Map<String, MethodHandler> buildHandlers() {
       final Map<String, MethodHandler> map = new HashMap<>();
       map.put("close", (proxy, args) -> handleClose());
-      map.put("isClosed", (proxy, args) -> isClosed);
+      map.put("isClosed", (proxy, args) -> closeState.isClosed());
       map.put("isWrapperFor", (proxy, args) -> handleIsWrapperFor(args));
       map.put("unwrap", (proxy, args) -> connection);
       map.put(
@@ -82,11 +82,11 @@ public class PooledConnectionUtility {
       return map;
     }
 
-    private synchronized Object handleClose() {
-      if (!isClosed) {
-        connectionSource.releaseConnection(connection);
+    private Object handleClose() {
+      if (!closeState.tryClose()) {
+        return null;
       }
-      isClosed = true;
+      connectionSource.releaseConnection(connection);
       return null;
     }
 
@@ -97,7 +97,7 @@ public class PooledConnectionUtility {
 
     private Object delegateToConnection(final Method method, final Object[] args) throws Exception {
       try {
-        if (isClosed) {
+        if (closeState.isClosed()) {
           throw new IllegalAccessException("Connection is closed");
         }
         return method.invoke(connection, args);

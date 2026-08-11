@@ -50,14 +50,12 @@ final class SingleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
   }
 
   private final Connection connection;
-  private volatile boolean isClosed;
+  private final CloseState closeState;
 
   SingleDatabaseConnectionSource(final Connection connection) {
     this.connection = requireNonNull(connection, "No connection provided");
     checkConnection();
-
-    // Explicitly set closed flag
-    isClosed = false;
+    closeState = new CloseState();
   }
 
   SingleDatabaseConnectionSource(
@@ -70,19 +68,16 @@ final class SingleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
 
   @Override
   public synchronized void close() throws Exception {
-    if (isClosed) {
+    if (!closeState.tryClose()) {
       LOGGER.log(Level.INFO, "Database connection source is already closed");
       return;
     }
-
     connection.close();
-
-    isClosed = true;
   }
 
   @Override
   public synchronized Connection get() {
-    if (isClosed) {
+    if (closeState.isClosed()) {
       throw new IllegalStateException("Database connection source is already closed");
     }
 
@@ -94,7 +89,7 @@ final class SingleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
 
   @Override
   public synchronized boolean releaseConnection(final Connection connection) {
-    if (isClosed) {
+    if (closeState.isClosed()) {
       throw new IllegalStateException("Database connection source is already closed");
     }
 

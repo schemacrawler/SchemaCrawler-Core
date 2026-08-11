@@ -14,7 +14,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -44,6 +48,7 @@ public class PooledConnectionTest {
   public void createDatabase() throws Exception {
     final DataSource db = DataSourceTestUtility.newEmbeddedDatabase("/testdb.sql");
     connection = db.getConnection();
+    reset(connectionSource);
   }
 
   @BeforeAll
@@ -146,5 +151,31 @@ public class PooledConnectionTest {
     }
     assertThat(testedIsWrapperFor, is(true));
     assertThat(testedUnrwap, is(true));
+  }
+
+  @Test
+  public void closeTwiceReleasesConnectionOnlyOnce() throws Exception {
+    final Connection pooledConnection =
+        PooledConnectionUtility.newPooledConnection(connection, connectionSource);
+
+    pooledConnection.close();
+    assertThrows(SQLException.class, pooledConnection::close);
+
+    verify(connectionSource, times(1)).releaseConnection(connection);
+  }
+
+  @Test
+  public void closeFailureMarksPooledConnectionClosed() throws Exception {
+    final Connection pooledConnection =
+        PooledConnectionUtility.newPooledConnection(connection, connectionSource);
+    doThrow(new RuntimeException("release failed"))
+        .when(connectionSource)
+        .releaseConnection(connection);
+
+    assertThrows(RuntimeException.class, pooledConnection::close);
+    assertThat(pooledConnection.isClosed(), is(true));
+    assertThrows(SQLException.class, pooledConnection::getMetaData);
+
+    verify(connectionSource, times(1)).releaseConnection(connection);
   }
 }
