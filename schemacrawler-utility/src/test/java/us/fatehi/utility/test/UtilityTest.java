@@ -15,6 +15,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static us.fatehi.utility.Utility.commonPrefix;
 import static us.fatehi.utility.Utility.convertForComparison;
 import static us.fatehi.utility.Utility.hasNoUpperCase;
+import static us.fatehi.utility.Utility.hash;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.isIntegral;
 import static us.fatehi.utility.Utility.join;
@@ -67,6 +68,21 @@ public class UtilityTest {
     assertThat(hasNoUpperCase("aa"), is(true));
     assertThat(hasNoUpperCase("a s"), is(true));
     assertThat(hasNoUpperCase("1.0"), is(true));
+  }
+
+  @Test
+  public void hashTest() {
+    assertThat(hash(null), is(nullValue()));
+    assertThat(
+        hash(
+            new Object() {
+              @Override
+              public String toString() {
+                return "";
+              }
+            }),
+        is(nullValue()));
+    assertThat(hash("abc"), is("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"));
   }
 
   @Test

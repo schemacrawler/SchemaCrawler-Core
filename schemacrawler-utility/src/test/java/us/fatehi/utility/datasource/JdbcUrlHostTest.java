@@ -9,8 +9,9 @@
 package us.fatehi.utility.datasource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
+import static us.fatehi.test.utility.TestUtility.SHA_256_HEX_PATTERN;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,7 @@ public class JdbcUrlHostTest {
   public void parseNormalizesPublicHostAndMarksItAsPublic() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql://Db.Example.Com:3306/appdb");
 
-    assertThat(jdbcUrl.hostHash(), containsString("sha-256:"));
+    assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hasHost(), is(true));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.hasPublicHost(), is(true));
@@ -40,7 +41,7 @@ public class JdbcUrlHostTest {
   public void parseMarksIpv6LiteralAsInternalOrIp() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:postgresql://[2001:db8::10]:5432/appdb");
 
-    assertThat(jdbcUrl.hostHash(), containsString("sha-256:"));
+    assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hasHost(), is(true));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.hasPublicHost(), is(true));

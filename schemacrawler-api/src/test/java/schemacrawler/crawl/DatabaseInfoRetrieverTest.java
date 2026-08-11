@@ -16,9 +16,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
 import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
+import static us.fatehi.test.utility.TestUtility.SHA_256_HEX_PATTERN;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -148,7 +150,7 @@ public class DatabaseInfoRetrieverTest {
     final DatabaseServerFingerprint fingerprint =
         catalog.getCrawlInfo().getDatabaseServerFingerprint();
     assertThat(fingerprint, is(notNullValue()));
-    assertThat(fingerprint.fingerprint(), containsString("sha-256:"));
+    assertThat(fingerprint.fingerprint(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(fingerprint.confidence(), is(notNullValue()));
   }
 
