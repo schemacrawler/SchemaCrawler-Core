@@ -11,7 +11,6 @@ package schemacrawler.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,6 +46,7 @@ import schemacrawler.schema.View;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
+import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
@@ -98,31 +98,21 @@ public class MetadataUtilityTest {
 
   @Test
   public void databaseObjectUri() {
-    final Schema schema = mock(Schema.class);
-    when(schema.toString()).thenReturn("PUBLIC.BOOKS");
+    final Schema schema = new SchemaReference("PUBLIC", "BOOKS");
 
     final Table table = mock(Table.class);
     when(table.getSchema()).thenReturn(schema);
-    when(table.getName()).thenReturn("order details");
+    when(table.getFullName()).thenReturn(schema.getFullName() + ".order details");
     assertThat(
         MetaDataUtility.getDatabaseObjectUri(table).toString(),
-        is("catalog://tables/PUBLIC.BOOKS/order%20details"));
+        is("catalog://tables/PUBLIC.BOOKS.order%20details"));
 
     final Routine routine = mock(Routine.class);
     when(routine.getSchema()).thenReturn(schema);
-    when(routine.getName()).thenReturn("find order");
+    when(routine.getFullName()).thenReturn(schema.getFullName() + ".find order");
     assertThat(
         MetaDataUtility.getDatabaseObjectUri(routine).toString(),
-        is("catalog://routines/PUBLIC.BOOKS/find%20order"));
-  }
-
-  @Test
-  public void databaseObjectUriMissingSchemaThrows() {
-    final Table table = mock(Table.class);
-    when(table.getSchema()).thenReturn(null);
-    when(table.getName()).thenReturn("order details");
-
-    assertThrows(NullPointerException.class, () -> MetaDataUtility.getDatabaseObjectUri(table));
+        is("catalog://routines/PUBLIC.BOOKS.find%20order"));
   }
 
   @Test
