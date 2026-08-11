@@ -8,7 +8,12 @@
 
 package us.fatehi.utility;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringJoiner;
@@ -68,6 +73,23 @@ public final class Utility {
       return false;
     }
     return text.chars().noneMatch(Character::isUpperCase);
+  }
+
+  public static String hash(final Object object) {
+    if (object == null) {
+      return null;
+    }
+    final String text = object.toString();
+    if (text.isEmpty()) {
+      return null;
+    }
+    try {
+      final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      final byte[] hashed = digest.digest(text.getBytes(UTF_8));
+      return HexFormat.of().formatHex(hashed);
+    } catch (final NoSuchAlgorithmException e) {
+      throw new IllegalStateException("SHA-256 not available", e);
+    }
   }
 
   /**

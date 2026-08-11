@@ -9,10 +9,11 @@
 package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
+import static us.fatehi.test.utility.TestUtility.SHA_256_HEX_PATTERN;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.DatabaseServerFingerprint;
@@ -31,7 +32,7 @@ public class DatabaseServerFingerprintBuilderTest {
             databaseInformation, "jdbc:postgresql://db.example.com:5432/appdb");
 
     assertThat(fingerprint, is(notNullValue()));
-    assertThat(fingerprint.fingerprint(), containsString("sha-256:"));
+    assertThat(fingerprint.fingerprint(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(fingerprint.confidence(), is(FingerprintConfidence.HIGH));
   }
 

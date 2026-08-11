@@ -103,8 +103,6 @@ public final class MetaDataUtility {
       return null;
     }
 
-    final String name = databaseObject.getName();
-    URI resource;
     try {
       final String context;
       if (databaseObject instanceof Table) {
@@ -114,12 +112,12 @@ public final class MetaDataUtility {
       } else {
         return null;
       }
-      final String path = "/" + String.join("/", databaseObject.getSchema().toString(), name);
-      resource = new URI("catalog", context, path, null);
+      final String path = "/" + databaseObject.getFullName();
+      final URI resource = new URI("catalog", context, path, null);
+      return resource;
     } catch (final URISyntaxException e) {
-      resource = null;
+      return null;
     }
-    return resource;
   }
 
   /**

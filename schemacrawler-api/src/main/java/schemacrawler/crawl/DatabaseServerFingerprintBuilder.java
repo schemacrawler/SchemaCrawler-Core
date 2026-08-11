@@ -8,16 +8,13 @@
 
 package schemacrawler.crawl;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import schemacrawler.schema.DatabaseServerFingerprint;
 import schemacrawler.schema.FingerprintConfidence;
+import us.fatehi.utility.Utility;
 import us.fatehi.utility.datasource.JdbcUrl;
 import us.fatehi.utility.datasource.JdbcUrlParser;
 import us.fatehi.utility.property.ProductVersion;
@@ -31,7 +28,7 @@ final class DatabaseServerFingerprintBuilder {
 
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse(connectionUrl);
     final Map<String, String> canonical = canonicalMap(databaseInformation, jdbcUrl);
-    final String fingerprint = hash(canonical);
+    final String fingerprint = Utility.hash(canonical);
     final FingerprintConfidence confidence = confidence(databaseInformation, jdbcUrl);
     return new DatabaseServerFingerprint(fingerprint, confidence);
   }
@@ -44,16 +41,6 @@ final class DatabaseServerFingerprintBuilder {
     canonical.put("database", jdbcUrl.databaseName());
     canonical.put("database_product_version", databaseInformation.getProductVersion());
     return canonical;
-  }
-
-  private static String hash(final Map<String, String> value) {
-    try {
-      final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-      final byte[] hashed = digest.digest(value.toString().getBytes(UTF_8));
-      return "sha-256:" + HexFormat.of().formatHex(hashed);
-    } catch (final NoSuchAlgorithmException e) {
-      throw new IllegalStateException("SHA-256 not available", e);
-    }
   }
 
   private static FingerprintConfidence confidence(

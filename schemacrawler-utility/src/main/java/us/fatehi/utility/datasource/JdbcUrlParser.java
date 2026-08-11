@@ -9,14 +9,11 @@
 package us.fatehi.utility.datasource;
 
 import static java.net.InetAddress.getByName;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static us.fatehi.utility.Utility.hash;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
@@ -169,16 +166,6 @@ public final class JdbcUrlParser {
     return value.startsWith("//") || value.startsWith("@");
   }
 
-  private static String hashHost(final String host) {
-    try {
-      final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-      final byte[] hashed = digest.digest(host.getBytes(UTF_8));
-      return "sha-256:" + HexFormat.of().formatHex(hashed);
-    } catch (final NoSuchAlgorithmException e) {
-      throw new IllegalStateException("SHA-256 not available", e);
-    }
-  }
-
   private static InetAddress hostAddress(final String host) {
     if (isBlank(host)) {
       return null;
@@ -206,7 +193,7 @@ public final class JdbcUrlParser {
       return null;
     }
     return switch (hostClassification) {
-      case PUBLIC -> hashHost(host.strip().toLowerCase());
+      case PUBLIC -> hash(host.strip().toLowerCase());
       default -> "<%s>".formatted(hostClassification).toLowerCase();
     };
   }
