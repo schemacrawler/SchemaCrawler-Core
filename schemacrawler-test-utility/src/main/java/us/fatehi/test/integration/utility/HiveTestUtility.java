@@ -14,6 +14,6 @@ public class HiveTestUtility {
 
   @SuppressWarnings("resource")
   public static HiveContainer newHiveContainer() {
-    return new HiveContainer(DockerImageName.parse("apache/hive").withTag("4.2.0"));
+    return new HiveContainer(DockerImageName.parse("apache/hive").withTag("4.1.0"));
   }
 }
