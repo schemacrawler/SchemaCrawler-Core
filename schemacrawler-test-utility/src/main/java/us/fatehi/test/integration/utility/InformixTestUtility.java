@@ -18,6 +18,7 @@ public class InformixTestUtility {
     return new InformixContainer(
             DockerImageName.parse("ibmcom/informix-developer-database").withTag("14.10.FC7W1DE"))
         .withDatabaseName("books")
-        .withInitFile(MountableFile.forClasspathResource("create-books-database.sql"));
+        .withInitFile(
+            MountableFile.forClasspathResource("testdb/informix/informix-books-database.sql"));
   }
 }
