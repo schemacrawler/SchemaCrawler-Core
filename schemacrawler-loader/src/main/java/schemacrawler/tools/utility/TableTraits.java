@@ -7,12 +7,10 @@
  */
 package schemacrawler.tools.utility;
 
-import static schemacrawler.ermodel.utility.ERModelUtility.inferBridgeTable;
 import static schemacrawler.loader.utility.TableRowCountsUtility.getRowCount;
 import static schemacrawler.loader.utility.TableRowCountsUtility.hasRowCount;
 
 import java.util.function.Function;
-
 import schemacrawler.schema.Table;
 
 public record TableTraits(
@@ -22,7 +20,7 @@ public record TableTraits(
     Boolean selfReferencing,
     Boolean hasTriggers,
     Boolean emptyTable,
-    Boolean bridgeTable) {
+    EntityModelType entityModelType) {
 
   private static final Function<Boolean, Boolean> makeTrueOrNull =
       booleanValue -> booleanValue == null || !booleanValue ? null : Boolean.TRUE;
@@ -38,7 +36,7 @@ public record TableTraits(
         table.isSelfReferencing(),
         table.hasTriggers(),
         hasRowCount(table) && getRowCount(table) == 0,
-        inferBridgeTable(table).toBoolean(false));
+        EntityModelType.from(table));
   }
 
   public TableTraits() {
@@ -46,7 +44,8 @@ public record TableTraits(
   }
 
   /**
-   * NOTE: A null value means either false or unknown. A null value is not serialized into JSON - only true values are.
+   * NOTE: A null value means either false or unknown. A null value is not serialized into JSON -
+   * only true and known values are.
    */
   public TableTraits {
     noPrimaryKey = makeTrueOrNull.apply(noPrimaryKey);
@@ -55,6 +54,8 @@ public record TableTraits(
     selfReferencing = makeTrueOrNull.apply(selfReferencing);
     hasTriggers = makeTrueOrNull.apply(hasTriggers);
     emptyTable = makeTrueOrNull.apply(emptyTable);
-    bridgeTable = makeTrueOrNull.apply(bridgeTable);
+    if (entityModelType == EntityModelType.unknown) {
+      entityModelType = null;
+    }
   }
 }

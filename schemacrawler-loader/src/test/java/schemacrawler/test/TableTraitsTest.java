@@ -28,6 +28,7 @@ import schemacrawler.test.utility.crawl.LightColumn;
 import schemacrawler.test.utility.crawl.LightColumnReference;
 import schemacrawler.test.utility.crawl.LightTable;
 import schemacrawler.test.utility.crawl.LightTrigger;
+import schemacrawler.tools.utility.EntityModelType;
 import schemacrawler.tools.utility.TableTraits;
 
 public class TableTraitsTest {
@@ -128,12 +129,13 @@ public class TableTraitsTest {
     assertThat(attributes.selfReferencing(), is(nullValue()));
     assertThat(attributes.hasTriggers(), is(nullValue()));
     assertThat(attributes.emptyTable(), is(nullValue()));
-    assertThat(attributes.bridgeTable(), is(nullValue()));
+    assertThat(attributes.entityModelType(), is(nullValue()));
   }
 
   @Test
   public void derivesAttributesFromTable() {
-    final LightTable table = new LightTable(new SchemaReference("PUBLIC", "BOOKS"), "BOOKS");
+    final LightTable table =
+        new LightTable(new SchemaReference("PUBLIC", "BOOKS"), "TABLE_TRAIT_1");
     table.addTrigger(new LightTrigger(table, "TRG_BOOKS"));
     table.setAttribute(TABLE_ROW_COUNT_KEY, 0L);
 
@@ -145,21 +147,13 @@ public class TableTraitsTest {
     assertThat(attributes.selfReferencing(), is(nullValue()));
     assertThat(attributes.hasTriggers(), is(Boolean.TRUE));
     assertThat(attributes.emptyTable(), is(Boolean.TRUE));
-    assertThat(attributes.bridgeTable(), is(nullValue()));
-  }
-
-  @Test
-  public void doesNotMarkEmptyWhenRowCountUnavailable() {
-    final LightTable table = new LightTable(new SchemaReference("PUBLIC", "BOOKS"), "BOOKS");
-
-    final TableTraits attributes = TableTraits.from(table);
-
-    assertThat(attributes.emptyTable(), is(nullValue()));
+    assertThat(attributes.entityModelType(), is(EntityModelType.non_entity));
   }
 
   @Test
   public void doesNotMarkEmptyWhenRowCountIsNonZero() {
-    final LightTable table = new LightTable(new SchemaReference("PUBLIC", "BOOKS"), "BOOKS");
+    final LightTable table =
+        new LightTable(new SchemaReference("PUBLIC", "BOOKS"), "TABLE_TRAIT_2");
     table.setAttribute(TABLE_ROW_COUNT_KEY, 7L);
 
     final TableTraits attributes = TableTraits.from(table);
@@ -168,20 +162,11 @@ public class TableTraitsTest {
   }
 
   @Test
-  public void doesNotMarkBridgeTableWhenNotInferredAsBridge() {
-    final Table table = new LightTable("A_TABLE");
-
-    final TableTraits attributes = TableTraits.from(table);
-
-    assertThat(attributes.bridgeTable(), is(nullValue()));
-  }
-
-  @Test
   public void marksBridgeTableWhenInferredAsBridge() {
     final Table table = bridgeCandidateTable();
 
     final TableTraits attributes = TableTraits.from(table);
 
-    assertThat(attributes.bridgeTable(), is(Boolean.TRUE));
+    assertThat(attributes.entityModelType(), is(EntityModelType.bridge_table));
   }
 }
