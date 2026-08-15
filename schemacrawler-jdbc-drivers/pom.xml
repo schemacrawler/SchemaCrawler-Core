@@ -140,7 +140,6 @@
       <groupId>io.trino</groupId>
       <artifactId>trino-jdbc</artifactId>
       <version>483</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.dbeaver.jdbc</groupId>
