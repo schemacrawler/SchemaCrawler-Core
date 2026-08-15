@@ -12,9 +12,10 @@ import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
@@ -28,7 +29,6 @@ import schemacrawler.schema.JavaSqlTypeGroup;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Procedure;
-import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
@@ -41,6 +41,8 @@ import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
 public final class MetaDataUtility {
+
+  private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
 
   public enum SimpleDatabaseObjectType {
     unknown,
@@ -104,18 +106,24 @@ public final class MetaDataUtility {
     }
 
     try {
-      final String context;
-      if (databaseObject instanceof Table) {
-        context = "tables";
-      } else if (databaseObject instanceof Routine) {
-        context = "routines";
-      } else {
-        return null;
+      final SimpleDatabaseObjectType simpleTypeName = getSimpleTypeName(databaseObject);
+      final String context =
+          switch (simpleTypeName) {
+            case table, view -> "tables";
+            case procedure, function -> "routines";
+            case sequence -> "sequences";
+            case synonym -> "synonyms";
+            default -> "";
+          };
+      if (isBlank(context)) {
+        throw new IllegalArgumentException(
+            "Unsupported object type <%s>".formatted(databaseObject));
       }
       final String path = "/" + databaseObject.getFullName();
       final URI resource = new URI("catalog", context, path, null);
       return resource;
-    } catch (final URISyntaxException e) {
+    } catch (final Exception e) {
+      LOGGER.log(Level.WARNING, "Could not construct URI for <%s>".formatted(databaseObject), e);
       return null;
     }
   }
@@ -139,11 +147,11 @@ public final class MetaDataUtility {
     if (databaseObject instanceof Procedure) {
       return SimpleDatabaseObjectType.procedure;
     }
-    // NOTE: Check View before Table, since View is a subclass of Table
-    if (databaseObject instanceof View) {
-      return SimpleDatabaseObjectType.view;
-    }
-    if (databaseObject instanceof Table) {
+    if (databaseObject instanceof final Table table) {
+      // NOTE: Check View before Table, since View is a subclass of Table
+      if (isView(table)) {
+        return SimpleDatabaseObjectType.view;
+      }
       return SimpleDatabaseObjectType.table;
     }
     // Handle null, DependantObject, and unknown subclasses
@@ -198,6 +206,13 @@ public final class MetaDataUtility {
 
   public static boolean isPartial(final DatabaseObject databaseObject) {
     return databaseObject == null || databaseObject instanceof PartialDatabaseObject;
+  }
+
+  public static boolean isView(final Table table) {
+    if ((table == null) || isPartial(table)) {
+      return false;
+    }
+    return table instanceof View || table.getTableType().isView();
   }
 
   public static String joinColumns(

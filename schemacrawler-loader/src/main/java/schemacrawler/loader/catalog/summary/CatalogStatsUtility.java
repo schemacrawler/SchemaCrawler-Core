@@ -8,6 +8,7 @@
 package schemacrawler.loader.catalog.summary;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.utility.MetaDataUtility.isView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +22,6 @@ import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.View;
 import us.fatehi.utility.UtilityMarker;
 
 /** Utility methods for building {@link CatalogStats}. */
@@ -46,10 +46,6 @@ public final class CatalogStatsUtility {
         catalog.getCrawlInfo(),
         catalogCounts(schemaCounts, catalog.getTables()),
         List.copyOf(schemaStats));
-  }
-
-  private static boolean isView(final Table table) {
-    return table instanceof View || table.getTableType().isView();
   }
 
   private static CatalogStats.CatalogCounts catalogCounts(

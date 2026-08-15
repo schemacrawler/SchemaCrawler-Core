@@ -102,7 +102,7 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
 
   @Override
   public TableType getTableType() {
-    throw new NotLoadedException(this);
+    return TableType.UNKNOWN;
   }
 
   @Override
@@ -112,7 +112,7 @@ final class TablePartial extends AbstractDatabaseObject implements Table, Partia
 
   @Override
   public TableType getType() {
-    throw new NotLoadedException(this);
+    return getTableType();
   }
 
   @Override

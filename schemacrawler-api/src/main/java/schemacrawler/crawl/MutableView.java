@@ -21,6 +21,7 @@ import schemacrawler.schema.View;
 final class MutableView extends MutableTable implements View {
 
   @Serial private static final long serialVersionUID = 3257290248802284852L;
+
   private final NamedObjectList<MutableTable> tableUsage = new NamedObjectList<>();
   private CheckOptionType checkOption;
   private boolean updatable;

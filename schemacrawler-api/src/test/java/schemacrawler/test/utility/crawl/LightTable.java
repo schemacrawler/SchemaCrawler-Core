@@ -151,7 +151,7 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public TableType getTableType() {
-    return getType();
+    return new TableType("table");
   }
 
   @Override
@@ -161,7 +161,7 @@ public final class LightTable extends AbstractLightDatabaseObject implements Tab
 
   @Override
   public TableType getType() {
-    return TableType.UNKNOWN;
+    return getTableType();
   }
 
   @Override
