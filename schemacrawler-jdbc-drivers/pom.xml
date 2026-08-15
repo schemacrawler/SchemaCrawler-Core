@@ -115,7 +115,7 @@
       <artifactId>hive-jdbc</artifactId>
       <version>4.1.0</version>
       <classifier>standalone</classifier>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>com.amazon.redshift</groupId>
       <artifactId>redshift-jdbc42</artifactId>
@@ -136,11 +136,6 @@
       <artifactId>mariadb-java-client</artifactId>
       <version>3.5.9</version>
     </dependency>
-    <dependency>
-      <groupId>io.trino</groupId>
-      <artifactId>trino-jdbc</artifactId>
-      <version>483</version>
-    </dependency>    
     <dependency>
       <groupId>com.dbeaver.jdbc</groupId>
       <artifactId>com.dbeaver.jdbc.driver.libsql</artifactId>

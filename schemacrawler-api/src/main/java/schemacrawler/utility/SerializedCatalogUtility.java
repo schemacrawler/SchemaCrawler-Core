@@ -30,7 +30,6 @@ public final class SerializedCatalogUtility {
 
   private static final List<Pattern> CATALOG_CLASS_PATTERNS =
       List.of(
-          Pattern.compile("us\\.fatehi\\.utility\\.CloudProvider"),
           Pattern.compile("us\\.fatehi\\.utility\\.property\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.database\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"),
