@@ -99,7 +99,7 @@ public final class CatalogStatsUtility {
         foreignKeys.size());
   }
 
-  private static CatalogStats.RoutineCounts routineCounts(final Collection<Routine> routines) {
+  private static CatalogStats.RoutinesCounts routineCounts(final Collection<Routine> routines) {
     int procedures = 0;
     int functions = 0;
     int parameters = 0;
@@ -114,20 +114,20 @@ public final class CatalogStatsUtility {
       }
       parameters += routine.getParameters().size();
     }
-    return new CatalogStats.RoutineCounts(routines.size(), procedures, functions, parameters);
+    return new CatalogStats.RoutinesCounts(routines.size(), procedures, functions, parameters);
   }
 
   private static CatalogStats.SchemaCounts schemaCounts(
       final Catalog catalog, final Schema schema) {
     return new CatalogStats.SchemaCounts(
-        new CatalogStats.DataTypeCounts(catalog.getColumnDataTypes(schema).size()),
+        new CatalogStats.DataTypesCounts(catalog.getColumnDataTypes(schema).size()),
         tableCounts(catalog.getTables(schema)),
         routineCounts(catalog.getRoutines(schema)),
-        new CatalogStats.SynonymCounts(catalog.getSynonyms(schema).size()),
-        new CatalogStats.SequenceCounts(catalog.getSequences(schema).size()));
+        new CatalogStats.SynonymsCounts(catalog.getSynonyms(schema).size()),
+        new CatalogStats.SequencesCounts(catalog.getSequences(schema).size()));
   }
 
-  private static CatalogStats.TableCounts tableCounts(final Collection<Table> tables) {
+  private static CatalogStats.TablesCounts tableCounts(final Collection<Table> tables) {
     int columns = 0;
     int primaryKeys = 0;
     int foreignKeys = 0;
@@ -142,7 +142,7 @@ public final class CatalogStatsUtility {
       indexes += table.getIndexes().size();
       triggers += table.getTriggers().size();
     }
-    return new CatalogStats.TableCounts(
+    return new CatalogStats.TablesCounts(
         tables.size(), columns, primaryKeys, foreignKeys, indexes, triggers);
   }
 

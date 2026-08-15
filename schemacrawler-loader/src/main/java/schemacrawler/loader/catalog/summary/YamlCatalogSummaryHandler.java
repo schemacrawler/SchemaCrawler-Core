@@ -83,7 +83,7 @@ final class YamlCatalogSummaryHandler implements CatalogSummaryHandler {
     return sb.toString();
   }
 
-  private void appendRoutineCounts(final CatalogStats.RoutineCounts routines) {
+  private void appendRoutineCounts(final CatalogStats.RoutinesCounts routines) {
     sb.append("    routines:\n");
     count("      ", "count", routines.count());
     if (routines.count() > 0) {
@@ -93,7 +93,7 @@ final class YamlCatalogSummaryHandler implements CatalogSummaryHandler {
     }
   }
 
-  private void appendTableCounts(final CatalogStats.TableCounts tables) {
+  private void appendTableCounts(final CatalogStats.TablesCounts tables) {
     sb.append("    tables:\n");
     count("      ", "count", tables.count());
     if (tables.count() > 0) {
