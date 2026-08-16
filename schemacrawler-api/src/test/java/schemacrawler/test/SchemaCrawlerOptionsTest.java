@@ -6,12 +6,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.schemacrawler;
+package schemacrawler.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
+
+import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 
 public class SchemaCrawlerOptionsTest {
 

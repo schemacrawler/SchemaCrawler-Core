@@ -8,7 +8,7 @@
 
 package schemacrawler.loader.implicitassociations;
 
-import static schemacrawler.test.utility.ProposedImplicitAssociationsTestUtility.implicitAssociations;
+import static schemacrawler.test.ProposedImplicitAssociationsTestUtility.implicitAssociations;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.test.utility.DisableLogging;

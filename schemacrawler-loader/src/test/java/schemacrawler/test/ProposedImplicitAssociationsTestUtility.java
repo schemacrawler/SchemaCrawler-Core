@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.test.utility;
+package schemacrawler.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
@@ -27,6 +27,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
+import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
