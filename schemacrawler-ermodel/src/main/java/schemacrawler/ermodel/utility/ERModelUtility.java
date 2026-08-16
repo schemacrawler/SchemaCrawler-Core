@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.ERModel;
@@ -22,6 +24,7 @@ import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.ermodel.model.TableReferenceRelationship;
+import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.OptionalBoolean;
@@ -30,6 +33,11 @@ import us.fatehi.utility.UtilityMarker;
 /** Utility for inferring entity model information from tables and foreign keys. */
 @UtilityMarker
 public class ERModelUtility {
+
+  private static final int MEMO_MAX_SIZE = 500;
+
+  private static final ConcurrentMap<NamedObjectKey, TableEntityModelInferrer> inferrerMemo =
+      new ConcurrentHashMap<>();
 
   public static ERModel buildEmptyERModel() {
     return ERModelBuilder.buildEmptyERModel();
@@ -74,7 +82,7 @@ public class ERModelUtility {
       return OptionalBoolean.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
+    final TableEntityModelInferrer tableEntityModel = inferrer(table);
     final OptionalBoolean coveredByIndex = tableEntityModel.coveredByIndex(fk);
     return coveredByIndex;
   }
@@ -95,7 +103,7 @@ public class ERModelUtility {
       return OptionalBoolean.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
+    final TableEntityModelInferrer tableEntityModel = inferrer(table);
     final OptionalBoolean coveredByIndex = tableEntityModel.coveredByUniqueIndex(fk);
     return coveredByIndex;
   }
@@ -111,7 +119,7 @@ public class ERModelUtility {
       return OptionalBoolean.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
+    final TableEntityModelInferrer tableEntityModel = inferrer(table);
     final boolean isBridgeTable = tableEntityModel.inferBridgeTable();
     return OptionalBoolean.fromBoolean(isBridgeTable);
   }
@@ -132,7 +140,7 @@ public class ERModelUtility {
       return RelationshipCardinality.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
+    final TableEntityModelInferrer tableEntityModel = inferrer(table);
     final RelationshipCardinality fkCardinality = tableEntityModel.inferCardinality(fk);
     return fkCardinality;
   }
@@ -148,9 +156,16 @@ public class ERModelUtility {
       return EntityType.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
+    final TableEntityModelInferrer tableEntityModel = inferrer(table);
     final EntityType entityType = tableEntityModel.inferEntityType();
     return entityType;
+  }
+
+  private static TableEntityModelInferrer inferrer(final Table table) {
+    if (inferrerMemo.size() >= MEMO_MAX_SIZE) {
+      inferrerMemo.clear();
+    }
+    return inferrerMemo.computeIfAbsent(table.key(), key -> new TableEntityModelInferrer(table));
   }
 
   private ERModelUtility() {

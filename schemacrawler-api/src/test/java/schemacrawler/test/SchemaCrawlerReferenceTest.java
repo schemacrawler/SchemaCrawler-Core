@@ -191,14 +191,6 @@ public class SchemaCrawlerReferenceTest {
 
     if (assertDataNotLoaded) {
       try {
-        table.getTableType();
-        fail(
-            "An exception should be thrown indicating that this table was not loaded from the"
-                + " database");
-      } catch (final NotLoadedException e) {
-        // Expected exception
-      }
-      try {
         column.getColumnDataType();
         fail(
             "An exception should be thrown indicating that this table was not loaded from the"

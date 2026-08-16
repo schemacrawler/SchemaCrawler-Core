@@ -16,23 +16,23 @@ import schemacrawler.schema.Schema;
 /** Immutable catalog summary statistics. */
 public final class CatalogStats {
 
-  public record DataTypeCounts(int count) {}
+  public record DataTypesCounts(int count) {}
 
-  public record SynonymCounts(int count) {}
+  public record SynonymsCounts(int count) {}
 
-  public record SequenceCounts(int count) {}
+  public record SequencesCounts(int count) {}
 
-  public record TableCounts(
+  public record TablesCounts(
       int count, int columns, int primaryKeys, int foreignKeys, int indexes, int triggers) {}
 
-  public record RoutineCounts(int count, int procedures, int functions, int parameters) {}
+  public record RoutinesCounts(int count, int procedures, int functions, int parameters) {}
 
   public record SchemaCounts(
-      DataTypeCounts dataTypes,
-      TableCounts tables,
-      RoutineCounts routines,
-      SynonymCounts synonyms,
-      SequenceCounts sequences) {}
+      DataTypesCounts dataTypes,
+      TablesCounts tables,
+      RoutinesCounts routines,
+      SynonymsCounts synonyms,
+      SequencesCounts sequences) {}
 
   /**
    * Aggregate counts across all schemas in the catalog.

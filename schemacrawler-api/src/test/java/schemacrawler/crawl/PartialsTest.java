@@ -22,6 +22,7 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableRelationshipType;
+import schemacrawler.schema.TableType;
 import schemacrawler.schemacrawler.SchemaReference;
 
 public class PartialsTest {
@@ -202,9 +203,7 @@ public class PartialsTest {
           "getPrimaryKey",
           "getPrivileges",
           "getTableConstraints",
-          "getTableType",
           "getTriggers",
-          "getType",
           "hasDefinition",
           "hasPrimaryKey",
         }) {
@@ -213,6 +212,9 @@ public class PartialsTest {
           () -> invokeMethod(table, methodName),
           "Testing partial method, " + methodName);
     }
+
+    assertThat(table.getType(), is(TableType.UNKNOWN));
+    assertThat(table.getTableType(), is(TableType.UNKNOWN));
 
     for (final String methodName :
         new String[] {"lookupIndex", "lookupPrivilege", "lookupTrigger"}) {

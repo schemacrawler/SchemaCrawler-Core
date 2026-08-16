@@ -14,12 +14,15 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static schemacrawler.schema.IdentifierQuotingStrategy.quote_all;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
+import java.util.List;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -27,6 +30,12 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import schemacrawler.filter.ReducerFactory;
+import schemacrawler.inclusionrule.ExcludeAll;
+import schemacrawler.inclusionrule.IncludeAll;
+import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
+import schemacrawler.inclusionrule.ListExclusionRule;
+import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.CatalogReducer;
 import schemacrawler.schema.DatabaseObject;
@@ -35,6 +44,8 @@ import schemacrawler.schema.Function;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Index;
+import schemacrawler.schema.NamedObject;
+import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Routine;
@@ -42,12 +53,16 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableType;
+import schemacrawler.schema.TypedObject;
 import schemacrawler.schema.View;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.WithTestDatabase;
+import schemacrawler.test.utility.crawl.LightProcedure;
+import schemacrawler.test.utility.crawl.LightTable;
 import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 
@@ -100,16 +115,12 @@ public class MetadataUtilityTest {
   public void databaseObjectUri() {
     final Schema schema = new SchemaReference("PUBLIC", "BOOKS");
 
-    final Table table = mock(Table.class);
-    when(table.getSchema()).thenReturn(schema);
-    when(table.getFullName()).thenReturn(schema.getFullName() + ".order details");
+    final Table table = new LightTable(schema, "order details");
     assertThat(
         MetaDataUtility.getDatabaseObjectUri(table).toString(),
         is("catalog://tables/PUBLIC.BOOKS.order%20details"));
 
-    final Routine routine = mock(Routine.class);
-    when(routine.getSchema()).thenReturn(schema);
-    when(routine.getFullName()).thenReturn(schema.getFullName() + ".find order");
+    final Routine routine = new LightProcedure(schema, "find order");
     assertThat(
         MetaDataUtility.getDatabaseObjectUri(routine).toString(),
         is("catalog://routines/PUBLIC.BOOKS.find%20order"));
@@ -120,6 +131,67 @@ public class MetadataUtilityTest {
     assertThat(MetaDataUtility.getDatabaseObjectUri(null), is((java.net.URI) null));
     assertThat(
         MetaDataUtility.getDatabaseObjectUri(mock(DatabaseObject.class)), is((java.net.URI) null));
+  }
+
+  @Test
+  public void detectsViewByInstanceAndTableType() {
+    assertThat(MetaDataUtility.isView(null), is(false));
+
+    final Table baseTable = mock(Table.class);
+    when(baseTable.getTableType()).thenReturn(new TableType("TABLE"));
+    assertThat(MetaDataUtility.isView(baseTable), is(false));
+
+    final Table nonPartialViewTypedTable = mock(Table.class);
+    when(nonPartialViewTypedTable.getTableType()).thenReturn(new TableType("VIEW"));
+    assertThat(MetaDataUtility.isView(nonPartialViewTypedTable), is(true));
+
+    final Table partialViewTypedTable =
+        mock(Table.class, withSettings().extraInterfaces(PartialDatabaseObject.class));
+    when(partialViewTypedTable.getTableType()).thenReturn(TableType.UNKNOWN);
+    assertThat(MetaDataUtility.isView(partialViewTypedTable), is(false));
+
+    final Table partialBaseTypedTable =
+        mock(Table.class, withSettings().extraInterfaces(PartialDatabaseObject.class));
+    when(partialBaseTypedTable.getTableType()).thenReturn(new TableType("TABLE"));
+    assertThat(MetaDataUtility.isView(partialBaseTypedTable), is(false));
+
+    final View view = mock(View.class);
+    assertThat(MetaDataUtility.isView(view), is(true));
+  }
+
+  @Test
+  public void inclusionRuleString() {
+    assertThat(MetaDataUtility.inclusionRuleString(null), is(".*"));
+
+    final InclusionRule includeAll = new IncludeAll();
+    assertThat(MetaDataUtility.inclusionRuleString(includeAll), is(".*"));
+
+    final InclusionRule excludeAll = new ExcludeAll();
+    assertThat(MetaDataUtility.inclusionRuleString(excludeAll), is(".*"));
+
+    final InclusionRule listExclusionRule = new ListExclusionRule(List.of("BOOKS"));
+    assertThat(MetaDataUtility.inclusionRuleString(listExclusionRule), is(".*"));
+
+    final InclusionRule regexRule = new RegularExpressionInclusionRule("BOOKS|AUTHORS");
+    assertThat(MetaDataUtility.inclusionRuleString(regexRule), is("BOOKS|AUTHORS"));
+
+    final InclusionRule regexRuleWithNullPattern =
+        new RegularExpressionInclusionRule((String) null);
+    assertThat(MetaDataUtility.inclusionRuleString(regexRuleWithNullPattern), is(".*"));
+
+    final InclusionRule blankRegexRule =
+        new InclusionRuleWithRegularExpression() {
+          @Override
+          public Pattern getInclusionPattern() {
+            return Pattern.compile("  ");
+          }
+
+          @Override
+          public boolean test(final String text) {
+            return true;
+          }
+        };
+    assertThat(MetaDataUtility.inclusionRuleString(blankRegexRule), is(".*"));
   }
 
   @BeforeAll
@@ -186,7 +258,7 @@ public class MetadataUtilityTest {
         MetaDataUtility.getSimpleTypeName(mock(View.class)),
         is(MetaDataUtility.SimpleDatabaseObjectType.view));
     assertThat(
-        MetaDataUtility.getSimpleTypeName(mock(Table.class)),
+        MetaDataUtility.getSimpleTypeName(new LightTable("table")),
         is(MetaDataUtility.SimpleDatabaseObjectType.table));
   }
 
@@ -217,5 +289,32 @@ public class MetadataUtilityTest {
   @Test
   public void systemGeneratedName_nullArg() {
     assertThat(MetaDataUtility.hasSystemGeneratedName(null), is(false));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void typeName() {
+    final NamedObject typedNamedObject =
+        mock(NamedObject.class, withSettings().extraInterfaces(TypedObject.class));
+    final TypedObject<TableType> typedObject = (TypedObject<TableType>) typedNamedObject;
+    when(typedObject.getType()).thenReturn(new TableType("MATERIALIZED VIEW"));
+    assertThat(MetaDataUtility.getTypeName(typedNamedObject), is("materialized view"));
+
+    final Schema schema = mock(Schema.class);
+    assertThat(MetaDataUtility.getTypeName(schema), is("schema"));
+
+    final Table table = new LightTable("table");
+    assertThat(MetaDataUtility.getTypeName(table), is("table"));
+
+    final Sequence sequence = mock(Sequence.class);
+    assertThat(MetaDataUtility.getTypeName(sequence), is("sequence"));
+
+    final DatabaseObject unknownDatabaseObject = mock(DatabaseObject.class);
+    assertThat(MetaDataUtility.getTypeName(unknownDatabaseObject), is(""));
+
+    final NamedObject nonDatabaseNamedObject = mock(NamedObject.class);
+    assertThat(MetaDataUtility.getTypeName(nonDatabaseNamedObject), is(""));
+
+    assertThat(MetaDataUtility.getTypeName(null), is(""));
   }
 }

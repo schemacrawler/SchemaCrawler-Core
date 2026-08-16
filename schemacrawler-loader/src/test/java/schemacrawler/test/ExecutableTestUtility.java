@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.test.utility;
+package schemacrawler.test;
 
 import java.nio.file.Path;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
