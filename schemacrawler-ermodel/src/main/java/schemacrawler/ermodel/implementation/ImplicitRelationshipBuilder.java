@@ -118,7 +118,8 @@ public final class ImplicitRelationshipBuilder implements Builder<TableReference
     }
 
     // Create a new relationship, and set its cardinality and entities.
-    final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(leftTable);
+    final TableEntityModelInferrer modelInferrer =
+        TableEntityModelInferrerFactory.forTable(leftTable);
     final RelationshipCardinality cardinality = modelInferrer.inferCardinality(implicitAssociation);
     rel.setCardinality(cardinality);
     rel.setEntities(leftEntity, rightEntity);

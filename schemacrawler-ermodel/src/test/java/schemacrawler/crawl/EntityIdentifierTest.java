@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
+import schemacrawler.ermodel.implementation.TableEntityModelInferrerFactory;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schema.TableReference;
@@ -41,7 +42,7 @@ public class EntityIdentifierTest {
     table.addColumn(new MutableColumn(table, "COLUMN1"));
     table.addColumn(new MutableColumn(table, "COLUMN2"));
 
-    final EntityType entityType = new TableEntityModelInferrer(table).inferEntityType();
+    final EntityType entityType = TableEntityModelInferrerFactory.forTable(table).inferEntityType();
     assertThat(entityType, is(EntityType.non_entity));
   }
 
@@ -67,7 +68,7 @@ public class EntityIdentifierTest {
     pk.addColumn(new MutableTableConstraintColumn(pk, id));
     table.setPrimaryKey(pk);
 
-    final EntityType entityType = new TableEntityModelInferrer(table).inferEntityType();
+    final EntityType entityType = TableEntityModelInferrerFactory.forTable(table).inferEntityType();
     assertThat(entityType, is(EntityType.strong_entity));
   }
 
@@ -108,7 +109,8 @@ public class EntityIdentifierTest {
     subtypeTable.addForeignKey(fk);
     subtypeId.setReferencedColumn(parentId);
 
-    final EntityType entityType = new TableEntityModelInferrer(subtypeTable).inferEntityType();
+    final EntityType entityType =
+        TableEntityModelInferrerFactory.forTable(subtypeTable).inferEntityType();
     assertThat(entityType, is(EntityType.subtype));
   }
 
@@ -119,7 +121,7 @@ public class EntityIdentifierTest {
     final TablePartial table2 = new TablePartial(schema, "TABLE_PARTIAL_2");
     final TableReference ref = new LightForeignKey("REF", table, table2);
 
-    final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
+    final TableEntityModelInferrer modelInferrer = TableEntityModelInferrerFactory.forTable(table);
     assertThat(modelInferrer.inferBridgeTable(), is(false));
     assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
     assertThat(modelInferrer.inferCardinality(ref), is(RelationshipCardinality.unknown));
@@ -191,7 +193,8 @@ public class EntityIdentifierTest {
     fk2Col.setReferencedColumn(id2);
     fk3Col.setReferencedColumn(id3);
 
-    final EntityType entityType = new TableEntityModelInferrer(unknownTable).inferEntityType();
+    final EntityType entityType =
+        TableEntityModelInferrerFactory.forTable(unknownTable).inferEntityType();
     assertThat(entityType, is(EntityType.unknown));
   }
 
@@ -204,7 +207,7 @@ public class EntityIdentifierTest {
     final TablePartial tableUnrelated2 = new TablePartial(schema, "TABLE_UNRELATED_2");
     final TableReference ref = new LightForeignKey("REF", tableUnrelated1, tableUnrelated2);
 
-    final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(table);
+    final TableEntityModelInferrer modelInferrer = TableEntityModelInferrerFactory.forTable(table);
     assertThat(modelInferrer.inferBridgeTable(), is(false));
     assertThat(modelInferrer.inferEntityType(), is(EntityType.unknown));
     assertThat(modelInferrer.inferCardinality(ref), is(RelationshipCardinality.unknown));
@@ -254,7 +257,8 @@ public class EntityIdentifierTest {
     weakTable.addForeignKey(fk);
     parentIdInWeak.setReferencedColumn(parentId);
 
-    final EntityType entityType = new TableEntityModelInferrer(weakTable).inferEntityType();
+    final EntityType entityType =
+        TableEntityModelInferrerFactory.forTable(weakTable).inferEntityType();
     assertThat(entityType, is(EntityType.weak_entity));
   }
 }

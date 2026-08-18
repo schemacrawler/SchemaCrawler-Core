@@ -43,14 +43,12 @@ public final class ERModelBuilder implements Builder<ERModel> {
 
   private final Catalog catalog;
   final MutableERModel erModel;
-  final Map<NamedObjectKey, TableEntityModelInferrer> inferrerMap;
 
   final Map<NamedObjectKey, MutableEntity> entityMap;
 
   private ERModelBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
 
-    inferrerMap = new HashMap<>();
     // Contains all entities, including ones not added to the ER model
     entityMap = new HashMap<>();
 
@@ -142,7 +140,7 @@ public final class ERModelBuilder implements Builder<ERModel> {
   }
 
   private TableEntityModelInferrer getModelInferrer(final Table table) {
-    return inferrerMap.computeIfAbsent(table.key(), key -> new TableEntityModelInferrer(table));
+    return TableEntityModelInferrerFactory.forTable(table);
   }
 
   private MutableEntity lookupOrCreateEntity(final Table table) {

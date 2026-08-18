@@ -11,8 +11,10 @@ package schemacrawler.crawl;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
+import schemacrawler.ermodel.implementation.TableEntityModelInferrerFactory;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.schemacrawler.SchemaReference;
@@ -20,327 +22,306 @@ import us.fatehi.utility.OptionalBoolean;
 
 public class TableEntityModelInferrerTest {
 
+  private record ParentFixture(MutableTable table, MutableColumn idColumn) {}
+
+  private record ChildFixture(
+      MutableTable table, MutableColumn fkColumn, MutableForeignKey foreignKey) {}
+
+  private static final SchemaReference SCHEMA = new SchemaReference("catalog", "schema");
+  private static final AtomicInteger NAME_COUNTER = new AtomicInteger();
+
+  private static void addIndex(
+      final MutableTable table,
+      final String indexBaseName,
+      final boolean unique,
+      final MutableColumn... indexColumns) {
+    final MutableIndex index = new MutableIndex(table, uniqueName(indexBaseName));
+    for (final MutableColumn column : indexColumns) {
+      index.addColumn(new MutableIndexColumn(index, column));
+    }
+    index.setUnique(unique);
+    table.addIndex(index);
+  }
+
+  private static void addPrimaryKey(
+      final MutableTable table, final String pkBaseName, final MutableColumn... pkColumns) {
+    final MutablePrimaryKey pk = MutablePrimaryKey.newPrimaryKey(table, uniqueName(pkBaseName));
+    for (final MutableColumn column : pkColumns) {
+      pk.addColumn(new MutableTableConstraintColumn(pk, column));
+    }
+    table.setPrimaryKey(pk);
+  }
+
+  private static ParentFixture parentWithPk(final String baseName) {
+    final MutableTable parent = new MutableTable(SCHEMA, uniqueName(baseName));
+    final MutableColumn parentId = new MutableColumn(parent, "ID");
+    parent.addColumn(parentId);
+    addPrimaryKey(parent, "PK_" + baseName, parentId);
+    return new ParentFixture(parent, parentId);
+  }
+
+  private static ChildFixture tableWithSingleFk(
+      final String tableBaseName,
+      final String fkBaseName,
+      final String fkColumnName,
+      final boolean nullable,
+      final MutableColumn parentColumn) {
+    final MutableTable table = new MutableTable(SCHEMA, uniqueName(tableBaseName));
+    final MutableColumn fkColumn = new MutableColumn(table, fkColumnName);
+    fkColumn.setNullable(nullable);
+    table.addColumn(fkColumn);
+    final MutableForeignKey fk =
+        new MutableForeignKey(
+            uniqueName(fkBaseName), new ImmutableColumnReference(1, fkColumn, parentColumn));
+    table.addForeignKey(fk);
+    return new ChildFixture(table, fkColumn, fk);
+  }
+
+  private static String uniqueName(final String baseName) {
+    return baseName + "_" + NAME_COUNTER.incrementAndGet();
+  }
+
   @Test
   public void testForeignKeyCoveredByIndex() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final MutableTable table = new MutableTable(schema, "TABLE");
-    final MutableColumn col1 = new MutableColumn(table, "COL1");
-    table.addColumn(col1);
+    final ParentFixture parent = parentWithPk("PARENT_COVERED_INDEX");
 
-    final MutableTable parentTable = new MutableTable(schema, "PARENT");
-    final MutableColumn parentCol1 = new MutableColumn(parentTable, "COL1");
-    parentTable.addColumn(parentCol1);
+    final ChildFixture withoutIndex =
+        tableWithSingleFk("TABLE_NO_INDEX", "FK_NO_INDEX", "COL1", false, parent.idColumn());
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(withoutIndex.table())
+            .coveredByIndex(withoutIndex.foreignKey()),
+        is(OptionalBoolean.false_value));
 
-    final ImmutableColumnReference columnReference =
-        new ImmutableColumnReference(1, col1, parentCol1);
-    final MutableForeignKey fk = new MutableForeignKey("FK", columnReference);
-    table.addForeignKey(fk);
-
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
-
-    // No index yet
-    assertThat(model.coveredByIndex(fk), is(OptionalBoolean.false_value));
-
-    // Add index
-    final MutableIndex index = new MutableIndex(table, "IDX");
-    index.addColumn(new MutableIndexColumn(index, col1));
-    table.addIndex(index);
-
-    final TableEntityModelInferrer modelWithIndex = new TableEntityModelInferrer(table);
-    assertThat(modelWithIndex.coveredByIndex(fk), is(OptionalBoolean.true_value));
+    final ChildFixture withIndex =
+        tableWithSingleFk("TABLE_WITH_INDEX", "FK_WITH_INDEX", "COL1", false, parent.idColumn());
+    addIndex(withIndex.table(), "IDX", false, withIndex.fkColumn());
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(withIndex.table())
+            .coveredByIndex(withIndex.foreignKey()),
+        is(OptionalBoolean.true_value));
   }
 
   @Test
   public void testForeignKeyCoveredByUniqueIndex() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final MutableTable table = new MutableTable(schema, "TABLE");
-    final MutableColumn col1 = new MutableColumn(table, "COL1");
-    table.addColumn(col1);
+    final ParentFixture parent = parentWithPk("PARENT_COVERED_UNIQUE_INDEX");
 
-    final MutableTable parentTable = new MutableTable(schema, "PARENT");
-    final MutableColumn parentCol1 = new MutableColumn(parentTable, "COL1");
-    parentTable.addColumn(parentCol1);
+    final ChildFixture withoutIndex =
+        tableWithSingleFk("TABLE_NO_UNIQUE", "FK_NO_UNIQUE", "COL1", false, parent.idColumn());
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(withoutIndex.table())
+            .coveredByUniqueIndex(withoutIndex.foreignKey()),
+        is(OptionalBoolean.false_value));
 
-    final ImmutableColumnReference columnReference =
-        new ImmutableColumnReference(1, col1, parentCol1);
-    final MutableForeignKey fk = new MutableForeignKey("FK", columnReference);
-    table.addForeignKey(fk);
+    final ChildFixture withNonUniqueIndex =
+        tableWithSingleFk("TABLE_NON_UNIQUE", "FK_NON_UNIQUE", "COL1", false, parent.idColumn());
+    addIndex(withNonUniqueIndex.table(), "IDX_NON_UNIQUE", false, withNonUniqueIndex.fkColumn());
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(withNonUniqueIndex.table())
+            .coveredByUniqueIndex(withNonUniqueIndex.foreignKey()),
+        is(OptionalBoolean.false_value));
 
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
+    final ChildFixture withUniqueIndex =
+        tableWithSingleFk("TABLE_UNIQUE", "FK_UNIQUE", "COL1", false, parent.idColumn());
+    addIndex(withUniqueIndex.table(), "IDX_UNIQUE", true, withUniqueIndex.fkColumn());
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(withUniqueIndex.table())
+            .coveredByUniqueIndex(withUniqueIndex.foreignKey()),
+        is(OptionalBoolean.true_value));
 
-    // No index yet
-    assertThat(model.coveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
-
-    // Add non-unique index
-    final MutableIndex index = new MutableIndex(table, "IDX");
-    index.addColumn(new MutableIndexColumn(index, col1));
-    index.setUnique(false);
-    table.addIndex(index);
-
-    final TableEntityModelInferrer modelWithIndex = new TableEntityModelInferrer(table);
-    assertThat(modelWithIndex.coveredByUniqueIndex(fk), is(OptionalBoolean.false_value));
-
-    // Add unique index
-    index.setUnique(true);
-    final TableEntityModelInferrer modelWithUniqueIndex = new TableEntityModelInferrer(table);
-    assertThat(modelWithUniqueIndex.coveredByUniqueIndex(fk), is(OptionalBoolean.true_value));
-
-    // Test PK as unique index
-    final MutableTable tableWithPk = new MutableTable(schema, "TABLE_PK");
+    final MutableTable tableWithPk = new MutableTable(SCHEMA, uniqueName("TABLE_PK_UNIQUE"));
     final MutableColumn pkCol = new MutableColumn(tableWithPk, "PK_COL");
     tableWithPk.addColumn(pkCol);
-    final MutablePrimaryKey pk = MutablePrimaryKey.newPrimaryKey(tableWithPk, "PK");
-    pk.addColumn(new MutableTableConstraintColumn(pk, pkCol));
-    tableWithPk.setPrimaryKey(pk);
-
-    final ImmutableColumnReference fkPkRef = new ImmutableColumnReference(1, pkCol, parentCol1);
-    final MutableForeignKey fkPk = new MutableForeignKey("FK_PK", fkPkRef);
+    addPrimaryKey(tableWithPk, "PK_TABLE_PK_UNIQUE", pkCol);
+    final MutableForeignKey fkPk =
+        new MutableForeignKey(
+            uniqueName("FK_PK"), new ImmutableColumnReference(1, pkCol, parent.idColumn()));
     tableWithPk.addForeignKey(fkPk);
 
-    final TableEntityModelInferrer modelWithPk = new TableEntityModelInferrer(tableWithPk);
-    assertThat(modelWithPk.coveredByUniqueIndex(fkPk), is(OptionalBoolean.true_value));
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(tableWithPk).coveredByUniqueIndex(fkPk),
+        is(OptionalBoolean.true_value));
   }
 
   @Test
   public void testIdentifyForeignKeyCardinality() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final MutableTable table = new MutableTable(schema, "TABLE");
-    final MutableColumn col1 = new MutableColumn(table, "COL1");
-    col1.setNullable(false); // Required
-    table.addColumn(col1);
+    final ParentFixture parent = parentWithPk("PARENT_CARDINALITY");
 
-    final MutableTable parentTable = new MutableTable(schema, "PARENT");
-    final MutableColumn parentCol1 = new MutableColumn(parentTable, "COL1");
-    parentTable.addColumn(parentCol1);
+    final ChildFixture oneMany =
+        tableWithSingleFk("TABLE_ONE_MANY", "FK_ONE_MANY", "COL1", false, parent.idColumn());
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(oneMany.table())
+            .inferCardinality(oneMany.foreignKey()),
+        is(RelationshipCardinality.one_many));
 
-    final ImmutableColumnReference columnReference =
-        new ImmutableColumnReference(1, col1, parentCol1);
-    final MutableForeignKey fk = new MutableForeignKey("FK", columnReference);
-    table.addForeignKey(fk);
+    final ChildFixture zeroMany =
+        tableWithSingleFk("TABLE_ZERO_MANY", "FK_ZERO_MANY", "COL2", true, parent.idColumn());
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(zeroMany.table())
+            .inferCardinality(zeroMany.foreignKey()),
+        is(RelationshipCardinality.zero_many));
 
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
+    final ChildFixture oneOne =
+        tableWithSingleFk("TABLE_ONE_ONE", "FK_ONE_ONE", "COL3", false, parent.idColumn());
+    addIndex(oneOne.table(), "UIDX_ONE_ONE", true, oneOne.fkColumn());
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(oneOne.table())
+            .inferCardinality(oneOne.foreignKey()),
+        is(RelationshipCardinality.one_one));
 
-    // 1. One-Many (Not unique, Not optional)
-    assertThat(model.inferCardinality(fk), is(RelationshipCardinality.one_many));
+    final ChildFixture zeroOne =
+        tableWithSingleFk("TABLE_ZERO_ONE", "FK_ZERO_ONE", "COL4", true, parent.idColumn());
+    addIndex(zeroOne.table(), "UIDX_ZERO_ONE", true, zeroOne.fkColumn());
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(zeroOne.table())
+            .inferCardinality(zeroOne.foreignKey()),
+        is(RelationshipCardinality.zero_one));
 
-    // 2. Zero-Many (Not unique, Optional)
-    col1.setNullable(true);
-    // TableEntityModel caches optionality from fk.isOptional() which relies on
-    // col.isNullable()
-    // but TableEntityModel also caches importedColumnsMap.
-    // We need a new model or a new FK if we want to test changes after model
-    // construction,
-    // although TableEntityModel.identifyRelationshipCardinality(fk) calls
-    // findOrGetImportedKeys(fk).
-    final MutableTable table2 = new MutableTable(schema, "TABLE2");
-    final MutableColumn col2 = new MutableColumn(table2, "COL2");
-    col2.setNullable(true);
-    table2.addColumn(col2);
-    final MutableForeignKey fk2 =
-        new MutableForeignKey("FK2", new ImmutableColumnReference(1, col2, parentCol1));
-    table2.addForeignKey(fk2);
-    final TableEntityModelInferrer model2 = new TableEntityModelInferrer(table2);
-    assertThat(model2.inferCardinality(fk2), is(RelationshipCardinality.zero_many));
-
-    // 3. One-One (Unique, Not optional)
-    final MutableTable table3 = new MutableTable(schema, "TABLE3");
-    final MutableColumn col3 = new MutableColumn(table3, "COL3");
-    col3.setNullable(false);
-    table3.addColumn(col3);
-    final MutableIndex uniqueIdx3 = new MutableIndex(table3, "UIDX3");
-    uniqueIdx3.addColumn(new MutableIndexColumn(uniqueIdx3, col3));
-    uniqueIdx3.setUnique(true);
-    table3.addIndex(uniqueIdx3);
-    final MutableForeignKey fk3 =
-        new MutableForeignKey("FK3", new ImmutableColumnReference(1, col3, parentCol1));
-    table3.addForeignKey(fk3);
-    final TableEntityModelInferrer model3 = new TableEntityModelInferrer(table3);
-    assertThat(model3.inferCardinality(fk3), is(RelationshipCardinality.one_one));
-
-    // 4. Zero-One (Unique, Optional)
-    final MutableTable table4 = new MutableTable(schema, "TABLE4");
-    final MutableColumn col4 = new MutableColumn(table4, "COL4");
-    col4.setNullable(true);
-    table4.addColumn(col4);
-    final MutableIndex uniqueIdx4 = new MutableIndex(table4, "UIDX4");
-    uniqueIdx4.addColumn(new MutableIndexColumn(uniqueIdx4, col4));
-    uniqueIdx4.setUnique(true);
-    table4.addIndex(uniqueIdx4);
-    final MutableForeignKey fk4 =
-        new MutableForeignKey("FK4", new ImmutableColumnReference(1, col4, parentCol1));
-    table4.addForeignKey(fk4);
-    final TableEntityModelInferrer model4 = new TableEntityModelInferrer(table4);
-    assertThat(model4.inferCardinality(fk4), is(RelationshipCardinality.zero_one));
-
-    // 5. Null FK
-    assertThat(model.inferCardinality(null), is(RelationshipCardinality.unknown));
-  }
-
-  @Test
-  public void testInferEntityTypeNonEntity() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final MutableTable table = new MutableTable(schema, "NO_PK");
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
-    assertThat(model.inferEntityType(), is(EntityType.non_entity));
-  }
-
-  @Test
-  public void testInferEntityTypeStrongEntity() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final MutableTable table = new MutableTable(schema, "STRONG");
-    final MutableColumn id = new MutableColumn(table, "ID");
-    table.addColumn(id);
-    final MutablePrimaryKey pk = MutablePrimaryKey.newPrimaryKey(table, "PK");
-    pk.addColumn(new MutableTableConstraintColumn(pk, id));
-    table.setPrimaryKey(pk);
-
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
-    assertThat(model.inferEntityType(), is(EntityType.strong_entity));
-  }
-
-  @Test
-  public void testInferEntityTypeSubtype() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-
-    final MutableTable parent = new MutableTable(schema, "PARENT");
-    final MutableColumn parentId = new MutableColumn(parent, "ID");
-    parent.addColumn(parentId);
-    final MutablePrimaryKey parentPk = MutablePrimaryKey.newPrimaryKey(parent, "PK_PARENT");
-    parentPk.addColumn(new MutableTableConstraintColumn(parentPk, parentId));
-    parent.setPrimaryKey(parentPk);
-
-    final MutableTable child = new MutableTable(schema, "CHILD");
-    final MutableColumn childId = new MutableColumn(child, "ID");
-    child.addColumn(childId);
-    final MutablePrimaryKey childPk = MutablePrimaryKey.newPrimaryKey(child, "PK_CHILD");
-    childPk.addColumn(new MutableTableConstraintColumn(childPk, childId));
-    child.setPrimaryKey(childPk);
-
-    final MutableForeignKey fk =
-        new MutableForeignKey(
-            "FK_CHILD_PARENT", new ImmutableColumnReference(1, childId, parentId));
-    child.addForeignKey(fk);
-
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(child);
-    assertThat(model.inferEntityType(), is(EntityType.subtype));
-    assertThat(model.inferSuperType().orElse(null), is(parent));
-  }
-
-  @Test
-  public void testInferEntityTypeWeakEntity() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-
-    final MutableTable parent = new MutableTable(schema, "PARENT");
-    final MutableColumn parentId = new MutableColumn(parent, "ID");
-    parent.addColumn(parentId);
-    final MutablePrimaryKey parentPk = MutablePrimaryKey.newPrimaryKey(parent, "PK_PARENT");
-    parentPk.addColumn(new MutableTableConstraintColumn(parentPk, parentId));
-    parent.setPrimaryKey(parentPk);
-
-    final MutableTable weak = new MutableTable(schema, "WEAK");
-    final MutableColumn weakParentId = new MutableColumn(weak, "PARENT_ID");
-    weak.addColumn(weakParentId);
-    final MutableColumn discriminator = new MutableColumn(weak, "SEQ");
-    weak.addColumn(discriminator);
-    final MutablePrimaryKey weakPk = MutablePrimaryKey.newPrimaryKey(weak, "PK_WEAK");
-    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, weakParentId));
-    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, discriminator));
-    weak.setPrimaryKey(weakPk);
-
-    final MutableForeignKey fk =
-        new MutableForeignKey(
-            "FK_WEAK_PARENT", new ImmutableColumnReference(1, weakParentId, parentId));
-    weak.addForeignKey(fk);
-
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(weak);
-    assertThat(model.inferEntityType(), is(EntityType.weak_entity));
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(oneMany.table()).inferCardinality(null),
+        is(RelationshipCardinality.unknown));
   }
 
   @Test
   public void testInferBridgeTable() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
+    final ParentFixture tableA = parentWithPk("TABLE_A");
+    final ParentFixture tableB = parentWithPk("TABLE_B");
 
-    final MutableTable tableA = new MutableTable(schema, "TABLE_A");
-    final MutableColumn colA = new MutableColumn(tableA, "ID");
-    tableA.addColumn(colA);
-    final MutablePrimaryKey pkA = MutablePrimaryKey.newPrimaryKey(tableA, "PK_A");
-    pkA.addColumn(new MutableTableConstraintColumn(pkA, colA));
-    tableA.setPrimaryKey(pkA);
+    final MutableTable noUnique = new MutableTable(SCHEMA, uniqueName("BRIDGE_NO_UNIQUE"));
+    final MutableColumn noUniqueColA = new MutableColumn(noUnique, "A_ID");
+    final MutableColumn noUniqueColB = new MutableColumn(noUnique, "B_ID");
+    final MutableColumn noUniquePk = new MutableColumn(noUnique, "ID");
+    noUnique.addColumn(noUniqueColA);
+    noUnique.addColumn(noUniqueColB);
+    noUnique.addColumn(noUniquePk);
+    addPrimaryKey(noUnique, "PK_BRIDGE_NO_UNIQUE", noUniquePk);
+    noUnique.addForeignKey(
+        new MutableForeignKey(
+            uniqueName("FK_A"), new ImmutableColumnReference(1, noUniqueColA, tableA.idColumn())));
+    noUnique.addForeignKey(
+        new MutableForeignKey(
+            uniqueName("FK_B"), new ImmutableColumnReference(1, noUniqueColB, tableB.idColumn())));
 
-    final MutableTable tableB = new MutableTable(schema, "TABLE_B");
-    final MutableColumn colB = new MutableColumn(tableB, "ID");
-    tableB.addColumn(colB);
-    final MutablePrimaryKey pkB = MutablePrimaryKey.newPrimaryKey(tableB, "PK_B");
-    pkB.addColumn(new MutableTableConstraintColumn(pkB, colB));
-    tableB.setPrimaryKey(pkB);
-
-    final MutableTable bridgeTable = new MutableTable(schema, "BRIDGE");
-    final MutableColumn bridgeColA = new MutableColumn(bridgeTable, "A_ID");
-    bridgeTable.addColumn(bridgeColA);
-    final MutableColumn bridgeColB = new MutableColumn(bridgeTable, "B_ID");
-    bridgeTable.addColumn(bridgeColB);
-
-    // Add a dummy PK so it's not a non_entity
-    final MutableColumn bridgePkCol = new MutableColumn(bridgeTable, "ID");
-    bridgeTable.addColumn(bridgePkCol);
-    final MutablePrimaryKey dummyPk = MutablePrimaryKey.newPrimaryKey(bridgeTable, "PK_DUMMY");
-    dummyPk.addColumn(new MutableTableConstraintColumn(dummyPk, bridgePkCol));
-    bridgeTable.setPrimaryKey(dummyPk);
-
-    final MutableForeignKey fkA =
-        new MutableForeignKey("FK_A", new ImmutableColumnReference(1, bridgeColA, colA));
-    bridgeTable.addForeignKey(fkA);
-    final MutableForeignKey fkB =
-        new MutableForeignKey("FK_B", new ImmutableColumnReference(1, bridgeColB, colB));
-    bridgeTable.addForeignKey(fkB);
-
-    // No PK/Unique index yet
-    TableEntityModelInferrer model = new TableEntityModelInferrer(bridgeTable);
+    TableEntityModelInferrer model = TableEntityModelInferrerFactory.forTable(noUnique);
     assertThat(model.inferBridgeTable(), is(false));
     assertThat(model.inferEntityType(), is(EntityType.unknown));
 
-    // Add PK on both columns
-    final MutablePrimaryKey bridgePk = MutablePrimaryKey.newPrimaryKey(bridgeTable, "PK_BRIDGE");
-    bridgePk.addColumn(new MutableTableConstraintColumn(bridgePk, bridgeColA));
-    bridgePk.addColumn(new MutableTableConstraintColumn(bridgePk, bridgeColB));
-    bridgeTable.setPrimaryKey(bridgePk);
-
-    model = new TableEntityModelInferrer(bridgeTable);
+    final MutableTable pkExact = new MutableTable(SCHEMA, uniqueName("BRIDGE_PK_EXACT"));
+    final MutableColumn pkExactColA = new MutableColumn(pkExact, "A_ID");
+    final MutableColumn pkExactColB = new MutableColumn(pkExact, "B_ID");
+    pkExact.addColumn(pkExactColA);
+    pkExact.addColumn(pkExactColB);
+    addPrimaryKey(pkExact, "PK_BRIDGE_EXACT", pkExactColA, pkExactColB);
+    pkExact.addForeignKey(
+        new MutableForeignKey(
+            uniqueName("FK_A_EXACT"),
+            new ImmutableColumnReference(1, pkExactColA, tableA.idColumn())));
+    pkExact.addForeignKey(
+        new MutableForeignKey(
+            uniqueName("FK_B_EXACT"),
+            new ImmutableColumnReference(1, pkExactColB, tableB.idColumn())));
+    model = TableEntityModelInferrerFactory.forTable(pkExact);
     assertThat(model.inferBridgeTable(), is(true));
 
-    // Test with PK containing an extra column - should NOT be a bridge table
-    final MutableColumn extraCol = new MutableColumn(bridgeTable, "EXTRA");
-    bridgeTable.addColumn(extraCol);
-    bridgePk.addColumn(new MutableTableConstraintColumn(bridgePk, extraCol));
-    model = new TableEntityModelInferrer(bridgeTable);
+    final MutableTable pkExtra = new MutableTable(SCHEMA, uniqueName("BRIDGE_PK_EXTRA"));
+    final MutableColumn pkExtraColA = new MutableColumn(pkExtra, "A_ID");
+    final MutableColumn pkExtraColB = new MutableColumn(pkExtra, "B_ID");
+    final MutableColumn pkExtraColX = new MutableColumn(pkExtra, "EXTRA");
+    pkExtra.addColumn(pkExtraColA);
+    pkExtra.addColumn(pkExtraColB);
+    pkExtra.addColumn(pkExtraColX);
+    addPrimaryKey(pkExtra, "PK_BRIDGE_EXTRA", pkExtraColA, pkExtraColB, pkExtraColX);
+    pkExtra.addForeignKey(
+        new MutableForeignKey(
+            uniqueName("FK_A_EXTRA"),
+            new ImmutableColumnReference(1, pkExtraColA, tableA.idColumn())));
+    pkExtra.addForeignKey(
+        new MutableForeignKey(
+            uniqueName("FK_B_EXTRA"),
+            new ImmutableColumnReference(1, pkExtraColB, tableB.idColumn())));
+    model = TableEntityModelInferrerFactory.forTable(pkExtra);
     assertThat(model.inferBridgeTable(), is(false));
 
-    // Test with Unique Index instead of PK
-    final MutableTable bridgeTable2 = new MutableTable(schema, "BRIDGE2");
-    final MutableColumn b2ColA = new MutableColumn(bridgeTable2, "A_ID");
-    bridgeTable2.addColumn(b2ColA);
-    final MutableColumn b2ColB = new MutableColumn(bridgeTable2, "B_ID");
-    bridgeTable2.addColumn(b2ColB);
+    final MutableTable uniqueIdxBridge = new MutableTable(SCHEMA, uniqueName("BRIDGE_UNIQUE_IDX"));
+    final MutableColumn uniqueIdxColA = new MutableColumn(uniqueIdxBridge, "A_ID");
+    final MutableColumn uniqueIdxColB = new MutableColumn(uniqueIdxBridge, "B_ID");
+    final MutableColumn uniqueIdxPk = new MutableColumn(uniqueIdxBridge, "ID");
+    uniqueIdxBridge.addColumn(uniqueIdxColA);
+    uniqueIdxBridge.addColumn(uniqueIdxColB);
+    uniqueIdxBridge.addColumn(uniqueIdxPk);
+    addPrimaryKey(uniqueIdxBridge, "PK_BRIDGE_UNIQUE_IDX", uniqueIdxPk);
+    uniqueIdxBridge.addForeignKey(
+        new MutableForeignKey(
+            uniqueName("FK_A_UIDX"),
+            new ImmutableColumnReference(1, uniqueIdxColA, tableA.idColumn())));
+    uniqueIdxBridge.addForeignKey(
+        new MutableForeignKey(
+            uniqueName("FK_B_UIDX"),
+            new ImmutableColumnReference(1, uniqueIdxColB, tableB.idColumn())));
+    addIndex(uniqueIdxBridge, "UIDX_BRIDGE", true, uniqueIdxColA, uniqueIdxColB);
 
-    bridgeTable2.addForeignKey(
-        new MutableForeignKey("FK_A2", new ImmutableColumnReference(1, b2ColA, colA)));
-    bridgeTable2.addForeignKey(
-        new MutableForeignKey("FK_B2", new ImmutableColumnReference(1, b2ColB, colB)));
-
-    final MutableIndex uniqueIdx = new MutableIndex(bridgeTable2, "UIDX_BRIDGE");
-    uniqueIdx.addColumn(new MutableIndexColumn(uniqueIdx, b2ColA));
-    uniqueIdx.addColumn(new MutableIndexColumn(uniqueIdx, b2ColB));
-    uniqueIdx.setUnique(true);
-    bridgeTable2.addIndex(uniqueIdx);
-
-    // Also need a PK for inferEntityType to not return non_entity
-    final MutableColumn b2PkCol = new MutableColumn(bridgeTable2, "ID");
-    bridgeTable2.addColumn(b2PkCol);
-    final MutablePrimaryKey b2Pk = MutablePrimaryKey.newPrimaryKey(bridgeTable2, "PK_B2");
-    b2Pk.addColumn(new MutableTableConstraintColumn(b2Pk, b2PkCol));
-    bridgeTable2.setPrimaryKey(b2Pk);
-
-    model = new TableEntityModelInferrer(bridgeTable2);
+    model = TableEntityModelInferrerFactory.forTable(uniqueIdxBridge);
     assertThat(model.inferBridgeTable(), is(true));
+  }
+
+  @Test
+  public void testInferEntityTypeNonEntity() {
+    final MutableTable table = new MutableTable(SCHEMA, uniqueName("NO_PK"));
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(table).inferEntityType(),
+        is(EntityType.non_entity));
+  }
+
+  @Test
+  public void testInferEntityTypeStrongEntity() {
+    final MutableTable table = new MutableTable(SCHEMA, uniqueName("STRONG"));
+    final MutableColumn id = new MutableColumn(table, "ID");
+    table.addColumn(id);
+    addPrimaryKey(table, "PK_STRONG", id);
+
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(table).inferEntityType(),
+        is(EntityType.strong_entity));
+  }
+
+  @Test
+  public void testInferEntityTypeSubtype() {
+    final ParentFixture parent = parentWithPk("PARENT_SUBTYPE");
+
+    final MutableTable child = new MutableTable(SCHEMA, uniqueName("CHILD_SUBTYPE"));
+    final MutableColumn childId = new MutableColumn(child, "ID");
+    child.addColumn(childId);
+    addPrimaryKey(child, "PK_CHILD_SUBTYPE", childId);
+
+    final MutableForeignKey fk =
+        new MutableForeignKey(
+            uniqueName("FK_CHILD_PARENT"),
+            new ImmutableColumnReference(1, childId, parent.idColumn()));
+    child.addForeignKey(fk);
+
+    final TableEntityModelInferrer model = TableEntityModelInferrerFactory.forTable(child);
+    assertThat(model.inferEntityType(), is(EntityType.subtype));
+    assertThat(model.inferSuperType().orElse(null), is(parent.table()));
+  }
+
+  @Test
+  public void testInferEntityTypeWeakEntity() {
+    final ParentFixture parent = parentWithPk("PARENT_WEAK");
+
+    final MutableTable weak = new MutableTable(SCHEMA, uniqueName("WEAK"));
+    final MutableColumn weakParentId = new MutableColumn(weak, "PARENT_ID");
+    weak.addColumn(weakParentId);
+    final MutableColumn discriminator = new MutableColumn(weak, "SEQ");
+    weak.addColumn(discriminator);
+    addPrimaryKey(weak, "PK_WEAK", weakParentId, discriminator);
+
+    final MutableForeignKey fk =
+        new MutableForeignKey(
+            uniqueName("FK_WEAK_PARENT"),
+            new ImmutableColumnReference(1, weakParentId, parent.idColumn()));
+    weak.addForeignKey(fk);
+
+    assertThat(
+        TableEntityModelInferrerFactory.forTable(weak).inferEntityType(),
+        is(EntityType.weak_entity));
   }
 }
