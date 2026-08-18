@@ -12,9 +12,9 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.ermodel.model.ERModel;
@@ -50,7 +50,7 @@ public final class ERModelBuilder implements Builder<ERModel> {
     this.catalog = requireNonNull(catalog, "No catalog provided");
 
     // Contains all entities, including ones not added to the ER model
-    entityMap = new HashMap<>();
+    entityMap = new ConcurrentHashMap<>();
 
     erModel = new MutableERModel();
   }
