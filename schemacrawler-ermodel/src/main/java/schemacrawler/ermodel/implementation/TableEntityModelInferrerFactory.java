@@ -33,12 +33,28 @@ public final class TableEntityModelInferrerFactory {
       return new TableEntityModelInferrer(table);
     }
 
-    final TableEntityModelInferrer inferrer =
-        inferrerMemo.computeIfAbsent(tableKey, key -> new TableEntityModelInferrer(table));
-    if (inferrerMemo.size() > MAX_CACHE_SIZE) {
-      inferrerMemo.clear();
-    }
-    return inferrer;
+    return inferrerMemo.compute(
+        tableKey,
+        (key, existing) -> {
+          // If already cached, return it
+          if (existing != null) {
+            return existing;
+          }
+
+          // Insert new value
+          final TableEntityModelInferrer tableInferrer = new TableEntityModelInferrer(table);
+
+          // Atomic eviction check
+          if (inferrerMemo.size() + 1 > MAX_CACHE_SIZE) {
+            inferrerMemo.clear();
+          }
+
+          return tableInferrer;
+        });
+  }
+
+  public static void clear() {
+    inferrerMemo.clear();
   }
 
   private TableEntityModelInferrerFactory() {

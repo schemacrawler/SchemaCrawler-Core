@@ -59,6 +59,7 @@ public class AbstractTextSupportTest {
     final Table partialTable =
         mock(Table.class, withSettings().extraInterfaces(PartialDatabaseObject.class));
     final TableReference fkWithPartialTable = mock(TableReference.class);
+    when(fkWithPartialTable.key()).thenReturn(new NamedObjectKey("PARTIAL_ON_FK_TABLE"));
     when(fkWithPartialTable.getForeignKeyTable()).thenReturn(partialTable);
     assertThat(support.cardinality(fkWithPartialTable), is(RelationshipCardinality.unknown));
 
