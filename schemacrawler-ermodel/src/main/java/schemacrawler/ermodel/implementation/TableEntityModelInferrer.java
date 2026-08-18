@@ -13,6 +13,7 @@ import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -24,6 +25,7 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.OptionalBoolean;
 
@@ -33,15 +35,76 @@ import us.fatehi.utility.OptionalBoolean;
  */
 public final class TableEntityModelInferrer {
 
-  private final Table table;
+  /** Builds a lookup of all known index column combinations for this table. */
+  private static void buildIndexesLookup(
+      final Table table,
+      final Set<Set<Column>> uniqueIndexesBuilder,
+      final Set<Set<Column>> indexesBuilder) {
+    if (table.hasPrimaryKey()) {
+      final Set<Column> pkColumns = Set.copyOf(table.getPrimaryKey().getConstrainedColumns());
+      uniqueIndexesBuilder.add(pkColumns);
+      indexesBuilder.add(pkColumns);
+    }
+    if (table.hasIndexes()) {
+      for (final Index index : table.getIndexes()) {
+        final Set<Column> indexColumns = Set.copyOf(index.getColumns());
+        indexesBuilder.add(indexColumns);
+        if (index.isUnique()) {
+          uniqueIndexesBuilder.add(indexColumns);
+        }
+      }
+    }
+  }
 
+  private static void buildSupportingLookups(
+      final Table table,
+      final Set<ForeignKey> importedForeignKeysBuilder,
+      final Set<Column> tablePkColumnsBuilder,
+      final Map<NamedObjectKey, Set<Column>> importedColumnsMapBuilder,
+      final Map<NamedObjectKey, Set<Column>> pkColumnsMapBuilder,
+      final Map<NamedObjectKey, Set<Column>> parentPkColumnsMapBuilder) {
+    // Precompute child columns for all imported foreign keys, including self-references.
+    // Cardinality inference depends on this map even when self-referencing FKs are excluded
+    // from entity-type classification.
+    for (final ForeignKey fk : table.getImportedForeignKeys()) {
+      final Set<Column> importedKeysForFk =
+          Set.copyOf(
+              fk.getColumnReferences().stream().map(ColumnReference::getForeignKeyColumn).toList());
+      importedColumnsMapBuilder.put(fk.key(), importedKeysForFk);
+
+      if (!fk.isSelfReferencing()) {
+        importedForeignKeysBuilder.add(fk);
+      }
+    }
+
+    if (table.hasPrimaryKey()) {
+      final List<TableConstraintColumn> constrainedColumns =
+          List.copyOf(table.getPrimaryKey().getConstrainedColumns());
+      tablePkColumnsBuilder.addAll(constrainedColumns);
+    }
+
+    for (final ForeignKey fk : importedForeignKeysBuilder) {
+      final Set<Column> fkParentColumns =
+          Set.copyOf(
+              fk.getColumnReferences().stream().map(ColumnReference::getPrimaryKeyColumn).toList());
+      pkColumnsMapBuilder.put(fk.key(), fkParentColumns);
+
+      final Table parentTable = fk.getPrimaryKeyTable();
+      if (!isPartial(parentTable) && parentTable.hasPrimaryKey()) {
+        final Set<Column> parentPkColumns =
+            Set.copyOf(parentTable.getPrimaryKey().getConstrainedColumns());
+        parentPkColumnsMapBuilder.put(fk.key(), parentPkColumns);
+      } else {
+        parentPkColumnsMapBuilder.put(fk.key(), Set.of());
+      }
+    }
+  }
+
+  private final Table table;
   private final Set<Set<Column>> uniqueIndexes;
   private final Set<Set<Column>> indexes;
-
   private final Set<ForeignKey> importedForeignKeys;
-
   private final Set<Column> tablePkColumns;
-
   private final Map<NamedObjectKey, Set<Column>> importedColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> pkColumnsMap;
   private final Map<NamedObjectKey, Set<Column>> parentPkColumnsMap;
@@ -54,20 +117,34 @@ public final class TableEntityModelInferrer {
   public TableEntityModelInferrer(final Table table) {
     this.table = requireNonNull(table, "No table provided");
 
-    uniqueIndexes = new HashSet<>();
-    indexes = new HashSet<>();
-
-    importedForeignKeys = new HashSet<>();
-    tablePkColumns = new HashSet<>();
-
-    importedColumnsMap = new HashMap<>();
-    pkColumnsMap = new HashMap<>();
-    parentPkColumnsMap = new HashMap<>();
+    // Build temporary mutable state
+    final Set<Set<Column>> uniqueIndexesBuilder = new HashSet<>();
+    final Set<Set<Column>> indexesBuilder = new HashSet<>();
+    final Set<ForeignKey> importedForeignKeysBuilder = new HashSet<>();
+    final Set<Column> tablePkColumnsBuilder = new HashSet<>();
+    final Map<NamedObjectKey, Set<Column>> importedColumnsMapBuilder = new HashMap<>();
+    final Map<NamedObjectKey, Set<Column>> pkColumnsMapBuilder = new HashMap<>();
+    final Map<NamedObjectKey, Set<Column>> parentPkColumnsMapBuilder = new HashMap<>();
 
     if (!isPartial(table)) {
-      buildSupportingLookups();
-      buildIndexesLookup();
+      buildSupportingLookups(
+          table,
+          importedForeignKeysBuilder,
+          tablePkColumnsBuilder,
+          importedColumnsMapBuilder,
+          pkColumnsMapBuilder,
+          parentPkColumnsMapBuilder);
+      buildIndexesLookup(table, uniqueIndexesBuilder, indexesBuilder);
     }
+
+    // Build immutable state
+    uniqueIndexes = Set.copyOf(uniqueIndexesBuilder);
+    indexes = Set.copyOf(indexesBuilder);
+    importedForeignKeys = Set.copyOf(importedForeignKeysBuilder);
+    tablePkColumns = Set.copyOf(tablePkColumnsBuilder);
+    importedColumnsMap = Map.copyOf(importedColumnsMapBuilder);
+    pkColumnsMap = Map.copyOf(pkColumnsMapBuilder);
+    parentPkColumnsMap = Map.copyOf(parentPkColumnsMapBuilder);
   }
 
   /**
@@ -82,7 +159,7 @@ public final class TableEntityModelInferrer {
       return OptionalBoolean.unknown;
     }
 
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    final Set<Column> importedColumns = resolveImportedKeys(fk);
     for (final Set<Column> indexColumns : indexes) {
       if (indexColumns.containsAll(importedColumns)) {
         return OptionalBoolean.true_value;
@@ -103,7 +180,7 @@ public final class TableEntityModelInferrer {
       return OptionalBoolean.unknown;
     }
 
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    final Set<Column> importedColumns = resolveImportedKeys(fk);
     return OptionalBoolean.fromBoolean(uniqueIndexes.contains(importedColumns));
   }
 
@@ -158,29 +235,27 @@ public final class TableEntityModelInferrer {
    */
   public RelationshipCardinality inferCardinality(final TableReference fk) {
 
-    if (!isFkValid(fk)) {
+    if (fk == null || isPartial(table)) {
       return RelationshipCardinality.unknown;
     }
+    if (!fk.getForeignKeyTable().equals(table)) {
+      throw new IllegalArgumentException("Not an imported foreign key for <%s>".formatted(table));
+    }
 
-    final RelationshipCardinality cardinality;
-
-    final Set<Column> importedColumns = findOrGetImportedKeys(fk);
+    final Set<Column> importedColumns = resolveImportedKeys(fk);
     final boolean isForeignKeyUnique = uniqueIndexes.contains(importedColumns);
     final boolean isForeignKeyOptional = fk.isOptional();
 
     if (isForeignKeyUnique) {
       if (isForeignKeyOptional) {
-        cardinality = RelationshipCardinality.zero_one;
-      } else {
-        cardinality = RelationshipCardinality.one_one;
+        return RelationshipCardinality.zero_one;
       }
-    } else if (isForeignKeyOptional) {
-      cardinality = RelationshipCardinality.zero_many;
-    } else {
-      cardinality = RelationshipCardinality.one_many;
+      return RelationshipCardinality.one_one;
     }
-
-    return cardinality;
+    if (isForeignKeyOptional) {
+      return RelationshipCardinality.zero_many;
+    }
+    return RelationshipCardinality.one_many;
   }
 
   /**
@@ -196,7 +271,8 @@ public final class TableEntityModelInferrer {
       return EntityType.unknown;
     }
     if (!table.hasPrimaryKey()) {
-      // Views without a primary key are unclassified; tables without a PK are non-entities
+      // Views without a primary key are unclassified; tables without a PK are
+      // non-entities
       return table.getTableType().isView() ? EntityType.unknown : EntityType.non_entity;
     }
 
@@ -253,70 +329,24 @@ public final class TableEntityModelInferrer {
     return table.toString();
   }
 
-  /** Builds a lookup of all known index column combinations for this table. */
-  private void buildIndexesLookup() {
-    if (table.hasPrimaryKey()) {
-      final Set<Column> pkColumns = Set.copyOf(table.getPrimaryKey().getConstrainedColumns());
-      uniqueIndexes.add(pkColumns);
-      indexes.add(pkColumns);
-    }
-    if (table.hasIndexes()) {
-      for (final Index index : table.getIndexes()) {
-        final Set<Column> indexColumns = Set.copyOf(index.getColumns());
-        indexes.add(indexColumns);
-        if (index.isUnique()) {
-          uniqueIndexes.add(indexColumns);
-        }
-      }
-    }
-  }
-
-  private void buildSupportingLookups() {
-    // Foreign keys imported from other tables
-    for (final ForeignKey fk : table.getImportedForeignKeys()) {
-      if (!fk.isSelfReferencing()) {
-        importedForeignKeys.add(fk);
-      }
-    }
-
-    if (table.hasPrimaryKey()) {
-      tablePkColumns.addAll(table.getPrimaryKey().getConstrainedColumns());
-    }
-
-    for (final ForeignKey fk : importedForeignKeys) {
-      final Set<Column> fkParentColumns =
-          Set.copyOf(
-              fk.getColumnReferences().stream().map(ColumnReference::getPrimaryKeyColumn).toList());
-      pkColumnsMap.put(fk.key(), fkParentColumns);
-
-      findOrGetImportedKeys(fk);
-
-      final Table parentTable = fk.getPrimaryKeyTable();
-      if (!isPartial(parentTable) && parentTable.hasPrimaryKey()) {
-        final Set<Column> parentPkColumns =
-            Set.copyOf(parentTable.getPrimaryKey().getConstrainedColumns());
-        parentPkColumnsMap.put(fk.key(), parentPkColumns);
-      } else {
-        parentPkColumnsMap.put(fk.key(), Set.of());
-      }
-    }
-  }
-
-  private Set<Column> findOrGetImportedKeys(final TableReference fk) {
-    requireNonNull(fk, "No foreign key provided");
-    return importedColumnsMap.computeIfAbsent(
-        fk.key(),
-        key ->
-            Set.copyOf(
-                fk.getColumnReferences().stream()
-                    .map(ColumnReference::getForeignKeyColumn)
-                    .toList()));
-  }
-
   private boolean isFkValid(final TableReference fk) {
     final boolean isNotValid =
         fk == null || isPartial(table) || !fk.getForeignKeyTable().equals(table);
     return !isNotValid;
+  }
+
+  private Set<Column> resolveImportedKeys(final TableReference fk) {
+    requireNonNull(fk, "No foreign key provided");
+    final Set<Column> importedColumns = importedColumnsMap.get(fk.key());
+    if (importedColumns != null) {
+      return importedColumns;
+    }
+    // Resolve imported keys from implicit associations, which have not been
+    // pre-computed (only foreign keys are pre-computed)
+    // Keep this instance immutable: do not mutate lookup maps, but still
+    // return an immutable set
+    return Set.copyOf(
+        fk.getColumnReferences().stream().map(ColumnReference::getForeignKeyColumn).toList());
   }
 
   /**
