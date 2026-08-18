@@ -20,7 +20,7 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class TableEntityModelInferrerFactory {
 
-  private static final int MAX_CACHE_SIZE = 0;
+  private static final int MAX_CACHE_SIZE = 10;
 
   private static final ConcurrentMap<NamedObjectKey, TableEntityModelInferrer> inferrerMemo =
       new ConcurrentHashMap<>();
