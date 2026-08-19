@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import schemacrawler.ermodel.implementation.ERModelBuilder;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
-import schemacrawler.ermodel.implementation.TableEntityModelInferrerCache;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.EntityType;
@@ -31,8 +30,6 @@ import us.fatehi.utility.UtilityMarker;
 /** Utility for inferring entity model information from tables and foreign keys. */
 @UtilityMarker
 public class ERModelUtility {
-
-  private static final TableEntityModelInferrerCache cache = new TableEntityModelInferrerCache();
 
   public static ERModel buildEmptyERModel() {
     return ERModelBuilder.buildEmptyERModel();
@@ -77,7 +74,7 @@ public class ERModelUtility {
       return OptionalBoolean.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = cache.fromTable(table);
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final OptionalBoolean coveredByIndex = tableEntityModel.coveredByIndex(fk);
     return coveredByIndex;
   }
@@ -98,7 +95,7 @@ public class ERModelUtility {
       return OptionalBoolean.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = cache.fromTable(table);
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final OptionalBoolean coveredByIndex = tableEntityModel.coveredByUniqueIndex(fk);
     return coveredByIndex;
   }
@@ -114,7 +111,7 @@ public class ERModelUtility {
       return OptionalBoolean.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = cache.fromTable(table);
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final boolean isBridgeTable = tableEntityModel.inferBridgeTable();
     return OptionalBoolean.fromBoolean(isBridgeTable);
   }
@@ -135,7 +132,7 @@ public class ERModelUtility {
       return RelationshipCardinality.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = cache.fromTable(table);
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final RelationshipCardinality fkCardinality = tableEntityModel.inferCardinality(fk);
     return fkCardinality;
   }
@@ -151,7 +148,7 @@ public class ERModelUtility {
       return EntityType.unknown;
     }
 
-    final TableEntityModelInferrer tableEntityModel = cache.fromTable(table);
+    final TableEntityModelInferrer tableEntityModel = new TableEntityModelInferrer(table);
     final EntityType entityType = tableEntityModel.inferEntityType();
     return entityType;
   }
