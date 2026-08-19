@@ -29,12 +29,12 @@ public class ERModelBuilderTest {
 
   @Test
   public void testConcurrentModificationException() {
-    final LightTable superTable = new LightTable("SUPER_TABLE");
+    final LightTable superTable = new LightTable("SUPER_TABLE_1");
     final LightColumn superPkCol = superTable.addColumn("ID");
     final PrimaryKey superPk = new LightPrimaryKey(superPkCol);
     superTable.setPrimaryKey(superPk);
 
-    final LightTable subTable = spy(new LightTable("SUB_TABLE"));
+    final LightTable subTable = spy(new LightTable("SUB_TABLE_1"));
     final LightColumn subPkCol = subTable.addColumn("ID");
     final LightPrimaryKey subPk = new LightPrimaryKey(subPkCol);
     subTable.setPrimaryKey(subPk);
@@ -61,12 +61,12 @@ public class ERModelBuilderTest {
 
   @Test
   public void testSubtypeIdentifyingRelationship() {
-    final LightTable superTable = new LightTable("SUPER_TABLE");
+    final LightTable superTable = new LightTable("SUPER_TABLE_2");
     final LightColumn superPkCol = superTable.addColumn("ID");
     final LightPrimaryKey superPk = new LightPrimaryKey(superPkCol);
     superTable.setPrimaryKey(superPk);
 
-    final LightTable subTable = spy(new LightTable("SUB_TABLE"));
+    final LightTable subTable = spy(new LightTable("SUB_TABLE_2"));
     final LightColumn subPkCol = subTable.addColumn("ID");
     final LightPrimaryKey subPk = new LightPrimaryKey(subPkCol);
     subTable.setPrimaryKey(subPk);
