@@ -37,6 +37,7 @@ public final class ImplicitRelationshipBuilder implements Builder<TableReference
 
   private final ImplicitAssociationBuilder implicitAssociationBuilder;
   private final MutableERModel erModel;
+  final TableEntityModelInferrerCache inferrerMap;
 
   private ImplicitRelationshipBuilder(final Catalog catalog, final ERModel erModel) {
     implicitAssociationBuilder = ImplicitAssociationBuilder.builder(catalog);
@@ -45,6 +46,7 @@ public final class ImplicitRelationshipBuilder implements Builder<TableReference
       throw new IllegalArgumentException("ER model cannot be loaded");
     }
     this.erModel = mutableERModel;
+    inferrerMap = new TableEntityModelInferrerCache();
   }
 
   public ImplicitRelationshipBuilder addColumnReference(
@@ -118,7 +120,8 @@ public final class ImplicitRelationshipBuilder implements Builder<TableReference
     }
 
     // Create a new relationship, and set its cardinality and entities.
-    final TableEntityModelInferrer modelInferrer = new TableEntityModelInferrer(leftTable);
+    final TableEntityModelInferrer modelInferrer =
+        inferrerMap.fromTableReference(implicitAssociation);
     final RelationshipCardinality cardinality = modelInferrer.inferCardinality(implicitAssociation);
     rel.setCardinality(cardinality);
     rel.setEntities(leftEntity, rightEntity);
