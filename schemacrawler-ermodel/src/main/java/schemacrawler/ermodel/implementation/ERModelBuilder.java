@@ -12,9 +12,9 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.ermodel.model.ERModel;
@@ -43,16 +43,15 @@ public final class ERModelBuilder implements Builder<ERModel> {
 
   private final Catalog catalog;
   final MutableERModel erModel;
-  final Map<NamedObjectKey, TableEntityModelInferrer> inferrerMap;
-
+  final TableEntityModelInferrerCache inferrerMap;
   final Map<NamedObjectKey, MutableEntity> entityMap;
 
   private ERModelBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
 
-    inferrerMap = new HashMap<>();
+    inferrerMap = new TableEntityModelInferrerCache();
     // Contains all entities, including ones not added to the ER model
-    entityMap = new HashMap<>();
+    entityMap = new ConcurrentHashMap<>();
 
     erModel = new MutableERModel();
   }
@@ -66,7 +65,7 @@ public final class ERModelBuilder implements Builder<ERModel> {
         continue;
       }
 
-      final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
+      final TableEntityModelInferrer modelInferrer = inferrerMap.fromTable(table);
       if (modelInferrer.inferBridgeTable()) {
         // Build M..N relationship
         final MutableManyToManyRelationship rel = new MutableManyToManyRelationship(table);
@@ -97,7 +96,7 @@ public final class ERModelBuilder implements Builder<ERModel> {
       final TableReference tableReference) {
 
     final Table leftTable = tableReference.getForeignKeyTable();
-    final TableEntityModelInferrer modelInferrer = getModelInferrer(leftTable);
+    final TableEntityModelInferrer modelInferrer = inferrerMap.fromTable(leftTable);
 
     if (modelInferrer.inferBridgeTable()) {
       LOGGER.log(
@@ -141,10 +140,6 @@ public final class ERModelBuilder implements Builder<ERModel> {
     return rel;
   }
 
-  private TableEntityModelInferrer getModelInferrer(final Table table) {
-    return inferrerMap.computeIfAbsent(table.key(), key -> new TableEntityModelInferrer(table));
-  }
-
   private MutableEntity lookupOrCreateEntity(final Table table) {
     if (table == null) {
       return null;
@@ -154,7 +149,7 @@ public final class ERModelBuilder implements Builder<ERModel> {
       return entityMap.get(tableKey);
     }
 
-    final TableEntityModelInferrer modelInferrer = getModelInferrer(table);
+    final TableEntityModelInferrer modelInferrer = inferrerMap.fromTable(table);
     final EntityType entityType = modelInferrer.inferEntityType();
     final MutableEntity entity =
         switch (entityType) {
