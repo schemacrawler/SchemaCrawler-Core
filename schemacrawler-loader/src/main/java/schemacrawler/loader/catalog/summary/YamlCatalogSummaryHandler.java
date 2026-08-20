@@ -8,6 +8,7 @@
 
 package schemacrawler.loader.catalog.summary;
 
+import schemacrawler.loader.utility.CatalogStats;
 import schemacrawler.schema.CrawlInfo;
 
 /** Produces a valid, parseable YAML summary of a catalog. */

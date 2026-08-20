@@ -15,8 +15,9 @@ import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOption
 import java.util.LinkedHashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import schemacrawler.loader.catalog.summary.CatalogStats;
-import schemacrawler.loader.catalog.summary.CatalogStatsUtility;
+
+import schemacrawler.loader.utility.CatalogStats;
+import schemacrawler.loader.utility.CatalogStatsUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Table;
