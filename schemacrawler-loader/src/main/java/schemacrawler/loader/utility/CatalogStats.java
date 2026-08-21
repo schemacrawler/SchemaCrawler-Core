@@ -10,11 +10,14 @@ package schemacrawler.loader.utility;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import schemacrawler.loader.utility.CatalogStats.CatalogCounts;
+import schemacrawler.loader.utility.CatalogStats.SchemaStats;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.Schema;
 
 /** Immutable catalog summary statistics. */
-public final class CatalogStats {
+public record CatalogStats(
+    String catalogName, CrawlInfo crawlInfo, CatalogCounts counts, List<SchemaStats> schemas) {
 
   public record DataTypesCounts(int count) {}
 
@@ -62,35 +65,10 @@ public final class CatalogStats {
 
   public record SchemaStats(Schema schema, SchemaCounts counts) {}
 
-  private final String catalogName;
-  private final CrawlInfo crawlInfo;
-  private final CatalogCounts counts;
-  private final List<SchemaStats> schemas;
-
-  CatalogStats(
-      final String catalogName,
-      final CrawlInfo crawlInfo,
-      final CatalogCounts counts,
-      final List<SchemaStats> schemas) {
-    this.catalogName = requireNonNull(catalogName, "No catalog name provided");
-    this.crawlInfo = requireNonNull(crawlInfo, "No crawl info provided");
-    this.counts = requireNonNull(counts, "No catalog counts provided");
-    this.schemas = List.copyOf(requireNonNull(schemas, "No schema stats provided"));
-  }
-
-  public String catalogName() {
-    return catalogName;
-  }
-
-  public CrawlInfo crawlInfo() {
-    return crawlInfo;
-  }
-
-  public CatalogCounts counts() {
-    return counts;
-  }
-
-  public List<SchemaStats> schemas() {
-    return schemas;
+  public CatalogStats {
+    catalogName = requireNonNull(catalogName, "No catalog name provided");
+    crawlInfo = requireNonNull(crawlInfo, "No crawl info provided");
+    counts = requireNonNull(counts, "No catalog counts provided");
+    schemas = List.copyOf(requireNonNull(schemas, "No schema stats provided"));
   }
 }
