@@ -44,7 +44,7 @@ final class YamlCatalogSummaryHandler implements CatalogSummaryHandler {
     final CrawlInfo crawlInfo = catalogStats.crawlInfo();
     final CatalogStats.CatalogCounts counts = catalogStats.counts();
 
-    sb.append("catalog: ").append(catalogStats.catalogName()).append("\n");
+    sb.append("catalog: ").append(catalogStats.title()).append("\n");
     sb.append("crawl-info:\n");
     entry("  ", "generated-by", crawlInfo.getSchemaCrawlerVersion());
     entry("  ", "generated-on", crawlInfo.getCrawlTimestamp());
