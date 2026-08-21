@@ -15,19 +15,71 @@ import schemacrawler.schema.Schema;
 
 /** Immutable catalog summary statistics. */
 public record CatalogStats(
-    String catalogName, CrawlInfo crawlInfo, CatalogCounts counts, List<SchemaStats> schemas) {
+    String title, CrawlInfo crawlInfo, CatalogCounts counts, List<SchemaStats> schemas) {
 
-  public record DataTypesCounts(int count) {}
+  /** Totals across all data types that are considered in a schema. */
+  public record DataTypesCounts(Integer count) {
+    public DataTypesCounts {
+      count = StatsUtility.removeNegativeInteger.apply(count);
+    }
+  }
 
-  public record SynonymsCounts(int count) {}
+  /** Totals across all synonyms that are considered in a schema. */
+  public record SynonymsCounts(Integer count) {
+    public SynonymsCounts {
+      count = StatsUtility.removeNegativeInteger.apply(count);
+    }
+  }
 
-  public record SequencesCounts(int count) {}
+  /** Totals across all sequences that are considered in a schema. */
+  public record SequencesCounts(Integer count) {
+    public SequencesCounts {
+      count = StatsUtility.removeNegativeInteger.apply(count);
+    }
+  }
 
+  /** Totals across all tables that are considered in a schema. */
   public record TablesCounts(
-      int count, int columns, int primaryKeys, int foreignKeys, int indexes, int triggers) {}
+      Integer count,
+      Integer columns,
+      Integer primaryKeys,
+      Integer foreignKeys,
+      Integer indexes,
+      Integer triggers,
+      Integer views) {
 
-  public record RoutinesCounts(int count, int procedures, int functions, int parameters) {}
+    public TablesCounts {
+      count = StatsUtility.removeNegativeInteger.apply(count);
+      columns = StatsUtility.removeNegativeInteger.apply(columns);
+      primaryKeys = StatsUtility.removeNegativeInteger.apply(primaryKeys);
+      foreignKeys = StatsUtility.removeNegativeInteger.apply(foreignKeys);
+      indexes = StatsUtility.removeNegativeInteger.apply(indexes);
+      triggers = StatsUtility.removeNegativeInteger.apply(triggers);
+      views = StatsUtility.removeNegativeInteger.apply(views);
+    }
 
+    public TablesCounts(final Integer count) {
+      this(count, null, null, null, null, null, null);
+    }
+  }
+
+  /** Totals across all routines that are considered in a schema. */
+  public record RoutinesCounts(
+      Integer count, Integer procedures, Integer functions, Integer parameters) {
+
+    public RoutinesCounts {
+      count = StatsUtility.removeNegativeInteger.apply(count);
+      procedures = StatsUtility.removeNegativeInteger.apply(procedures);
+      functions = StatsUtility.removeNegativeInteger.apply(functions);
+      parameters = StatsUtility.removeNegativeInteger.apply(parameters);
+    }
+
+    public RoutinesCounts(final Integer count) {
+      this(count, null, null, null);
+    }
+  }
+
+  /** Totals across all objects that are considered in a schema. */
   public record SchemaCounts(
       DataTypesCounts dataTypes,
       TablesCounts tables,
@@ -46,25 +98,37 @@ public record CatalogStats(
    * @param synonyms total number of synonyms across all schemas
    * @param sequences total number of sequences across all schemas
    * @param tableCount number of non-view tables (excludes views)
-   * @param viewCount number of views
-   * @param foreignKeyCount deduplicated number of foreign keys across all tables
+   * @param views number of views
+   * @param foreignKeys deduplicated number of foreign keys across all tables
    */
   public record CatalogCounts(
-      int schemas,
-      int dataTypes,
-      int tables,
-      int columns,
-      int routines,
-      int synonyms,
-      int sequences,
-      int tableCount,
-      int viewCount,
-      int foreignKeyCount) {}
+      Integer schemas,
+      Integer dataTypes,
+      Integer tables,
+      Integer views,
+      Integer foreignKeys,
+      Integer columns,
+      Integer routines,
+      Integer synonyms,
+      Integer sequences) {
+
+    public CatalogCounts {
+      schemas = StatsUtility.removeNegativeInteger.apply(schemas);
+      dataTypes = StatsUtility.removeNegativeInteger.apply(dataTypes);
+      tables = StatsUtility.removeNegativeInteger.apply(tables);
+      views = StatsUtility.removeNegativeInteger.apply(views);
+      columns = StatsUtility.removeNegativeInteger.apply(columns);
+      foreignKeys = StatsUtility.removeNegativeInteger.apply(foreignKeys);
+      routines = StatsUtility.removeNegativeInteger.apply(routines);
+      synonyms = StatsUtility.removeNegativeInteger.apply(synonyms);
+      sequences = StatsUtility.removeNegativeInteger.apply(sequences);
+    }
+  }
 
   public record SchemaStats(Schema schema, SchemaCounts counts) {}
 
   public CatalogStats {
-    catalogName = requireNonNull(catalogName, "No catalog name provided");
+    title = requireNonNull(title, "No title provided");
     crawlInfo = requireNonNull(crawlInfo, "No crawl info provided");
     counts = requireNonNull(counts, "No catalog counts provided");
     schemas = List.copyOf(requireNonNull(schemas, "No schema stats provided"));

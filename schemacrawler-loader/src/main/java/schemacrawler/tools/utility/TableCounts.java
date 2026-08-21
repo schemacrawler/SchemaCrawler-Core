@@ -7,8 +7,10 @@
  */
 package schemacrawler.tools.utility;
 
+import static schemacrawler.loader.utility.StatsUtility.makeValidRowCount;
+import static schemacrawler.loader.utility.StatsUtility.removeNegativeInteger;
+
 import java.util.List;
-import java.util.function.Function;
 import schemacrawler.loader.utility.TableRowCountsUtility;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
@@ -20,10 +22,6 @@ public record TableCounts(
     Integer indexCount,
     Integer triggerCount,
     Long rowCount) {
-
-  private static final Function<Integer, Integer> removeNegativeInteger =
-      x -> x == null || x < 0 ? null : x;
-  private static final Function<Long, Long> makeValidRowCount = x -> x == null || x <= 0 ? null : x;
 
   public TableCounts {
     significantColumnCount = removeNegativeInteger.apply(significantColumnCount);

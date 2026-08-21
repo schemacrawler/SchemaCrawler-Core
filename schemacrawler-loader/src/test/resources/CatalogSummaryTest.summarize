@@ -1,14 +1,14 @@
-catalog: catalog
+catalog: 
 crawl-info:
-  generated-by: SchemaCrawler 17.11.0
-  generated-on: '2026-05-03 20:54:51'
+  generated-by: SchemaCrawler 17.14.0
+  generated-on: '2026-08-21 17:16:38'
   database: HSQL Database Engine 2.7.4
   jdbc-driver: HSQL Database Engine Driver 2.7.4
   os: Windows 11 10.0
-  jvm: Microsoft OpenJDK 64-Bit Server VM 21.0.8+9-LTS
+  jvm: Microsoft OpenJDK 64-Bit Server VM 21.0.11+10-LTS
 counts:
   schemas: 6
-  data-types: 7
+  data-types: 32
   tables: 20
   columns: 90
   routines: 15
