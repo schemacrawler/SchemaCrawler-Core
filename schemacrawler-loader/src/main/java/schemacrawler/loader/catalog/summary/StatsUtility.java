@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.utility;
+package schemacrawler.loader.catalog.summary;
 
 import java.util.function.Function;
 import us.fatehi.utility.UtilityMarker;

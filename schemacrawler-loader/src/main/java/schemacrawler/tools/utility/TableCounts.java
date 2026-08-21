@@ -7,8 +7,8 @@
  */
 package schemacrawler.tools.utility;
 
-import static schemacrawler.loader.utility.StatsUtility.makeValidRowCount;
-import static schemacrawler.loader.utility.StatsUtility.removeNegativeInteger;
+import static schemacrawler.loader.catalog.summary.StatsUtility.makeValidRowCount;
+import static schemacrawler.loader.catalog.summary.StatsUtility.removeNegativeInteger;
 
 import java.util.List;
 import schemacrawler.loader.utility.TableRowCountsUtility;

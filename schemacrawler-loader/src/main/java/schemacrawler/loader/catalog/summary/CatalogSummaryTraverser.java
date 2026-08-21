@@ -10,8 +10,6 @@ package schemacrawler.loader.catalog.summary;
 
 import static java.util.Objects.requireNonNull;
 
-import schemacrawler.loader.utility.CatalogStats;
-import schemacrawler.loader.utility.CatalogStatsUtility;
 import schemacrawler.schema.Catalog;
 
 /**

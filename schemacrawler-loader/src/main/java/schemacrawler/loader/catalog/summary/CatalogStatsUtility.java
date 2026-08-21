@@ -5,21 +5,21 @@
  * All rights reserved.
  * SPDX-License-Identifier: EPL-2.0
  */
-package schemacrawler.loader.utility;
+package schemacrawler.loader.catalog.summary;
 
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import schemacrawler.loader.utility.CatalogStats.CatalogCounts;
-import schemacrawler.loader.utility.CatalogStats.DataTypesCounts;
-import schemacrawler.loader.utility.CatalogStats.RoutinesCounts;
-import schemacrawler.loader.utility.CatalogStats.SchemaCounts;
-import schemacrawler.loader.utility.CatalogStats.SchemaStats;
-import schemacrawler.loader.utility.CatalogStats.SequencesCounts;
-import schemacrawler.loader.utility.CatalogStats.SynonymsCounts;
-import schemacrawler.loader.utility.CatalogStats.TablesCounts;
+import schemacrawler.loader.catalog.summary.CatalogStats.CatalogCounts;
+import schemacrawler.loader.catalog.summary.CatalogStats.DataTypesCounts;
+import schemacrawler.loader.catalog.summary.CatalogStats.RoutinesCounts;
+import schemacrawler.loader.catalog.summary.CatalogStats.SchemaCounts;
+import schemacrawler.loader.catalog.summary.CatalogStats.SchemaStats;
+import schemacrawler.loader.catalog.summary.CatalogStats.SequencesCounts;
+import schemacrawler.loader.catalog.summary.CatalogStats.SynonymsCounts;
+import schemacrawler.loader.catalog.summary.CatalogStats.TablesCounts;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;

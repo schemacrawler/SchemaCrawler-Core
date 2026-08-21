@@ -8,8 +8,6 @@
 
 package schemacrawler.loader.catalog.summary;
 
-import schemacrawler.loader.utility.CatalogStats;
-
 /**
  * Handler interface for catalog summary traversal. Implementations receive structured count data
  * for each schema and catalog-level aggregates through {@link CatalogStats}.

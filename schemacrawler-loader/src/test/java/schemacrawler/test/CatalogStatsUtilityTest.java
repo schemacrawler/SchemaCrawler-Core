@@ -18,10 +18,10 @@ import static schemacrawler.test.utility.DatabaseTestUtility.schemaCrawlerOption
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import schemacrawler.loader.utility.CatalogStats;
-import schemacrawler.loader.utility.CatalogStats.CatalogCounts;
-import schemacrawler.loader.utility.CatalogStats.SchemaStats;
-import schemacrawler.loader.utility.CatalogStatsUtility;
+import schemacrawler.loader.catalog.summary.CatalogStats;
+import schemacrawler.loader.catalog.summary.CatalogStats.CatalogCounts;
+import schemacrawler.loader.catalog.summary.CatalogStats.SchemaStats;
+import schemacrawler.loader.catalog.summary.CatalogStatsUtility;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Schema;
 import schemacrawler.test.utility.WithTestDatabase;

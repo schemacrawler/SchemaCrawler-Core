@@ -5,7 +5,7 @@
  * All rights reserved.
  * SPDX-License-Identifier: EPL-2.0
  */
-package schemacrawler.loader.utility;
+package schemacrawler.loader.catalog.summary;
 
 import static java.util.Objects.requireNonNull;
 
