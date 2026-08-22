@@ -9,7 +9,7 @@
 package us.fatehi.utility.database;
 
 import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.isBlank;
+import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -17,13 +17,19 @@ import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import us.fatehi.utility.SQLRuntimeException;
 import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.property.VersionNumber;
@@ -33,120 +39,57 @@ import us.fatehi.utility.string.StringFormat;
 public final class JdbcDriverRegistry {
 
   private static final Logger LOGGER = Logger.getLogger(JdbcDriverRegistry.class.getName());
+  private static JdbcDriverRegistry registrySingleton;
 
-  private static final Object LOCK = new Object();
-
-  private static volatile Collection<JdbcDriver> cachedDrivers;
-
-  public static Collection<PropertyName> availableJDBCDrivers() {
-    final Collection<JdbcDriver> availableDrivers = discoverAvailableDrivers();
-    final Collection<PropertyName> availableJDBCDrivers = new ArrayList<>();
-    for (final JdbcDriver jdbcDriver : availableDrivers) {
-      availableJDBCDrivers.add(
-          new PropertyName(
-              jdbcDriver.driverClassName(), jdbcDriver.driverVersionNumber().toString()));
+  public static JdbcDriverRegistry getRegistry() {
+    if (registrySingleton == null) {
+      registrySingleton = new JdbcDriverRegistry();
     }
-    return availableJDBCDrivers;
+    return registrySingleton;
   }
 
-  public static Connection createConnection(
-      final String connectionUrl, final java.util.Properties connectionProperties)
-      throws SQLException {
-    requireConnectionUrl(connectionUrl);
-    final java.util.Properties properties =
-        connectionProperties == null ? new java.util.Properties() : connectionProperties;
-    final Driver jdbcDriver = getJdbcDriver(connectionUrl);
-    return jdbcDriver.connect(connectionUrl, properties);
-  }
-
-  public static Collection<JdbcDriver> discoverAvailableDrivers() {
-    if (cachedDrivers == null) {
-      synchronized (LOCK) {
-        if (cachedDrivers == null) {
-          try {
-            cachedDrivers = performDiscovery();
-          } catch (final SQLException e) {
-            LOGGER.log(Level.WARNING, e.getMessage(), e);
-            cachedDrivers = List.of();
-          }
-        }
-      }
-    }
-    return cachedDrivers;
-  }
-
-  public static JdbcDriverMetadata inspectMetadata(final String connectionUrl) throws SQLException {
-    requireConnectionUrl(connectionUrl);
-    final Driver jdbcDriver = getJdbcDriver(connectionUrl);
-    final DriverPropertyInfo[] properties =
-        jdbcDriver.getPropertyInfo(connectionUrl, new java.util.Properties());
-    final List<JdbcDriverProperty> jdbcDriverProperties = new ArrayList<>();
-    for (final DriverPropertyInfo propertyInfo : properties) {
-      jdbcDriverProperties.add(toJdbcDriverProperty(propertyInfo));
-    }
-    return new JdbcDriverMetadata(toJdbcDriver(jdbcDriver), jdbcDriverProperties);
-  }
-
-  public static JdbcDriver resolveDriverForUrl(final String connectionUrl) throws SQLException {
-    requireConnectionUrl(connectionUrl);
-    return toJdbcDriver(getJdbcDriver(connectionUrl));
-  }
-
-  private static Driver getJdbcDriver(final String connectionUrl) throws SQLException {
+  private static Map<String, JdbcDriver> loadJdbcDriverRegistry() {
     try {
-      final Driver jdbcDriver = DriverManager.getDriver(connectionUrl);
-      if (jdbcDriver == null) {
-        throw new SQLException(
-            "Could not find a suitable JDBC driver for database connection URL <%s>"
-                .formatted(connectionUrl));
+      final Map<String, JdbcDriver> jdbcDrivers = new LinkedHashMap<>();
+      final ServiceLoader<Driver> serviceLoader = ServiceLoader.load(Driver.class);
+      serviceLoader.stream()
+          .forEach(
+              driverProvider -> {
+                try {
+                  final Driver driver = driverProvider.get();
+                  final JdbcDriver jdbcDriver = toJdbcDriver(driver);
+                  final String driverClassName = jdbcDriver.driverClassName();
+                  if (!jdbcDrivers.containsKey(driverClassName)) {
+                    jdbcDrivers.put(driverClassName, jdbcDriver);
+                    LOGGER.log(
+                        Level.FINE, new StringFormat("Found JDBC driver <%s>", driverClassName));
+                  } else {
+                    LOGGER.log(
+                        Level.FINE,
+                        new StringFormat("Skipping duplicate JDBC driver <%s>", driverClassName));
+                  }
+                } catch (final Exception | ServiceConfigurationError | LinkageError e) {
+                  LOGGER.log(
+                      Level.FINE,
+                      e,
+                      new StringFormat("Could not load JDBC driver provider <%s>", driverProvider));
+                }
+              });
+
+      if (jdbcDrivers.isEmpty()) {
+        throw new SQLException("No database drivers are available");
       }
-      return jdbcDriver;
+
+      LOGGER.log(
+          Level.CONFIG,
+          new StringFormat(
+              "Registered JDBC Drivers: %s",
+              jdbcDrivers.keySet().stream().sorted().collect(Collectors.joining(", "))));
+
+      return Map.copyOf(jdbcDrivers);
     } catch (final SQLException e) {
-      throw new SQLException(
-          "Could not find a suitable JDBC driver for database connection URL <%s>"
-              .formatted(connectionUrl),
-          e);
-    }
-  }
-
-  private static Collection<JdbcDriver> performDiscovery() throws SQLException {
-    final List<JdbcDriver> jdbcDrivers = new ArrayList<>();
-    final ServiceLoader<Driver> serviceLoader = ServiceLoader.load(Driver.class);
-    serviceLoader.stream()
-        .forEach(
-            driverProvider -> {
-              try {
-                final Driver driver = driverProvider.get();
-                jdbcDrivers.add(toJdbcDriver(driver));
-                LOGGER.log(
-                    Level.FINE,
-                    new StringFormat("Found JDBC driver <%s>", driver.getClass().getName()));
-              } catch (final Exception | ServiceConfigurationError | LinkageError e) {
-                LOGGER.log(
-                    Level.FINE,
-                    e,
-                    new StringFormat("Could not load JDBC driver provider <%s>", driverProvider));
-              }
-            });
-
-    if (jdbcDrivers.isEmpty()) {
-      throw new SQLException("No database drivers are available");
-    }
-
-    LOGGER.log(
-        Level.CONFIG,
-        new StringFormat(
-            "Registered JDBC Drivers: %s",
-            jdbcDrivers.stream()
-                .map(JdbcDriver::driverClassName)
-                .sorted()
-                .collect(Collectors.joining(", "))));
-    return List.copyOf(jdbcDrivers);
-  }
-
-  private static void requireConnectionUrl(final String connectionUrl) throws SQLException {
-    if (isBlank(connectionUrl)) {
-      throw new SQLException("No database connection URL provided");
+      LOGGER.log(Level.WARNING, e.getMessage(), e);
+      return Map.of();
     }
   }
 
@@ -157,27 +100,106 @@ public final class JdbcDriverRegistry {
     return new JdbcDriver(
         driver.getClass().getName(),
         new VersionNumber(driverMajorVersion, driverMinorVersion),
-        new VersionNumber(0, 0),
         driver.jdbcCompliant());
   }
 
-  private static JdbcDriverProperty toJdbcDriverProperty(final DriverPropertyInfo propertyInfo) {
-    requireNonNull(propertyInfo, "No JDBC driver property info provided");
-    final List<String> choices;
-    if (propertyInfo.choices == null || propertyInfo.choices.length == 0) {
-      choices = List.of();
-    } else {
-      choices = List.of(propertyInfo.choices);
+  private static Collection<JdbcDriverPropertyInfo> toJdbcDriverProperties(
+      final Driver driver, final String connectionUrl) {
+    requireNonNull(driver, "No JDBC driver provided");
+    try {
+      final DriverPropertyInfo[] propertyInfos =
+          driver.getPropertyInfo(connectionUrl, new Properties());
+      final List<JdbcDriverPropertyInfo> jdbcDriverProperties = new ArrayList<>();
+      for (final DriverPropertyInfo propertyInfo : propertyInfos) {
+        if (propertyInfo == null) {
+          continue;
+        }
+        final List<String> choices;
+        if (propertyInfo.choices == null) {
+          choices = List.of();
+        } else {
+          choices = Arrays.asList(propertyInfo.choices);
+        }
+        final JdbcDriverPropertyInfo jdbcDriverPropertyInfo =
+            new JdbcDriverPropertyInfo(
+                propertyInfo.name,
+                propertyInfo.description,
+                propertyInfo.required,
+                propertyInfo.value,
+                choices);
+        jdbcDriverProperties.add(jdbcDriverPropertyInfo);
+      }
+      return List.copyOf(jdbcDriverProperties);
+    } catch (final SQLException | RuntimeException e) {
+      LOGGER.log(
+          Level.WARNING,
+          e,
+          new StringFormat(
+              "Could not load JDBC driver properties for <%s> at <%s>",
+              driver.getClass().getName(), connectionUrl));
+      return List.of();
     }
-    return new JdbcDriverProperty(
-        propertyInfo.name,
-        propertyInfo.description,
-        propertyInfo.required,
-        propertyInfo.value,
-        choices);
   }
 
+  private final Map<String, JdbcDriver> cachedDrivers;
+
   private JdbcDriverRegistry() {
-    // Prevent instantiation
+    cachedDrivers = new LinkedHashMap<>(loadJdbcDriverRegistry());
+  }
+
+  public Collection<PropertyName> availableJDBCDrivers() {
+    final Collection<PropertyName> availableJDBCDrivers = new ArrayList<>();
+    for (final JdbcDriver jdbcDriver : cachedDrivers.values()) {
+      availableJDBCDrivers.add(
+          new PropertyName(
+              jdbcDriver.driverClassName(), jdbcDriver.driverVersionNumber().toString()));
+    }
+    return List.copyOf(availableJDBCDrivers);
+  }
+
+  public Connection createConnection(
+      final String connectionUrl, final Properties connectionProperties) throws SQLException {
+    requireNotBlank(connectionUrl, "No JDBC connection URL provided");
+    final Properties properties =
+        connectionProperties == null ? new Properties() : connectionProperties;
+    final Optional<Driver> jdbcDriverOptional = lookupDriver(connectionUrl);
+    if (jdbcDriverOptional.isEmpty()) {
+      throw new SQLException(
+          "Could not find a suitable JDBC driver for database connection URL <%s>"
+              .formatted(connectionUrl));
+    }
+
+    final Driver driver = jdbcDriverOptional.get();
+    return driver.connect(connectionUrl, properties);
+  }
+
+  public JdbcDriverMetadata inspectMetadata(final String connectionUrl) {
+    requireNotBlank(connectionUrl, "No JDBC connection URL provided");
+    final Optional<Driver> jdbcDriverOptional = lookupDriver(connectionUrl);
+    if (jdbcDriverOptional.isEmpty()) {
+      return new JdbcDriverMetadata();
+    }
+
+    final Driver driver = jdbcDriverOptional.get();
+    final String driverClassName = driver.getClass().getName();
+    final JdbcDriver jdbcDriver = cachedDrivers.get(driverClassName);
+    final JdbcDriverMetadata metadata =
+        new JdbcDriverMetadata(jdbcDriver, toJdbcDriverProperties(driver, connectionUrl));
+    return metadata;
+  }
+
+  private Optional<Driver> lookupDriver(final String connectionUrl) {
+    try {
+      final Driver jdbcDriver = DriverManager.getDriver(connectionUrl);
+      return Optional.ofNullable(jdbcDriver);
+    } catch (final SQLException e) {
+      if ("08001".equals(e.getSQLState())) {
+        return Optional.empty();
+      }
+      throw new SQLRuntimeException(
+          "Could not find a suitable JDBC driver for database connection URL <%s>"
+              .formatted(connectionUrl),
+          e);
+    }
   }
 }

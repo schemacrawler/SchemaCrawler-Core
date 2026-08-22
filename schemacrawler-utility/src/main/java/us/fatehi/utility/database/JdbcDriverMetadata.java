@@ -15,10 +15,15 @@ import java.util.Collection;
 import java.util.List;
 
 /** Complete JDBC driver metadata including available connection properties. */
-public record JdbcDriverMetadata(JdbcDriver driver, Collection<JdbcDriverProperty> properties) {
+public record JdbcDriverMetadata(
+    JdbcDriver jdbcDriver, Collection<JdbcDriverPropertyInfo> properties) {
 
   public JdbcDriverMetadata {
-    driver = requireNonNull(driver, "Driver required");
+    jdbcDriver = requireNonNull(jdbcDriver, "Driver required");
     properties = properties == null ? List.of() : List.copyOf(new ArrayList<>(properties));
+  }
+
+  public JdbcDriverMetadata() {
+    this(new JdbcDriver(), null);
   }
 }

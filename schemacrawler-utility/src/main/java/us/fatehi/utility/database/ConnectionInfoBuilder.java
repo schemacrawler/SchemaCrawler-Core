@@ -9,7 +9,6 @@
 package us.fatehi.utility.database;
 
 import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -62,22 +61,6 @@ public final class ConnectionInfoBuilder {
     }
   }
 
-  private static JdbcDriver getJdbcDriver(final String connectionUrl) {
-    if (isBlank(connectionUrl)) {
-      return null;
-    }
-    try {
-      return JdbcDriverRegistry.resolveDriverForUrl(connectionUrl);
-    } catch (final SQLException e) {
-      LOGGER.log(
-          Level.WARNING,
-          new StringFormat(
-              "Could not find a suitable JDBC driver for database connection URL <%s>",
-              connectionUrl, e));
-      return null;
-    }
-  }
-
   private final DatabaseMetaData dbMetaData;
 
   private ConnectionInfoBuilder(final Connection connection) throws SQLException {
@@ -95,28 +78,24 @@ public final class ConnectionInfoBuilder {
 
   public JdbcDriverInformation buildJdbcDriverInformation() throws SQLException {
     final String connectionUrl = getConnectionUrl(dbMetaData);
-    final JdbcDriver jdbcDriver = getJdbcDriver(connectionUrl);
-    final String jdbcDriverClassName;
-    final boolean isJdbcCompliant;
-    if (jdbcDriver != null) {
-      jdbcDriverClassName = jdbcDriver.driverClassName();
-      isJdbcCompliant = jdbcDriver.jdbcCompliant();
+    final JdbcDriverMetadata jdbcDriverMetadata =
+        JdbcDriverRegistry.getRegistry().inspectMetadata(connectionUrl);
+    final JdbcDriver jdbcDriver;
+    if (jdbcDriverMetadata != null) {
+      jdbcDriver = jdbcDriverMetadata.jdbcDriver();
     } else {
-      jdbcDriverClassName = "";
-      isJdbcCompliant = false;
+      jdbcDriver = new JdbcDriver();
     }
 
     return new JdbcDriverInformation(
         getConnectionInfoProperty(() -> dbMetaData.getDriverName(), ""),
-        jdbcDriverClassName,
+        jdbcDriver.driverClassName(),
         getConnectionInfoProperty(() -> dbMetaData.getDriverVersion(), ""),
-        new VersionNumber(
-            getConnectionInfoProperty(() -> dbMetaData.getDriverMajorVersion(), 0),
-            getConnectionInfoProperty(() -> dbMetaData.getDriverMinorVersion(), 0)),
+        jdbcDriver.driverVersionNumber(),
         new VersionNumber(
             getConnectionInfoProperty(() -> dbMetaData.getJDBCMajorVersion(), 0),
             getConnectionInfoProperty(() -> dbMetaData.getJDBCMinorVersion(), 0)),
-        isJdbcCompliant,
+        jdbcDriver.jdbcCompliant(),
         connectionUrl);
   }
 }

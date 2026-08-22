@@ -12,11 +12,10 @@ import static java.util.Comparator.naturalOrder;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
-import java.sql.DriverPropertyInfo;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import schemacrawler.schema.JdbcDriverProperty;
+import us.fatehi.utility.database.JdbcDriverPropertyInfo;
 import us.fatehi.utility.property.AbstractProperty;
 import us.fatehi.utility.property.PropertyName;
 
@@ -30,22 +29,10 @@ final class ImmutableJdbcDriverProperty extends AbstractProperty implements Jdbc
   private final List<String> choices;
   private final boolean required;
 
-  ImmutableJdbcDriverProperty(final DriverPropertyInfo driverPropertyInfo) {
-    this(
-        new us.fatehi.utility.database.JdbcDriverProperty(
-            driverPropertyInfo.name,
-            driverPropertyInfo.description,
-            driverPropertyInfo.required,
-            driverPropertyInfo.value,
-            driverPropertyInfo.choices == null
-                ? List.of()
-                : Arrays.asList(driverPropertyInfo.choices)));
-  }
-
-  ImmutableJdbcDriverProperty(final us.fatehi.utility.database.JdbcDriverProperty driverProperty) {
+  ImmutableJdbcDriverProperty(final JdbcDriverPropertyInfo driverProperty) {
     super(
         new PropertyName(driverProperty.name(), driverProperty.description()),
-        driverProperty.defaultValue());
+        driverProperty.value());
     required = driverProperty.required();
     choices = driverProperty.choices().stream().sorted(naturalOrder()).toList();
   }

@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import us.fatehi.utility.SQLRuntimeException;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.string.StringFormat;
 
@@ -64,6 +65,13 @@ final class SimpleDatabaseConnectionSource extends AbstractDatabaseConnectionSou
 
     // Explicitly set closed flag
     isClosed = false;
+
+    // Attempt to make a connection without adding to the pool
+    try (final Connection connection = getConnection(connectionUrl, jdbcConnectionProperties)) {
+      // No-op
+    } catch (final SQLException e) {
+      throw new SQLRuntimeException("Could not create a database connection", e);
+    }
   }
 
   @Override

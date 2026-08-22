@@ -8,7 +8,7 @@
 
 package us.fatehi.utility.database;
 
-import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.isBlank;
 
 import us.fatehi.utility.property.VersionNumber;
 
@@ -18,14 +18,15 @@ import us.fatehi.utility.property.VersionNumber;
  * <p>Does not expose the internal {@link java.sql.Driver} instance.
  */
 public record JdbcDriver(
-    String driverClassName,
-    VersionNumber driverVersionNumber,
-    VersionNumber jdbcVersionNumber,
-    boolean jdbcCompliant) {
+    String driverClassName, VersionNumber driverVersionNumber, boolean jdbcCompliant) {
 
   public JdbcDriver {
-    driverClassName = requireNonNull(driverClassName, "Driver class name required");
-    driverVersionNumber = requireNonNull(driverVersionNumber, "Driver version number required");
-    jdbcVersionNumber = requireNonNull(jdbcVersionNumber, "JDBC version number required");
+    driverClassName = isBlank(driverClassName) ? "" : driverClassName;
+    driverVersionNumber =
+        driverVersionNumber == null ? new VersionNumber(0, 0) : driverVersionNumber;
+  }
+
+  public JdbcDriver() {
+    this(null, null, false);
   }
 }

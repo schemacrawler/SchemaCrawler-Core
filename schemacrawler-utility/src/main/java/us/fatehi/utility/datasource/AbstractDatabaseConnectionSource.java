@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import us.fatehi.utility.SQLRuntimeException;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.database.JdbcDriverMetadata;
-import us.fatehi.utility.database.JdbcDriverProperty;
+import us.fatehi.utility.database.JdbcDriverPropertyInfo;
 import us.fatehi.utility.database.JdbcDriverRegistry;
 import us.fatehi.utility.string.StringFormat;
 
@@ -43,8 +43,10 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
         List.of("server", "host", "port", "database", "urlx", "user", "password", "url");
     final Properties jdbcConnectionProperties;
     try {
+      final JdbcDriverRegistry jdbcDriverRegistry = JdbcDriverRegistry.getRegistry();
       final Set<String> jdbcDriverProperties =
-          getJdbcDriverProperties(connectionUrl, additionalDriverProperties, skipProperties);
+          getJdbcDriverProperties(
+              jdbcDriverRegistry, connectionUrl, additionalDriverProperties, skipProperties);
 
       jdbcConnectionProperties = new Properties();
       if (user != null) {
@@ -93,6 +95,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     }
 
     try {
+      final JdbcDriverRegistry jdbcDriverRegistry = JdbcDriverRegistry.getRegistry();
       LOGGER.log(
           Level.INFO,
           new StringFormat(
@@ -105,7 +108,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
       // (MySQL Connector/J) may raise an exception other than a
       // SQLException in this case.)
       final Connection connection =
-          JdbcDriverRegistry.createConnection(connectionUrl, jdbcConnectionProperties);
+          jdbcDriverRegistry.createConnection(connectionUrl, jdbcConnectionProperties);
       LOGGER.log(Level.INFO, new StringFormat("Opened database connection <%s>", connection));
       return connection;
     } catch (final SQLException e) {
@@ -117,13 +120,14 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
   }
 
   private static Set<String> getJdbcDriverProperties(
+      final JdbcDriverRegistry jdbcDriverRegistry,
       final String connectionUrl,
       final Set<String> additionalDriverProperties,
       final List<String> skipProperties)
       throws SQLException {
-    final JdbcDriverMetadata metadata = JdbcDriverRegistry.inspectMetadata(connectionUrl);
+    final JdbcDriverMetadata metadata = jdbcDriverRegistry.inspectMetadata(connectionUrl);
     final Set<String> jdbcDriverProperties = new HashSet<>();
-    for (final JdbcDriverProperty driverPropertyInfo : metadata.properties()) {
+    for (final JdbcDriverPropertyInfo driverPropertyInfo : metadata.properties()) {
       final String jdbcPropertyName = driverPropertyInfo.name();
       final String normalizedPropertyName = jdbcPropertyName.toLowerCase();
       if (skipProperties != null && skipProperties.contains(normalizedPropertyName)) {

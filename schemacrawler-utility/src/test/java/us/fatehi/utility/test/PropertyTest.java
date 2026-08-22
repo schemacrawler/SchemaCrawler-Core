@@ -9,8 +9,11 @@
 package us.fatehi.utility.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.Serializable;
 import java.util.List;
@@ -97,8 +100,25 @@ public class PropertyTest {
   }
 
   @Test
+  public void nullPropertyName() {
+    final NullPointerException exception =
+        assertThrows(NullPointerException.class, () -> new PropertyEx(null, "value"));
+    assertThat(exception.getMessage(), is("No property name provided"));
+  }
+
+  @Test
   public void serialize() {
     assertThat(SerializationUtils.clone(property), is(property));
+  }
+
+  @Test
+  public void specificEqualsAndHashCode() {
+    final Property property2 = new PropertyEx(new PropertyName("name"), "value");
+    final Property property3 = new PropertyEx(new PropertyName("other"), "value");
+    assertThat(property, is(equalTo(property2)));
+    assertThat(property, is(not(equalTo(property3))));
+    assertThat(property.hashCode(), is(property2.hashCode()));
+    assertThat(property.hashCode(), is(not(property3.hashCode())));
   }
 
   @Test
