@@ -10,6 +10,7 @@ package us.fatehi.utility.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -69,6 +70,50 @@ public class JdbcDriverPropertyInfoTest {
         new JdbcDriverProperty("username", "database user", true, "scott", List.of());
 
     assertThat(propertyInfo.getValue(), is("scott"));
+  }
+
+  @Test
+  public void requiredPropertyFlag() {
+    final JdbcDriverProperty propertyInfo =
+        new JdbcDriverProperty("username", "database user", true, "scott", List.of());
+
+    assertThat(propertyInfo.isRequired(), is(true));
+  }
+
+  @Test
+  public void toStringWithDescription() {
+    final JdbcDriverProperty propertyInfo =
+        new JdbcDriverProperty(
+            "username", "database user", true, "scott", List.of("scott", "admin"));
+    final String newLine = System.lineSeparator();
+
+    final String expected =
+        "username = scott"
+            + newLine
+            + "database user"
+            + newLine
+            + "  is required? true"
+            + newLine
+            + "  choices: [scott, admin]";
+    assertThat(propertyInfo.toString(), is(expected));
+  }
+
+  @Test
+  public void toStringWithoutDescription() {
+    final JdbcDriverProperty propertyInfo =
+        new JdbcDriverProperty("username", "", false, "scott", List.of());
+
+    assertThat(propertyInfo.toString(), is(containsString("username = scott")));
+    assertThat(propertyInfo.toString(), is(containsString("  is required? false")));
+    assertThat(propertyInfo.toString(), is(containsString("  choices: []")));
+  }
+
+  @Test
+  public void uppercasePasswordNameMasksValue() {
+    final JdbcDriverProperty propertyInfo =
+        new JdbcDriverProperty("PASSWORD", "database password", true, "secret", List.of());
+
+    assertThat(propertyInfo.getValue(), is(nullValue()));
   }
 
   @Test
