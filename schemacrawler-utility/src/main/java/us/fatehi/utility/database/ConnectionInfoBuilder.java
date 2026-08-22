@@ -17,7 +17,6 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.property.VersionNumber;
-import us.fatehi.utility.string.StringFormat;
 
 public final class ConnectionInfoBuilder {
 
@@ -55,8 +54,7 @@ public final class ConnectionInfoBuilder {
     try {
       return dbMetaData.getURL();
     } catch (final SQLException e) {
-      LOGGER.log(
-          Level.WARNING, new StringFormat("Could not obtain the database connection URL", e));
+      LOGGER.log(Level.WARNING, "Could not obtain the database connection URL", e);
       return "";
     }
   }

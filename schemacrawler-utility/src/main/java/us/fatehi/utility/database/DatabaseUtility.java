@@ -13,15 +13,11 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.UtilityLogger;
@@ -108,32 +104,6 @@ public final class DatabaseUtility {
     } catch (final SQLException e) {
       throw new SQLException("%s%n%s".formatted(e.getMessage(), sql), e);
     }
-  }
-
-  /**
-   * Load registered database drivers, and throw exception if any driver cannot be loaded. Cycling
-   * through the service loader and loading driver classes allows for dependencies to be vetted out.
-   *
-   * <p>Do not use DriverManager.getDrivers(), since that swallows exceptions.
-   *
-   * @throws SQLException
-   */
-  public static Collection<Driver> getAvailableJdbcDrivers() throws SQLException {
-    final Collection<Driver> drivers = new ArrayList<>();
-    try {
-      final ServiceLoader<Driver> serviceLoader = ServiceLoader.load(Driver.class);
-      for (final Driver driver : serviceLoader) {
-        drivers.add(driver);
-      }
-    } catch (final Exception | ServiceConfigurationError | LinkageError e) {
-      // Catch errors for missing third-party jars;
-      // other errors (e.g. OutOfMemoryError) are intentionally not caught here
-      throw new SQLException("Could not load database drivers: %s".formatted(e.getMessage()), e);
-    }
-    if (drivers.isEmpty()) {
-      throw new SQLException("No database drivers are available");
-    }
-    return drivers;
   }
 
   public static long readResultsForLong(final String sql, final ResultSet resultSet)

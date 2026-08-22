@@ -95,7 +95,6 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     }
 
     try {
-      final JdbcDriverRegistry jdbcDriverRegistry = JdbcDriverRegistry.getRegistry();
       LOGGER.log(
           Level.INFO,
           new StringFormat(
@@ -107,6 +106,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
       // will accept the connection URL, and some non-compliant drivers
       // (MySQL Connector/J) may raise an exception other than a
       // SQLException in this case.)
+      final JdbcDriverRegistry jdbcDriverRegistry = JdbcDriverRegistry.getRegistry();
       final Connection connection =
           jdbcDriverRegistry.createConnection(connectionUrl, jdbcConnectionProperties);
       LOGGER.log(Level.INFO, new StringFormat("Opened database connection <%s>", connection));

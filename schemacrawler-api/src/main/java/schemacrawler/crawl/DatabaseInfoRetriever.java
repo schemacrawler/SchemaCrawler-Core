@@ -192,8 +192,10 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
 
       final JdbcDriverRegistry jdbcDriverRegistry = JdbcDriverRegistry.getRegistry();
       final JdbcDriverMetadata jdbcDriverMetadata = jdbcDriverRegistry.inspectMetadata(url);
-      if (jdbcDriverMetadata == null) {
-        throw new SQLException("No JDBC driver found");
+      if (jdbcDriverMetadata == null
+          || isBlank(jdbcDriverMetadata.jdbcDriver().driverClassName())) {
+        LOGGER.log(Level.INFO, "No JDBC driver found");
+        return;
       }
 
       driverInfo.addJdbcDriverProperties(jdbcDriverMetadata.properties());

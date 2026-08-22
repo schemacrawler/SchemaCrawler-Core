@@ -9,6 +9,7 @@
 package us.fatehi.utility.database;
 
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.sql.Connection;
@@ -65,7 +66,7 @@ public final class JdbcDriverRegistry {
                         Level.FINE, new StringFormat("Found JDBC driver <%s>", driverClassName));
                   } else {
                     LOGGER.log(
-                        Level.FINE,
+                        Level.WARNING,
                         new StringFormat("Skipping duplicate JDBC driver <%s>", driverClassName));
                   }
                 } catch (final Exception | ServiceConfigurationError | LinkageError e) {
@@ -114,7 +115,7 @@ public final class JdbcDriverRegistry {
         return jdbcDriverProperties;
       }
       for (final DriverPropertyInfo propertyInfo : propertyInfos) {
-        if (propertyInfo == null) {
+        if (propertyInfo == null || isBlank(propertyInfo.name)) {
           continue;
         }
         final List<String> choices;
