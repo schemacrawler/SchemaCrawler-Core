@@ -107,9 +107,12 @@ public final class JdbcDriverRegistry {
       final Driver driver, final String connectionUrl) {
     requireNonNull(driver, "No JDBC driver provided");
     try {
+      final List<JdbcDriverProperty> jdbcDriverProperties = new ArrayList<>();
       final DriverPropertyInfo[] propertyInfos =
           driver.getPropertyInfo(connectionUrl, new Properties());
-      final List<JdbcDriverProperty> jdbcDriverProperties = new ArrayList<>();
+      if (propertyInfos == null) {
+        return jdbcDriverProperties;
+      }
       for (final DriverPropertyInfo propertyInfo : propertyInfos) {
         if (propertyInfo == null) {
           continue;
