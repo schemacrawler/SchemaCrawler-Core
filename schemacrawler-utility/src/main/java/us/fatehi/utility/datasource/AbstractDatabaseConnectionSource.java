@@ -11,9 +11,6 @@ package us.fatehi.utility.datasource;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +22,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.SQLRuntimeException;
 import us.fatehi.utility.database.DatabaseUtility;
+import us.fatehi.utility.database.JdbcDriverMetadata;
+import us.fatehi.utility.database.JdbcDriverProperty;
+import us.fatehi.utility.database.JdbcDriverRegistry;
 import us.fatehi.utility.string.StringFormat;
 
 abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSource {
@@ -43,10 +43,8 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
         List.of("server", "host", "port", "database", "urlx", "user", "password", "url");
     final Properties jdbcConnectionProperties;
     try {
-      final Driver jdbcDriver = getJdbcDriver(connectionUrl);
       final Set<String> jdbcDriverProperties =
-          getJdbcDriverProperties(
-              jdbcDriver, connectionUrl, additionalDriverProperties, skipProperties);
+          getJdbcDriverProperties(connectionUrl, additionalDriverProperties, skipProperties);
 
       jdbcConnectionProperties = new Properties();
       if (user != null) {
@@ -106,8 +104,8 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
       // will accept the connection URL, and some non-compliant drivers
       // (MySQL Connector/J) may raise an exception other than a
       // SQLException in this case.)
-      final Driver driver = getJdbcDriver(connectionUrl);
-      final Connection connection = driver.connect(connectionUrl, jdbcConnectionProperties);
+      final Connection connection =
+          JdbcDriverRegistry.createConnection(connectionUrl, jdbcConnectionProperties);
       LOGGER.log(Level.INFO, new StringFormat("Opened database connection <%s>", connection));
       return connection;
     } catch (final SQLException e) {
@@ -118,32 +116,20 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     }
   }
 
-  private static Driver getJdbcDriver(final String connectionUrl) throws SQLException {
-    try {
-      return DriverManager.getDriver(connectionUrl);
-    } catch (final SQLException e) {
-      throw new SQLException(
-          "Could not find a suitable JDBC driver for database connection URL <%s>"
-              .formatted(connectionUrl),
-          e);
-    }
-  }
-
   private static Set<String> getJdbcDriverProperties(
-      final Driver jdbcDriver,
       final String connectionUrl,
       final Set<String> additionalDriverProperties,
       final List<String> skipProperties)
       throws SQLException {
-    final DriverPropertyInfo[] propertyInfo =
-        jdbcDriver.getPropertyInfo(connectionUrl, new Properties());
+    final JdbcDriverMetadata metadata = JdbcDriverRegistry.inspectMetadata(connectionUrl);
     final Set<String> jdbcDriverProperties = new HashSet<>();
-    for (final DriverPropertyInfo driverPropertyInfo : propertyInfo) {
-      final String jdbcPropertyName = driverPropertyInfo.name;
-      if (skipProperties != null && skipProperties.contains(jdbcPropertyName)) {
+    for (final JdbcDriverProperty driverPropertyInfo : metadata.properties()) {
+      final String jdbcPropertyName = driverPropertyInfo.name();
+      final String normalizedPropertyName = jdbcPropertyName.toLowerCase();
+      if (skipProperties != null && skipProperties.contains(normalizedPropertyName)) {
         continue;
       }
-      jdbcDriverProperties.add(jdbcPropertyName.toLowerCase());
+      jdbcDriverProperties.add(normalizedPropertyName);
     }
     if (additionalDriverProperties != null) {
       additionalDriverProperties.stream()

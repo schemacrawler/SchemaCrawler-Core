@@ -31,17 +31,23 @@ final class ImmutableJdbcDriverProperty extends AbstractProperty implements Jdbc
   private final boolean required;
 
   ImmutableJdbcDriverProperty(final DriverPropertyInfo driverPropertyInfo) {
-    super(
-        new PropertyName(driverPropertyInfo.name, driverPropertyInfo.description),
-        driverPropertyInfo.value);
-    required = driverPropertyInfo.required;
+    this(
+        new us.fatehi.utility.database.JdbcDriverProperty(
+            driverPropertyInfo.name,
+            driverPropertyInfo.description,
+            driverPropertyInfo.required,
+            driverPropertyInfo.value,
+            driverPropertyInfo.choices == null
+                ? List.of()
+                : Arrays.asList(driverPropertyInfo.choices)));
+  }
 
-    if (driverPropertyInfo.choices == null) {
-      choices = List.of();
-    } else {
-      choices = Arrays.asList(driverPropertyInfo.choices);
-      choices.sort(naturalOrder());
-    }
+  ImmutableJdbcDriverProperty(final us.fatehi.utility.database.JdbcDriverProperty driverProperty) {
+    super(
+        new PropertyName(driverProperty.name(), driverProperty.description()),
+        driverProperty.defaultValue());
+    required = driverProperty.required();
+    choices = driverProperty.choices().stream().sorted(naturalOrder()).toList();
   }
 
   /** {@inheritDoc} */

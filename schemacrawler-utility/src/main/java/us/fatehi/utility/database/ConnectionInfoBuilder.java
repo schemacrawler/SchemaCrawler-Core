@@ -13,8 +13,6 @@ import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
@@ -64,12 +62,12 @@ public final class ConnectionInfoBuilder {
     }
   }
 
-  private static Driver getJdbcDriver(final String connectionUrl) {
+  private static JdbcDriver getJdbcDriver(final String connectionUrl) {
     if (isBlank(connectionUrl)) {
       return null;
     }
     try {
-      return DriverManager.getDriver(connectionUrl);
+      return JdbcDriverRegistry.resolveDriverForUrl(connectionUrl);
     } catch (final SQLException e) {
       LOGGER.log(
           Level.WARNING,
@@ -97,11 +95,11 @@ public final class ConnectionInfoBuilder {
 
   public JdbcDriverInformation buildJdbcDriverInformation() throws SQLException {
     final String connectionUrl = getConnectionUrl(dbMetaData);
-    final Driver jdbcDriver = getJdbcDriver(connectionUrl);
+    final JdbcDriver jdbcDriver = getJdbcDriver(connectionUrl);
     final String jdbcDriverClassName;
     final boolean isJdbcCompliant;
     if (jdbcDriver != null) {
-      jdbcDriverClassName = jdbcDriver.getClass().getName();
+      jdbcDriverClassName = jdbcDriver.driverClassName();
       isJdbcCompliant = jdbcDriver.jdbcCompliant();
     } else {
       jdbcDriverClassName = "";
