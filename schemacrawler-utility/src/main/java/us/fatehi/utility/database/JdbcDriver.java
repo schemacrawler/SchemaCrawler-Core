@@ -10,7 +10,6 @@ package us.fatehi.utility.database;
 
 import static java.util.Objects.requireNonNull;
 
-import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.property.VersionNumber;
 
 /**
@@ -28,14 +27,5 @@ public record JdbcDriver(
     driverClassName = requireNonNull(driverClassName, "Driver class name required");
     driverVersionNumber = requireNonNull(driverVersionNumber, "Driver version number required");
     jdbcVersionNumber = requireNonNull(jdbcVersionNumber, "JDBC version number required");
-  }
-
-  public PropertyName toPropertyName() {
-    return new PropertyName(driverClassName, driverVersionNumber.toString());
-  }
-
-  @Override
-  public String toString() {
-    return toPropertyName().toString();
   }
 }

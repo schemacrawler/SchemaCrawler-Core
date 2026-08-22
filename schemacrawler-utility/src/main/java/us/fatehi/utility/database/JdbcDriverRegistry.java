@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import us.fatehi.utility.UtilityMarker;
+import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.property.VersionNumber;
 import us.fatehi.utility.string.StringFormat;
 
@@ -36,6 +37,17 @@ public final class JdbcDriverRegistry {
   private static final Object LOCK = new Object();
 
   private static volatile Collection<JdbcDriver> cachedDrivers;
+
+  public static Collection<PropertyName> availableJDBCDrivers() {
+    final Collection<JdbcDriver> availableDrivers = discoverAvailableDrivers();
+    final Collection<PropertyName> availableJDBCDrivers = new ArrayList<>();
+    for (final JdbcDriver jdbcDriver : availableDrivers) {
+      availableJDBCDrivers.add(
+          new PropertyName(
+              jdbcDriver.driverClassName(), jdbcDriver.driverVersionNumber().toString()));
+    }
+    return availableJDBCDrivers;
+  }
 
   public static Connection createConnection(
       final String connectionUrl, final java.util.Properties connectionProperties)
