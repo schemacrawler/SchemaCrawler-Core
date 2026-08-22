@@ -46,14 +46,7 @@ final class OfflineCatalogLoader extends AbstractCatalogLoader<OfflineCatalogLoa
 
     final Catalog catalog;
     try (final Connection connection = getConnectionSource().get(); ) {
-      if (connection == null) {
-        return;
-      }
-
-      final boolean isOfflineConnection =
-          connection instanceof OfflineConnection
-              || connection.isWrapperFor(OfflineConnection.class);
-      if (!isOfflineConnection) {
+      if (!isOfflineConnection(connection)) {
         return;
       }
 
@@ -84,5 +77,23 @@ final class OfflineCatalogLoader extends AbstractCatalogLoader<OfflineCatalogLoa
   @Override
   public boolean usesConnection() {
     return true;
+  }
+
+  /**
+   * Some badly behaved drivers (such as Apache Hive) do not implement `isWrapperFor` cleanly, so we
+   * capture and log the exception.
+   *
+   * @param connection Database connection
+   * @return Whether this is an offline connection
+   */
+  private boolean isOfflineConnection(final Connection connection) {
+    try {
+      return connection != null
+          && (connection instanceof OfflineConnection
+              || connection.isWrapperFor(OfflineConnection.class));
+    } catch (final Exception e) {
+      LOGGER.log(Level.INFO, e.getMessage(), e);
+      return false;
+    }
   }
 }

@@ -2,6 +2,12 @@
 
 SchemaCrawler Core release notes.
 
+<a name="v17.14.1"></a>
+## Release v17.14.1 - 2026-08-22
+
+- Do not distribute Apache Hive JDBC driver
+
+
 <a name="v17.12.3"></a>
 ## Release v17.12.3 - 2026-08-02
 
