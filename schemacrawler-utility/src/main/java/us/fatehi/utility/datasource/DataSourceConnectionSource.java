@@ -56,4 +56,9 @@ final class DataSourceConnectionSource extends AbstractDatabaseConnectionSource 
     }
     return true;
   }
+
+  @Override
+  public String toString() {
+    return dataSource.toString();
+  }
 }
