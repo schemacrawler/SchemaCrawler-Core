@@ -63,7 +63,7 @@ public class JdbcDriverRegistryTest {
     assertThat(metadata.jdbcDriver().driverClassName(), is(TestDatabaseDriver.class.getName()));
     final List<String> propertyNames =
         metadata.properties().stream()
-            .map(us.fatehi.utility.database.JdbcDriverPropertyInfo::name)
+            .map(us.fatehi.utility.database.JdbcDriverProperty::name)
             .collect(Collectors.toList());
     assertThat(propertyNames, hasItem("publishedJdbcDriverProperty"));
     assertThat(metadata.properties(), is(notNullValue()));

@@ -34,7 +34,6 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import us.fatehi.utility.UtilityLogger;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.database.JdbcDriverMetadata;
-import us.fatehi.utility.database.JdbcDriverPropertyInfo;
 import us.fatehi.utility.database.JdbcDriverRegistry;
 import us.fatehi.utility.property.Property;
 import us.fatehi.utility.string.StringFormat;
@@ -197,9 +196,8 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
         throw new SQLException("No JDBC driver found");
       }
 
-      for (final JdbcDriverPropertyInfo jdbcDriverProperty : jdbcDriverMetadata.properties()) {
-        driverInfo.addJdbcDriverProperty(new ImmutableJdbcDriverProperty(jdbcDriverProperty));
-      }
+      driverInfo.addJdbcDriverProperties(jdbcDriverMetadata.properties());
+
     } catch (final SQLException e) {
       LOGGER.log(Level.WARNING, "Could not obtain additional JDBC driver information", e);
     }

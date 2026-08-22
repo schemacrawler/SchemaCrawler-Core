@@ -103,13 +103,13 @@ public final class JdbcDriverRegistry {
         driver.jdbcCompliant());
   }
 
-  private static Collection<JdbcDriverPropertyInfo> toJdbcDriverProperties(
+  private static Collection<JdbcDriverProperty> toJdbcDriverProperties(
       final Driver driver, final String connectionUrl) {
     requireNonNull(driver, "No JDBC driver provided");
     try {
       final DriverPropertyInfo[] propertyInfos =
           driver.getPropertyInfo(connectionUrl, new Properties());
-      final List<JdbcDriverPropertyInfo> jdbcDriverProperties = new ArrayList<>();
+      final List<JdbcDriverProperty> jdbcDriverProperties = new ArrayList<>();
       for (final DriverPropertyInfo propertyInfo : propertyInfos) {
         if (propertyInfo == null) {
           continue;
@@ -120,8 +120,8 @@ public final class JdbcDriverRegistry {
         } else {
           choices = Arrays.asList(propertyInfo.choices);
         }
-        final JdbcDriverPropertyInfo jdbcDriverPropertyInfo =
-            new JdbcDriverPropertyInfo(
+        final JdbcDriverProperty jdbcDriverPropertyInfo =
+            new JdbcDriverProperty(
                 propertyInfo.name,
                 propertyInfo.description,
                 propertyInfo.required,
@@ -182,7 +182,12 @@ public final class JdbcDriverRegistry {
 
     final Driver driver = jdbcDriverOptional.get();
     final String driverClassName = driver.getClass().getName();
-    final JdbcDriver jdbcDriver = cachedDrivers.get(driverClassName);
+    final JdbcDriver jdbcDriver;
+    if (cachedDrivers.containsKey(driverClassName)) {
+      jdbcDriver = cachedDrivers.get(driverClassName);
+    } else {
+      jdbcDriver = new JdbcDriver();
+    }
     final JdbcDriverMetadata metadata =
         new JdbcDriverMetadata(jdbcDriver, toJdbcDriverProperties(driver, connectionUrl));
     return metadata;

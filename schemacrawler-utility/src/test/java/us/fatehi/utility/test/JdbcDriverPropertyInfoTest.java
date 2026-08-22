@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.database.JdbcDriverPropertyInfo;
+import us.fatehi.utility.database.JdbcDriverProperty;
 
 public class JdbcDriverPropertyInfoTest {
 
@@ -28,8 +28,8 @@ public class JdbcDriverPropertyInfoTest {
     choices.add("a");
     choices.add("b");
 
-    final JdbcDriverPropertyInfo propertyInfo =
-        new JdbcDriverPropertyInfo("mode", "connection mode", false, "a", choices);
+    final JdbcDriverProperty propertyInfo =
+        new JdbcDriverProperty("mode", "connection mode", false, "a", choices);
 
     choices.add("c");
     assertThat(propertyInfo.choices(), contains("a", "b"));
@@ -39,8 +39,8 @@ public class JdbcDriverPropertyInfoTest {
 
   @Test
   public void descriptionDefaultsToEmptyWhenBlank() {
-    final JdbcDriverPropertyInfo propertyInfo =
-        new JdbcDriverPropertyInfo("mode", "  ", false, "default", null);
+    final JdbcDriverProperty propertyInfo =
+        new JdbcDriverProperty("mode", "  ", false, "default", null);
 
     assertThat(propertyInfo.getDescription(), is(""));
     assertThat(propertyInfo.getName(), is("mode"));
@@ -48,8 +48,8 @@ public class JdbcDriverPropertyInfoTest {
 
   @Test
   public void nullChoicesBecomeEmpty() {
-    final JdbcDriverPropertyInfo propertyInfo =
-        new JdbcDriverPropertyInfo("schema", "schema name", false, "public", null);
+    final JdbcDriverProperty propertyInfo =
+        new JdbcDriverProperty("schema", "schema name", false, "public", null);
 
     assertThat(propertyInfo.choices(), is(notNullValue()));
     assertThat(propertyInfo.choices().isEmpty(), is(true));
@@ -57,16 +57,16 @@ public class JdbcDriverPropertyInfoTest {
 
   @Test
   public void passwordLikeNameMasksValue() {
-    final JdbcDriverPropertyInfo propertyInfo =
-        new JdbcDriverPropertyInfo("dbPassword", "database password", true, "secret", List.of());
+    final JdbcDriverProperty propertyInfo =
+        new JdbcDriverProperty("dbPassword", "database password", true, "secret", List.of());
 
     assertThat(propertyInfo.getValue(), is(nullValue()));
   }
 
   @Test
   public void regularNameRetainsValue() {
-    final JdbcDriverPropertyInfo propertyInfo =
-        new JdbcDriverPropertyInfo("username", "database user", true, "scott", List.of());
+    final JdbcDriverProperty propertyInfo =
+        new JdbcDriverProperty("username", "database user", true, "scott", List.of());
 
     assertThat(propertyInfo.getValue(), is("scott"));
   }
@@ -75,9 +75,9 @@ public class JdbcDriverPropertyInfoTest {
   public void requiresPropertyName() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> new JdbcDriverPropertyInfo("  ", "description", false, "value", List.of()));
+        () -> new JdbcDriverProperty("  ", "description", false, "value", List.of()));
     assertThrows(
         IllegalArgumentException.class,
-        () -> new JdbcDriverPropertyInfo(null, "description", false, "value", List.of()));
+        () -> new JdbcDriverProperty(null, "description", false, "value", List.of()));
   }
 }

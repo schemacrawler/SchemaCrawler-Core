@@ -167,23 +167,23 @@ updates are detected for TYPE_SCROLL_INSENSITIVE result sets = true
 updates are detected for TYPE_SCROLL_SENSITIVE result sets = true
 uses local file per table = false
 uses local files = false
-connection url=jdbc:hsqldb:hsql://0.0.0.0:53981/schemacrawler53981
+connection url=jdbc:hsqldb:hsql://0.0.0.0:59895/schemacrawler59895
 driver class=org.hsqldb.jdbc.JDBCDriver
 default_schema = false
   is required? false
-  choices: [false, true]
+  choices: [true, false]
 get_column_name = true
   is required? false
-  choices: [false, true]
+  choices: [true, false]
 ifexists = false
   is required? false
-  choices: [false, true]
+  choices: [true, false]
 password = null
   is required? true
   choices: []
 shutdown = false
   is required? false
-  choices: [false, true]
+  choices: [true, false]
 user = null
   is required? true
   choices: []

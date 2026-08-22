@@ -15,8 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 /** Complete JDBC driver metadata including available connection properties. */
-public record JdbcDriverMetadata(
-    JdbcDriver jdbcDriver, Collection<JdbcDriverPropertyInfo> properties) {
+public record JdbcDriverMetadata(JdbcDriver jdbcDriver, Collection<JdbcDriverProperty> properties) {
 
   public JdbcDriverMetadata {
     jdbcDriver = requireNonNull(jdbcDriver, "Driver required");

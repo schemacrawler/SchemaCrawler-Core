@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import us.fatehi.utility.SQLRuntimeException;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.database.JdbcDriverMetadata;
-import us.fatehi.utility.database.JdbcDriverPropertyInfo;
+import us.fatehi.utility.database.JdbcDriverProperty;
 import us.fatehi.utility.database.JdbcDriverRegistry;
 import us.fatehi.utility.string.StringFormat;
 
@@ -127,7 +127,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
       throws SQLException {
     final JdbcDriverMetadata metadata = jdbcDriverRegistry.inspectMetadata(connectionUrl);
     final Set<String> jdbcDriverProperties = new HashSet<>();
-    for (final JdbcDriverPropertyInfo driverPropertyInfo : metadata.properties()) {
+    for (final JdbcDriverProperty driverPropertyInfo : metadata.properties()) {
       final String jdbcPropertyName = driverPropertyInfo.name();
       final String normalizedPropertyName = jdbcPropertyName.toLowerCase();
       if (skipProperties != null && skipProperties.contains(normalizedPropertyName)) {
