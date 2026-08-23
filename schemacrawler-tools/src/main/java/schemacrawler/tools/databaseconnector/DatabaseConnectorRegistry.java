@@ -46,11 +46,36 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
     return registrySingleton;
   }
 
+  private static void addDatabaseConnector(
+      final DatabaseConnector databaseConnector,
+      final Map<String, DatabaseConnector> databaseConnectorRegistry) {
+    final String databaseSystemIdentifier =
+        databaseConnector.getDatabaseServerType().getDatabaseSystemIdentifier();
+    if (databaseConnectorRegistry.containsKey(databaseSystemIdentifier)) {
+      LOGGER.log(
+          Level.WARNING,
+          new StringFormat(
+              "Skipping database connector, %s=%s (already registered)",
+              databaseSystemIdentifier, databaseConnector.getClass().getName()));
+      return;
+    }
+    LOGGER.log(
+        Level.CONFIG,
+        new StringFormat(
+            "Loading database connector, %s=%s",
+            databaseSystemIdentifier, databaseConnector.getClass().getName()));
+    databaseConnectorRegistry.put(databaseSystemIdentifier, databaseConnector);
+
+    // Special case: MariaDB is handled by the MySQL plugin
+    if ("mysql".equals(databaseSystemIdentifier)) {
+      databaseConnectorRegistry.put("mariadb", databaseConnector);
+    }
+  }
+
   private static Map<String, DatabaseConnector> loadDatabaseConnectorRegistry() {
 
     // Use thread-safe map
     final Map<String, DatabaseConnector> databaseConnectorRegistry = new ConcurrentHashMap<>();
-    final List<DatabaseConnector> databaseConnectors = new ArrayList<>();
     final List<DatabaseConnectorBundle> databaseConnectorBundles = new ArrayList<>();
 
     try {
@@ -59,9 +84,12 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
               DatabaseConnector.class, DatabaseConnectorRegistry.class.getClassLoader());
       for (final DatabaseConnector databaseConnector : serviceLoader) {
         if (databaseConnector instanceof final DatabaseConnectorBundle databaseConnectorBundle) {
+          // Save the bundle for later processing
+          // We do not want lightweight bundles to override connectors that are implemented with
+          // code
           databaseConnectorBundles.add(databaseConnectorBundle);
         } else {
-          databaseConnectors.add(databaseConnector);
+          addDatabaseConnector(databaseConnector, databaseConnectorRegistry);
         }
       }
     } catch (final Exception | ServiceConfigurationError | LinkageError e) {
@@ -70,39 +98,10 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
       throw new InternalRuntimeException("Could not load database connector registry", e);
     }
 
-    for (final DatabaseConnector databaseConnector : databaseConnectors) {
-      final String databaseSystemIdentifier =
-          databaseConnector.getDatabaseServerType().getDatabaseSystemIdentifier();
-
-      LOGGER.log(
-          Level.CONFIG,
-          new StringFormat(
-              "Loading database connector, %s=%s",
-              databaseSystemIdentifier, databaseConnector.getClass().getName()));
-      databaseConnectorRegistry.put(databaseSystemIdentifier, databaseConnector);
-    }
-
     for (final DatabaseConnectorBundle databaseConnectorBundle : databaseConnectorBundles) {
       for (final DatabaseConnector databaseConnector :
           databaseConnectorBundle.getDatabaseConnectors()) {
-        final String databaseSystemIdentifier =
-            databaseConnector.getDatabaseServerType().getDatabaseSystemIdentifier();
-
-        if (databaseConnectorRegistry.containsKey(databaseSystemIdentifier)) {
-          LOGGER.log(
-              Level.WARNING,
-              new StringFormat(
-                  "Skipping database connector, %s=%s (already registered)",
-                  databaseSystemIdentifier, databaseConnector.getClass().getName()));
-          continue;
-        }
-
-        LOGGER.log(
-            Level.CONFIG,
-            new StringFormat(
-                "Loading database connector, %s=%s",
-                databaseSystemIdentifier, databaseConnector.getClass().getName()));
-        databaseConnectorRegistry.put(databaseSystemIdentifier, databaseConnector);
+        addDatabaseConnector(databaseConnector, databaseConnectorRegistry);
       }
     }
 
@@ -126,13 +125,11 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
   }
 
   public DatabaseConnector getDatabaseConnector(final String databaseSystemIdentifier) {
-    String lookupDatabaseSystemIdentifier = databaseSystemIdentifier;
-    if ("mariadb".equals(databaseSystemIdentifier)) {
-      // Special case: MariaDB is handled by the MySQL plugin
-      lookupDatabaseSystemIdentifier = "mysql";
+    if (isBlank(databaseSystemIdentifier)) {
+      return UNKNOWN;
     }
-    if (hasDatabaseSystemIdentifier(lookupDatabaseSystemIdentifier)) {
-      return databaseConnectorRegistry.get(lookupDatabaseSystemIdentifier);
+    if (hasDatabaseSystemIdentifier(databaseSystemIdentifier)) {
+      return databaseConnectorRegistry.get(databaseSystemIdentifier);
     }
     return UNKNOWN;
   }
