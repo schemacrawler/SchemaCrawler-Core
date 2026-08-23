@@ -25,7 +25,6 @@ public final class TestDatabaseConnectorBundle extends DatabaseConnector
     final PluginCommand pluginCommand = PluginCommand.newDatabasePluginCommand(dbServerType);
     return DatabaseConnectorOptionsBuilder.builder(dbServerType)
         .withHelpCommand(pluginCommand)
-        .withUrlStartsWith("jdbc:%s:".formatted(dbServerType.getDatabaseSystemIdentifier()))
         .withDatabaseConnectionSourceBuilder(
             () ->
                 DatabaseConnectionSourceBuilder.builder(

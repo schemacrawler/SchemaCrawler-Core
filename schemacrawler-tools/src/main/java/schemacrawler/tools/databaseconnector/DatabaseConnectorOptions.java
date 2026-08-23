@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import java.sql.Connection;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
@@ -25,7 +24,6 @@ import us.fatehi.utility.datasource.DatabaseServerType;
 
 public record DatabaseConnectorOptions(
     DatabaseServerType dbServerType,
-    Predicate<String> supportsUrl,
     BiConsumer<InformationSchemaViewsBuilder, Connection> informationSchemaViewsBuildProcess,
     BiConsumer<SchemaRetrievalOptionsBuilder, Connection> schemaRetrievalOptionsBuildProcess,
     Consumer<LimitOptionsBuilder> limitOptionsBuildProcess,
@@ -35,7 +33,6 @@ public record DatabaseConnectorOptions(
 
   public DatabaseConnectorOptions {
     requireNonNull(dbServerType, "Database server type not provided");
-    requireNonNull(supportsUrl, "Supports URL predicate not provided");
     requireNonNull(
         informationSchemaViewsBuildProcess, "Information schema views builder not provided");
     requireNonNull(
