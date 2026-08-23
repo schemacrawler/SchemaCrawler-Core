@@ -18,9 +18,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.DriverPropertyInfo;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -29,7 +26,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schemacrawler.InformationSchemaViews;
@@ -37,6 +33,8 @@ import schemacrawler.schemacrawler.Query;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import us.fatehi.utility.UtilityLogger;
 import us.fatehi.utility.database.DatabaseUtility;
+import us.fatehi.utility.database.JdbcDriverMetadata;
+import us.fatehi.utility.database.JdbcDriverRegistry;
 import us.fatehi.utility.property.Property;
 import us.fatehi.utility.string.StringFormat;
 
@@ -192,15 +190,16 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
       final DatabaseMetaData dbMetaData = connection.getMetaData();
       final String url = dbMetaData.getURL();
 
-      final Driver jdbcDriver = DriverManager.getDriver(dbMetaData.getURL());
-      if (jdbcDriver == null) {
-        throw new SQLException("No JDBC driver found");
+      final JdbcDriverRegistry jdbcDriverRegistry = JdbcDriverRegistry.getRegistry();
+      final JdbcDriverMetadata jdbcDriverMetadata = jdbcDriverRegistry.inspectMetadata(url);
+      if (jdbcDriverMetadata == null
+          || isBlank(jdbcDriverMetadata.jdbcDriver().driverClassName())) {
+        LOGGER.log(Level.INFO, "No JDBC driver found");
+        return;
       }
 
-      final DriverPropertyInfo[] propertyInfo = jdbcDriver.getPropertyInfo(url, new Properties());
-      for (final DriverPropertyInfo driverPropertyInfo : propertyInfo) {
-        driverInfo.addJdbcDriverProperty(new ImmutableJdbcDriverProperty(driverPropertyInfo));
-      }
+      driverInfo.addJdbcDriverProperties(jdbcDriverMetadata.properties());
+
     } catch (final SQLException e) {
       LOGGER.log(Level.WARNING, "Could not obtain additional JDBC driver information", e);
     }

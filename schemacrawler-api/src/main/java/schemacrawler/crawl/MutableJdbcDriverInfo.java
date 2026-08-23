@@ -17,9 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import schemacrawler.schema.JdbcDriverInfo;
-import schemacrawler.schema.JdbcDriverProperty;
 import schemacrawler.schemacrawler.ModelImplementation;
 import us.fatehi.utility.database.JdbcDriverInformation;
+import us.fatehi.utility.database.JdbcDriverProperty;
 import us.fatehi.utility.property.BaseProductVersion;
 import us.fatehi.utility.property.VersionNumber;
 
@@ -34,7 +34,7 @@ final class MutableJdbcDriverInfo extends BaseProductVersion implements JdbcDriv
 
   private final JdbcDriverInformation jdbcDriverInformation;
   // Mutable properties collection
-  private final Set<ImmutableJdbcDriverProperty> jdbcDriverProperties;
+  private final Set<JdbcDriverProperty> jdbcDriverProperties;
 
   public MutableJdbcDriverInfo(final JdbcDriverInformation jdbcDriverInformation) {
     super(jdbcDriverInformation);
@@ -89,12 +89,9 @@ final class MutableJdbcDriverInfo extends BaseProductVersion implements JdbcDriv
     return jdbcDriverInformation.toString();
   }
 
-  /**
-   * Adds a JDBC driver property.
-   *
-   * @param jdbcDriverProperty JDBC driver property
-   */
-  void addJdbcDriverProperty(final ImmutableJdbcDriverProperty jdbcDriverProperty) {
-    jdbcDriverProperties.add(jdbcDriverProperty);
+  void addJdbcDriverProperties(Collection<JdbcDriverProperty> properties) {
+    if (properties != null) {
+      jdbcDriverProperties.addAll(properties);
+    }
   }
 }

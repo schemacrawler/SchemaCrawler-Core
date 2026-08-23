@@ -9,18 +9,14 @@
 package us.fatehi.utility.database;
 
 import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.property.VersionNumber;
-import us.fatehi.utility.string.StringFormat;
 
 public final class ConnectionInfoBuilder {
 
@@ -58,25 +54,8 @@ public final class ConnectionInfoBuilder {
     try {
       return dbMetaData.getURL();
     } catch (final SQLException e) {
-      LOGGER.log(
-          Level.WARNING, new StringFormat("Could not obtain the database connection URL", e));
+      LOGGER.log(Level.WARNING, "Could not obtain the database connection URL", e);
       return "";
-    }
-  }
-
-  private static Driver getJdbcDriver(final String connectionUrl) {
-    if (isBlank(connectionUrl)) {
-      return null;
-    }
-    try {
-      return DriverManager.getDriver(connectionUrl);
-    } catch (final SQLException e) {
-      LOGGER.log(
-          Level.WARNING,
-          new StringFormat(
-              "Could not find a suitable JDBC driver for database connection URL <%s>",
-              connectionUrl, e));
-      return null;
     }
   }
 
@@ -97,28 +76,24 @@ public final class ConnectionInfoBuilder {
 
   public JdbcDriverInformation buildJdbcDriverInformation() throws SQLException {
     final String connectionUrl = getConnectionUrl(dbMetaData);
-    final Driver jdbcDriver = getJdbcDriver(connectionUrl);
-    final String jdbcDriverClassName;
-    final boolean isJdbcCompliant;
-    if (jdbcDriver != null) {
-      jdbcDriverClassName = jdbcDriver.getClass().getName();
-      isJdbcCompliant = jdbcDriver.jdbcCompliant();
+    final JdbcDriverMetadata jdbcDriverMetadata =
+        JdbcDriverRegistry.getRegistry().inspectMetadata(connectionUrl);
+    final JdbcDriver jdbcDriver;
+    if (jdbcDriverMetadata != null) {
+      jdbcDriver = jdbcDriverMetadata.jdbcDriver();
     } else {
-      jdbcDriverClassName = "";
-      isJdbcCompliant = false;
+      jdbcDriver = new JdbcDriver();
     }
 
     return new JdbcDriverInformation(
         getConnectionInfoProperty(() -> dbMetaData.getDriverName(), ""),
-        jdbcDriverClassName,
+        jdbcDriver.driverClassName(),
         getConnectionInfoProperty(() -> dbMetaData.getDriverVersion(), ""),
-        new VersionNumber(
-            getConnectionInfoProperty(() -> dbMetaData.getDriverMajorVersion(), 0),
-            getConnectionInfoProperty(() -> dbMetaData.getDriverMinorVersion(), 0)),
+        jdbcDriver.driverVersionNumber(),
         new VersionNumber(
             getConnectionInfoProperty(() -> dbMetaData.getJDBCMajorVersion(), 0),
             getConnectionInfoProperty(() -> dbMetaData.getJDBCMinorVersion(), 0)),
-        isJdbcCompliant,
+        jdbcDriver.jdbcCompliant(),
         connectionUrl);
   }
 }

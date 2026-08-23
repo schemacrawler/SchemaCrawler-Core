@@ -86,7 +86,7 @@ public final class DatabaseConnectorUtility {
     try {
       url = connection.getMetaData().getURL();
     } catch (final SQLException e) {
-      LOGGER.log(Level.CONFIG, "Cannot get connection URL");
+      LOGGER.log(Level.CONFIG, "Could not obtain the database connection URL");
       return "";
     }
     return url;
