@@ -141,7 +141,8 @@ public final class DatabaseConnectorUtility {
     final List<String> connectorsRequired =
         List.of("db2", "hsqldb", "mariadb", "mysql", "oracle", "postgresql", "sqlite", "sqlserver");
     final String allowedDatabaseConnector =
-        new SystemPropertiesConfig().getStringValue("SC_WITHOUT_DATABASE_PLUGIN");
+        normalizedIdentifier(
+            new SystemPropertiesConfig().getStringValue("SC_WITHOUT_DATABASE_PLUGIN"));
     final boolean isAllowed =
         databaseSystemIdentifier.equalsIgnoreCase(allowedDatabaseConnector)
             || "mariadb".equalsIgnoreCase(databaseSystemIdentifier)
