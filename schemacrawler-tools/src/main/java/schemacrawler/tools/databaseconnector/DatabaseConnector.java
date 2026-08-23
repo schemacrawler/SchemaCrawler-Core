@@ -9,7 +9,6 @@
 package schemacrawler.tools.databaseconnector;
 
 import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.util.Map;
@@ -110,13 +109,6 @@ public abstract class DatabaseConnector {
     dbConnectionSourceBuilder.withUserCredentials(userCredentials);
     final DatabaseConnectionSource connectionSource = dbConnectionSourceBuilder.build();
     return connectionSource;
-  }
-
-  public final boolean supportsUrl(final String url) {
-    if (isBlank(url)) {
-      return false;
-    }
-    return options.supportsUrl().test(url);
   }
 
   @Override

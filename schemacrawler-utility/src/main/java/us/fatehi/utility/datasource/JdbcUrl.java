@@ -12,14 +12,14 @@ import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
 public record JdbcUrl(
-    String databaseServerType,
+    String databaseSystemIdentifier,
     String hostHash,
     Integer port,
     String databaseName,
     HostClassification hostClassification) {
 
   public JdbcUrl {
-    databaseServerType = normalizeToken(databaseServerType);
+    databaseSystemIdentifier = normalizeToken(databaseSystemIdentifier);
     hostHash = normalizeToken(hostHash);
     databaseName = normalizeToken(databaseName);
     if (hostClassification == null) {
@@ -35,8 +35,8 @@ public record JdbcUrl(
     return !isBlank(databaseName);
   }
 
-  public boolean hasDatabaseServerType() {
-    return !isBlank(databaseServerType);
+  public boolean hasDatabaseSystemIdentifier() {
+    return !isBlank(databaseSystemIdentifier);
   }
 
   public boolean hasHost() {

@@ -8,5 +8,13 @@
 
 package schemacrawler.tools.databaseconnector;
 
+import us.fatehi.utility.datasource.JdbcUrlParser;
+
 public record DatabaseUrlConnectionOptions(String connectionUrl)
-    implements DatabaseConnectionOptions {}
+    implements DatabaseConnectionOptions {
+
+  @Override
+  public String databaseSystemIdentifier() {
+    return JdbcUrlParser.parse(connectionUrl).databaseSystemIdentifier();
+  }
+}

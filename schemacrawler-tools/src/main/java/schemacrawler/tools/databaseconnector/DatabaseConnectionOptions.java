@@ -11,4 +11,7 @@ package schemacrawler.tools.databaseconnector;
 import us.fatehi.utility.Options;
 
 public sealed interface DatabaseConnectionOptions extends Options
-    permits DatabaseUrlConnectionOptions, DatabaseServerHostConnectionOptions {}
+    permits DatabaseUrlConnectionOptions, DatabaseServerHostConnectionOptions {
+
+  String databaseSystemIdentifier();
+}

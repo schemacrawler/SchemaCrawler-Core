@@ -49,21 +49,20 @@ public class DatabaseConnectorRegistryTest {
     assertThat(databaseConnectorRegistry.getHelpCommands(), hasSize(2));
 
     final DatabaseConnector testDbConnector =
-        databaseConnectorRegistry.findDatabaseConnectorFromDatabaseSystemIdentifier("test-db");
+        databaseConnectorRegistry.getDatabaseConnector("test-db");
     assertThat(testDbConnector, is(notNullValue()));
     assertThat(
         testDbConnector.getDatabaseServerType().getDatabaseSystemIdentifier(), is("test-db"));
 
     final DatabaseConnector bundleDbConnector =
-        databaseConnectorRegistry.findDatabaseConnectorFromDatabaseSystemIdentifier(
-            "test-bundle-db");
+        databaseConnectorRegistry.getDatabaseConnector("test-bundle-db");
     assertThat(bundleDbConnector, is(notNullValue()));
     assertThat(
         bundleDbConnector.getDatabaseServerType().getDatabaseSystemIdentifier(),
         is("test-bundle-db"));
 
     final DatabaseConnector unknownConnector =
-        databaseConnectorRegistry.findDatabaseConnectorFromDatabaseSystemIdentifier("newdb");
+        databaseConnectorRegistry.getDatabaseConnector("newdb");
     assertThat(unknownConnector, is(notNullValue()));
     assertThat(
         unknownConnector.getDatabaseServerType().getDatabaseSystemIdentifier(), is(nullValue()));
@@ -77,19 +76,15 @@ public class DatabaseConnectorRegistryTest {
     DatabaseServerType databaseServerType;
 
     databaseServerType =
-        databaseConnectorRegistry
-            .findDatabaseConnectorFromUrl("jdbc:test-db:something")
-            .getDatabaseServerType();
+        databaseConnectorRegistry.getDatabaseConnector("test-db").getDatabaseServerType();
     assertThat(databaseServerType.getDatabaseSystemIdentifier(), is("test-db"));
 
     databaseServerType =
-        databaseConnectorRegistry
-            .findDatabaseConnectorFromUrl("jdbc:other-db:something")
-            .getDatabaseServerType();
+        databaseConnectorRegistry.getDatabaseConnector("other-db").getDatabaseServerType();
     assertThat(databaseServerType, is(DatabaseServerType.UNKNOWN));
 
     databaseServerType =
-        databaseConnectorRegistry.findDatabaseConnectorFromUrl(null).getDatabaseServerType();
+        databaseConnectorRegistry.getDatabaseConnector(null).getDatabaseServerType();
     assertThat(databaseServerType, is(DatabaseServerType.UNKNOWN));
   }
 

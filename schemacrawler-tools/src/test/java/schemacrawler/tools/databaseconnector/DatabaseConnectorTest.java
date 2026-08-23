@@ -60,10 +60,6 @@ public class DatabaseConnectorTest {
         databaseConnector.withSchemaCrawlerOptionsDefaults(schemaCrawlerOptions),
         is(not(nullValue())));
 
-    assertThat(databaseConnector.supportsUrl("jdbc:test-db:somevalue"), is(true));
-    assertThat(databaseConnector.supportsUrl("jdbc:newdb:somevalue"), is(false));
-    assertThat(databaseConnector.supportsUrl(null), is(false));
-
     assertThat(databaseConnector.toString(), is("Database connector for test-db - Test Database"));
   }
 
@@ -78,9 +74,6 @@ public class DatabaseConnectorTest {
 
     assertThat(
         databaseConnector.getDatabaseServerType().getDatabaseSystemIdentifier(), is(nullValue()));
-
-    assertThat(databaseConnector.supportsUrl("jdbc:newdb:somevalue"), is(false));
-    assertThat(databaseConnector.supportsUrl(null), is(false));
 
     assertThat(
         databaseConnector.toString(), is("Database connector for unknown database system type"));

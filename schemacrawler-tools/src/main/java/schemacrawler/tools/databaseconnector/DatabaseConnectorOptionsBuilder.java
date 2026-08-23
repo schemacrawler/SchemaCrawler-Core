@@ -15,7 +15,6 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.sql.Connection;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
@@ -24,7 +23,6 @@ import schemacrawler.tools.executable.commandline.PluginCommand;
 import us.fatehi.utility.OptionsBuilder;
 import us.fatehi.utility.datasource.DatabaseConnectionSourceBuilder;
 import us.fatehi.utility.datasource.DatabaseServerType;
-import us.fatehi.utility.datasource.JdbcUrlParser;
 
 public class DatabaseConnectorOptionsBuilder
     implements OptionsBuilder<DatabaseConnectorOptionsBuilder, DatabaseConnectorOptions> {
@@ -34,8 +32,6 @@ public class DatabaseConnectorOptionsBuilder
   }
 
   private final DatabaseServerType dbServerType;
-  private Predicate<String> supportsUrl;
-
   private BiConsumer<InformationSchemaViewsBuilder, Connection> informationSchemaViewsBuildProcess;
   private BiConsumer<SchemaRetrievalOptionsBuilder, Connection> schemaRetrievalOptionsBuildProcess;
   private Consumer<LimitOptionsBuilder> limitOptionsBuildProcess;
@@ -44,7 +40,6 @@ public class DatabaseConnectorOptionsBuilder
 
   private DatabaseConnectorOptionsBuilder(final DatabaseServerType dbServerType) {
     this.dbServerType = requireNonNull(dbServerType, "No database server type provided");
-    supportsUrl = null;
     informationSchemaViewsBuildProcess = (builder, conn) -> {};
     schemaRetrievalOptionsBuildProcess = (builder, conn) -> {};
     limitOptionsBuildProcess = builder -> {};
@@ -62,7 +57,6 @@ public class DatabaseConnectorOptionsBuilder
     if (!dbServerType.equals(options.dbServerType())) {
       throw new IllegalArgumentException("Cannot convert from options");
     }
-    supportsUrl = options.supportsUrl();
     informationSchemaViewsBuildProcess = options.informationSchemaViewsBuildProcess();
     schemaRetrievalOptionsBuildProcess = options.schemaRetrievalOptionsBuildProcess();
     limitOptionsBuildProcess = options.limitOptionsBuildProcess();
@@ -73,12 +67,8 @@ public class DatabaseConnectorOptionsBuilder
 
   @Override
   public DatabaseConnectorOptions toOptions() {
-    if (supportsUrl == null) {
-      buildDefaultSupportsUrlPredicate();
-    }
     return new DatabaseConnectorOptions(
         dbServerType,
-        supportsUrl,
         informationSchemaViewsBuildProcess,
         schemaRetrievalOptionsBuildProcess,
         limitOptionsBuildProcess,
@@ -133,34 +123,5 @@ public class DatabaseConnectorOptionsBuilder
       schemaRetrievalOptionsBuildProcess = schemaRetrievalOptionsBuildProcess.andThen(process);
     }
     return this;
-  }
-
-  public DatabaseConnectorOptionsBuilder withUrlStartsWith(final String urlStartsWith) {
-    if (!isBlank(urlStartsWith)) {
-      supportsUrl = url -> url != null && url.startsWith(urlStartsWith);
-    }
-    return this;
-  }
-
-  public DatabaseConnectorOptionsBuilder withUrlSupportPredicate(
-      final Predicate<String> supportsUrl) {
-    if (supportsUrl != null) {
-      this.supportsUrl = supportsUrl;
-    }
-    return this;
-  }
-
-  private void buildDefaultSupportsUrlPredicate() {
-    final String template = dbConnectionSourceBuildProcess.get().getConnectionUrlTemplate();
-    if (!isBlank(template)) {
-      final String databaseServerType = JdbcUrlParser.parse(template).databaseServerType();
-      if (!isBlank(databaseServerType)) {
-        final String prefix = "jdbc:%s:".formatted(databaseServerType);
-        supportsUrl = url -> url != null && url.startsWith(prefix);
-      }
-    }
-    if (supportsUrl == null) {
-      supportsUrl = url -> false;
-    }
   }
 }
