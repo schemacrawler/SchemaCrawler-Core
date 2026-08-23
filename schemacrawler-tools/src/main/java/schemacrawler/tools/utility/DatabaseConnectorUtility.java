@@ -9,7 +9,6 @@
 package schemacrawler.tools.utility;
 
 import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,7 +20,6 @@ import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.tools.databaseconnector.DatabaseConnector;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
-import schemacrawler.tools.databaseconnector.UnknownDatabaseConnector;
 import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
@@ -35,103 +33,6 @@ public final class DatabaseConnectorUtility {
 
   private static final Logger LOGGER = Logger.getLogger(DatabaseConnectorUtility.class.getName());
 
-  public static DatabaseConnector findDatabaseConnector(final Connection connection) {
-
-    requireNonNull(connection, "No database connection provided");
-
-    final DatabaseConnectorRegistry registry = DatabaseConnectorRegistry.getRegistry();
-    DatabaseConnector dbConnector = registry.findDatabaseConnector(connection);
-    final DatabaseServerType databaseServerType = dbConnector.getDatabaseServerType();
-
-    // Log SchemaCrawler database plugin being used
-    if (databaseServerType.isUnknownDatabaseSystem()) {
-      LOGGER.log(Level.INFO, "Not using any SchemaCrawler database plugin");
-    } else {
-      LOGGER.log(Level.INFO, "Using SchemaCrawler database plugin for " + databaseServerType);
-    }
-
-    // Get database connection URL
-    final String url = getConnectionUrl(connection);
-    if (isBlank(url)) {
-      return dbConnector;
-    }
-
-    final boolean useMatchedDatabasePlugin = useMatchedDatabasePlugin(url, databaseServerType);
-    if (!useMatchedDatabasePlugin) {
-      dbConnector = UnknownDatabaseConnector.UNKNOWN;
-    }
-    return dbConnector;
-  }
-
-  private static String extractDatabaseServerTypeFromUrl(final String url) {
-    final String matchedDBServerType = JdbcUrlParser.parse(url).databaseServerType();
-    final String urlDBServerType =
-        List.of("db2", "hsqldb", "mariadb", "mysql", "oracle", "postgresql", "sqlite", "sqlserver")
-                .contains(matchedDBServerType)
-            ? matchedDBServerType
-            : null;
-    if (isBlank(urlDBServerType)) {
-      return "";
-    }
-    if ("mariadb".equals(urlDBServerType)) {
-      // Special case: MariaDB is handled by the MySQL plugin
-      return "mysql";
-    }
-    return urlDBServerType;
-  }
-
-  private static String getConnectionUrl(final Connection connection) {
-    requireNonNull(connection, "No connection provided");
-    final String url;
-    try {
-      url = connection.getMetaData().getURL();
-    } catch (final SQLException e) {
-      LOGGER.log(Level.CONFIG, "Could not obtain the database connection URL");
-      return "";
-    }
-    return url;
-  }
-
-  private static boolean useMatchedDatabasePlugin(
-      final String url, final DatabaseServerType dbServerType) {
-
-    // Extract database server type
-    final String urlDBServerType = extractDatabaseServerTypeFromUrl(url);
-    if (isBlank(urlDBServerType)) {
-      return true;
-    }
-
-    // Find out what is matched
-    final boolean dbConnectorPresent =
-        urlDBServerType.equalsIgnoreCase(dbServerType.getDatabaseSystemIdentifier());
-
-    final String withoutDatabasePlugin =
-        new SystemPropertiesConfig().getStringValue("SC_WITHOUT_DATABASE_PLUGIN");
-    final boolean useWithoutDatabasePlugin =
-        urlDBServerType.equalsIgnoreCase(withoutDatabasePlugin);
-
-    // Throw exception if plugin is needed, but not found
-    if (!dbConnectorPresent && !useWithoutDatabasePlugin) {
-      throw new InternalRuntimeException(
-          """
-          Add the SchemaCrawler database plugin for <%s> to the CLASSPATH for
-          %s
-          or set
-          SC_WITHOUT_DATABASE_PLUGIN=%s
-          either as an environmental variable or as a Java system property
-          """
-              .formatted(urlDBServerType, url, urlDBServerType));
-    }
-
-    final boolean useMatchedDatabasePlugin = dbConnectorPresent && !useWithoutDatabasePlugin;
-
-    return useMatchedDatabasePlugin;
-  }
-
-  private DatabaseConnectorUtility() {
-    // Prevent instantiation
-  }
-
   /**
    * Returns database specific options using an existing SchemaCrawler database plugin.
    *
@@ -140,6 +41,8 @@ public final class DatabaseConnectorUtility {
   public static SchemaRetrievalOptions matchSchemaRetrievalOptions(
       final DatabaseConnectionSource connectionSource) {
     try (final Connection connection = connectionSource.get()) {
+      // Validate and open a live connection first, because plugin-specific schema
+      // retrieval options may depend on database metadata from that connection.
       DatabaseUtility.checkConnection(connection);
       final DatabaseConnector dbConnector = findDatabaseConnector(connection);
       final SchemaRetrievalOptionsBuilder schemaRetrievalOptionsBuilder =
@@ -162,6 +65,7 @@ public final class DatabaseConnectorUtility {
       final DatabaseConnectionSource connectionSource,
       final SchemaRetrievalOptions schemaRetrievalOptions) {
 
+    // Gracefully skip wiring if either side of the handoff is missing.
     if (connectionSource == null) {
       LOGGER.log(Level.CONFIG, "No database connection source provided");
       return;
@@ -171,7 +75,84 @@ public final class DatabaseConnectorUtility {
       return;
     }
 
+    // Plugin-provided initializer must run on first connection to set server-specific
+    // session state before metadata crawling starts.
     connectionSource.setFirstConnectionInitializer(
         schemaRetrievalOptions.getConnectionInitializer());
+  }
+
+  private static DatabaseConnector findDatabaseConnector(final Connection connection) {
+    requireNonNull(connection, "No database connection provided");
+
+    // Resolve database type from JDBC URL, then look up the matching connector.
+    final String connectionUrl = getConnectionUrl(connection);
+    final String databaseSystemIdentifier =
+        JdbcUrlParser.parse(connectionUrl).databaseSystemIdentifier();
+
+    final DatabaseConnectorRegistry registry = DatabaseConnectorRegistry.getRegistry();
+    final DatabaseConnector dbConnector = registry.getDatabaseConnector(databaseSystemIdentifier);
+    final DatabaseServerType databaseServerType = dbConnector.getDatabaseServerType();
+
+    // Enforce plugin requirements for supported databases unless explicitly bypassed.
+    throwIfDatabaseConnectorRequired(databaseSystemIdentifier, databaseServerType);
+
+    // Log SchemaCrawler database connector being used
+    if (databaseServerType.isUnknownDatabaseSystem()) {
+      LOGGER.log(Level.INFO, "Not using any SchemaCrawler database connector");
+    } else {
+      LOGGER.log(
+          Level.INFO,
+          "Using SchemaCrawler database connector for <%s>".formatted(databaseServerType));
+    }
+
+    return dbConnector;
+  }
+
+  private static String getConnectionUrl(final Connection connection) {
+    requireNonNull(connection, "No connection provided");
+    final String url;
+    try {
+      // JDBC metadata URL is the canonical source for connector resolution.
+      url = connection.getMetaData().getURL();
+    } catch (final SQLException e) {
+      // Callers treat blank URL as "cannot infer connector from URL".
+      LOGGER.log(Level.CONFIG, "Could not obtain the database connection URL");
+      return "";
+    }
+    return url;
+  }
+
+  private static void throwIfDatabaseConnectorRequired(
+      final String dbSystemIdentifier, final DatabaseServerType dbServerType) {
+
+    String databaseSystemIdentifier = dbSystemIdentifier;
+    // MariaDB intentionally reuses the MySQL connector implementation.
+    if ("mariadb".equals(databaseSystemIdentifier)) {
+      databaseSystemIdentifier = "mysql";
+    }
+
+    final List<String> connectorsRequired =
+        List.of("db2", "hsqldb", "mariadb", "mysql", "oracle", "postgresql", "sqlite", "sqlserver");
+    final String allowedDatabaseConnector =
+        new SystemPropertiesConfig().getStringValue("SC_WITHOUT_DATABASE_PLUGIN");
+
+    // Fail fast when a known database should have a plugin but none is available,
+    // unless that database is explicitly allow-listed via SC_WITHOUT_DATABASE_PLUGIN.
+    if (dbServerType.isUnknownDatabaseSystem()
+        && connectorsRequired.contains(dbSystemIdentifier)
+        && !dbSystemIdentifier.equalsIgnoreCase(allowedDatabaseConnector)) {
+      throw new InternalRuntimeException(
+          """
+          Add the SchemaCrawler database plugin for <%s> to the CLASSPATH
+          or set
+          SC_WITHOUT_DATABASE_PLUGIN=%s
+          either as an environmental variable or as a Java system property
+          """
+              .formatted(dbSystemIdentifier, dbSystemIdentifier));
+    }
+  }
+
+  private DatabaseConnectorUtility() {
+    // Prevent instantiation
   }
 }

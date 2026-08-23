@@ -153,7 +153,7 @@ public class DatabaseConnectorOptionsBuilder
   private void buildDefaultSupportsUrlPredicate() {
     final String template = dbConnectionSourceBuildProcess.get().getConnectionUrlTemplate();
     if (!isBlank(template)) {
-      final String databaseServerType = JdbcUrlParser.parse(template).databaseServerType();
+      final String databaseServerType = JdbcUrlParser.parse(template).databaseSystemIdentifier();
       if (!isBlank(databaseServerType)) {
         final String prefix = "jdbc:%s:".formatted(databaseServerType);
         supportsUrl = url -> url != null && url.startsWith(prefix);

@@ -36,7 +36,7 @@ final class DatabaseServerFingerprintBuilder {
   private static Map<String, String> canonicalMap(
       final ProductVersion databaseInformation, final JdbcUrl jdbcUrl) {
     final Map<String, String> canonical = new LinkedHashMap<>();
-    canonical.put("type", jdbcUrl.databaseServerType());
+    canonical.put("type", jdbcUrl.databaseSystemIdentifier());
     canonical.put("host", jdbcUrl.hostHash());
     canonical.put("database", jdbcUrl.databaseName());
     canonical.put("database_product_version", databaseInformation.getProductVersion());
@@ -45,7 +45,7 @@ final class DatabaseServerFingerprintBuilder {
 
   private static FingerprintConfidence confidence(
       final ProductVersion databaseInformation, final JdbcUrl jdbcUrl) {
-    final boolean hasType = jdbcUrl.hasDatabaseServerType();
+    final boolean hasType = jdbcUrl.hasDatabaseSystemIdentifier();
     final boolean hasHost = jdbcUrl.hasHost();
     final boolean hasDatabaseName = jdbcUrl.hasDatabaseName();
     final boolean hasPublicHost = jdbcUrl.hasPublicHost();

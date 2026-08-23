@@ -24,7 +24,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseAuthorityWithDatabasePropertyFallback() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver://sqlhost:1433;database=Sales");
-    assertThat(jdbcUrl.databaseServerType(), is("sqlserver"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(1433));
@@ -34,7 +34,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseAuthorityWithDbPropertyFallback() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver://sqlhost:1433;db=Sales");
-    assertThat(jdbcUrl.databaseServerType(), is("sqlserver"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(1433));
@@ -45,7 +45,7 @@ public class JdbcUrlParserTest {
   public void parseAuthorityWithQueryAndFragment() {
     final JdbcUrl jdbcUrl =
         JdbcUrlParser.parse("jdbc:postgresql://pgserver:5432/appdb?ssl=true#connection");
-    assertThat(jdbcUrl.databaseServerType(), is("postgresql"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("postgresql"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(5432));
@@ -55,7 +55,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseBlankUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse(null);
-    assertThat(jdbcUrl.databaseServerType(), is(""));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is(""));
     assertThat(jdbcUrl.hostHash(), is(""));
     assertThat(jdbcUrl.port(), is(nullValue()));
     assertThat(jdbcUrl.databaseName(), is(""));
@@ -64,7 +64,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseBracketedIpv6HostPort() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:postgresql://[2001:db8::10]:5432/mydb");
-    assertThat(jdbcUrl.databaseServerType(), is("postgresql"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("postgresql"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(5432));
@@ -75,7 +75,7 @@ public class JdbcUrlParserTest {
   public void parseHostListUsesFirstHost() {
     final JdbcUrl jdbcUrl =
         JdbcUrlParser.parse("jdbc:postgresql://host1:5432,host2:5433,host3:5434/mydb");
-    assertThat(jdbcUrl.databaseServerType(), is("postgresql"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("postgresql"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(5432));
@@ -85,7 +85,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseHostPortDatabaseUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql://db.example.com:3306/appdb");
-    assertThat(jdbcUrl.databaseServerType(), is("mysql"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("mysql"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(3306));
@@ -95,7 +95,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseInvalidPortAsNull() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql://dbhost:notaport/appdb");
-    assertThat(jdbcUrl.databaseServerType(), is("mysql"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("mysql"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(nullValue()));
@@ -105,7 +105,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseJdbcWithoutDriverBody() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql");
-    assertThat(jdbcUrl.databaseServerType(), is("mysql"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("mysql"));
     assertThat(jdbcUrl.hostHash(), is(""));
     assertThat(jdbcUrl.port(), is(nullValue()));
     assertThat(jdbcUrl.databaseName(), is(""));
@@ -114,7 +114,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseNestedAuthorityUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:hsqldb:hsql://localhost:9001/schemacrawler");
-    assertThat(jdbcUrl.databaseServerType(), is("hsqldb"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("hsqldb"));
     assertThat(jdbcUrl.hostHash(), is("<localhost>"));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.LOCALHOST));
     assertThat(jdbcUrl.port(), is(9001));
@@ -124,7 +124,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseNonAuthoritySemicolonFormFallbackToHeadToken() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver:sqlhost:1433;encrypt=true");
-    assertThat(jdbcUrl.databaseServerType(), is("sqlserver"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(1433));
@@ -134,7 +134,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseNonAuthoritySemicolonFormWithDatabase() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver:sqlhost:1433;database=Sales");
-    assertThat(jdbcUrl.databaseServerType(), is("sqlserver"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(1433));
@@ -144,7 +144,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseNonAuthoritySemicolonFormWithDatabaseName() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver:sqlhost:1433;databaseName=Sales");
-    assertThat(jdbcUrl.databaseServerType(), is("sqlserver"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(1433));
@@ -154,7 +154,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseNonJdbcUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("mysql://db:3306/appdb");
-    assertThat(jdbcUrl.databaseServerType(), is(""));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is(""));
     assertThat(jdbcUrl.hostHash(), is(""));
     assertThat(jdbcUrl.port(), is(nullValue()));
     assertThat(jdbcUrl.databaseName(), is(""));
@@ -163,7 +163,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseOfflineFileUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:offline:C:\\temp\\snapshot.db");
-    assertThat(jdbcUrl.databaseServerType(), is("offline"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("offline"));
     assertThat(jdbcUrl.hostHash(), is(""));
     assertThat(jdbcUrl.port(), is(nullValue()));
     assertThat(jdbcUrl.databaseName(), is("c:\\temp\\snapshot.db"));
@@ -172,7 +172,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseOracleAtHostSyntaxWithoutSlashes() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:oracle:thin:@oracledb:1521/ORCL");
-    assertThat(jdbcUrl.databaseServerType(), is("oracle"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("oracle"));
     assertThat(jdbcUrl.hostHash(), is(""));
     assertThat(jdbcUrl.port(), is(nullValue()));
     assertThat(jdbcUrl.databaseName(), is("thin:@oracledb:1521"));
@@ -181,7 +181,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseOracleStyleUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:oracle:thin:@//oracledb:1521/ORCLPDB1");
-    assertThat(jdbcUrl.databaseServerType(), is("oracle"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("oracle"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(1521));
@@ -191,7 +191,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseSqliteMemoryUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlite::memory:");
-    assertThat(jdbcUrl.databaseServerType(), is("sqlite"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlite"));
     assertThat(jdbcUrl.hostHash(), is(""));
     assertThat(jdbcUrl.port(), is(nullValue()));
     assertThat(jdbcUrl.databaseName(), is(":memory:"));
@@ -200,7 +200,7 @@ public class JdbcUrlParserTest {
   @Test
   public void parseSqlServerStyleUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver://sqlhost:1433;databaseName=Sales");
-    assertThat(jdbcUrl.databaseServerType(), is("sqlserver"));
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
     assertThat(jdbcUrl.hostHash(), matchesPattern(SHA_256_HEX_PATTERN));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(1433));

@@ -51,7 +51,7 @@ public class JdbcUrlHostTest {
   public void parseLocalUrlHasNoHost() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlite::memory:");
 
-    assertThat(jdbcUrl.hasDatabaseServerType(), is(true));
+    assertThat(jdbcUrl.hasDatabaseSystemIdentifier(), is(true));
     assertThat(jdbcUrl.hasHost(), is(false));
     assertThat(jdbcUrl.hasPort(), is(false));
     assertThat(jdbcUrl.hasDatabaseName(), is(true));
@@ -63,7 +63,7 @@ public class JdbcUrlHostTest {
   public void parseJdbcWithoutDriverBodyHasTypeButNoHostOrPort() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql");
 
-    assertThat(jdbcUrl.hasDatabaseServerType(), is(true));
+    assertThat(jdbcUrl.hasDatabaseSystemIdentifier(), is(true));
     assertThat(jdbcUrl.hasHost(), is(false));
     assertThat(jdbcUrl.hasPort(), is(false));
     assertThat(jdbcUrl.hasDatabaseName(), is(false));

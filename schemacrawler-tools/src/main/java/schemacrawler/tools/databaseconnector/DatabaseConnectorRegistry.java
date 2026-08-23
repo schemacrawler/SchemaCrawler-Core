@@ -11,10 +11,7 @@ package schemacrawler.tools.databaseconnector;
 import static java.util.Comparator.naturalOrder;
 import static schemacrawler.tools.databaseconnector.UnknownDatabaseConnector.UNKNOWN;
 import static us.fatehi.utility.Utility.isBlank;
-import static us.fatehi.utility.database.DatabaseUtility.checkConnection;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -123,41 +120,21 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
     databaseConnectorRegistry = loadDatabaseConnectorRegistry();
   }
 
-  public DatabaseConnector findDatabaseConnector(final Connection connection) {
-    try {
-      checkConnection(connection);
-      final String url = connection.getMetaData().getURL();
-      return findDatabaseConnectorFromUrl(url);
-    } catch (final SQLException e) {
-      return UNKNOWN;
-    }
-  }
-
-  public DatabaseConnector findDatabaseConnectorFromDatabaseSystemIdentifier(
-      final String databaseSystemIdentifier) {
-    if (hasDatabaseSystemIdentifier(databaseSystemIdentifier)) {
-      return databaseConnectorRegistry.get(databaseSystemIdentifier);
-    }
-    return UNKNOWN;
-  }
-
-  public DatabaseConnector findDatabaseConnectorFromUrl(final String url) {
-    if (isBlank(url)) {
-      return UNKNOWN;
-    }
-
-    for (final DatabaseConnector databaseConnector : databaseConnectorRegistry.values()) {
-      if (databaseConnector.supportsUrl(url)) {
-        return databaseConnector;
-      }
-    }
-
-    return UNKNOWN;
-  }
-
   @Override
-  public Collection getCommandLineCommands() {
+  public Collection<PluginCommand> getCommandLineCommands() {
     return List.of();
+  }
+
+  public DatabaseConnector getDatabaseConnector(final String databaseSystemIdentifier) {
+    String lookupDatabaseSystemIdentifier = databaseSystemIdentifier;
+    if ("mariadb".equals(databaseSystemIdentifier)) {
+      // Special case: MariaDB is handled by the MySQL plugin
+      lookupDatabaseSystemIdentifier = "mysql";
+    }
+    if (hasDatabaseSystemIdentifier(lookupDatabaseSystemIdentifier)) {
+      return databaseConnectorRegistry.get(lookupDatabaseSystemIdentifier);
+    }
+    return UNKNOWN;
   }
 
   public List<DatabaseServerType> getDatabaseServerTypes() {
