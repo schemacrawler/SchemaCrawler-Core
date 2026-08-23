@@ -9,6 +9,7 @@
 package schemacrawler.tools.utility;
 
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.isBlank;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -123,32 +124,39 @@ public final class DatabaseConnectorUtility {
   }
 
   private static void throwIfDatabaseConnectorRequired(
-      final String dbSystemIdentifier, final DatabaseServerType dbServerType) {
-
-    String databaseSystemIdentifier = dbSystemIdentifier;
-    // MariaDB intentionally reuses the MySQL connector implementation.
-    if ("mariadb".equals(databaseSystemIdentifier)) {
-      databaseSystemIdentifier = "mysql";
+      final String databaseSystemIdentifier, final DatabaseServerType dbServerType) {
+    if (isBlank(databaseSystemIdentifier) || dbServerType == null) {
+      return;
     }
 
     final List<String> connectorsRequired =
         List.of("db2", "hsqldb", "mariadb", "mysql", "oracle", "postgresql", "sqlite", "sqlserver");
     final String allowedDatabaseConnector =
         new SystemPropertiesConfig().getStringValue("SC_WITHOUT_DATABASE_PLUGIN");
+    final boolean isAllowed =
+        databaseSystemIdentifier.equalsIgnoreCase(allowedDatabaseConnector)
+            || ("mariadb".equalsIgnoreCase(databaseSystemIdentifier)
+                && "mysql".equalsIgnoreCase(allowedDatabaseConnector));
 
     // Fail fast when a known database should have a plugin but none is available,
     // unless that database is explicitly allow-listed via SC_WITHOUT_DATABASE_PLUGIN.
     if (dbServerType.isUnknownDatabaseSystem()
-        && connectorsRequired.contains(dbSystemIdentifier)
-        && !dbSystemIdentifier.equalsIgnoreCase(allowedDatabaseConnector)) {
+        && connectorsRequired.contains(databaseSystemIdentifier)
+        && !isAllowed) {
+      final String pluginId;
+      if ("mariadb".equalsIgnoreCase(databaseSystemIdentifier)) {
+        pluginId = "mysql";
+      } else {
+        pluginId = databaseSystemIdentifier;
+      }
       throw new InternalRuntimeException(
           """
-          Add the SchemaCrawler database plugin for <%s> to the CLASSPATH
+          Add the SchemaCrawler database connector plugin for <%s> to the CLASSPATH
           or set
           SC_WITHOUT_DATABASE_PLUGIN=%s
           either as an environmental variable or as a Java system property
           """
-              .formatted(dbSystemIdentifier, dbSystemIdentifier));
+              .formatted(pluginId, pluginId));
     }
   }
 
