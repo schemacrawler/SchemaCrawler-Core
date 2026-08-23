@@ -14,6 +14,10 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static us.fatehi.test.utility.TestUtility.SHA_256_HEX_PATTERN;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import us.fatehi.utility.datasource.HostClassification;
 import us.fatehi.utility.datasource.JdbcUrl;
@@ -205,5 +209,18 @@ public class JdbcUrlParserTest {
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.port(), is(1433));
     assertThat(jdbcUrl.databaseName(), is("sales"));
+  }
+
+  @RepeatedTest(5)
+  @DisplayName("Random database connection URL protocols test")
+  public void parseSpyWrappedMysqlUrl() {
+    final int randomLength = RandomUtils.insecure().randomInt(1, 10);
+    final String spySubProtcol = RandomStringUtils.insecure().nextAlphabetic(randomLength);
+    final JdbcUrl jdbcUrl =
+        JdbcUrlParser.parse("jdbc:%s://dbhost:9999/appdb".formatted(spySubProtcol));
+    assertThat(
+        "For spy sub-procol <%s>".formatted(spySubProtcol),
+        jdbcUrl.databaseSystemIdentifier(),
+        is(spySubProtcol.toLowerCase()));
   }
 }

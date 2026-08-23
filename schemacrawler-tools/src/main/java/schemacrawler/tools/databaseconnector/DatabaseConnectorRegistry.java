@@ -10,7 +10,6 @@ package schemacrawler.tools.databaseconnector;
 
 import static java.util.Comparator.naturalOrder;
 import static schemacrawler.tools.databaseconnector.UnknownDatabaseConnector.UNKNOWN;
-import static us.fatehi.utility.Utility.isBlank;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +21,9 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static us.fatehi.utility.Utility.isBlank;
+
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.tools.command.PluginCommandRegistry;
 import schemacrawler.tools.executable.commandline.PluginCommand;
