@@ -76,7 +76,8 @@ public final class DatabaseConnectorUtility {
       return;
     }
 
-    // Plugin-provided initializer must run on first connection to set server-specific
+    // Plugin-provided initializer must run on first connection to set
+    // server-specific
     // session state before metadata crawling starts.
     connectionSource.setFirstConnectionInitializer(
         schemaRetrievalOptions.getConnectionInitializer());
@@ -88,13 +89,14 @@ public final class DatabaseConnectorUtility {
     // Resolve database type from JDBC URL, then look up the matching connector.
     final String connectionUrl = getConnectionUrl(connection);
     final String databaseSystemIdentifier =
-        JdbcUrlParser.parse(connectionUrl).databaseSystemIdentifier();
+        normalizedIdentifier(JdbcUrlParser.parse(connectionUrl).databaseSystemIdentifier());
 
     final DatabaseConnectorRegistry registry = DatabaseConnectorRegistry.getRegistry();
     final DatabaseConnector dbConnector = registry.getDatabaseConnector(databaseSystemIdentifier);
     final DatabaseServerType databaseServerType = dbConnector.getDatabaseServerType();
 
-    // Enforce plugin requirements for supported databases unless explicitly bypassed.
+    // Enforce plugin requirements for supported databases unless explicitly
+    // bypassed.
     throwIfDatabaseConnectorRequired(databaseSystemIdentifier, databaseServerType);
 
     // Log SchemaCrawler database connector being used
@@ -123,6 +125,13 @@ public final class DatabaseConnectorUtility {
     return url;
   }
 
+  private static String normalizedIdentifier(final String databaseSystemIdentifier) {
+    if ("mariadb".equalsIgnoreCase(databaseSystemIdentifier)) {
+      return "mysql";
+    }
+    return databaseSystemIdentifier;
+  }
+
   private static void throwIfDatabaseConnectorRequired(
       final String databaseSystemIdentifier, final DatabaseServerType dbServerType) {
     if (isBlank(databaseSystemIdentifier) || dbServerType == null) {
@@ -135,11 +144,12 @@ public final class DatabaseConnectorUtility {
         new SystemPropertiesConfig().getStringValue("SC_WITHOUT_DATABASE_PLUGIN");
     final boolean isAllowed =
         databaseSystemIdentifier.equalsIgnoreCase(allowedDatabaseConnector)
-            || ("mariadb".equalsIgnoreCase(databaseSystemIdentifier)
-                && "mysql".equalsIgnoreCase(allowedDatabaseConnector));
+            || "mariadb".equalsIgnoreCase(databaseSystemIdentifier)
+                && "mysql".equalsIgnoreCase(allowedDatabaseConnector);
 
     // Fail fast when a known database should have a plugin but none is available,
-    // unless that database is explicitly allow-listed via SC_WITHOUT_DATABASE_PLUGIN.
+    // unless that database is explicitly allow-listed via
+    // SC_WITHOUT_DATABASE_PLUGIN.
     if (dbServerType.isUnknownDatabaseSystem()
         && connectorsRequired.contains(databaseSystemIdentifier)
         && !isAllowed) {

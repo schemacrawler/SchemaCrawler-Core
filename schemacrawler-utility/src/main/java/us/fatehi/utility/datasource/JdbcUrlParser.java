@@ -14,6 +14,7 @@ import static us.fatehi.utility.Utility.isBlank;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Set;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
@@ -27,6 +28,12 @@ public final class JdbcUrlParser {
       HostClassification hostClassification) {}
 
   private record ParsedHostPort(String host, Integer port, HostClassification hostClassification) {}
+
+  // Known spy JDBC driver subprotocol prefixes. These prefixes wrap an inner JDBC
+  // URL and delegate connection work to another driver. Add new spy drivers here.
+  // We cannot make this detection generic, since drivers like HSQLDB support
+  // sub-protocols - for example, jdbc:hsqldb:mysql://localhost:9001/schemacrawler
+  private static final Set<String> SPY_PREFIXES = Set.of("p6spy", "log4jdbc");
 
   public static JdbcUrl parse(final String url) {
     if (isBlank(url)) {
@@ -44,6 +51,20 @@ public final class JdbcUrlParser {
     }
 
     final String databaseServerType = jdbc.substring("jdbc:".length(), subprotocolEnd);
+
+    // Spy drivers wrap the original JDBC URL; unwrap to identify the real database
+    // system.
+    // Examples:
+    // - P6Spy: jdbc:p6spy:mysql://host/db → inner URL: jdbc:mysql://host/db
+    // - log4jdbc: jdbc:log4jdbc:mysql://host/db → inner URL: jdbc:mysql://host/db
+    // The SPY_PREFIXES set enumerates known spy driver subprotocols.
+    if (isSpyPrefix(databaseServerType)) {
+      final String innerUrl = unwrapSpyUrl(jdbc.substring(subprotocolEnd + 1));
+      if (!isBlank(innerUrl)) {
+        return parse(innerUrl);
+      }
+    }
+
     String body = stripQueryAndFragment(jdbc.substring(subprotocolEnd + 1));
     body = normalizeOracleAuthorityMarker(body);
     if (!hasAuthorityPrefix(body) && body.contains("://")) {
@@ -181,6 +202,13 @@ public final class JdbcUrlParser {
     }
   }
 
+  private static boolean isSpyPrefix(final String subprotocol) {
+    if (isBlank(subprotocol)) {
+      return false;
+    }
+    return SPY_PREFIXES.contains(subprotocol.toLowerCase());
+  }
+
   private static boolean looksLikeIpLiteral(final String host) {
     return host.matches("\\d{1,3}(?:\\.\\d{1,3}){3}")
         || host.matches("\\[[0-9a-fA-F:]+\\]")
@@ -295,6 +323,16 @@ public final class JdbcUrlParser {
 
   private static String stripQueryAndFragment(final String value) {
     return value.split("[?#]", 2)[0];
+  }
+
+  private static String unwrapSpyUrl(final String remainder) {
+    // Both P6Spy and log4jdbc use the form: jdbc:<spy>:<inner-subprotocol>:<rest>
+    // where the inner part, prefixed with "jdbc:", is a complete JDBC URL.
+    if (isBlank(remainder)) {
+      return null;
+    }
+    final String inner = remainder.trim();
+    return inner.startsWith("jdbc:") ? inner : "jdbc:" + inner;
   }
 
   private JdbcUrlParser() {

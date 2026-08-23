@@ -65,11 +65,6 @@ public final class DatabaseConnectorRegistry extends BasePluginRegistry
             "Loading database connector, %s=%s",
             databaseSystemIdentifier, databaseConnector.getClass().getName()));
     databaseConnectorRegistry.put(databaseSystemIdentifier, databaseConnector);
-
-    // Special case: MariaDB is handled by the MySQL plugin
-    if ("mysql".equals(databaseSystemIdentifier)) {
-      databaseConnectorRegistry.put("mariadb", databaseConnector);
-    }
   }
 
   private static Map<String, DatabaseConnector> loadDatabaseConnectorRegistry() {
