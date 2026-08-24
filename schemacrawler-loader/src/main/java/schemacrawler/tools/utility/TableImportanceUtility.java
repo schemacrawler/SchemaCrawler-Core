@@ -25,14 +25,6 @@ public class TableImportanceUtility {
       return null;
     }
 
-    final String attributeKey = TableCounts.class.getCanonicalName();
-    if (table.hasAttribute(attributeKey)) {
-      final TableCounts tableCountsAttribute = table.getAttribute(attributeKey);
-      if (tableCountsAttribute != null) {
-        return tableCountsAttribute;
-      }
-    }
-
     final Long rowCount =
         TableRowCountsUtility.hasRowCount(table) ? TableRowCountsUtility.getRowCount(table) : null;
     final List<Column> columns = table.getColumns();
@@ -45,22 +37,12 @@ public class TableImportanceUtility {
             table.getTriggers().size(),
             rowCount);
 
-    table.setAttribute(attributeKey, tableCounts);
-
     return tableCounts;
   }
 
   public static TableTraits tableTraitsfrom(final Table table) {
     if (table == null) {
       return new TableTraits();
-    }
-
-    final String attributeKey = TableTraits.class.getCanonicalName();
-    if (table.hasAttribute(attributeKey)) {
-      final TableTraits tableTraitsAttribute = table.getAttribute(attributeKey);
-      if (tableTraitsAttribute != null) {
-        return tableTraitsAttribute;
-      }
     }
 
     final TableTraits tableTraits =
@@ -72,8 +54,6 @@ public class TableImportanceUtility {
             table.hasTriggers(),
             hasRowCount(table) && getRowCount(table) == 0,
             EntityModelType.from(table));
-
-    table.setAttribute(attributeKey, tableTraits);
 
     return tableTraits;
   }
