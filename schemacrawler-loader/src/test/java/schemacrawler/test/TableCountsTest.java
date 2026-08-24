@@ -17,6 +17,7 @@ import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.crawl.LightTable;
 import schemacrawler.test.utility.crawl.LightTrigger;
 import schemacrawler.tools.utility.TableCounts;
+import schemacrawler.tools.utility.TableImportanceUtility;
 
 public class TableCountsTest {
 
@@ -90,7 +91,7 @@ public class TableCountsTest {
 
   @Test
   public void fromNullTableReturnsNull() {
-    assertThat(TableCounts.from(null), is(nullValue()));
+    assertThat(TableImportanceUtility.tableCountsfrom(null), is(nullValue()));
   }
 
   @Test
@@ -100,7 +101,7 @@ public class TableCountsTest {
     table.addColumn("NAME");
     table.addTrigger(new LightTrigger(table, "TRG_AUTHORS"));
 
-    final TableCounts counts = TableCounts.from(table);
+    final TableCounts counts = TableImportanceUtility.tableCountsfrom(table);
 
     assertThat(counts.columnCount(), is(2));
     assertThat(counts.triggerCount(), is(1));
@@ -113,7 +114,7 @@ public class TableCountsTest {
     table.addColumn("ID");
     table.setAttribute(TABLE_ROW_COUNT_KEY, 100L);
 
-    final TableCounts counts = TableCounts.from(table);
+    final TableCounts counts = TableImportanceUtility.tableCountsfrom(table);
 
     assertThat(counts.columnCount(), is(1));
     assertThat(counts.rowCount(), is(100L));
@@ -124,7 +125,7 @@ public class TableCountsTest {
     final LightTable table = new LightTable(new SchemaReference("PUBLIC", "BOOKS"), "AUTHORS");
     table.setAttribute(TABLE_ROW_COUNT_KEY, 0L);
 
-    final TableCounts counts = TableCounts.from(table);
+    final TableCounts counts = TableImportanceUtility.tableCountsfrom(table);
 
     assertThat(counts.rowCount(), is(nullValue()));
   }
