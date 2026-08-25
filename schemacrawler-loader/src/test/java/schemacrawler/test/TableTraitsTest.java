@@ -29,6 +29,7 @@ import schemacrawler.test.utility.crawl.LightColumnReference;
 import schemacrawler.test.utility.crawl.LightTable;
 import schemacrawler.test.utility.crawl.LightTrigger;
 import schemacrawler.tools.utility.EntityModelType;
+import schemacrawler.tools.utility.TableImportanceUtility;
 import schemacrawler.tools.utility.TableTraits;
 
 public class TableTraitsTest {
@@ -121,7 +122,7 @@ public class TableTraitsTest {
 
   @Test
   public void handlesNullTable() {
-    final TableTraits attributes = TableTraits.from(null);
+    final TableTraits attributes = TableImportanceUtility.tableTraitsfrom(null);
 
     assertThat(attributes.noPrimaryKey(), is(nullValue()));
     assertThat(attributes.noForeignKeys(), is(nullValue()));
@@ -139,7 +140,7 @@ public class TableTraitsTest {
     table.addTrigger(new LightTrigger(table, "TRG_BOOKS"));
     table.setAttribute(TABLE_ROW_COUNT_KEY, 0L);
 
-    final TableTraits attributes = TableTraits.from(table);
+    final TableTraits attributes = TableImportanceUtility.tableTraitsfrom(table);
 
     assertThat(attributes.noPrimaryKey(), is(Boolean.TRUE));
     assertThat(attributes.noForeignKeys(), is(Boolean.TRUE));
@@ -156,7 +157,7 @@ public class TableTraitsTest {
         new LightTable(new SchemaReference("PUBLIC", "BOOKS"), "TABLE_TRAIT_2");
     table.setAttribute(TABLE_ROW_COUNT_KEY, 7L);
 
-    final TableTraits attributes = TableTraits.from(table);
+    final TableTraits attributes = TableImportanceUtility.tableTraitsfrom(table);
 
     assertThat(attributes.emptyTable(), is(nullValue()));
   }
@@ -165,7 +166,7 @@ public class TableTraitsTest {
   public void marksBridgeTableWhenInferredAsBridge() {
     final Table table = bridgeCandidateTable();
 
-    final TableTraits attributes = TableTraits.from(table);
+    final TableTraits attributes = TableImportanceUtility.tableTraitsfrom(table);
 
     assertThat(attributes.entityModelType(), is(EntityModelType.bridge_table));
   }

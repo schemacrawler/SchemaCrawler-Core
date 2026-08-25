@@ -10,11 +10,6 @@ package schemacrawler.tools.utility;
 import static schemacrawler.loader.catalog.summary.StatsUtility.makeValidRowCount;
 import static schemacrawler.loader.catalog.summary.StatsUtility.removeNegativeInteger;
 
-import java.util.List;
-import schemacrawler.loader.utility.TableRowCountsUtility;
-import schemacrawler.schema.Column;
-import schemacrawler.schema.Table;
-
 public record TableCounts(
     Integer significantColumnCount,
     Integer columnCount,
@@ -34,21 +29,5 @@ public record TableCounts(
 
   public TableCounts() {
     this(null, null, null, null, null, null);
-  }
-
-  public static TableCounts from(final Table table) {
-    if (table == null) {
-      return null;
-    }
-    final Long rowCount =
-        TableRowCountsUtility.hasRowCount(table) ? TableRowCountsUtility.getRowCount(table) : null;
-    final List<Column> columns = table.getColumns();
-    return new TableCounts(
-        (int) columns.stream().filter(Column::isSignificant).count(),
-        columns.size(),
-        table.getReferencedTables().size(),
-        table.getIndexes().size(),
-        table.getTriggers().size(),
-        rowCount);
   }
 }

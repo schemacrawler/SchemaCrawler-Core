@@ -7,11 +7,7 @@
  */
 package schemacrawler.tools.utility;
 
-import static schemacrawler.loader.utility.TableRowCountsUtility.getRowCount;
-import static schemacrawler.loader.utility.TableRowCountsUtility.hasRowCount;
-
 import java.util.function.Function;
-import schemacrawler.schema.Table;
 
 public record TableTraits(
     Boolean noPrimaryKey,
@@ -24,20 +20,6 @@ public record TableTraits(
 
   private static final Function<Boolean, Boolean> makeTrueOrNull =
       booleanValue -> booleanValue == null || !booleanValue ? null : Boolean.TRUE;
-
-  public static TableTraits from(final Table table) {
-    if (table == null) {
-      return new TableTraits();
-    }
-    return new TableTraits(
-        !table.hasPrimaryKey(),
-        !table.hasForeignKeys(),
-        !table.hasIndexes(),
-        table.isSelfReferencing(),
-        table.hasTriggers(),
-        hasRowCount(table) && getRowCount(table) == 0,
-        EntityModelType.from(table));
-  }
 
   public TableTraits() {
     this(null, null, null, null, null, null, null);
