@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.tools.registry;
+package us.fatehi.registry;
 
 import java.util.Collection;
 import us.fatehi.utility.property.PropertyName;

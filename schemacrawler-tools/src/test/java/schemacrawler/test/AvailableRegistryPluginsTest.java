@@ -19,7 +19,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.tools.command.CommandRegistry;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
-import schemacrawler.tools.registry.PluginRegistry;
+import us.fatehi.registry.PluginRegistry;
 import us.fatehi.utility.database.JdbcDriverRegistry;
 import us.fatehi.utility.property.PropertyName;
 
@@ -35,7 +35,7 @@ public class AvailableRegistryPluginsTest {
   @Test
   public void availableJDBCDrivers() {
     final Collection<PropertyName> availableDrivers =
-        JdbcDriverRegistry.getRegistry().availableJDBCDrivers();
+        JdbcDriverRegistry.getRegistry().getRegisteredPlugins();
     assertThat(availableDrivers.size(), is(JDBC_DRIVER_COUNT));
   }
 

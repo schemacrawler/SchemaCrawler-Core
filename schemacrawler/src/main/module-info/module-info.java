@@ -16,6 +16,7 @@ module us.fatehi.schemacrawler.schemacrawler {
   requires static tools.jackson.databind;
 
   // Export public API packages from schemacrawler-utility
+  exports us.fatehi.registry;
   exports us.fatehi.utility;
   exports us.fatehi.utility.database;
   exports us.fatehi.utility.datasource;
@@ -51,7 +52,6 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.loader.catalog;
   exports schemacrawler.loader.ermodel;
   exports schemacrawler.tools.options;
-  exports schemacrawler.tools.registry;
   exports schemacrawler.tools.state;
   exports schemacrawler.tools.utility;
 

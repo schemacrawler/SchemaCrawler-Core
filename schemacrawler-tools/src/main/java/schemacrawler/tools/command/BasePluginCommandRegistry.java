@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.registry.BasePluginRegistry;
+import us.fatehi.registry.BasePluginRegistry;
 import us.fatehi.utility.property.PropertyName;
 
 public abstract class BasePluginCommandRegistry<R extends CommandProvider>

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
-import schemacrawler.tools.registry.PluginRegistry;
+import us.fatehi.registry.PluginRegistry;
 
 public final class PluginRegistryTestUtility {
 
