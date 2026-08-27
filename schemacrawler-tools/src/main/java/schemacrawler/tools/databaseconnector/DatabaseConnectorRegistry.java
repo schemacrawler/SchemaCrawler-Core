@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.tools.command.PluginCommandRegistry;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.registry.BasePluginRegistry;
+import us.fatehi.registry.BasePluginRegistry;
 import us.fatehi.utility.datasource.DatabaseServerType;
 import us.fatehi.utility.property.PropertyName;
 import us.fatehi.utility.string.StringFormat;

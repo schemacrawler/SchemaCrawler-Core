@@ -39,7 +39,7 @@ public class JdbcDriverRegistryTest {
   @Test
   public void discoverAvailableDrivers() throws Exception {
     final Collection<PropertyName> jdbcDrivers =
-        JdbcDriverRegistry.getRegistry().availableJDBCDrivers();
+        JdbcDriverRegistry.getRegistry().getRegisteredPlugins();
     final Collection<String> jdbcDriverClassNames =
         jdbcDrivers.stream().map(PropertyName::getName).collect(Collectors.toList());
     assertThat(jdbcDriverClassNames, hasItem(TestDatabaseDriver.class.getName()));
@@ -51,8 +51,8 @@ public class JdbcDriverRegistryTest {
     final JdbcDriverRegistry secondRegistry = JdbcDriverRegistry.getRegistry();
     assertThat(secondRegistry, is(firstRegistry));
 
-    final Collection<PropertyName> firstRead = firstRegistry.availableJDBCDrivers();
-    final Collection<PropertyName> secondRead = secondRegistry.availableJDBCDrivers();
+    final Collection<PropertyName> firstRead = firstRegistry.getRegisteredPlugins();
+    final Collection<PropertyName> secondRead = secondRegistry.getRegisteredPlugins();
     assertThat(secondRead, is(firstRead));
   }
 

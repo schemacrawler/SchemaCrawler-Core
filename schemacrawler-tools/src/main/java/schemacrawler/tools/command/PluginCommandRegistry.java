@@ -10,7 +10,7 @@ package schemacrawler.tools.command;
 
 import java.util.Collection;
 import schemacrawler.tools.executable.commandline.PluginCommand;
-import schemacrawler.tools.registry.PluginRegistry;
+import us.fatehi.registry.PluginRegistry;
 
 public interface PluginCommandRegistry<R extends CommandProvider> extends PluginRegistry {
 

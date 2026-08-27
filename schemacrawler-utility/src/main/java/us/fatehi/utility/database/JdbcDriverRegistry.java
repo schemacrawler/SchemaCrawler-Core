@@ -30,6 +30,7 @@ import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import us.fatehi.registry.BasePluginRegistry;
 import us.fatehi.utility.SQLRuntimeException;
 import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.property.PropertyName;
@@ -37,7 +38,7 @@ import us.fatehi.utility.property.VersionNumber;
 import us.fatehi.utility.string.StringFormat;
 
 @UtilityMarker
-public final class JdbcDriverRegistry {
+public final class JdbcDriverRegistry extends BasePluginRegistry {
 
   private static final Logger LOGGER = Logger.getLogger(JdbcDriverRegistry.class.getName());
   private static JdbcDriverRegistry registrySingleton;
@@ -148,17 +149,8 @@ public final class JdbcDriverRegistry {
   private final Map<String, JdbcDriver> cachedDrivers;
 
   private JdbcDriverRegistry() {
+    super("JDBC Drivers");
     cachedDrivers = new LinkedHashMap<>(loadJdbcDriverRegistry());
-  }
-
-  public Collection<PropertyName> availableJDBCDrivers() {
-    final Collection<PropertyName> availableJDBCDrivers = new ArrayList<>();
-    for (final JdbcDriver jdbcDriver : cachedDrivers.values()) {
-      availableJDBCDrivers.add(
-          new PropertyName(
-              jdbcDriver.driverClassName(), jdbcDriver.driverVersionNumber().toString()));
-    }
-    return List.copyOf(availableJDBCDrivers);
   }
 
   public Connection createConnection(
@@ -175,6 +167,17 @@ public final class JdbcDriverRegistry {
 
     final Driver driver = jdbcDriverOptional.get();
     return driver.connect(connectionUrl, properties);
+  }
+
+  @Override
+  public Collection<PropertyName> getRegisteredPlugins() {
+    final Collection<PropertyName> availableJDBCDrivers = new ArrayList<>();
+    for (final JdbcDriver jdbcDriver : cachedDrivers.values()) {
+      availableJDBCDrivers.add(
+          new PropertyName(
+              jdbcDriver.driverClassName(), jdbcDriver.driverVersionNumber().toString()));
+    }
+    return List.copyOf(availableJDBCDrivers);
   }
 
   public JdbcDriverMetadata inspectMetadata(final String connectionUrl) {

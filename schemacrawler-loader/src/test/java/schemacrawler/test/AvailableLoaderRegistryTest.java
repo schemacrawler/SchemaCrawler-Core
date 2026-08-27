@@ -17,7 +17,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.loader.catalog.CatalogLoaderRegistry;
 import schemacrawler.loader.ermodel.ERModelLoaderRegistry;
-import schemacrawler.tools.registry.PluginRegistry;
+import us.fatehi.registry.PluginRegistry;
 import us.fatehi.utility.property.PropertyName;
 
 public class AvailableLoaderRegistryTest {
