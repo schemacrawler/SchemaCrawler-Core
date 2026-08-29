@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package us.fatehi.utility.datasource;
+package us.fatehi.utility.jdbc.serverfingerprint;
 
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.trimToEmpty;

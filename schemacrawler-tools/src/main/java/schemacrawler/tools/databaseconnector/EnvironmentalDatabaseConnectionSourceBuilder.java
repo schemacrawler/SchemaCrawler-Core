@@ -6,10 +6,10 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 
 import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.datasource.DatabaseConnectionSourceBuilder;
-import us.fatehi.utility.datasource.JdbcUrl;
-import us.fatehi.utility.datasource.JdbcUrlParser;
 import us.fatehi.utility.datasource.MultiUseUserCredentials;
 import us.fatehi.utility.datasource.UserCredentials;
+import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrl;
+import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrlParser;
 import us.fatehi.utility.readconfig.EnvironmentVariableConfig;
 import us.fatehi.utility.readconfig.ReadConfig;
 

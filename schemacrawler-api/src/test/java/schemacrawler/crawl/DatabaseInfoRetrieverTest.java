@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import schemacrawler.schema.DatabaseServerFingerprint;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schemacrawler.InformationSchemaKey;
@@ -49,6 +48,7 @@ import us.fatehi.utility.database.ConnectionInfoBuilder;
 import us.fatehi.utility.database.JdbcDriverProperty;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSources;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
 import us.fatehi.utility.property.Property;
 
 @WithTestDatabase

@@ -32,6 +32,7 @@ import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder;
 
 /**
  * Database and connection information. Created from metadata returned by a JDBC call, and other

@@ -18,9 +18,9 @@ import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.datasource.HostClassification;
-import us.fatehi.utility.datasource.JdbcUrl;
-import us.fatehi.utility.datasource.JdbcUrlParser;
+import us.fatehi.utility.jdbc.serverfingerprint.HostClassification;
+import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrl;
+import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrlParser;
 
 public class JdbcUrlParserTest {
 

@@ -32,6 +32,7 @@ public final class SerializedCatalogUtility {
       List.of(
           Pattern.compile("us\\.fatehi\\.utility\\.property\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.database\\.[A-Z].*"),
+          Pattern.compile("us\\.fatehi\\.utility\\.jdbc\\.serverfingerprint\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.[A-Z].*"),
           Pattern.compile("(\\[L)?java\\.(lang|util)\\..*"),

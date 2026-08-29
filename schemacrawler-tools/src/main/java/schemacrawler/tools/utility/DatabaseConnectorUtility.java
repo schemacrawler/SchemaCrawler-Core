@@ -25,7 +25,7 @@ import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseServerType;
-import us.fatehi.utility.datasource.JdbcUrlParser;
+import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrlParser;
 import us.fatehi.utility.readconfig.SystemPropertiesConfig;
 
 /** SchemaCrawler utility methods. */

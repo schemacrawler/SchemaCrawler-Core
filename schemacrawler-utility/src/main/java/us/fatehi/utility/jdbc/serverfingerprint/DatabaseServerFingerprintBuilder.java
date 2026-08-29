@@ -6,22 +6,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.crawl;
+package us.fatehi.utility.jdbc.serverfingerprint;
 
 import static java.util.Objects.requireNonNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import schemacrawler.schema.DatabaseServerFingerprint;
-import schemacrawler.schema.FingerprintConfidence;
 import us.fatehi.utility.Utility;
-import us.fatehi.utility.datasource.JdbcUrl;
-import us.fatehi.utility.datasource.JdbcUrlParser;
 import us.fatehi.utility.property.ProductVersion;
 
-final class DatabaseServerFingerprintBuilder {
+public final class DatabaseServerFingerprintBuilder {
 
-  static DatabaseServerFingerprint build(
+  public static DatabaseServerFingerprint build(
       final ProductVersion databaseInformation, final String connectionUrl) {
     requireNonNull(databaseInformation, "No database information provided");
     requireNonNull(connectionUrl, "No JDBC connection URL provided");

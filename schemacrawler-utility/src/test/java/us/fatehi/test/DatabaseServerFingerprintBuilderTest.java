@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.crawl;
+package us.fatehi.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -16,9 +16,10 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static us.fatehi.test.utility.TestUtility.SHA_256_HEX_PATTERN;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.schema.DatabaseServerFingerprint;
-import schemacrawler.schema.FingerprintConfidence;
 import us.fatehi.utility.database.DatabaseInformation;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder;
+import us.fatehi.utility.jdbc.serverfingerprint.FingerprintConfidence;
 
 public class DatabaseServerFingerprintBuilderTest {
 

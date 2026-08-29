@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.schema;
+package us.fatehi.utility.jdbc.serverfingerprint;
 
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;

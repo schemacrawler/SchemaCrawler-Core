@@ -13,8 +13,8 @@ import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.datasource.JdbcUrl;
-import us.fatehi.utility.datasource.JdbcUrlParser;
+import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrl;
+import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrlParser;
 
 /**
  * Tests that {@link JdbcUrlParser} correctly identifies the underlying database system when a spy
