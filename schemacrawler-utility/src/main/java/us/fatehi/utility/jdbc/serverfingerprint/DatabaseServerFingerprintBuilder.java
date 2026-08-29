@@ -12,30 +12,33 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import us.fatehi.utility.Nullable;
 import us.fatehi.utility.Utility;
 import us.fatehi.utility.property.ProductVersion;
 
 public final class DatabaseServerFingerprintBuilder {
 
   public static DatabaseServerFingerprint build(
-      final ProductVersion databaseInformation, final String connectionUrl) {
-    requireNonNull(databaseInformation, "No database information provided");
+      @Nullable final ProductVersion databaseInformation, final String connectionUrl) {
     requireNonNull(connectionUrl, "No JDBC connection URL provided");
 
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse(connectionUrl);
     final Map<String, String> canonical = canonicalMap(databaseInformation, jdbcUrl);
     final String fingerprint = Utility.hash(canonical);
     final FingerprintConfidence confidence = confidence(databaseInformation, jdbcUrl);
-    return new DatabaseServerFingerprint(fingerprint, confidence);
+    return new DatabaseServerFingerprint(
+        jdbcUrl.databaseSystemIdentifier(), jdbcUrl.hostClassification(), fingerprint, confidence);
   }
 
   private static Map<String, String> canonicalMap(
-      final ProductVersion databaseInformation, final JdbcUrl jdbcUrl) {
+      @Nullable final ProductVersion databaseInformation, final JdbcUrl jdbcUrl) {
     final Map<String, String> canonical = new LinkedHashMap<>();
     canonical.put("type", jdbcUrl.databaseSystemIdentifier());
     canonical.put("host", jdbcUrl.hostHash());
     canonical.put("database", jdbcUrl.databaseName());
-    canonical.put("database_product_version", databaseInformation.getProductVersion());
+    if (databaseInformation != null) {
+      canonical.put("version", databaseInformation.getProductVersion());
+    }
     return canonical;
   }
 

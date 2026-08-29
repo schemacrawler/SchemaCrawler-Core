@@ -25,7 +25,8 @@ import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseServerType;
-import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrlParser;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder;
 import us.fatehi.utility.readconfig.SystemPropertiesConfig;
 
 /** SchemaCrawler utility methods. */
@@ -88,8 +89,9 @@ public final class DatabaseConnectorUtility {
 
     // Resolve database type from JDBC URL, then look up the matching connector.
     final String connectionUrl = getConnectionUrl(connection);
-    final String databaseSystemIdentifier =
-        normalizedIdentifier(JdbcUrlParser.parse(connectionUrl).databaseSystemIdentifier());
+    final DatabaseServerFingerprint serverFingerprint =
+        DatabaseServerFingerprintBuilder.build(null, connectionUrl);
+    final String databaseSystemIdentifier = serverFingerprint.databaseSystemIdentifier();
 
     final DatabaseConnectorRegistry registry = DatabaseConnectorRegistry.getRegistry();
     final DatabaseConnector dbConnector = registry.getDatabaseConnector(databaseSystemIdentifier);

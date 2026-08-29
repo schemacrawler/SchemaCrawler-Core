@@ -11,13 +11,13 @@ package us.fatehi.utility.jdbc.serverfingerprint;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
-public record JdbcUrl(
+record JdbcUrl(
     String databaseSystemIdentifier,
     String hostHash,
     String databaseName,
     HostClassification hostClassification) {
 
-  public JdbcUrl {
+  JdbcUrl {
     databaseSystemIdentifier = normalizeToken(databaseSystemIdentifier);
     hostHash = normalizeToken(hostHash);
     databaseName = normalizeToken(databaseName);
@@ -26,23 +26,23 @@ public record JdbcUrl(
     }
   }
 
-  public JdbcUrl() {
+  JdbcUrl() {
     this(null, null, null, null);
   }
 
-  public boolean hasDatabaseName() {
+  boolean hasDatabaseName() {
     return !isBlank(databaseName);
   }
 
-  public boolean hasDatabaseSystemIdentifier() {
+  boolean hasDatabaseSystemIdentifier() {
     return !isBlank(databaseSystemIdentifier);
   }
 
-  public boolean hasHost() {
+  boolean hasHost() {
     return !isBlank(hostHash);
   }
 
-  public boolean hasPublicHost() {
+  boolean hasPublicHost() {
     return hasHost() && hostClassification == HostClassification.PUBLIC;
   }
 

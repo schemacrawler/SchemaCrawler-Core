@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package us.fatehi.utility.test;
+package us.fatehi.utility.jdbc.serverfingerprint;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -18,9 +18,6 @@ import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.jdbc.serverfingerprint.HostClassification;
-import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrl;
-import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrlParser;
 
 public class JdbcUrlParserTest {
 

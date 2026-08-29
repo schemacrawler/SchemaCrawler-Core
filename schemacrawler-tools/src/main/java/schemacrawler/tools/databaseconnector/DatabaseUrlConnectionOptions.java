@@ -8,13 +8,17 @@
 
 package schemacrawler.tools.databaseconnector;
 
-import us.fatehi.utility.jdbc.serverfingerprint.JdbcUrlParser;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder;
 
 public record DatabaseUrlConnectionOptions(String connectionUrl)
     implements DatabaseConnectionOptions {
 
   @Override
   public String databaseSystemIdentifier() {
-    return JdbcUrlParser.parse(connectionUrl).databaseSystemIdentifier();
+    final DatabaseServerFingerprint serverFingerprint =
+        DatabaseServerFingerprintBuilder.build(null, connectionUrl);
+    final String databaseSystemIdentifier = serverFingerprint.databaseSystemIdentifier();
+    return databaseSystemIdentifier;
   }
 }

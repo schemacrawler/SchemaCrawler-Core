@@ -15,14 +15,23 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 import java.io.Serializable;
 
 /** Database server fingerprint and confidence. */
-public record DatabaseServerFingerprint(String fingerprint, FingerprintConfidence confidence)
+public record DatabaseServerFingerprint(
+    String databaseSystemIdentifier,
+    HostClassification hostClassification,
+    String fingerprint,
+    FingerprintConfidence confidence)
     implements Serializable {
 
   public DatabaseServerFingerprint {
+    databaseSystemIdentifier = trimToEmpty(databaseSystemIdentifier);
     fingerprint = trimToEmpty(fingerprint);
-    if (isBlank(fingerprint)) {
+    if (isBlank(databaseSystemIdentifier) || isBlank(fingerprint)) {
       confidence = FingerprintConfidence.LOW;
     }
     requireNonNull(confidence, "No confidence provided");
+  }
+
+  public DatabaseServerFingerprint() {
+    this(null, HostClassification.UNKNOWN, null, FingerprintConfidence.LOW);
   }
 }

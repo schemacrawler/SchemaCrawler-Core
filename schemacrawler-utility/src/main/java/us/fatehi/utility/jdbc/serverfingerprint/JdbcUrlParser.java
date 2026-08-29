@@ -18,7 +18,7 @@ import java.util.Set;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
-public final class JdbcUrlParser {
+final class JdbcUrlParser {
 
   private record ParsedAuthority(
       String host,
@@ -35,7 +35,7 @@ public final class JdbcUrlParser {
   // sub-protocols - for example, jdbc:hsqldb:mysql://localhost:9001/schemacrawler
   private static final Set<String> SPY_PREFIXES = Set.of("p6spy", "log4jdbc");
 
-  public static JdbcUrl parse(final String url) {
+  static JdbcUrl parse(final String url) {
     if (isBlank(url)) {
       return new JdbcUrl();
     }
