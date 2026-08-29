@@ -14,7 +14,6 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 public record JdbcUrl(
     String databaseSystemIdentifier,
     String hostHash,
-    Integer port,
     String databaseName,
     HostClassification hostClassification) {
 
@@ -28,7 +27,7 @@ public record JdbcUrl(
   }
 
   public JdbcUrl() {
-    this(null, null, null, null, null);
+    this(null, null, null, null);
   }
 
   public boolean hasDatabaseName() {
@@ -41,10 +40,6 @@ public record JdbcUrl(
 
   public boolean hasHost() {
     return !isBlank(hostHash);
-  }
-
-  public boolean hasPort() {
-    return port != null;
   }
 
   public boolean hasPublicHost() {

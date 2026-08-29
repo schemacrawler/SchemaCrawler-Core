@@ -53,7 +53,6 @@ public class JdbcUrlHostTest {
 
     assertThat(jdbcUrl.hasDatabaseSystemIdentifier(), is(true));
     assertThat(jdbcUrl.hasHost(), is(false));
-    assertThat(jdbcUrl.hasPort(), is(false));
     assertThat(jdbcUrl.hasDatabaseName(), is(true));
     assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
     assertThat(jdbcUrl.hasPublicHost(), is(false));
@@ -65,7 +64,6 @@ public class JdbcUrlHostTest {
 
     assertThat(jdbcUrl.hasDatabaseSystemIdentifier(), is(true));
     assertThat(jdbcUrl.hasHost(), is(false));
-    assertThat(jdbcUrl.hasPort(), is(false));
     assertThat(jdbcUrl.hasDatabaseName(), is(false));
   }
 }

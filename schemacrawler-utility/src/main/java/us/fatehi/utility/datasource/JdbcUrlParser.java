@@ -46,8 +46,7 @@ public final class JdbcUrlParser {
 
     final int subprotocolEnd = jdbc.indexOf(':', "jdbc:".length());
     if (subprotocolEnd < 0) {
-      return new JdbcUrl(
-          jdbc.substring("jdbc:".length()), null, null, null, HostClassification.PUBLIC);
+      return new JdbcUrl(jdbc.substring("jdbc:".length()), null, null, HostClassification.PUBLIC);
     }
 
     final String databaseServerType = jdbc.substring("jdbc:".length(), subprotocolEnd);
@@ -124,7 +123,6 @@ public final class JdbcUrlParser {
     return new JdbcUrl(
         databaseServerType,
         normalizeHost(host, hostClassification),
-        port,
         databaseName,
         hostClassification);
   }
