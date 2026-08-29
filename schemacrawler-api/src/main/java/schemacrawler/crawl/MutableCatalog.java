@@ -32,6 +32,7 @@ import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
 import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder;
 
 /**
@@ -76,13 +77,12 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
     this.databaseInfo = requireNonNull(databaseInfo, "No database information provided");
     this.jdbcDriverInfo = requireNonNull(jdbcDriverInfo, "No JDBC driver information provided");
+    final DatabaseServerFingerprint databaseServerFingerprint =
+        DatabaseServerFingerprintBuilder.builder(jdbcDriverInfo.getConnectionUrl())
+            .withDatabaseProductVersion(databaseInfo)
+            .build();
     crawlInfo =
-        new ImmutableCrawlInfo(
-            title,
-            databaseInfo,
-            jdbcDriverInfo,
-            DatabaseServerFingerprintBuilder.build(
-                databaseInfo, jdbcDriverInfo.getConnectionUrl()));
+        new ImmutableCrawlInfo(title, databaseInfo, jdbcDriverInfo, databaseServerFingerprint);
   }
 
   /** {@inheritDoc} */

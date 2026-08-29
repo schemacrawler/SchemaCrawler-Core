@@ -89,7 +89,7 @@ public final class EnvironmentalDatabaseConnectionSourceBuilder {
   private static DatabaseConnectionSourceBuilder builderFromUrl(final String connectionUrl) {
 
     final DatabaseServerFingerprint serverFingerprint =
-        DatabaseServerFingerprintBuilder.build(null, connectionUrl);
+        DatabaseServerFingerprintBuilder.builder(connectionUrl).build();
     final String databaseSystemIdentifier = serverFingerprint.databaseSystemIdentifier();
 
     final DatabaseConnectionSourceBuilder dbConnectionSourceBuilder;

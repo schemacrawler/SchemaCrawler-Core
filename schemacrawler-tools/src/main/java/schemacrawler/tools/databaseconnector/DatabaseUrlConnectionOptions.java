@@ -17,7 +17,7 @@ public record DatabaseUrlConnectionOptions(String connectionUrl)
   @Override
   public String databaseSystemIdentifier() {
     final DatabaseServerFingerprint serverFingerprint =
-        DatabaseServerFingerprintBuilder.build(null, connectionUrl);
+        DatabaseServerFingerprintBuilder.builder(connectionUrl).build();
     final String databaseSystemIdentifier = serverFingerprint.databaseSystemIdentifier();
     return databaseSystemIdentifier;
   }

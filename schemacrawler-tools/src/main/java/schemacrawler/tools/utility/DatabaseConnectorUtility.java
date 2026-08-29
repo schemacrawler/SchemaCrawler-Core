@@ -90,7 +90,7 @@ public final class DatabaseConnectorUtility {
     // Resolve database type from JDBC URL, then look up the matching connector.
     final String connectionUrl = getConnectionUrl(connection);
     final DatabaseServerFingerprint serverFingerprint =
-        DatabaseServerFingerprintBuilder.build(null, connectionUrl);
+        DatabaseServerFingerprintBuilder.builder(connectionUrl).build();
     final String databaseSystemIdentifier = serverFingerprint.databaseSystemIdentifier();
 
     final DatabaseConnectorRegistry registry = DatabaseConnectorRegistry.getRegistry();
