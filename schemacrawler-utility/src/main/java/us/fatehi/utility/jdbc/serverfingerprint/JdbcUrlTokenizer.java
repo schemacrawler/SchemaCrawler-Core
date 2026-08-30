@@ -17,7 +17,7 @@ import java.util.Set;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
-final class JdbcUrlParser {
+final class JdbcUrlTokenizer {
 
   private record ParsedAuthority(
       String host,
@@ -34,18 +34,19 @@ final class JdbcUrlParser {
   // sub-protocols - for example, jdbc:hsqldb:mysql://localhost:9001/schemacrawler
   private static final Set<String> SPY_PREFIXES = Set.of("p6spy", "log4jdbc");
 
-  static JdbcUrl parse(final String url) {
+  static JdbcUrlTokens tokenize(final String url) {
     if (isBlank(url)) {
-      return new JdbcUrl();
+      return new JdbcUrlTokens();
     }
     final String jdbc = url.trim();
     if (!jdbc.startsWith("jdbc:")) {
-      return new JdbcUrl();
+      return new JdbcUrlTokens();
     }
 
     final int subprotocolEnd = jdbc.indexOf(':', "jdbc:".length());
     if (subprotocolEnd < 0) {
-      return new JdbcUrl(jdbc.substring("jdbc:".length()), null, null, HostClassification.PUBLIC);
+      return new JdbcUrlTokens(
+          jdbc.substring("jdbc:".length()), null, null, HostClassification.PUBLIC);
     }
 
     final String databaseServerType = jdbc.substring("jdbc:".length(), subprotocolEnd);
@@ -59,7 +60,7 @@ final class JdbcUrlParser {
     if (isSpyPrefix(databaseServerType)) {
       final String innerUrl = unwrapSpyUrl(jdbc.substring(subprotocolEnd + 1));
       if (!isBlank(innerUrl)) {
-        return parse(innerUrl);
+        return tokenize(innerUrl);
       }
     }
 
@@ -119,7 +120,7 @@ final class JdbcUrlParser {
       databaseName = firstToken(normalizedBody);
     }
 
-    return new JdbcUrl(
+    return new JdbcUrlTokens(
         databaseServerType,
         normalizeHost(host, hostClassification),
         databaseName,
@@ -332,7 +333,7 @@ final class JdbcUrlParser {
     return inner.startsWith("jdbc:") ? inner : "jdbc:" + inner;
   }
 
-  private JdbcUrlParser() {
+  private JdbcUrlTokenizer() {
     // Prevent instantiation
   }
 }

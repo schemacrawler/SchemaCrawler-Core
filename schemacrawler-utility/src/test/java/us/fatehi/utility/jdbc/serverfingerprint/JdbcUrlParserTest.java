@@ -11,6 +11,7 @@ package us.fatehi.utility.jdbc.serverfingerprint;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static us.fatehi.test.utility.TestUtility.NOT_BLANK;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -23,152 +24,234 @@ public class JdbcUrlParserTest {
 
   @Test
   public void parseAuthorityWithDatabasePropertyFallback() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver://sqlhost:1433;database=Sales");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("sales"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:sqlserver://sqlhost:1433;database=Sales");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
   }
 
   @Test
   public void parseAuthorityWithDbPropertyFallback() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver://sqlhost:1433;db=Sales");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("sales"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:sqlserver://sqlhost:1433;db=Sales");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
   }
 
   @Test
   public void parseAuthorityWithQueryAndFragment() {
-    final JdbcUrl jdbcUrl =
-        JdbcUrlParser.parse("jdbc:postgresql://pgserver:5432/appdb?ssl=true#connection");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("postgresql"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("appdb"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:postgresql://pgserver:5432/appdb?ssl=true#connection");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("postgresql")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("appdb")));
   }
 
   @Test
   public void parseBlankUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse(null);
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is(""));
-    assertThat(jdbcUrl.host(), is(""));
-    assertThat(jdbcUrl.databaseName(), is(""));
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize(null);
+    assertAll(
+        () -> assertThat("database system identifier", jdbcUrl.databaseSystemIdentifier(), is("")),
+        () -> assertThat("host", jdbcUrl.host(), is("")),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("")));
   }
 
   @Test
   public void parseBracketedIpv6HostPort() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:postgresql://[2001:db8::10]:5432/mydb");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("postgresql"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("mydb"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:postgresql://[2001:db8::10]:5432/mydb");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("postgresql")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("mydb")));
   }
 
   @Test
   public void parseHostListUsesFirstHost() {
-    final JdbcUrl jdbcUrl =
-        JdbcUrlParser.parse("jdbc:postgresql://host1:5432,host2:5433,host3:5434/mydb");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("postgresql"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("mydb"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:postgresql://host1:5432,host2:5433,host3:5434/mydb");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("postgresql")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("mydb")));
   }
 
   @Test
   public void parseHostPortDatabaseUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql://db.example.com:3306/appdb");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("mysql"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("appdb"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:mysql://db.example.com:3306/appdb");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("mysql")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("appdb")));
   }
 
   @Test
   public void parseInvalidPortAsNull() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql://dbhost:notaport/appdb");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("mysql"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("appdb"));
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:mysql://dbhost:notaport/appdb");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("mysql")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("appdb")));
   }
 
   @Test
   public void parseJdbcWithoutDriverBody() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("mysql"));
-    assertThat(jdbcUrl.host(), is(""));
-    assertThat(jdbcUrl.databaseName(), is(""));
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:mysql");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("mysql")),
+        () -> assertThat("host", jdbcUrl.host(), is("")),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("")));
   }
 
   @Test
   public void parseNestedAuthorityUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:hsqldb:hsql://localhost:9001/schemacrawler");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("hsqldb"));
-    assertThat(jdbcUrl.host(), is("<localhost>"));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.LOCALHOST));
-    assertThat(jdbcUrl.databaseName(), is("schemacrawler"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:hsqldb:hsql://localhost:9001/schemacrawler");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("hsqldb")),
+        () -> assertThat("host", jdbcUrl.host(), is("<localhost>")),
+        () ->
+            assertThat(
+                "host classification",
+                jdbcUrl.hostClassification(),
+                is(HostClassification.LOCALHOST)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("schemacrawler")));
   }
 
   @Test
   public void parseNonAuthoritySemicolonFormFallbackToHeadToken() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver:sqlhost:1433;encrypt=true");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("sqlhost:1433"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:sqlserver:sqlhost:1433;encrypt=true");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("sqlhost:1433")));
   }
 
   @Test
   public void parseNonAuthoritySemicolonFormWithDatabase() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver:sqlhost:1433;database=Sales");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("sales"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:sqlserver:sqlhost:1433;database=Sales");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
   }
 
   @Test
   public void parseNonAuthoritySemicolonFormWithDatabaseName() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver:sqlhost:1433;databaseName=Sales");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("sales"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:sqlserver:sqlhost:1433;databaseName=Sales");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
   }
 
   @Test
   public void parseNonJdbcUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("mysql://db:3306/appdb");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is(""));
-    assertThat(jdbcUrl.host(), is(""));
-    assertThat(jdbcUrl.databaseName(), is(""));
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("mysql://db:3306/appdb");
+    assertAll(
+        () -> assertThat("database system identifier", jdbcUrl.databaseSystemIdentifier(), is("")),
+        () -> assertThat("host", jdbcUrl.host(), is("")),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("")));
   }
 
   @Test
   public void parseOfflineFileUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:offline:C:\\temp\\snapshot.db");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("offline"));
-    assertThat(jdbcUrl.host(), is(""));
-    assertThat(jdbcUrl.databaseName(), is("c:\\temp\\snapshot.db"));
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:offline:C:\\temp\\snapshot.db");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("offline")),
+        () -> assertThat("host", jdbcUrl.host(), is("")),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("c:\\temp\\snapshot.db")));
   }
 
   @Test
   public void parseOracleAtHostSyntaxWithoutSlashes() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:oracle:thin:@oracledb:1521/ORCL");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("oracle"));
-    assertThat(jdbcUrl.host(), is(""));
-    assertThat(jdbcUrl.databaseName(), is("thin:@oracledb:1521"));
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:oracle:thin:@oracledb:1521/ORCL");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("oracle")),
+        () -> assertThat("host", jdbcUrl.host(), is("")),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("thin:@oracledb:1521")));
   }
 
   @Test
   public void parseOracleStyleUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:oracle:thin:@//oracledb:1521/ORCLPDB1");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("oracle"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("orclpdb1"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:oracle:thin:@//oracledb:1521/ORCLPDB1");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("oracle")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("orclpdb1")));
   }
 
   @RepeatedTest(5)
@@ -176,8 +259,8 @@ public class JdbcUrlParserTest {
   public void parseSpyWrappedMysqlUrl() {
     final int randomLength = RandomUtils.insecure().randomInt(1, 10);
     final String spySubProtcol = RandomStringUtils.insecure().nextAlphabetic(randomLength);
-    final JdbcUrl jdbcUrl =
-        JdbcUrlParser.parse("jdbc:%s://dbhost:9999/appdb".formatted(spySubProtcol));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:%s://dbhost:9999/appdb".formatted(spySubProtcol));
     assertThat(
         "For spy sub-procol <%s>".formatted(spySubProtcol),
         jdbcUrl.databaseSystemIdentifier(),
@@ -186,18 +269,27 @@ public class JdbcUrlParserTest {
 
   @Test
   public void parseSqliteMemoryUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlite::memory:");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlite"));
-    assertThat(jdbcUrl.host(), is(""));
-    assertThat(jdbcUrl.databaseName(), is(":memory:"));
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:sqlite::memory:");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlite")),
+        () -> assertThat("host", jdbcUrl.host(), is("")),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is(":memory:")));
   }
 
   @Test
   public void parseSqlServerStyleUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlserver://sqlhost:1433;databaseName=Sales");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("sqlserver"));
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.databaseName(), is("sales"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:sqlserver://sqlhost:1433;databaseName=Sales");
+    assertAll(
+        () ->
+            assertThat(
+                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
   }
 }

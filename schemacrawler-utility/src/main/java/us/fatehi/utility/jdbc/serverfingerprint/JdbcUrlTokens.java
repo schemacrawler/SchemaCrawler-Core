@@ -11,13 +11,13 @@ package us.fatehi.utility.jdbc.serverfingerprint;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
-record JdbcUrl(
+record JdbcUrlTokens(
     String databaseSystemIdentifier,
     String host,
     String databaseName,
     HostClassification hostClassification) {
 
-  JdbcUrl {
+  JdbcUrlTokens {
     databaseSystemIdentifier = normalizeToken(databaseSystemIdentifier);
     host = normalizeToken(host);
     databaseName = normalizeToken(databaseName);
@@ -26,7 +26,7 @@ record JdbcUrl(
     }
   }
 
-  JdbcUrl() {
+  JdbcUrlTokens() {
     this(null, null, null, null);
   }
 

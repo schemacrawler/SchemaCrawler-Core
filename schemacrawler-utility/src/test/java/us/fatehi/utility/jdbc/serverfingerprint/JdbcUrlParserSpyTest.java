@@ -15,8 +15,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests that {@link JdbcUrlParser} correctly identifies the underlying database system when a spy
- * JDBC driver wraps the original URL (P6Spy, log4jdbc).
+ * Tests that {@link JdbcUrlTokenizer} correctly identifies the underlying database system when a
+ * spy JDBC driver wraps the original URL (P6Spy, log4jdbc).
  *
  * <p>These tests are expected to fail until production code is updated to unwrap spy URL prefixes.
  */
@@ -25,21 +25,23 @@ public class JdbcUrlParserSpyTest {
   @Test
   @DisplayName("HSQLDB supporting MySQL URL - databaseSystemIdentifier should be mysql")
   public void parseHsqldbSupportHsqlUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:hsqldb:mysql://localhost:9001/schemacrawler");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("hsqldb"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:hsqldb:mysql://localhost:9001/schemacrawler");
+    assertThat("database system identifier", jdbcUrl.databaseSystemIdentifier(), is("hsqldb"));
   }
 
   @Test
   @DisplayName("log4jdbc wrapping PostgreSQL URL - databaseSystemIdentifier should be postgresql")
   public void parseLog4jdbcWrappedPostgresqlUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:log4jdbc:postgresql://pghost:5432/mydb");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("postgresql"));
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:log4jdbc:postgresql://pghost:5432/mydb");
+    assertThat("database system identifier", jdbcUrl.databaseSystemIdentifier(), is("postgresql"));
   }
 
   @Test
   @DisplayName("P6Spy wrapping MySQL URL - databaseSystemIdentifier should be mysql")
   public void parseP6SpyWrappedMysqlUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:p6spy:mysql://dbhost:3306/appdb");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("mysql"));
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:p6spy:mysql://dbhost:3306/appdb");
+    assertThat("database system identifier", jdbcUrl.databaseSystemIdentifier(), is("mysql"));
   }
 }

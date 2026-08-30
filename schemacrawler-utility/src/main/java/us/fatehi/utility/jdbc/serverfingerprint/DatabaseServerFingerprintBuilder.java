@@ -53,7 +53,7 @@ public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseS
   @Override
   public DatabaseServerFingerprint build() {
 
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse(connectionUrl);
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize(connectionUrl);
     final Map<String, String> canonical = canonicalMap(jdbcUrl);
     final String fingerprint = Utility.hash(canonical);
     final FingerprintConfidence confidence = confidence(jdbcUrl);
@@ -67,7 +67,7 @@ public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseS
     return this;
   }
 
-  private Map<String, String> canonicalMap(final JdbcUrl jdbcUrl) {
+  private Map<String, String> canonicalMap(final JdbcUrlTokens jdbcUrl) {
     final Map<String, String> canonical = new LinkedHashMap<>();
     canonical.put("type", jdbcUrl.databaseSystemIdentifier());
     canonical.put("host", jdbcUrl.host());
@@ -89,7 +89,7 @@ public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseS
    * upgrade does not change which server this is, so it should not raise or lower how confident we
    * are in the server's identity - only the fingerprint hash reflects that change.
    */
-  private FingerprintConfidence confidence(final JdbcUrl jdbcUrl) {
+  private FingerprintConfidence confidence(final JdbcUrlTokens jdbcUrl) {
     final boolean hasType = jdbcUrl.hasDatabaseSystemIdentifier();
     final boolean hasHost = jdbcUrl.hasHost();
     final boolean hasDatabaseName = jdbcUrl.hasDatabaseName();

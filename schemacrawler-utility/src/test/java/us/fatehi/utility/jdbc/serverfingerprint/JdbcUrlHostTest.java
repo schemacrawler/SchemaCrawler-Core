@@ -11,6 +11,7 @@ package us.fatehi.utility.jdbc.serverfingerprint;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static us.fatehi.test.utility.TestUtility.NOT_BLANK;
 
 import org.junit.jupiter.api.Test;
@@ -19,51 +20,73 @@ public class JdbcUrlHostTest {
 
   @Test
   public void parseJdbcWithoutDriverBodyHasTypeButNoHostOrPort() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql");
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:mysql");
 
-    assertThat(jdbcUrl.hasDatabaseSystemIdentifier(), is(true));
-    assertThat(jdbcUrl.hasHost(), is(false));
-    assertThat(jdbcUrl.hasDatabaseName(), is(false));
+    assertAll(
+        () ->
+            assertThat(
+                "has database system identifier", jdbcUrl.hasDatabaseSystemIdentifier(), is(true)),
+        () -> assertThat("has host", jdbcUrl.hasHost(), is(false)),
+        () -> assertThat("has database name", jdbcUrl.hasDatabaseName(), is(false)));
   }
 
   @Test
   public void parseLocalUrlHasNoHost() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:sqlite::memory:");
+    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:sqlite::memory:");
 
-    assertThat(jdbcUrl.hasDatabaseSystemIdentifier(), is(true));
-    assertThat(jdbcUrl.hasHost(), is(false));
-    assertThat(jdbcUrl.hasDatabaseName(), is(true));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.hasPublicHost(), is(false));
+    assertAll(
+        () ->
+            assertThat(
+                "has database system identifier", jdbcUrl.hasDatabaseSystemIdentifier(), is(true)),
+        () -> assertThat("has host", jdbcUrl.hasHost(), is(false)),
+        () -> assertThat("has database name", jdbcUrl.hasDatabaseName(), is(true)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("has public host", jdbcUrl.hasPublicHost(), is(false)));
   }
 
   @Test
   public void parseMarksIpv6LiteralAsInternalOrIp() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:postgresql://[2001:db8::10]:5432/appdb");
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:postgresql://[2001:db8::10]:5432/appdb");
 
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hasHost(), is(true));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.hasPublicHost(), is(true));
+    assertAll(
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("has host", jdbcUrl.hasHost(), is(true)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("has public host", jdbcUrl.hasPublicHost(), is(true)));
   }
 
   @Test
   public void parseMarksPrivateIpv4AsInternalIp() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:postgresql://10.0.0.7:5432/appdb");
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:postgresql://10.0.0.7:5432/appdb");
 
-    assertThat(jdbcUrl.host(), is("<internal>"));
-    assertThat(jdbcUrl.hasHost(), is(true));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.INTERNAL));
-    assertThat(jdbcUrl.hasPublicHost(), is(false));
+    assertAll(
+        () -> assertThat("host", jdbcUrl.host(), is("<internal>")),
+        () -> assertThat("has host", jdbcUrl.hasHost(), is(true)),
+        () ->
+            assertThat(
+                "host classification",
+                jdbcUrl.hostClassification(),
+                is(HostClassification.INTERNAL)),
+        () -> assertThat("has public host", jdbcUrl.hasPublicHost(), is(false)));
   }
 
   @Test
   public void parseNormalizesPublicHostAndMarksItAsPublic() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql://Db.Example.Com:3306/appdb");
+    final JdbcUrlTokens jdbcUrl =
+        JdbcUrlTokenizer.tokenize("jdbc:mysql://Db.Example.Com:3306/appdb");
 
-    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hasHost(), is(true));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.hasPublicHost(), is(true));
+    assertAll(
+        () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("has host", jdbcUrl.hasHost(), is(true)),
+        () ->
+            assertThat(
+                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
+        () -> assertThat("has public host", jdbcUrl.hasPublicHost(), is(true)));
   }
 }
