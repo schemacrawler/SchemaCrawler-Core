@@ -13,13 +13,13 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 
 record JdbcUrl(
     String databaseSystemIdentifier,
-    String hostHash,
+    String host,
     String databaseName,
     HostClassification hostClassification) {
 
   JdbcUrl {
     databaseSystemIdentifier = normalizeToken(databaseSystemIdentifier);
-    hostHash = normalizeToken(hostHash);
+    host = normalizeToken(host);
     databaseName = normalizeToken(databaseName);
     if (hostClassification == null) {
       hostClassification = HostClassification.UNKNOWN;
@@ -39,7 +39,7 @@ record JdbcUrl(
   }
 
   boolean hasHost() {
-    return !isBlank(hostHash);
+    return !isBlank(host);
   }
 
   boolean hasPublicHost() {

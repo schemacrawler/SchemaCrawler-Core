@@ -18,33 +18,12 @@ import org.junit.jupiter.api.Test;
 public class JdbcUrlHostTest {
 
   @Test
-  public void parseNormalizesPublicHostAndMarksItAsPublic() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql://Db.Example.Com:3306/appdb");
+  public void parseJdbcWithoutDriverBodyHasTypeButNoHostOrPort() {
+    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql");
 
-    assertThat(jdbcUrl.hostHash(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hasHost(), is(true));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.hasPublicHost(), is(true));
-  }
-
-  @Test
-  public void parseMarksPrivateIpv4AsInternalIp() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:postgresql://10.0.0.7:5432/appdb");
-
-    assertThat(jdbcUrl.hostHash(), is("<internal>"));
-    assertThat(jdbcUrl.hasHost(), is(true));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.INTERNAL));
-    assertThat(jdbcUrl.hasPublicHost(), is(false));
-  }
-
-  @Test
-  public void parseMarksIpv6LiteralAsInternalOrIp() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:postgresql://[2001:db8::10]:5432/appdb");
-
-    assertThat(jdbcUrl.hostHash(), matchesPattern(NOT_BLANK));
-    assertThat(jdbcUrl.hasHost(), is(true));
-    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
-    assertThat(jdbcUrl.hasPublicHost(), is(true));
+    assertThat(jdbcUrl.hasDatabaseSystemIdentifier(), is(true));
+    assertThat(jdbcUrl.hasHost(), is(false));
+    assertThat(jdbcUrl.hasDatabaseName(), is(false));
   }
 
   @Test
@@ -59,11 +38,32 @@ public class JdbcUrlHostTest {
   }
 
   @Test
-  public void parseJdbcWithoutDriverBodyHasTypeButNoHostOrPort() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql");
+  public void parseMarksIpv6LiteralAsInternalOrIp() {
+    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:postgresql://[2001:db8::10]:5432/appdb");
 
-    assertThat(jdbcUrl.hasDatabaseSystemIdentifier(), is(true));
-    assertThat(jdbcUrl.hasHost(), is(false));
-    assertThat(jdbcUrl.hasDatabaseName(), is(false));
+    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
+    assertThat(jdbcUrl.hasHost(), is(true));
+    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
+    assertThat(jdbcUrl.hasPublicHost(), is(true));
+  }
+
+  @Test
+  public void parseMarksPrivateIpv4AsInternalIp() {
+    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:postgresql://10.0.0.7:5432/appdb");
+
+    assertThat(jdbcUrl.host(), is("<internal>"));
+    assertThat(jdbcUrl.hasHost(), is(true));
+    assertThat(jdbcUrl.hostClassification(), is(HostClassification.INTERNAL));
+    assertThat(jdbcUrl.hasPublicHost(), is(false));
+  }
+
+  @Test
+  public void parseNormalizesPublicHostAndMarksItAsPublic() {
+    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:mysql://Db.Example.Com:3306/appdb");
+
+    assertThat(jdbcUrl.host(), matchesPattern(NOT_BLANK));
+    assertThat(jdbcUrl.hasHost(), is(true));
+    assertThat(jdbcUrl.hostClassification(), is(HostClassification.PUBLIC));
+    assertThat(jdbcUrl.hasPublicHost(), is(true));
   }
 }

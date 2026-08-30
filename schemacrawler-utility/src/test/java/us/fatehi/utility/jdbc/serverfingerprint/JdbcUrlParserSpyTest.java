@@ -23,6 +23,13 @@ import org.junit.jupiter.api.Test;
 public class JdbcUrlParserSpyTest {
 
   @Test
+  @DisplayName("HSQLDB supporting MySQL URL - databaseSystemIdentifier should be mysql")
+  public void parseHsqldbSupportHsqlUrl() {
+    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:hsqldb:mysql://localhost:9001/schemacrawler");
+    assertThat(jdbcUrl.databaseSystemIdentifier(), is("hsqldb"));
+  }
+
+  @Test
   @DisplayName("log4jdbc wrapping PostgreSQL URL - databaseSystemIdentifier should be postgresql")
   public void parseLog4jdbcWrappedPostgresqlUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:log4jdbc:postgresql://pghost:5432/mydb");
@@ -34,12 +41,5 @@ public class JdbcUrlParserSpyTest {
   public void parseP6SpyWrappedMysqlUrl() {
     final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:p6spy:mysql://dbhost:3306/appdb");
     assertThat(jdbcUrl.databaseSystemIdentifier(), is("mysql"));
-  }
-
-  @Test
-  @DisplayName("HSQLDB supporting MySQL URL - databaseSystemIdentifier should be mysql")
-  public void parseHsqldbSupportHsqlUrl() {
-    final JdbcUrl jdbcUrl = JdbcUrlParser.parse("jdbc:hsqldb:mysql://localhost:9001/schemacrawler");
-    assertThat(jdbcUrl.databaseSystemIdentifier(), is("hsqldb"));
   }
 }

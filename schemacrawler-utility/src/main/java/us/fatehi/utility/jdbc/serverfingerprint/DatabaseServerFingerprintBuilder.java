@@ -70,7 +70,7 @@ public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseS
   private Map<String, String> canonicalMap(final JdbcUrl jdbcUrl) {
     final Map<String, String> canonical = new LinkedHashMap<>();
     canonical.put("type", jdbcUrl.databaseSystemIdentifier());
-    canonical.put("host", jdbcUrl.hostHash());
+    canonical.put("host", jdbcUrl.host());
     canonical.put("database", jdbcUrl.databaseName());
     // The product version is included in the hash on purpose, so that the
     // fingerprint value changes when a server is upgraded or patched,
