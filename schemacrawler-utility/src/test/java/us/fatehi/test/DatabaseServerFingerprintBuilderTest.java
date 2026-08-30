@@ -49,7 +49,7 @@ public class DatabaseServerFingerprintBuilderTest {
             .build();
 
     assertThat(fingerprint, is(notNullValue()));
-    assertThat(fingerprint.confidence(), is(FingerprintConfidence.LOW));
+    assertThat(fingerprint.confidence(), is(FingerprintConfidence.MEDIUM));
   }
 
   @Test

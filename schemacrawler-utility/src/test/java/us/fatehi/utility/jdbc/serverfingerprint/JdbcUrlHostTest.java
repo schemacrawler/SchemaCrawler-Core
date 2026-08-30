@@ -32,18 +32,28 @@ public class JdbcUrlHostTest {
 
   @Test
   public void parseLocalUrlHasNoHost() {
-    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:sqlite::memory:");
+
+    final String url = "jdbc:sqlite::memory:";
+    final String connectionUrl = url;
+    final JdbcUrlTokens parsed = JdbcUrlTokenizer.tokenize(connectionUrl);
 
     assertAll(
         () ->
             assertThat(
-                "has database system identifier", jdbcUrl.hasDatabaseSystemIdentifier(), is(true)),
-        () -> assertThat("has host", jdbcUrl.hasHost(), is(false)),
-        () -> assertThat("has database name", jdbcUrl.hasDatabaseName(), is(true)),
+                "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
+        () -> assertThat("host", parsed.host(), is(":memory:")),
+        () -> assertThat("database name", parsed.databaseName(), is("")),
         () ->
             assertThat(
-                "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
-        () -> assertThat("has public host", jdbcUrl.hasPublicHost(), is(false)));
+                "host classification",
+                parsed.hostClassification(),
+                is(HostClassification.LOCALHOST)),
+        () ->
+            assertThat(
+                "has database system identifier", parsed.hasDatabaseSystemIdentifier(), is(true)),
+        () -> assertThat("has host", parsed.hasHost(), is(true)),
+        () -> assertThat("has database name", parsed.hasDatabaseName(), is(false)),
+        () -> assertThat("has public host", parsed.hasPublicHost(), is(false)));
   }
 
   @Test

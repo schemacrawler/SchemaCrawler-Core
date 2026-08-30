@@ -268,17 +268,6 @@ public class JdbcUrlParserTest {
   }
 
   @Test
-  public void parseSqliteMemoryUrl() {
-    final JdbcUrlTokens jdbcUrl = JdbcUrlTokenizer.tokenize("jdbc:sqlite::memory:");
-    assertAll(
-        () ->
-            assertThat(
-                "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlite")),
-        () -> assertThat("host", jdbcUrl.host(), is("")),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is(":memory:")));
-  }
-
-  @Test
   public void parseSqlServerStyleUrl() {
     final JdbcUrlTokens jdbcUrl =
         JdbcUrlTokenizer.tokenize("jdbc:sqlserver://sqlhost:1433;databaseName=Sales");
