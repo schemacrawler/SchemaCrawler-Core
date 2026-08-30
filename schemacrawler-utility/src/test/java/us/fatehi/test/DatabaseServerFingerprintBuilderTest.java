@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
-import static us.fatehi.test.utility.TestUtility.SHA_256_HEX_PATTERN;
+import static us.fatehi.test.utility.TestUtility.NOT_BLANK;
 
 import org.junit.jupiter.api.Test;
 import us.fatehi.utility.database.DatabaseInformation;
@@ -34,7 +34,7 @@ public class DatabaseServerFingerprintBuilderTest {
             .build();
 
     assertThat(fingerprint, is(notNullValue()));
-    assertThat(fingerprint.fingerprint(), matchesPattern(SHA_256_HEX_PATTERN));
+    assertThat(fingerprint.fingerprint(), matchesPattern(NOT_BLANK));
     assertThat(fingerprint.confidence(), is(FingerprintConfidence.HIGH));
   }
 

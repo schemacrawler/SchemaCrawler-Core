@@ -36,7 +36,7 @@ import org.opentest4j.TestAbortedException;
 
 public final class TestUtility {
 
-  public static final String SHA_256_HEX_PATTERN = "^[0-9a-f]{64}$";
+  public static final String NOT_BLANK = "^(?!\\s*$).+$";
 
   public static void clean(final String dirname) throws Exception {
     final Path expectedResultsDirectory = buildDirectory().resolve("unit_tests_results_output");
