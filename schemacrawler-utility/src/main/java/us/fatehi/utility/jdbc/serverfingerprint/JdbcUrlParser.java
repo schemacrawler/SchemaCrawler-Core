@@ -9,7 +9,6 @@
 package us.fatehi.utility.jdbc.serverfingerprint;
 
 import static java.net.InetAddress.getByName;
-import static us.fatehi.utility.Utility.hash;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.net.InetAddress;
@@ -219,7 +218,7 @@ final class JdbcUrlParser {
       return null;
     }
     return switch (hostClassification) {
-      case PUBLIC -> hash(host.strip().toLowerCase());
+      case PUBLIC -> host.strip().toLowerCase();
       default -> "<%s>".formatted(hostClassification).toLowerCase();
     };
   }
