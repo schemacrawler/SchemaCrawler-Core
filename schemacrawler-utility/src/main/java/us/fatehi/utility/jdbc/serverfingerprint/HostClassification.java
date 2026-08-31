@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package us.fatehi.utility.datasource;
+package us.fatehi.utility.jdbc.serverfingerprint;
 
 /**
  * Classifies the host in a JDBC URL by its network accessibility. Used to determine whether a

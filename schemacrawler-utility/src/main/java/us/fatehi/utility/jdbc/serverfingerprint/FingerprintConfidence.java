@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.schema;
+package us.fatehi.utility.jdbc.serverfingerprint;
 
 /** Confidence level for a database server fingerprint. */
 public enum FingerprintConfidence {

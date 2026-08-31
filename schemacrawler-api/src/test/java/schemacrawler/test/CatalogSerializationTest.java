@@ -29,12 +29,12 @@ import java.sql.Connection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.DatabaseServerFingerprint;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.utility.SerializedCatalogUtility;
 import us.fatehi.utility.IOUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
 
 @WithTestDatabase
 public class CatalogSerializationTest {

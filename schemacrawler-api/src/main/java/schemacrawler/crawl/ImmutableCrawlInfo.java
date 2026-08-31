@@ -28,9 +28,8 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.SignStyle;
 import java.util.UUID;
 import schemacrawler.schema.CrawlInfo;
-import schemacrawler.schema.DatabaseServerFingerprint;
-import schemacrawler.schema.FingerprintConfidence;
 import schemacrawler.schemacrawler.Version;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
 import us.fatehi.utility.property.BaseProductVersion;
 import us.fatehi.utility.property.JvmSystemInfo;
 import us.fatehi.utility.property.OperatingSystemInfo;
@@ -97,7 +96,7 @@ final class ImmutableCrawlInfo implements CrawlInfo {
     if (databaseServerFingerprint != null) {
       return databaseServerFingerprint;
     }
-    return new DatabaseServerFingerprint("", FingerprintConfidence.LOW);
+    return new DatabaseServerFingerprint();
   }
 
   @Override

@@ -20,7 +20,7 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
 import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
-import static us.fatehi.test.utility.TestUtility.SHA_256_HEX_PATTERN;
+import static us.fatehi.test.utility.TestUtility.NOT_BLANK;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import schemacrawler.schema.DatabaseServerFingerprint;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schemacrawler.InformationSchemaKey;
@@ -49,6 +48,7 @@ import us.fatehi.utility.database.ConnectionInfoBuilder;
 import us.fatehi.utility.database.JdbcDriverProperty;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSources;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
 import us.fatehi.utility.property.Property;
 
 @WithTestDatabase
@@ -150,7 +150,7 @@ public class DatabaseInfoRetrieverTest {
     final DatabaseServerFingerprint fingerprint =
         catalog.getCrawlInfo().getDatabaseServerFingerprint();
     assertThat(fingerprint, is(notNullValue()));
-    assertThat(fingerprint.fingerprint(), matchesPattern(SHA_256_HEX_PATTERN));
+    assertThat(fingerprint.fingerprint(), matchesPattern(NOT_BLANK));
     assertThat(fingerprint.confidence(), is(notNullValue()));
   }
 

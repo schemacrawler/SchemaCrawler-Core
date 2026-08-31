@@ -10,6 +10,7 @@ package schemacrawler.schema;
 
 import java.io.Serializable;
 import java.time.Instant;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
 import us.fatehi.utility.property.ProductVersion;
 
 public interface CrawlInfo extends Serializable {

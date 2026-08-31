@@ -18,9 +18,8 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.SignStyle;
 import java.util.UUID;
 import schemacrawler.schema.CrawlInfo;
-import schemacrawler.schema.DatabaseServerFingerprint;
-import schemacrawler.schema.FingerprintConfidence;
 import schemacrawler.schemacrawler.Version;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
 import us.fatehi.utility.property.BaseProductVersion;
 import us.fatehi.utility.property.ProductVersion;
 
@@ -87,7 +86,7 @@ public class LightCrawlInfo implements CrawlInfo {
 
   @Override
   public DatabaseServerFingerprint getDatabaseServerFingerprint() {
-    return new DatabaseServerFingerprint("light-test-fingerprint", FingerprintConfidence.LOW);
+    return new DatabaseServerFingerprint();
   }
 
   /** {@inheritDoc} */
