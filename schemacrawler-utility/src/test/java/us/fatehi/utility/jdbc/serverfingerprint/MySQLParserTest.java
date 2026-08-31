@@ -21,6 +21,7 @@ class MySQLParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("mariadb")),
         () -> assertThat("host", parsed.host(), is("db.example.com")),
+        () -> assertThat("port", parsed.port(), is(3307)),
         () -> assertThat("database name", parsed.databaseName(), is("production")),
         () ->
             assertThat(
@@ -44,7 +45,8 @@ class MySQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("mariadb")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(3306)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -72,6 +74,7 @@ class MySQLParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("mysql")),
         () -> assertThat("host", parsed.host(), is("primary")),
+        () -> assertThat("port", parsed.port(), is(3306)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -95,7 +98,8 @@ class MySQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("mysql")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(3306)),
         () -> assertThat("database name", parsed.databaseName(), is("")),
         () ->
             assertThat(
@@ -122,6 +126,7 @@ class MySQLParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("mysql")),
         () -> assertThat("host", parsed.host(), is("host1")),
+        () -> assertThat("port", parsed.port(), is(3306)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -145,7 +150,8 @@ class MySQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("mysql")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -171,7 +177,8 @@ class MySQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("mysql")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(3306)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -197,7 +204,8 @@ class MySQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("mysql")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(3306)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(

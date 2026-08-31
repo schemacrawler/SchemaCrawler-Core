@@ -31,10 +31,11 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(1433)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("Sales")));
   }
 
   @Test
@@ -46,10 +47,11 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(1433)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("Sales")));
   }
 
   @Test
@@ -61,6 +63,7 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("postgresql")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(5432)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
@@ -73,6 +76,7 @@ public class JdbcUrlParserTest {
     assertAll(
         () -> assertThat("database system identifier", jdbcUrl.databaseSystemIdentifier(), is("")),
         () -> assertThat("host", jdbcUrl.host(), is("")),
+        () -> assertThat("has port", jdbcUrl.hasPort(), is(false)),
         () -> assertThat("database name", jdbcUrl.databaseName(), is("")));
   }
 
@@ -85,6 +89,7 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("postgresql")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(5432)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
@@ -100,6 +105,7 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("postgresql")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(5432)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
@@ -115,6 +121,7 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("mysql")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(3306)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
@@ -129,6 +136,7 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("mysql")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("has port", jdbcUrl.hasPort(), is(false)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
@@ -143,6 +151,7 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("mysql")),
         () -> assertThat("host", jdbcUrl.host(), is("")),
+        () -> assertThat("has port", jdbcUrl.hasPort(), is(false)),
         () -> assertThat("database name", jdbcUrl.databaseName(), is("")));
   }
 
@@ -154,7 +163,8 @@ public class JdbcUrlParserTest {
         () ->
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("hsqldb")),
-        () -> assertThat("host", jdbcUrl.host(), is("<localhost>")),
+        () -> assertThat("host", jdbcUrl.host(), is("localhost")),
+        () -> assertThat("port", jdbcUrl.port(), is(9001)),
         () ->
             assertThat(
                 "host classification",
@@ -172,6 +182,7 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(1433)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
@@ -187,10 +198,11 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(1433)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("Sales")));
   }
 
   @Test
@@ -202,10 +214,11 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(1433)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("Sales")));
   }
 
   @Test
@@ -214,6 +227,7 @@ public class JdbcUrlParserTest {
     assertAll(
         () -> assertThat("database system identifier", jdbcUrl.databaseSystemIdentifier(), is("")),
         () -> assertThat("host", jdbcUrl.host(), is("")),
+        () -> assertThat("has port", jdbcUrl.hasPort(), is(false)),
         () -> assertThat("database name", jdbcUrl.databaseName(), is("")));
   }
 
@@ -225,7 +239,8 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("offline")),
         () -> assertThat("host", jdbcUrl.host(), is("")),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is("c:\\temp\\snapshot.db")));
+        () -> assertThat("has port", jdbcUrl.hasPort(), is(false)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("C:\\temp\\snapshot.db")));
   }
 
   @Test
@@ -235,8 +250,10 @@ public class JdbcUrlParserTest {
         () ->
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("oracle")),
-        () -> assertThat("host", jdbcUrl.host(), is("")),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is("thin:@oracledb:1521")));
+        () -> assertThat("host", jdbcUrl.host(), is("oracledb")),
+        () -> assertThat("port", jdbcUrl.port(), is(1521)),
+        () -> assertThat("has port", jdbcUrl.hasPort(), is(true)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("ORCL")));
   }
 
   @Test
@@ -248,10 +265,11 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("oracle")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(1521)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is("orclpdb1")));
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("ORCLPDB1")));
   }
 
   @RepeatedTest(5)
@@ -276,9 +294,10 @@ public class JdbcUrlParserTest {
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("sqlserver")),
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
+        () -> assertThat("port", jdbcUrl.port(), is(1433)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is("sales")));
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("Sales")));
   }
 }

@@ -20,7 +20,8 @@ class SQLServerParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlserver")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(1433)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -48,7 +49,8 @@ class SQLServerParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlserver")),
         () -> assertThat("host", parsed.host(), is("myserver")),
-        () -> assertThat("database name", parsed.databaseName(), is("adventureworks")),
+        () -> assertThat("port", parsed.port(), is(1433)),
+        () -> assertThat("database name", parsed.databaseName(), is("AdventureWorks")),
         () ->
             assertThat(
                 "host classification", parsed.hostClassification(), is(HostClassification.PUBLIC)),
@@ -72,6 +74,7 @@ class SQLServerParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlserver")),
         () -> assertThat("host", parsed.host(), is("dbserver")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("production")),
         () ->
             assertThat(
@@ -95,7 +98,8 @@ class SQLServerParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlserver")),
-        () -> assertThat("host", parsed.host(), is("localhost\\sqlexpress")),
+        () -> assertThat("host", parsed.host(), is("localhost\\SQLEXPRESS")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -119,7 +123,8 @@ class SQLServerParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlserver")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -145,7 +150,8 @@ class SQLServerParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlserver")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(1433)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -171,7 +177,8 @@ class SQLServerParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlserver")),
-        () -> assertThat("host", parsed.host(), is("localhost\\sqlexpress")),
+        () -> assertThat("host", parsed.host(), is("localhost\\SQLEXPRESS")),
+        () -> assertThat("port", parsed.port(), is(1433)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -196,7 +203,8 @@ class SQLServerParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlserver")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(1433)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(

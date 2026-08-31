@@ -14,6 +14,8 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import us.fatehi.utility.UtilityMarker;
 
 /**
@@ -36,8 +38,8 @@ import us.fatehi.utility.UtilityMarker;
  *   <li>Normalize Oracle's {@code @//host:port/service} full authority form so it is recognized as
  *       a standard {@code //host:port/...} authority.
  *   <li>Branch on the remaining body's shape - see {@link #tokenize(String)}'s inline branch
- *       documentation for Branch A (authority form), Branch B (non-authority, semicolon
- *       properties), and Branch C (non-authority, no properties).
+ *       documentation for Branch A (authority form) and Branch B (non-authority form, with or
+ *       without semicolon-delimited properties).
  * </ol>
  *
  * <h2>Design principles</h2>
@@ -54,10 +56,17 @@ import us.fatehi.utility.UtilityMarker;
  *       future driver following the same convention) often prefix their body with a short
  *       alphabetic "mode" token before a colon, such as {@code mem:}, {@code file:}, {@code res:}.
  *       This tokenizer treats that token as a pseudo-host: it is reported verbatim as {@code host}
- *       (never masked, unlike a real resolved hostname) and given a classification that reflects
- *       what the mode implies (memory-based modes are {@code LOCALHOST}, file/resource modes are
- *       {@code INTERNAL} or {@code LOCALHOST} per the driver's convention). See {@link
- *       #resolveEmbeddedOrHost(String)}.
+ *       and given a classification that reflects what the mode implies (memory-based modes are
+ *       {@code LOCALHOST}, file/resource modes are {@code INTERNAL} or {@code LOCALHOST} per the
+ *       driver's convention). See {@link #resolveEmbeddedOrHost(String)}.
+ *   <li><b>No masking or case normalization here.</b> This class returns {@code host} and {@code
+ *       databaseName} exactly as they appear in the URL - no lower-casing, no substitution of a
+ *       masked placeholder for locally- or privately-scoped hosts. Callers that need a masked or
+ *       case-normalized value for hashing or display (such as {@link
+ *       DatabaseServerFingerprintBuilder}) are responsible for applying that transformation
+ *       themselves, based on the reported {@link HostClassification}. (The database system
+ *       identifier is the one exception: it is still lower-cased here, since it is an internal
+ *       driver-prefix token rather than user-facing host or database data.)
  *   <li><b>Oracle TNS descriptors are out of scope.</b> Parenthesized {@code (DESCRIPTION=...)}
  *       connection strings are never decomposed into host/port; this is intentional and permanent.
  * </ul>
@@ -81,8 +90,9 @@ final class JdbcUrlTokenizer {
    * be a real {@code host:port} pair, an embedded-database mode-token pseudo-host, or a plain local
    * path with no host information at all. See {@link #resolveEmbeddedOrHost(String)}.
    *
-   * @param host the final, display-ready host value (already masked if it is a real hostname
-   *     needing masking; reported verbatim if it is a mode-token pseudo-host or blank)
+   * @param host the host value, reported exactly as it appears in the URL (a real hostname/IP
+   *     literal, a mode-token pseudo-host such as {@code "mem"}, or blank) - never masked or
+   *     case-normalized
    * @param port the port number, if this turned out to be a real {@code host:port} pair; {@code
    *     null} otherwise (mode tokens and plain paths never carry a port)
    * @param databaseNameFallback the best available database-name value if no semicolon-property
@@ -107,9 +117,27 @@ final class JdbcUrlTokenizer {
   // Any mode token not listed here still gets recognized (see resolveEmbeddedOrHost),
   // falling back to classifyHost() so unrecognized future tokens still receive a
   // reasonable classification instead of silently defaulting to PUBLIC.
-  private static final Set<String> MEMORY_MODE_TOKENS = Set.of("mem", "memory");
+  private static final Set<String> LOCALHOST_MODE_TOKENS = Set.of("mem", "memory", "res");
   private static final Set<String> INTERNAL_MODE_TOKENS = Set.of("file");
-  private static final Set<String> LOCALHOST_MODE_TOKENS = Set.of("res");
+
+  // Matches an IPv4 dotted-quad literal, e.g. "192.168.1.1".
+  private static final Pattern IPV4_LITERAL_PATTERN = Pattern.compile("\\d{1,3}(?:\\.\\d{1,3}){3}");
+
+  // Matches a bracketed IPv6 literal, e.g. "[::1]" or "[2001:db8::1]".
+  private static final Pattern IPV6_BRACKETED_LITERAL_PATTERN =
+      Pattern.compile("\\[[0-9a-fA-F:]+\\]");
+
+  // Splits a URL body at its first "?" (query string) or "#" (fragment) marker.
+  private static final Pattern QUERY_OR_FRAGMENT_PATTERN = Pattern.compile("[?#]");
+
+  // Matches an Oracle short-form body of the shape "host:port:SID" or
+  // "host:port/service" - the text following the short form's leading "@" (with
+  // that "@" already stripped by the caller). The port is bounded by whichever of
+  // ":" (SID form) or "/" (service-name form) comes first, or the end of the
+  // string if neither is present; whatever follows that separator - if any - is
+  // the database name.
+  private static final Pattern ORACLE_SHORT_FORM_PATTERN =
+      Pattern.compile("^(?<host>[^:/]+):(?<port>\\d+)(?:[:/](?<databaseName>.*))?$");
 
   static JdbcUrlTokens tokenize(final String url) {
     if (isBlank(url)) {
@@ -124,7 +152,7 @@ final class JdbcUrlTokenizer {
     if (subprotocolEnd < 0) {
       // e.g. "jdbc:mysql" - a driver identifier with no further body at all.
       return new JdbcUrlTokens(
-          jdbc.substring("jdbc:".length()), null, null, HostClassification.UNKNOWN, null);
+          jdbc.substring("jdbc:".length()), null, null, null, HostClassification.UNKNOWN);
     }
 
     final String databaseServerType = jdbc.substring("jdbc:".length(), subprotocolEnd);
@@ -170,26 +198,35 @@ final class JdbcUrlTokenizer {
       // - jdbc:oracle:thin:@//oracledb:1521/ORCLPDB1
       // - jdbc:h2:tcp://localhost:9092/~/testdb
       final ParsedAuthority parsed = parseAuthority(normalizedBody);
-      host = maskHost(parsed.host(), parsed.hostClassification());
+      host = parsed.host();
       port = parsed.port();
       hostClassification = parsed.hostClassification();
       databaseName = parsed.databaseName();
       if (isBlank(databaseName)) {
         databaseName = databaseNameFromOptions(parsed.options());
       }
-    } else if (normalizedBody.contains(";")) {
-      // Branch B: non-authority form with semicolon-delimited properties. The
-      // portion before the first ";" ("head") is resolved the same way as Branch
-      // C's body (see resolveEmbeddedOrHost): it may be a real host[:port] pair, an
-      // embedded-database mode-token pseudo-host, or a plain local path. The
-      // database name prefers a recognized property key (databaseName/database/db)
-      // and otherwise falls back to whatever resolveEmbeddedOrHost reports.
+    } else {
+      // Branch B: non-authority form - the body may or may not contain
+      // semicolon-delimited properties. Splitting on the first ";" always yields a
+      // "head" token to resolve (the whole body when there is no ";"); resolving
+      // the head is identical either way (see resolveEmbeddedOrHost): it may be a
+      // real host[:port] pair, an embedded-database mode-token pseudo-host
+      // (including SQLite's special ":memory:"/"memory:" form), or a plain local
+      // path/file reference with no host at all. The database name prefers a
+      // recognized property key (databaseName/database/db) from any options found
+      // after the ";", and otherwise falls back to whatever resolveEmbeddedOrHost
+      // reports.
       // Examples:
       // - jdbc:sqlserver:sqlhost:1433;databaseName=Sales (host:port, db from property)
       // - jdbc:sqlserver:sqlhost:1433;encrypt=true (host:port, db falls back to head)
       // - jdbc:hsqldb:file:testdb;shutdown=true;hsqldb.tx=mvcc (mode token "file")
       // - jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL (mode token "mem")
       // - jdbc:h2:~/testdb;MODE=MySQL (plain local path, no host at all)
+      // - jdbc:sqlite:/data/databases/mydb.db (plain local path, no ";" at all)
+      // - jdbc:sqlite::memory: (SQLite in-memory special case, no ";" at all)
+      // - jdbc:h2:mem:testdb (mode token "mem", no ";" at all)
+      // - jdbc:hsqldb:res:/org/mydatabase/mydb (mode token "res", no ";" at all)
+      // - jdbc:oracle:thin:@oracledb:1521/ORCL (Oracle short-form carve-out, no ";")
       final String[] headAndOptions = normalizedBody.split(";", 2);
       final String head = headAndOptions[0];
       final String options = headAndOptions.length > 1 ? headAndOptions[1] : "";
@@ -201,26 +238,9 @@ final class JdbcUrlTokenizer {
       if (isBlank(databaseName)) {
         databaseName = resolved.databaseNameFallback();
       }
-    } else {
-      // Branch C: path-only/local forms - no host authority and no semicolon
-      // properties. Resolved identically to Branch B's head token (see
-      // resolveEmbeddedOrHost): a real host:port pair, an embedded-database
-      // mode-token pseudo-host (including SQLite's special ":memory:"/"memory:"
-      // form), or a plain local path/file reference with no host at all.
-      // Examples:
-      // - jdbc:sqlite:/data/databases/mydb.db (plain local path)
-      // - jdbc:sqlite::memory: (SQLite in-memory special case)
-      // - jdbc:h2:mem:testdb (mode token "mem")
-      // - jdbc:hsqldb:res:/org/mydatabase/mydb (mode token "res")
-      // - jdbc:oracle:thin:@oracledb:1521/ORCL (Oracle short-form carve-out)
-      final EmbeddedOrHost resolved = resolveEmbeddedOrHost(normalizedBody);
-      host = resolved.host();
-      port = resolved.port();
-      hostClassification = resolved.hostClassification();
-      databaseName = resolved.databaseNameFallback();
     }
 
-    return new JdbcUrlTokens(databaseServerType, host, databaseName, hostClassification, port);
+    return new JdbcUrlTokens(databaseServerType, host, port, databaseName, hostClassification);
   }
 
   private static HostClassification classifyHost(final String host) {
@@ -304,29 +324,9 @@ final class JdbcUrlTokenizer {
   }
 
   private static boolean looksLikeIpLiteral(final String host) {
-    return host.matches("\\d{1,3}(?:\\.\\d{1,3}){3}")
-        || host.matches("\\[[0-9a-fA-F:]+\\]")
+    return IPV4_LITERAL_PATTERN.matcher(host).matches()
+        || IPV6_BRACKETED_LITERAL_PATTERN.matcher(host).matches()
         || host.contains(":");
-  }
-
-  /**
-   * Masks a real, resolved host value according to its classification, so that no locally- or
-   * privately-scoped hostname or IP address is exposed in the tokenized output. {@code PUBLIC}
-   * hosts are preserved (lower-cased); all other classifications are replaced with a fixed,
-   * non-identifying placeholder such as {@code "<localhost>"} or {@code "<internal>"}.
-   *
-   * <p>This masking must <b>not</b> be applied to embedded-database mode-token pseudo-hosts (e.g.
-   * {@code "mem"}, {@code "file"}) - those are reported verbatim by {@link
-   * #resolveEmbeddedOrHost(String)} without ever calling this method.
-   */
-  private static String maskHost(final String host, final HostClassification hostClassification) {
-    if (isBlank(host)) {
-      return "";
-    }
-    return switch (hostClassification) {
-      case PUBLIC -> host.strip().toLowerCase();
-      default -> "<%s>".formatted(hostClassification).toLowerCase();
-    };
   }
 
   /**
@@ -339,40 +339,51 @@ final class JdbcUrlTokenizer {
    */
   private static HostClassification modeClassification(final String token) {
     final String normalized = token.toLowerCase();
-    if (MEMORY_MODE_TOKENS.contains(normalized)) {
+    if (LOCALHOST_MODE_TOKENS.contains(normalized)) {
       return HostClassification.LOCALHOST;
     }
     if (INTERNAL_MODE_TOKENS.contains(normalized)) {
       return HostClassification.INTERNAL;
-    }
-    if (LOCALHOST_MODE_TOKENS.contains(normalized)) {
-      return HostClassification.LOCALHOST;
     }
     return classifyHost(token);
   }
 
   /**
    * Resolves a non-authority URL body - or, for Branch B, the portion of it preceding the first
-   * {@code ;} - into one of three shapes, checked in order:
+   * {@code ;} - into one of four shapes, checked in order:
    *
    * <ol>
    *   <li><b>SQLite's special in-memory form</b>: the body is exactly {@code ":memory:"} or {@code
    *       "memory:"}. Reported verbatim as {@code host} (so e.g. {@code ":memory:"} stays {@code
    *       ":memory:"}), classified {@code LOCALHOST}, with a blank database name.
+   *   <li><b>An Oracle TNS descriptor short form</b>: the token before the first colon is followed
+   *       by {@code @(} (e.g. {@code thin:@(description=...)}). TNS descriptor parsing is out of
+   *       scope, so this falls back to the legacy single-truncation behavior (host blank,
+   *       classification {@code UNKNOWN}, database name left as the unparsed descriptor text) - see
+   *       {@link #resolveOracleShortForm(String)}'s Javadoc for how this differs from the next
+   *       case.
+   *   <li><b>An Oracle non-descriptor short form</b>: the token before the first colon is followed
+   *       by {@code @host:port:SID} or {@code @host:port/service} (no {@code //} authority marker -
+   *       that form is normalized and routed through Branch A before reaching this method; see
+   *       {@link #normalizeOracleAuthorityMarker(String)}). Delegates to {@link
+   *       #resolveOracleShortForm(String)}, which parses the text after the leading {@code @} as an
+   *       ordinary {@code host:port} pair, classifies the host (see {@link #classifyHost(String)}),
+   *       and reports whatever follows the port (a {@code /service} or {@code :SID} suffix) as the
+   *       database name. If that text does not have a parseable {@code host:port} prefix, falls
+   *       through to the next cases below instead.
    *   <li><b>A real {@code host:port} pair</b>: the body contains a colon, and the text after that
    *       colon parses as a valid integer port (e.g. {@code sqlhost:1433}). The host is classified
-   *       and masked exactly like an authority-form host (see {@link #maskHost(String,
-   *       HostClassification)}), and the unsplit {@code host:port} text is offered as a
-   *       database-name fallback for callers with no recognized database property (this
-   *       intentionally preserves the pre-redesign fallback behavior for SQL Server-style URLs). An
-   *       Oracle {@code thin:@host:port/service} short form is explicitly carved out ahead of this
-   *       check and handled separately, since TNS/service-name parsing is out of scope.
+   *       (see {@link #classifyHost(String)}) and reported verbatim, unmasked - masking is applied
+   *       only when a fingerprint is built, not during tokenization - and the unsplit {@code
+   *       host:port} text is offered as a database-name fallback for callers with no recognized
+   *       database property (this intentionally preserves the pre-redesign fallback behavior for
+   *       SQL Server-style URLs).
    *   <li><b>An embedded-database mode-token pseudo-host</b>: the body contains a colon, the token
    *       before it is 2+ non-numeric characters (excluding Windows drive letters such as {@code
    *       C:}, which are always exactly one character), and the text after the colon is not a valid
    *       port number (e.g. {@code mem:testdb}, {@code file:/data/db}, {@code res:/org/db}). The
-   *       token becomes {@code host}, reported verbatim and never masked (see {@link
-   *       #modeClassification(String)}), and the remainder becomes the database-name fallback.
+   *       token becomes {@code host}, reported verbatim (see {@link #modeClassification(String)}),
+   *       and the remainder becomes the database-name fallback.
    * </ol>
    *
    * <p>If none of the above match, the body is a <b>plain local path or file reference</b> with no
@@ -396,19 +407,31 @@ final class JdbcUrlTokenizer {
       final String token = trimmed.substring(0, colon);
       final String rest = trimmed.substring(colon + 1);
 
-      // Oracle's "thin:@host:port/service" short form: TNS/service-name parsing is
-      // out of scope, so fall back to the legacy single-truncation behavior
-      // (host blank, database name truncated at the first "/") rather than
-      // treating "thin" as a mode token or "@oracledb:1521" as a real host.
-      if (rest.startsWith("@")) {
+      // Oracle TNS descriptor short form: "thin:@(description=...)". TNS/descriptor
+      // parsing is out of scope, so fall back to the legacy single-truncation
+      // behavior (host blank, database name left as the unparsed descriptor text)
+      // rather than attempting to decompose the parenthesized expression.
+      if (rest.startsWith("@(")) {
         return new EmbeddedOrHost("", null, firstToken(trimmed), HostClassification.UNKNOWN);
+      }
+
+      // Oracle's non-descriptor short forms: "thin:@host:port:SID" and
+      // "thin:@host:port/service" (no "//" authority marker - that form is already
+      // normalized and routed through Branch A before reaching this method). These
+      // are ordinary host:port pairs once the leading "@" is stripped, with the
+      // database name taken from whatever follows the port (a "/service" or
+      // ":SID" suffix).
+      if (rest.startsWith("@")) {
+        final EmbeddedOrHost oracleShortForm = resolveOracleShortForm(rest.substring(1));
+        if (oracleShortForm != null) {
+          return oracleShortForm;
+        }
       }
 
       final Integer restAsPort = parsePort(rest);
       if (restAsPort != null) {
         final HostClassification classification = classifyHost(token);
-        return new EmbeddedOrHost(
-            maskHost(token, classification), restAsPort, trimmed, classification);
+        return new EmbeddedOrHost(token, restAsPort, trimmed, classification);
       }
 
       final boolean isModeToken =
@@ -423,6 +446,36 @@ final class JdbcUrlTokenizer {
         null,
         trimmed,
         isBlank(trimmed) ? HostClassification.UNKNOWN : HostClassification.INTERNAL);
+  }
+
+  /**
+   * Resolves an Oracle short-form body of the shape {@code host:port:SID} or {@code
+   * host:port/service} - the text following the short form's leading {@code @}, with that {@code @}
+   * already stripped by the caller - using {@link #ORACLE_SHORT_FORM_PATTERN}. Returns {@code null}
+   * if {@code value} does not match that pattern (in which case the caller should fall through to
+   * other handling), so this method only ever returns a fully-resolved {@link EmbeddedOrHost} or
+   * signals "not a match" via {@code null}.
+   *
+   * @param value the short form's body, e.g. {@code "localhost:1521:ORCL"} or {@code
+   *     "dbserver.example.com:1522/myservice"}
+   * @return the resolved host/port/database name/classification, or {@code null} if {@code value}
+   *     does not match {@link #ORACLE_SHORT_FORM_PATTERN}
+   */
+  private static EmbeddedOrHost resolveOracleShortForm(final String value) {
+    final Matcher matcher = ORACLE_SHORT_FORM_PATTERN.matcher(value);
+    if (!matcher.matches()) {
+      return null;
+    }
+
+    final String host = matcher.group("host");
+    final Integer port = parsePort(matcher.group("port"));
+    if (port == null) {
+      return null;
+    }
+
+    final String databaseName = matcher.group("databaseName");
+    return new EmbeddedOrHost(
+        host, port, databaseName == null ? "" : databaseName, classifyHost(host));
   }
 
   private static String normalizeOracleAuthorityMarker(final String value) {
@@ -531,7 +584,7 @@ final class JdbcUrlTokenizer {
   }
 
   private static String stripQueryAndFragment(final String value) {
-    return value.split("[?#]", 2)[0];
+    return QUERY_OR_FRAGMENT_PATTERN.split(value, 2)[0];
   }
 
   private static String unwrapSpyUrl(final String remainder) {

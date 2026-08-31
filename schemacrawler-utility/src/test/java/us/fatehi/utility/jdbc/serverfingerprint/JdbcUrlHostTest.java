@@ -27,6 +27,7 @@ public class JdbcUrlHostTest {
             assertThat(
                 "has database system identifier", jdbcUrl.hasDatabaseSystemIdentifier(), is(true)),
         () -> assertThat("has host", jdbcUrl.hasHost(), is(false)),
+        () -> assertThat("has port", jdbcUrl.hasPort(), is(false)),
         () -> assertThat("has database name", jdbcUrl.hasDatabaseName(), is(false)));
   }
 
@@ -42,6 +43,7 @@ public class JdbcUrlHostTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
         () -> assertThat("host", parsed.host(), is(":memory:")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("")),
         () ->
             assertThat(
@@ -64,6 +66,7 @@ public class JdbcUrlHostTest {
     assertAll(
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
         () -> assertThat("has host", jdbcUrl.hasHost(), is(true)),
+        () -> assertThat("port", jdbcUrl.port(), is(5432)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),
@@ -76,8 +79,9 @@ public class JdbcUrlHostTest {
         JdbcUrlTokenizer.tokenize("jdbc:postgresql://10.0.0.7:5432/appdb");
 
     assertAll(
-        () -> assertThat("host", jdbcUrl.host(), is("<internal>")),
+        () -> assertThat("host", jdbcUrl.host(), is("10.0.0.7")),
         () -> assertThat("has host", jdbcUrl.hasHost(), is(true)),
+        () -> assertThat("port", jdbcUrl.port(), is(5432)),
         () ->
             assertThat(
                 "host classification",
@@ -94,6 +98,7 @@ public class JdbcUrlHostTest {
     assertAll(
         () -> assertThat("host", jdbcUrl.host(), matchesPattern(NOT_BLANK)),
         () -> assertThat("has host", jdbcUrl.hasHost(), is(true)),
+        () -> assertThat("port", jdbcUrl.port(), is(3306)),
         () ->
             assertThat(
                 "host classification", jdbcUrl.hostClassification(), is(HostClassification.PUBLIC)),

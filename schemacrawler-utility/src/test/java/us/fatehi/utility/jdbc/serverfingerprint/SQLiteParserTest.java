@@ -21,6 +21,7 @@ class SQLiteParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("/data/databases/mydb.db")),
         () ->
             assertThat(
@@ -47,6 +48,7 @@ class SQLiteParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () ->
             assertThat(
                 "database name", parsed.databaseName(), is("/var/lib/app/data/application.db")),
@@ -75,6 +77,7 @@ class SQLiteParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("")),
         () ->
             assertThat(
@@ -99,6 +102,7 @@ class SQLiteParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
         () -> assertThat("host", parsed.host(), is(":memory:")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("")),
         () ->
             assertThat(
@@ -125,6 +129,7 @@ class SQLiteParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("../data/mydb.db")),
         () ->
             assertThat(
@@ -151,6 +156,7 @@ class SQLiteParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("test.db")),
         () ->
             assertThat(
@@ -177,7 +183,8 @@ class SQLiteParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
         () -> assertThat("host", parsed.host(), is("")),
-        () -> assertThat("database name", parsed.databaseName(), is("c:\\databases\\test.db")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
+        () -> assertThat("database name", parsed.databaseName(), is("C:\\databases\\test.db")),
         () ->
             assertThat(
                 "host classification",
@@ -203,6 +210,7 @@ class SQLiteParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("sqlite")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("test.db")),
         () ->
             assertThat(
