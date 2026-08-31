@@ -14,6 +14,8 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import us.fatehi.utility.UtilityMarker;
 
 /**
@@ -115,9 +117,27 @@ final class JdbcUrlTokenizer {
   // Any mode token not listed here still gets recognized (see resolveEmbeddedOrHost),
   // falling back to classifyHost() so unrecognized future tokens still receive a
   // reasonable classification instead of silently defaulting to PUBLIC.
-  private static final Set<String> MEMORY_MODE_TOKENS = Set.of("mem", "memory");
+  private static final Set<String> LOCALHOST_MODE_TOKENS = Set.of("mem", "memory", "res");
   private static final Set<String> INTERNAL_MODE_TOKENS = Set.of("file");
-  private static final Set<String> LOCALHOST_MODE_TOKENS = Set.of("res");
+
+  // Matches an IPv4 dotted-quad literal, e.g. "192.168.1.1".
+  private static final Pattern IPV4_LITERAL_PATTERN = Pattern.compile("\\d{1,3}(?:\\.\\d{1,3}){3}");
+
+  // Matches a bracketed IPv6 literal, e.g. "[::1]" or "[2001:db8::1]".
+  private static final Pattern IPV6_BRACKETED_LITERAL_PATTERN =
+      Pattern.compile("\\[[0-9a-fA-F:]+\\]");
+
+  // Splits a URL body at its first "?" (query string) or "#" (fragment) marker.
+  private static final Pattern QUERY_OR_FRAGMENT_PATTERN = Pattern.compile("[?#]");
+
+  // Matches an Oracle short-form body of the shape "host:port:SID" or
+  // "host:port/service" - the text following the short form's leading "@" (with
+  // that "@" already stripped by the caller). The port is bounded by whichever of
+  // ":" (SID form) or "/" (service-name form) comes first, or the end of the
+  // string if neither is present; whatever follows that separator - if any - is
+  // the database name.
+  private static final Pattern ORACLE_SHORT_FORM_PATTERN =
+      Pattern.compile("^(?<host>[^:/]+):(?<port>\\d+)(?:[:/](?<databaseName>.*))?$");
 
   static JdbcUrlTokens tokenize(final String url) {
     if (isBlank(url)) {
@@ -304,8 +324,8 @@ final class JdbcUrlTokenizer {
   }
 
   private static boolean looksLikeIpLiteral(final String host) {
-    return host.matches("\\d{1,3}(?:\\.\\d{1,3}){3}")
-        || host.matches("\\[[0-9a-fA-F:]+\\]")
+    return IPV4_LITERAL_PATTERN.matcher(host).matches()
+        || IPV6_BRACKETED_LITERAL_PATTERN.matcher(host).matches()
         || host.contains(":");
   }
 
@@ -319,14 +339,11 @@ final class JdbcUrlTokenizer {
    */
   private static HostClassification modeClassification(final String token) {
     final String normalized = token.toLowerCase();
-    if (MEMORY_MODE_TOKENS.contains(normalized)) {
+    if (LOCALHOST_MODE_TOKENS.contains(normalized)) {
       return HostClassification.LOCALHOST;
     }
     if (INTERNAL_MODE_TOKENS.contains(normalized)) {
       return HostClassification.INTERNAL;
-    }
-    if (LOCALHOST_MODE_TOKENS.contains(normalized)) {
-      return HostClassification.LOCALHOST;
     }
     return classifyHost(token);
   }
@@ -434,38 +451,31 @@ final class JdbcUrlTokenizer {
   /**
    * Resolves an Oracle short-form body of the shape {@code host:port:SID} or {@code
    * host:port/service} - the text following the short form's leading {@code @}, with that {@code @}
-   * already stripped by the caller. Returns {@code null} if {@code value} does not have a parseable
-   * {@code host:port} prefix (in which case the caller should fall through to other handling), so
-   * this method only ever returns a fully-resolved {@link EmbeddedOrHost} or signals "not a match"
-   * via {@code null}.
+   * already stripped by the caller - using {@link #ORACLE_SHORT_FORM_PATTERN}. Returns {@code null}
+   * if {@code value} does not match that pattern (in which case the caller should fall through to
+   * other handling), so this method only ever returns a fully-resolved {@link EmbeddedOrHost} or
+   * signals "not a match" via {@code null}.
    *
    * @param value the short form's body, e.g. {@code "localhost:1521:ORCL"} or {@code
    *     "dbserver.example.com:1522/myservice"}
    * @return the resolved host/port/database name/classification, or {@code null} if {@code value}
-   *     does not start with a real {@code host:port} pair
+   *     does not match {@link #ORACLE_SHORT_FORM_PATTERN}
    */
   private static EmbeddedOrHost resolveOracleShortForm(final String value) {
-    final int hostPortColon = value.indexOf(':');
-    if (hostPortColon <= 0) {
+    final Matcher matcher = ORACLE_SHORT_FORM_PATTERN.matcher(value);
+    if (!matcher.matches()) {
       return null;
     }
-    final String host = value.substring(0, hostPortColon);
-    final String afterHost = value.substring(hostPortColon + 1);
 
-    // The port runs up to the next "/" (service-name form) or ":" (SID form), or to
-    // the end of the string if neither separator is present.
-    final int slash = afterHost.indexOf('/');
-    final int sidColon = afterHost.indexOf(':');
-    final int separator = slash < 0 ? sidColon : sidColon < 0 ? slash : Math.min(slash, sidColon);
-    final String portText = separator < 0 ? afterHost : afterHost.substring(0, separator);
-
-    final Integer port = parsePort(portText);
+    final String host = matcher.group("host");
+    final Integer port = parsePort(matcher.group("port"));
     if (port == null) {
       return null;
     }
 
-    final String databaseName = separator < 0 ? "" : afterHost.substring(separator + 1);
-    return new EmbeddedOrHost(host, port, databaseName, classifyHost(host));
+    final String databaseName = matcher.group("databaseName");
+    return new EmbeddedOrHost(
+        host, port, databaseName == null ? "" : databaseName, classifyHost(host));
   }
 
   private static String normalizeOracleAuthorityMarker(final String value) {
@@ -574,7 +584,7 @@ final class JdbcUrlTokenizer {
   }
 
   private static String stripQueryAndFragment(final String value) {
-    return value.split("[?#]", 2)[0];
+    return QUERY_OR_FRAGMENT_PATTERN.split(value, 2)[0];
   }
 
   private static String unwrapSpyUrl(final String remainder) {
