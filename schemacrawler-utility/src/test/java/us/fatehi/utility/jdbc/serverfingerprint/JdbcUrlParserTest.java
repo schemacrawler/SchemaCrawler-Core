@@ -250,9 +250,10 @@ public class JdbcUrlParserTest {
         () ->
             assertThat(
                 "database system identifier", jdbcUrl.databaseSystemIdentifier(), is("oracle")),
-        () -> assertThat("host", jdbcUrl.host(), is("")),
-        () -> assertThat("has port", jdbcUrl.hasPort(), is(false)),
-        () -> assertThat("database name", jdbcUrl.databaseName(), is("thin:@oracledb:1521")));
+        () -> assertThat("host", jdbcUrl.host(), is("oracledb")),
+        () -> assertThat("port", jdbcUrl.port(), is(1521)),
+        () -> assertThat("has port", jdbcUrl.hasPort(), is(true)),
+        () -> assertThat("database name", jdbcUrl.databaseName(), is("ORCL")));
   }
 
   @Test

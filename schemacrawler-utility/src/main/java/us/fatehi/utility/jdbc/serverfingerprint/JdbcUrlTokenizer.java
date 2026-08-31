@@ -341,21 +341,34 @@ final class JdbcUrlTokenizer {
 
   /**
    * Resolves a non-authority URL body - or, for Branch B, the portion of it preceding the first
-   * {@code ;} - into one of three shapes, checked in order:
+   * {@code ;} - into one of four shapes, checked in order:
    *
    * <ol>
    *   <li><b>SQLite's special in-memory form</b>: the body is exactly {@code ":memory:"} or {@code
    *       "memory:"}. Reported verbatim as {@code host} (so e.g. {@code ":memory:"} stays {@code
    *       ":memory:"}), classified {@code LOCALHOST}, with a blank database name.
+   *   <li><b>An Oracle TNS descriptor short form</b>: the token before the first colon is followed
+   *       by {@code @(} (e.g. {@code thin:@(description=...)}). TNS descriptor parsing is out of
+   *       scope, so this falls back to the legacy single-truncation behavior (host blank,
+   *       classification {@code UNKNOWN}, database name left as the unparsed descriptor text) - see
+   *       {@link #resolveOracleShortForm(String)}'s Javadoc for how this differs from the next
+   *       case.
+   *   <li><b>An Oracle non-descriptor short form</b>: the token before the first colon is followed
+   *       by {@code @host:port:SID} or {@code @host:port/service} (no {@code //} authority marker -
+   *       that form is normalized and routed through Branch A before reaching this method; see
+   *       {@link #normalizeOracleAuthorityMarker(String)}). Delegates to {@link
+   *       #resolveOracleShortForm(String)}, which parses the text after the leading {@code @} as an
+   *       ordinary {@code host:port} pair, classifies the host (see {@link #classifyHost(String)}),
+   *       and reports whatever follows the port (a {@code /service} or {@code :SID} suffix) as the
+   *       database name. If that text does not have a parseable {@code host:port} prefix, falls
+   *       through to the next cases below instead.
    *   <li><b>A real {@code host:port} pair</b>: the body contains a colon, and the text after that
    *       colon parses as a valid integer port (e.g. {@code sqlhost:1433}). The host is classified
    *       (see {@link #classifyHost(String)}) and reported verbatim, unmasked - masking is applied
    *       only when a fingerprint is built, not during tokenization - and the unsplit {@code
    *       host:port} text is offered as a database-name fallback for callers with no recognized
    *       database property (this intentionally preserves the pre-redesign fallback behavior for
-   *       SQL Server-style URLs). An Oracle {@code thin:@host:port/service} short form is
-   *       explicitly carved out ahead of this check and handled separately, since TNS/service-name
-   *       parsing is out of scope.
+   *       SQL Server-style URLs).
    *   <li><b>An embedded-database mode-token pseudo-host</b>: the body contains a colon, the token
    *       before it is 2+ non-numeric characters (excluding Windows drive letters such as {@code
    *       C:}, which are always exactly one character), and the text after the colon is not a valid
@@ -385,12 +398,25 @@ final class JdbcUrlTokenizer {
       final String token = trimmed.substring(0, colon);
       final String rest = trimmed.substring(colon + 1);
 
-      // Oracle's "thin:@host:port/service" short form: TNS/service-name parsing is
-      // out of scope, so fall back to the legacy single-truncation behavior
-      // (host blank, database name truncated at the first "/") rather than
-      // treating "thin" as a mode token or "@oracledb:1521" as a real host.
-      if (rest.startsWith("@")) {
+      // Oracle TNS descriptor short form: "thin:@(description=...)". TNS/descriptor
+      // parsing is out of scope, so fall back to the legacy single-truncation
+      // behavior (host blank, database name left as the unparsed descriptor text)
+      // rather than attempting to decompose the parenthesized expression.
+      if (rest.startsWith("@(")) {
         return new EmbeddedOrHost("", null, firstToken(trimmed), HostClassification.UNKNOWN);
+      }
+
+      // Oracle's non-descriptor short forms: "thin:@host:port:SID" and
+      // "thin:@host:port/service" (no "//" authority marker - that form is already
+      // normalized and routed through Branch A before reaching this method). These
+      // are ordinary host:port pairs once the leading "@" is stripped, with the
+      // database name taken from whatever follows the port (a "/service" or
+      // ":SID" suffix).
+      if (rest.startsWith("@")) {
+        final EmbeddedOrHost oracleShortForm = resolveOracleShortForm(rest.substring(1));
+        if (oracleShortForm != null) {
+          return oracleShortForm;
+        }
       }
 
       final Integer restAsPort = parsePort(rest);
@@ -411,6 +437,43 @@ final class JdbcUrlTokenizer {
         null,
         trimmed,
         isBlank(trimmed) ? HostClassification.UNKNOWN : HostClassification.INTERNAL);
+  }
+
+  /**
+   * Resolves an Oracle short-form body of the shape {@code host:port:SID} or {@code
+   * host:port/service} - the text following the short form's leading {@code @}, with that {@code @}
+   * already stripped by the caller. Returns {@code null} if {@code value} does not have a parseable
+   * {@code host:port} prefix (in which case the caller should fall through to other handling), so
+   * this method only ever returns a fully-resolved {@link EmbeddedOrHost} or signals "not a match"
+   * via {@code null}.
+   *
+   * @param value the short form's body, e.g. {@code "localhost:1521:ORCL"} or {@code
+   *     "dbserver.example.com:1522/myservice"}
+   * @return the resolved host/port/database name/classification, or {@code null} if {@code value}
+   *     does not start with a real {@code host:port} pair
+   */
+  private static EmbeddedOrHost resolveOracleShortForm(final String value) {
+    final int hostPortColon = value.indexOf(':');
+    if (hostPortColon <= 0) {
+      return null;
+    }
+    final String host = value.substring(0, hostPortColon);
+    final String afterHost = value.substring(hostPortColon + 1);
+
+    // The port runs up to the next "/" (service-name form) or ":" (SID form), or to
+    // the end of the string if neither separator is present.
+    final int slash = afterHost.indexOf('/');
+    final int sidColon = afterHost.indexOf(':');
+    final int separator = slash < 0 ? sidColon : sidColon < 0 ? slash : Math.min(slash, sidColon);
+    final String portText = separator < 0 ? afterHost : afterHost.substring(0, separator);
+
+    final Integer port = parsePort(portText);
+    if (port == null) {
+      return null;
+    }
+
+    final String databaseName = separator < 0 ? "" : afterHost.substring(separator + 1);
+    return new EmbeddedOrHost(host, port, databaseName, classifyHost(host));
   }
 
   private static String normalizeOracleAuthorityMarker(final String value) {
