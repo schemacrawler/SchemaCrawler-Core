@@ -2,6 +2,13 @@
 
 SchemaCrawler Core release notes.
 
+<a name="v17.14.2"></a>
+## Release v17.14.2 - 2026-09-10
+
+- Rewrite database server finger-printing to parse more JDBC connection URL types
+- Do not output JDBC connection URL, since it may contain sensitive information 
+
+
 <a name="v17.14.1"></a>
 ## Release v17.14.1 - 2026-08-22
 
