@@ -26,7 +26,7 @@ public record JdbcDriverProperty(
     implements Property {
 
   private static final Predicate<String> passwordMatcher =
-      Pattern.compile("password", Pattern.CASE_INSENSITIVE).asPredicate();
+      Pattern.compile("(password|token)", Pattern.CASE_INSENSITIVE).asPredicate();
 
   public JdbcDriverProperty {
     name = requireNotBlank(name, "Property name required");
