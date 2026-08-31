@@ -36,8 +36,8 @@ import us.fatehi.utility.UtilityMarker;
  *   <li>Normalize Oracle's {@code @//host:port/service} full authority form so it is recognized as
  *       a standard {@code //host:port/...} authority.
  *   <li>Branch on the remaining body's shape - see {@link #tokenize(String)}'s inline branch
- *       documentation for Branch A (authority form), Branch B (non-authority, semicolon
- *       properties), and Branch C (non-authority, no properties).
+ *       documentation for Branch A (authority form) and Branch B (non-authority form, with or
+ *       without semicolon-delimited properties).
  * </ol>
  *
  * <h2>Design principles</h2>
@@ -185,19 +185,28 @@ final class JdbcUrlTokenizer {
       if (isBlank(databaseName)) {
         databaseName = databaseNameFromOptions(parsed.options());
       }
-    } else if (normalizedBody.contains(";")) {
-      // Branch B: non-authority form with semicolon-delimited properties. The
-      // portion before the first ";" ("head") is resolved the same way as Branch
-      // C's body (see resolveEmbeddedOrHost): it may be a real host[:port] pair, an
-      // embedded-database mode-token pseudo-host, or a plain local path. The
-      // database name prefers a recognized property key (databaseName/database/db)
-      // and otherwise falls back to whatever resolveEmbeddedOrHost reports.
+    } else {
+      // Branch B: non-authority form - the body may or may not contain
+      // semicolon-delimited properties. Splitting on the first ";" always yields a
+      // "head" token to resolve (the whole body when there is no ";"); resolving
+      // the head is identical either way (see resolveEmbeddedOrHost): it may be a
+      // real host[:port] pair, an embedded-database mode-token pseudo-host
+      // (including SQLite's special ":memory:"/"memory:" form), or a plain local
+      // path/file reference with no host at all. The database name prefers a
+      // recognized property key (databaseName/database/db) from any options found
+      // after the ";", and otherwise falls back to whatever resolveEmbeddedOrHost
+      // reports.
       // Examples:
       // - jdbc:sqlserver:sqlhost:1433;databaseName=Sales (host:port, db from property)
       // - jdbc:sqlserver:sqlhost:1433;encrypt=true (host:port, db falls back to head)
       // - jdbc:hsqldb:file:testdb;shutdown=true;hsqldb.tx=mvcc (mode token "file")
       // - jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL (mode token "mem")
       // - jdbc:h2:~/testdb;MODE=MySQL (plain local path, no host at all)
+      // - jdbc:sqlite:/data/databases/mydb.db (plain local path, no ";" at all)
+      // - jdbc:sqlite::memory: (SQLite in-memory special case, no ";" at all)
+      // - jdbc:h2:mem:testdb (mode token "mem", no ";" at all)
+      // - jdbc:hsqldb:res:/org/mydatabase/mydb (mode token "res", no ";" at all)
+      // - jdbc:oracle:thin:@oracledb:1521/ORCL (Oracle short-form carve-out, no ";")
       final String[] headAndOptions = normalizedBody.split(";", 2);
       final String head = headAndOptions[0];
       final String options = headAndOptions.length > 1 ? headAndOptions[1] : "";
@@ -209,23 +218,6 @@ final class JdbcUrlTokenizer {
       if (isBlank(databaseName)) {
         databaseName = resolved.databaseNameFallback();
       }
-    } else {
-      // Branch C: path-only/local forms - no host authority and no semicolon
-      // properties. Resolved identically to Branch B's head token (see
-      // resolveEmbeddedOrHost): a real host:port pair, an embedded-database
-      // mode-token pseudo-host (including SQLite's special ":memory:"/"memory:"
-      // form), or a plain local path/file reference with no host at all.
-      // Examples:
-      // - jdbc:sqlite:/data/databases/mydb.db (plain local path)
-      // - jdbc:sqlite::memory: (SQLite in-memory special case)
-      // - jdbc:h2:mem:testdb (mode token "mem")
-      // - jdbc:hsqldb:res:/org/mydatabase/mydb (mode token "res")
-      // - jdbc:oracle:thin:@oracledb:1521/ORCL (Oracle short-form carve-out)
-      final EmbeddedOrHost resolved = resolveEmbeddedOrHost(normalizedBody);
-      host = resolved.host();
-      port = resolved.port();
-      hostClassification = resolved.hostClassification();
-      databaseName = resolved.databaseNameFallback();
     }
 
     return new JdbcUrlTokens(databaseServerType, host, port, databaseName, hostClassification);
