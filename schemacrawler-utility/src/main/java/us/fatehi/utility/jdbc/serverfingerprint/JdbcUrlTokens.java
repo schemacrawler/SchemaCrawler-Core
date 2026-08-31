@@ -46,9 +46,9 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 record JdbcUrlTokens(
     String databaseSystemIdentifier,
     String host,
+    Integer port,
     String databaseName,
-    HostClassification hostClassification,
-    Integer port) {
+    HostClassification hostClassification) {
 
   JdbcUrlTokens {
     databaseSystemIdentifier = normalizeToken(databaseSystemIdentifier);
@@ -69,6 +69,10 @@ record JdbcUrlTokens(
 
   boolean hasDatabaseSystemIdentifier() {
     return !isBlank(databaseSystemIdentifier);
+  }
+
+  boolean hasPort() {
+    return port != null;
   }
 
   boolean hasHost() {

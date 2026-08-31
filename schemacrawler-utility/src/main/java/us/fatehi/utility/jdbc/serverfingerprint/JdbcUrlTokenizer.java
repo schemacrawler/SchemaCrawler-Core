@@ -124,7 +124,7 @@ final class JdbcUrlTokenizer {
     if (subprotocolEnd < 0) {
       // e.g. "jdbc:mysql" - a driver identifier with no further body at all.
       return new JdbcUrlTokens(
-          jdbc.substring("jdbc:".length()), null, null, HostClassification.UNKNOWN, null);
+          jdbc.substring("jdbc:".length()), null, null, null, HostClassification.UNKNOWN);
     }
 
     final String databaseServerType = jdbc.substring("jdbc:".length(), subprotocolEnd);
@@ -220,7 +220,7 @@ final class JdbcUrlTokenizer {
       databaseName = resolved.databaseNameFallback();
     }
 
-    return new JdbcUrlTokens(databaseServerType, host, databaseName, hostClassification, port);
+    return new JdbcUrlTokens(databaseServerType, host, port, databaseName, hostClassification);
   }
 
   private static HostClassification classifyHost(final String host) {
