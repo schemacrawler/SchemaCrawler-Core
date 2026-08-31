@@ -21,6 +21,7 @@ class HSQLDBParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
         () -> assertThat("host", parsed.host(), is("file")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("/opt/db/testdb")),
         () ->
             assertThat(
@@ -47,6 +48,7 @@ class HSQLDBParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
         () -> assertThat("host", parsed.host(), is("file")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -72,7 +74,8 @@ class HSQLDBParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(8080)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -99,6 +102,7 @@ class HSQLDBParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
         () -> assertThat("host", parsed.host(), is("secure.example.com")),
+        () -> assertThat("port", parsed.port(), is(8443)),
         () -> assertThat("database name", parsed.databaseName(), is("securedb")),
         () ->
             assertThat(
@@ -123,6 +127,7 @@ class HSQLDBParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("/data/mydb")),
         () ->
             assertThat(
@@ -149,6 +154,7 @@ class HSQLDBParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
         () -> assertThat("host", parsed.host(), is("mem")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -175,6 +181,7 @@ class HSQLDBParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
         () -> assertThat("host", parsed.host(), is("mem")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -201,6 +208,7 @@ class HSQLDBParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
         () -> assertThat("host", parsed.host(), is("res")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("/org/mydatabase/mydb")),
         () ->
             assertThat(
@@ -226,7 +234,8 @@ class HSQLDBParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(9001)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -253,6 +262,7 @@ class HSQLDBParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("hsqldb")),
         () -> assertThat("host", parsed.host(), is("dbserver")),
+        () -> assertThat("port", parsed.port(), is(9002)),
         () -> assertThat("database name", parsed.databaseName(), is("production")),
         () ->
             assertThat(

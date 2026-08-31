@@ -54,10 +54,17 @@ import us.fatehi.utility.UtilityMarker;
  *       future driver following the same convention) often prefix their body with a short
  *       alphabetic "mode" token before a colon, such as {@code mem:}, {@code file:}, {@code res:}.
  *       This tokenizer treats that token as a pseudo-host: it is reported verbatim as {@code host}
- *       (never masked, unlike a real resolved hostname) and given a classification that reflects
- *       what the mode implies (memory-based modes are {@code LOCALHOST}, file/resource modes are
- *       {@code INTERNAL} or {@code LOCALHOST} per the driver's convention). See {@link
- *       #resolveEmbeddedOrHost(String)}.
+ *       and given a classification that reflects what the mode implies (memory-based modes are
+ *       {@code LOCALHOST}, file/resource modes are {@code INTERNAL} or {@code LOCALHOST} per the
+ *       driver's convention). See {@link #resolveEmbeddedOrHost(String)}.
+ *   <li><b>No masking or case normalization here.</b> This class returns {@code host} and {@code
+ *       databaseName} exactly as they appear in the URL - no lower-casing, no substitution of a
+ *       masked placeholder for locally- or privately-scoped hosts. Callers that need a masked or
+ *       case-normalized value for hashing or display (such as {@link
+ *       DatabaseServerFingerprintBuilder}) are responsible for applying that transformation
+ *       themselves, based on the reported {@link HostClassification}. (The database system
+ *       identifier is the one exception: it is still lower-cased here, since it is an internal
+ *       driver-prefix token rather than user-facing host or database data.)
  *   <li><b>Oracle TNS descriptors are out of scope.</b> Parenthesized {@code (DESCRIPTION=...)}
  *       connection strings are never decomposed into host/port; this is intentional and permanent.
  * </ul>
@@ -81,8 +88,9 @@ final class JdbcUrlTokenizer {
    * be a real {@code host:port} pair, an embedded-database mode-token pseudo-host, or a plain local
    * path with no host information at all. See {@link #resolveEmbeddedOrHost(String)}.
    *
-   * @param host the final, display-ready host value (already masked if it is a real hostname
-   *     needing masking; reported verbatim if it is a mode-token pseudo-host or blank)
+   * @param host the host value, reported exactly as it appears in the URL (a real hostname/IP
+   *     literal, a mode-token pseudo-host such as {@code "mem"}, or blank) - never masked or
+   *     case-normalized
    * @param port the port number, if this turned out to be a real {@code host:port} pair; {@code
    *     null} otherwise (mode tokens and plain paths never carry a port)
    * @param databaseNameFallback the best available database-name value if no semicolon-property
@@ -170,7 +178,7 @@ final class JdbcUrlTokenizer {
       // - jdbc:oracle:thin:@//oracledb:1521/ORCLPDB1
       // - jdbc:h2:tcp://localhost:9092/~/testdb
       final ParsedAuthority parsed = parseAuthority(normalizedBody);
-      host = maskHost(parsed.host(), parsed.hostClassification());
+      host = parsed.host();
       port = parsed.port();
       hostClassification = parsed.hostClassification();
       databaseName = parsed.databaseName();
@@ -310,26 +318,6 @@ final class JdbcUrlTokenizer {
   }
 
   /**
-   * Masks a real, resolved host value according to its classification, so that no locally- or
-   * privately-scoped hostname or IP address is exposed in the tokenized output. {@code PUBLIC}
-   * hosts are preserved (lower-cased); all other classifications are replaced with a fixed,
-   * non-identifying placeholder such as {@code "<localhost>"} or {@code "<internal>"}.
-   *
-   * <p>This masking must <b>not</b> be applied to embedded-database mode-token pseudo-hosts (e.g.
-   * {@code "mem"}, {@code "file"}) - those are reported verbatim by {@link
-   * #resolveEmbeddedOrHost(String)} without ever calling this method.
-   */
-  private static String maskHost(final String host, final HostClassification hostClassification) {
-    if (isBlank(host)) {
-      return "";
-    }
-    return switch (hostClassification) {
-      case PUBLIC -> host.strip().toLowerCase();
-      default -> "<%s>".formatted(hostClassification).toLowerCase();
-    };
-  }
-
-  /**
    * Classifies a recognized embedded-database mode token (e.g. {@code mem}, {@code file}, {@code
    * res}). Well-known tokens get an explicit classification reflecting their nature (memory-based
    * modes are {@code LOCALHOST}; file/resource modes are {@code INTERNAL} or {@code LOCALHOST} per
@@ -361,18 +349,19 @@ final class JdbcUrlTokenizer {
    *       ":memory:"}), classified {@code LOCALHOST}, with a blank database name.
    *   <li><b>A real {@code host:port} pair</b>: the body contains a colon, and the text after that
    *       colon parses as a valid integer port (e.g. {@code sqlhost:1433}). The host is classified
-   *       and masked exactly like an authority-form host (see {@link #maskHost(String,
-   *       HostClassification)}), and the unsplit {@code host:port} text is offered as a
-   *       database-name fallback for callers with no recognized database property (this
-   *       intentionally preserves the pre-redesign fallback behavior for SQL Server-style URLs). An
-   *       Oracle {@code thin:@host:port/service} short form is explicitly carved out ahead of this
-   *       check and handled separately, since TNS/service-name parsing is out of scope.
+   *       (see {@link #classifyHost(String)}) and reported verbatim, unmasked - masking is applied
+   *       only when a fingerprint is built, not during tokenization - and the unsplit {@code
+   *       host:port} text is offered as a database-name fallback for callers with no recognized
+   *       database property (this intentionally preserves the pre-redesign fallback behavior for
+   *       SQL Server-style URLs). An Oracle {@code thin:@host:port/service} short form is
+   *       explicitly carved out ahead of this check and handled separately, since TNS/service-name
+   *       parsing is out of scope.
    *   <li><b>An embedded-database mode-token pseudo-host</b>: the body contains a colon, the token
    *       before it is 2+ non-numeric characters (excluding Windows drive letters such as {@code
    *       C:}, which are always exactly one character), and the text after the colon is not a valid
    *       port number (e.g. {@code mem:testdb}, {@code file:/data/db}, {@code res:/org/db}). The
-   *       token becomes {@code host}, reported verbatim and never masked (see {@link
-   *       #modeClassification(String)}), and the remainder becomes the database-name fallback.
+   *       token becomes {@code host}, reported verbatim (see {@link #modeClassification(String)}),
+   *       and the remainder becomes the database-name fallback.
    * </ol>
    *
    * <p>If none of the above match, the body is a <b>plain local path or file reference</b> with no
@@ -407,8 +396,7 @@ final class JdbcUrlTokenizer {
       final Integer restAsPort = parsePort(rest);
       if (restAsPort != null) {
         final HostClassification classification = classifyHost(token);
-        return new EmbeddedOrHost(
-            maskHost(token, classification), restAsPort, trimmed, classification);
+        return new EmbeddedOrHost(token, restAsPort, trimmed, classification);
       }
 
       final boolean isModeToken =

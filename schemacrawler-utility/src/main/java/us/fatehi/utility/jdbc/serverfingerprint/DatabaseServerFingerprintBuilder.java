@@ -70,8 +70,8 @@ public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseS
   private Map<String, String> canonicalMap(final JdbcUrlTokens jdbcUrl) {
     final Map<String, String> canonical = new LinkedHashMap<>();
     canonical.put("type", jdbcUrl.databaseSystemIdentifier());
-    canonical.put("host", jdbcUrl.host());
-    canonical.put("database", jdbcUrl.databaseName());
+    canonical.put("host", canonicalHost(jdbcUrl));
+    canonical.put("database", jdbcUrl.databaseName().toLowerCase());
     // The product version is included in the hash on purpose, so that the
     // fingerprint value changes when a server is upgraded or patched,
     // even though the server's identity (and hence  its confidence level)
@@ -81,6 +81,36 @@ public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseS
       canonical.put("version", databaseInformation.getProductVersion());
     }
     return canonical;
+  }
+
+  /**
+   * Derives the host value used as hash input, normalized according to {@code hostClassification} -
+   * this is the single place in the codebase where host masking and case-normalization policy is
+   * applied, deliberately kept separate from {@link JdbcUrlTokenizer}, which reports {@code host}
+   * exactly as it appears in the URL.
+   *
+   * <ul>
+   *   <li>{@code PUBLIC} - lower-cased, but never masked, since DNS hostnames are case-insensitive
+   *       and a publicly routable host is not sensitive information.
+   *   <li>{@code LOCALHOST}/{@code INTERNAL} - masked to a fixed, lower-case placeholder such as
+   *       {@code "<localhost>"} or {@code "<internal>"}, so that no privately-scoped hostname or IP
+   *       address leaks into the fingerprint hash input.
+   *   <li>{@code UNKNOWN} - treated as blank, since there is no host information to normalize.
+   * </ul>
+   */
+  private static String canonicalHost(final JdbcUrlTokens jdbcUrl) {
+    final HostClassification classification = jdbcUrl.hostClassification();
+    final String host = jdbcUrl.host();
+    switch (classification) {
+      case PUBLIC:
+        return host.strip().toLowerCase();
+      case LOCALHOST:
+      case INTERNAL:
+        return String.format("<%s>", classification).toLowerCase();
+      case UNKNOWN:
+      default:
+        return "";
+    }
   }
 
   /**

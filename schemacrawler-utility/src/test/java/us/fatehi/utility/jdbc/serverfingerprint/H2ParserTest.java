@@ -17,6 +17,7 @@ class H2ParserTest {
     assertAll(
         () -> assertThat("database system identifier", parsed.databaseSystemIdentifier(), is("h2")),
         () -> assertThat("host", parsed.host(), is("file")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("/data/mydb")),
         () ->
             assertThat(
@@ -39,6 +40,7 @@ class H2ParserTest {
     assertAll(
         () -> assertThat("database system identifier", parsed.databaseSystemIdentifier(), is("h2")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("~/test")),
         () ->
             assertThat(
@@ -61,6 +63,7 @@ class H2ParserTest {
     assertAll(
         () -> assertThat("database system identifier", parsed.databaseSystemIdentifier(), is("h2")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("~/testdb")),
         () ->
             assertThat(
@@ -83,6 +86,7 @@ class H2ParserTest {
     assertAll(
         () -> assertThat("database system identifier", parsed.databaseSystemIdentifier(), is("h2")),
         () -> assertThat("host", parsed.host(), is("")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("/opt/databases/mydb")),
         () ->
             assertThat(
@@ -105,6 +109,7 @@ class H2ParserTest {
     assertAll(
         () -> assertThat("database system identifier", parsed.databaseSystemIdentifier(), is("h2")),
         () -> assertThat("host", parsed.host(), is("mem")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -127,6 +132,7 @@ class H2ParserTest {
     assertAll(
         () -> assertThat("database system identifier", parsed.databaseSystemIdentifier(), is("h2")),
         () -> assertThat("host", parsed.host(), is("mem")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -149,6 +155,7 @@ class H2ParserTest {
     assertAll(
         () -> assertThat("database system identifier", parsed.databaseSystemIdentifier(), is("h2")),
         () -> assertThat("host", parsed.host(), is("dbserver")),
+        () -> assertThat("port", parsed.port(), is(9092)),
         () -> assertThat("database name", parsed.databaseName(), is("~/production")),
         () ->
             assertThat(
@@ -168,7 +175,8 @@ class H2ParserTest {
 
     assertAll(
         () -> assertThat("database system identifier", parsed.databaseSystemIdentifier(), is("h2")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(9092)),
         () -> assertThat("database name", parsed.databaseName(), is("~/testdb")),
         () ->
             assertThat(
@@ -191,6 +199,7 @@ class H2ParserTest {
     assertAll(
         () -> assertThat("database system identifier", parsed.databaseSystemIdentifier(), is("h2")),
         () -> assertThat("host", parsed.host(), is("mem")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(

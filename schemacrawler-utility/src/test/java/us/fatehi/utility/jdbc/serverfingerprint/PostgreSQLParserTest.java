@@ -21,7 +21,8 @@ class PostgreSQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("postgresql")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(5432)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -47,7 +48,8 @@ class PostgreSQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("postgresql")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("::1")),
+        () -> assertThat("port", parsed.port(), is(5432)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -74,6 +76,7 @@ class PostgreSQLParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("postgresql")),
         () -> assertThat("host", parsed.host(), is("host1")),
+        () -> assertThat("port", parsed.port(), is(5432)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -98,6 +101,7 @@ class PostgreSQLParserTest {
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("postgresql")),
         () -> assertThat("host", parsed.host(), is("dbserver")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("production")),
         () ->
             assertThat(
@@ -121,7 +125,8 @@ class PostgreSQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("postgresql")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(5432)),
         () -> assertThat("database name", parsed.databaseName(), is("testdb")),
         () ->
             assertThat(
@@ -147,7 +152,8 @@ class PostgreSQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("postgresql")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("has port", parsed.hasPort(), is(false)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
@@ -173,7 +179,8 @@ class PostgreSQLParserTest {
         () ->
             assertThat(
                 "database system identifier", parsed.databaseSystemIdentifier(), is("postgresql")),
-        () -> assertThat("host", parsed.host(), is("<localhost>")),
+        () -> assertThat("host", parsed.host(), is("localhost")),
+        () -> assertThat("port", parsed.port(), is(5432)),
         () -> assertThat("database name", parsed.databaseName(), is("mydb")),
         () ->
             assertThat(
