@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import us.fatehi.utility.UtilityLogger;
+import us.fatehi.utility.logging.UtilityLogger;
 
 public class UtilityLoggerLogFatalStackTraceTest {
 

@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package us.fatehi.utility;
+package us.fatehi.utility.logging;
 
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.join;
@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import us.fatehi.utility.PropertiesUtility;
 
 public final class UtilityLogger {
 

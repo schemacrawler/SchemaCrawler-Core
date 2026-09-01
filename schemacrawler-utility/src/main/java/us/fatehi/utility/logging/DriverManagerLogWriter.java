@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package us.fatehi.utility;
+package us.fatehi.utility.logging;
 
 import static us.fatehi.utility.Utility.isBlank;
 

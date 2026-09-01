@@ -17,7 +17,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.SystemExitException;
+import us.fatehi.utility.process.SystemExitException;
 
 public class SystemExitExceptionTest {
 

@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import us.fatehi.utility.IOUtility;
-import us.fatehi.utility.LoggingConfig;
+import us.fatehi.utility.logging.LoggingConfig;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class IOUtilityTest {

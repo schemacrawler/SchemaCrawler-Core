@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import us.fatehi.utility.LoggingConfig;
+import us.fatehi.utility.logging.LoggingConfig;
 
 public final class TestDebugLoggingExtension implements BeforeAllCallback {
 
