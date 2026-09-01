@@ -30,7 +30,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.Multimap;
-import us.fatehi.utility.UtilityLogger;
+import us.fatehi.utility.logging.UtilityLogger;
 import us.fatehi.utility.string.StringFormat;
 
 final class DataTypeRetriever extends AbstractRetriever {

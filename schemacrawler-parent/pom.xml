@@ -423,7 +423,7 @@
           <useModulePath>true</useModulePath>
           <excludedGroups>${schemacrawler.test.excludedGroups}</excludedGroups>
           <systemPropertyVariables>
-            <java.util.logging.config.class>us.fatehi.utility.LoggingConfig</java.util.logging.config.class>
+            <java.util.logging.config.class>us.fatehi.utility.logging.LoggingConfig</java.util.logging.config.class>
           </systemPropertyVariables>
         </configuration>
       </plugin>

@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package us.fatehi.utility;
+package us.fatehi.test;
 
 import static java.sql.Types.BLOB;
 import static java.sql.Types.CLOB;

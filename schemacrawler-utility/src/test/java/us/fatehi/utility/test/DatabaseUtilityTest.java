@@ -46,9 +46,9 @@ import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import us.fatehi.test.utility.DataSourceTestUtility;
 import us.fatehi.test.utility.TestObjectUtility;
-import us.fatehi.utility.LoggingConfig;
-import us.fatehi.utility.UtilityLogger;
 import us.fatehi.utility.database.DatabaseUtility;
+import us.fatehi.utility.logging.LoggingConfig;
+import us.fatehi.utility.logging.UtilityLogger;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)

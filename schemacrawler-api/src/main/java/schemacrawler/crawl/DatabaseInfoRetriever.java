@@ -31,10 +31,10 @@ import java.util.logging.Logger;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
-import us.fatehi.utility.UtilityLogger;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.database.JdbcDriverMetadata;
 import us.fatehi.utility.database.JdbcDriverRegistry;
+import us.fatehi.utility.logging.UtilityLogger;
 import us.fatehi.utility.property.Property;
 import us.fatehi.utility.string.StringFormat;
 

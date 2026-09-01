@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import us.fatehi.utility.ProcessExecutor;
+import us.fatehi.utility.process.ProcessExecutor;
 
 public class ProcessExecutorTest {
 
