@@ -55,12 +55,6 @@ public final class MetaDataUtility {
 
   private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
 
-  public static final Predicate<? super Column> IS_ATTRIBUTE_COLUMN =
-      column ->
-          column != null
-              && (isPartial(column)
-                  || (!column.isPartOfPrimaryKey() && !column.isPartOfForeignKey()));
-
   public static final Predicate<Table> IS_VIEW =
       table ->
           table != null
@@ -215,10 +209,6 @@ public final class MetaDataUtility {
       }
     }
     return inclusionRuleString;
-  }
-
-  public static boolean isAttributeColumn(final Column column) {
-    return IS_ATTRIBUTE_COLUMN.test(column);
   }
 
   public static boolean isPartial(final DatabaseObject databaseObject) {

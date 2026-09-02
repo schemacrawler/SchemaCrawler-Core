@@ -8,7 +8,6 @@
 
 package schemacrawler.ermodel.implementation;
 
-import static schemacrawler.utility.MetaDataUtility.IS_ATTRIBUTE_COLUMN;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.Serial;
@@ -34,7 +33,8 @@ abstract class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
     } else {
       entityAttributes =
           table.getColumns().stream()
-              .filter(IS_ATTRIBUTE_COLUMN)
+              .filter(column -> !isPartial(column))
+              .filter(column -> column.isAttribute())
               .map(column -> new MutableEntityAttribute(this, column))
               .collect(Collectors.toList());
     }

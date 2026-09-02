@@ -10,7 +10,6 @@ package schemacrawler.tools.utility;
 
 import static schemacrawler.loader.utility.TableRowCountsUtility.getRowCount;
 import static schemacrawler.loader.utility.TableRowCountsUtility.hasRowCount;
-import static schemacrawler.utility.MetaDataUtility.IS_ATTRIBUTE_COLUMN;
 
 import java.util.List;
 import schemacrawler.loader.utility.TableRowCountsUtility;
@@ -31,7 +30,7 @@ public class TableImportanceUtility {
     final List<Column> columns = table.getColumns();
     final TableCounts tableCounts =
         new TableCounts(
-            (int) columns.stream().filter(IS_ATTRIBUTE_COLUMN).count(),
+            (int) columns.stream().filter(Column::isAttribute).count(),
             columns.size(),
             table.getReferencedTables().size(),
             table.getIndexes().size(),
