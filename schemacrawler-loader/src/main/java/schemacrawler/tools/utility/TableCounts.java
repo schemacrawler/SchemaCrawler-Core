@@ -11,7 +11,7 @@ import static schemacrawler.loader.catalog.summary.StatsUtility.makeValidRowCoun
 import static schemacrawler.loader.catalog.summary.StatsUtility.removeNegativeInteger;
 
 public record TableCounts(
-    Integer significantColumnCount,
+    Integer attributeColumnCount,
     Integer columnCount,
     Integer foreignKeyCount,
     Integer indexCount,
@@ -19,7 +19,7 @@ public record TableCounts(
     Long rowCount) {
 
   public TableCounts {
-    significantColumnCount = removeNegativeInteger.apply(significantColumnCount);
+    attributeColumnCount = removeNegativeInteger.apply(attributeColumnCount);
     columnCount = removeNegativeInteger.apply(columnCount);
     foreignKeyCount = removeNegativeInteger.apply(foreignKeyCount);
     indexCount = removeNegativeInteger.apply(indexCount);
