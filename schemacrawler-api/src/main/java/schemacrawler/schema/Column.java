@@ -45,6 +45,15 @@ public interface Column extends BaseColumn<Table> {
   }
 
   /**
+   * True if this column is not a primary or foreign key, but an attribute of an entity.
+   *
+   * @return If the column is an entity attribute
+   */
+  default boolean isAttribute() {
+    return (!isPartOfPrimaryKey() && !isPartOfForeignKey());
+  }
+
+  /**
    * True if this column is auto-incremented.
    *
    * @return If the column is auto-incremented

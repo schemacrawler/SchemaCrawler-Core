@@ -33,10 +33,8 @@ abstract class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
     } else {
       entityAttributes =
           table.getColumns().stream()
-              .filter(
-                  column ->
-                      isPartial(column)
-                          || (!column.isPartOfPrimaryKey() && !column.isPartOfForeignKey()))
+              .filter(column -> !isPartial(column))
+              .filter(column -> column.isAttribute())
               .map(column -> new MutableEntityAttribute(this, column))
               .collect(Collectors.toList());
     }

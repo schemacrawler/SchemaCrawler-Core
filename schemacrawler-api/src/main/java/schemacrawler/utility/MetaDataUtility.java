@@ -14,6 +14,7 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -42,8 +43,6 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class MetaDataUtility {
 
-  private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
-
   public enum SimpleDatabaseObjectType {
     unknown,
     table,
@@ -53,6 +52,14 @@ public final class MetaDataUtility {
     synonym,
     sequence;
   }
+
+  private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
+
+  public static final Predicate<Table> IS_VIEW =
+      table ->
+          table != null
+              && !isPartial(table)
+              && (table instanceof View || table.getTableType().isView());
 
   private static final List<Pattern> SYSTEM_GENERATED_NAME_PATTERNS =
       List.of(
@@ -209,10 +216,7 @@ public final class MetaDataUtility {
   }
 
   public static boolean isView(final Table table) {
-    if ((table == null) || isPartial(table)) {
-      return false;
-    }
-    return table instanceof View || table.getTableType().isView();
+    return IS_VIEW.test(table);
   }
 
   public static String joinColumns(

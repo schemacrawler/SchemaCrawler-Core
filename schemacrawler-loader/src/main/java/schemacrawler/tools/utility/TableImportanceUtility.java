@@ -30,7 +30,7 @@ public class TableImportanceUtility {
     final List<Column> columns = table.getColumns();
     final TableCounts tableCounts =
         new TableCounts(
-            (int) columns.stream().filter(Column::isSignificant).count(),
+            (int) columns.stream().filter(Column::isAttribute).count(),
             columns.size(),
             table.getReferencedTables().size(),
             table.getIndexes().size(),
