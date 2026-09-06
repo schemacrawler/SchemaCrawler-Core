@@ -7,6 +7,7 @@
  */
 package schemacrawler.tools.utility;
 
+import java.io.Serializable;
 import java.util.function.Function;
 
 public record TableTraits(
@@ -16,7 +17,8 @@ public record TableTraits(
     Boolean selfReferencing,
     Boolean hasTriggers,
     Boolean emptyTable,
-    EntityModelType entityModelType) {
+    EntityModelType entityModelType)
+    implements Serializable {
 
   private static final Function<Boolean, Boolean> makeTrueOrNull =
       booleanValue -> booleanValue == null || !booleanValue ? null : Boolean.TRUE;

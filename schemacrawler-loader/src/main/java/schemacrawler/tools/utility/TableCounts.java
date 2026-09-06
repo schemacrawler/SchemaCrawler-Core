@@ -10,13 +10,16 @@ package schemacrawler.tools.utility;
 import static schemacrawler.loader.catalog.summary.StatsUtility.makeValidRowCount;
 import static schemacrawler.loader.catalog.summary.StatsUtility.removeNegativeInteger;
 
+import java.io.Serializable;
+
 public record TableCounts(
     Integer attributeColumnCount,
     Integer columnCount,
     Integer foreignKeyCount,
     Integer indexCount,
     Integer triggerCount,
-    Long rowCount) {
+    Long rowCount)
+    implements Serializable {
 
   public TableCounts {
     attributeColumnCount = removeNegativeInteger.apply(attributeColumnCount);
