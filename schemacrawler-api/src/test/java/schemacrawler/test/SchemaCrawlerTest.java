@@ -76,7 +76,7 @@ import schemacrawler.utility.NamedObjectSort;
 import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.test.utility.extensions.TestContext;
-import us.fatehi.utility.database.JdbcDriverProperty;
+import us.fatehi.utility.jdbc.driver.JdbcDriverProperty;
 import us.fatehi.utility.property.Property;
 
 @WithTestDatabase

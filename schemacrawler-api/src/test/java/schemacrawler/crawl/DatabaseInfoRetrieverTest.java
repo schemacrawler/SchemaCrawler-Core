@@ -45,9 +45,9 @@ import schemacrawler.test.utility.WithTestDatabase;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.test.utility.extensions.TestContext;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
-import us.fatehi.utility.database.JdbcDriverProperty;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseConnectionSources;
+import us.fatehi.utility.jdbc.driver.JdbcDriverProperty;
 import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
 import us.fatehi.utility.property.Property;
 

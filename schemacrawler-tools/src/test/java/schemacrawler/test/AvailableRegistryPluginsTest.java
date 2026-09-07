@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.tools.command.CommandRegistry;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
 import us.fatehi.registry.PluginRegistry;
-import us.fatehi.utility.database.JdbcDriverRegistry;
+import us.fatehi.utility.jdbc.driver.JdbcDriverRegistry;
 import us.fatehi.utility.property.PropertyName;
 
 public class AvailableRegistryPluginsTest {

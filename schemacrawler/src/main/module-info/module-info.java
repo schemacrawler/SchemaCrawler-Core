@@ -23,6 +23,7 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports us.fatehi.utility.graph;
   exports us.fatehi.utility.html;
   exports us.fatehi.utility.ioresource;
+  exports us.fatehi.utility.jdbc.driver;
   exports us.fatehi.utility.jdbc.serverfingerprint;
   exports us.fatehi.utility.logging;
   exports us.fatehi.utility.process;

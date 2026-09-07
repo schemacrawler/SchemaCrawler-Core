@@ -22,9 +22,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.SQLRuntimeException;
 import us.fatehi.utility.database.DatabaseUtility;
-import us.fatehi.utility.database.JdbcDriverMetadata;
-import us.fatehi.utility.database.JdbcDriverProperty;
-import us.fatehi.utility.database.JdbcDriverRegistry;
+import us.fatehi.utility.jdbc.driver.JdbcDriverMetadata;
+import us.fatehi.utility.jdbc.driver.JdbcDriverProperty;
+import us.fatehi.utility.jdbc.driver.JdbcDriverRegistry;
 import us.fatehi.utility.string.StringFormat;
 
 abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSource {

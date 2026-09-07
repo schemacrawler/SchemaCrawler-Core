@@ -26,7 +26,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import us.fatehi.test.utility.DataSourceTestUtility;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
 import us.fatehi.utility.database.DatabaseInformation;
-import us.fatehi.utility.database.JdbcDriverInformation;
+import us.fatehi.utility.jdbc.driver.JdbcDriverInformation;
 import us.fatehi.utility.property.VersionNumber;
 
 @TestInstance(Lifecycle.PER_CLASS)

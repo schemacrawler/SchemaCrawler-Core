@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Set;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schemacrawler.ModelImplementation;
-import us.fatehi.utility.database.JdbcDriverInformation;
-import us.fatehi.utility.database.JdbcDriverProperty;
+import us.fatehi.utility.jdbc.driver.JdbcDriverInformation;
+import us.fatehi.utility.jdbc.driver.JdbcDriverProperty;
 import us.fatehi.utility.property.BaseProductVersion;
 import us.fatehi.utility.property.VersionNumber;
 

@@ -21,7 +21,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.database.JdbcConnectionUtility;
+import us.fatehi.utility.jdbc.driver.JdbcConnectionUtility;
 
 public class JdbcConnectionUtilityTest {
 
