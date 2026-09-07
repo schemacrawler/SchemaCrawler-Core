@@ -42,10 +42,11 @@ public class OfflineDriver implements Driver {
   }
 
   @Override
-  public Connection connect(final String url, final Properties info) throws SQLException {
-    if (acceptsURL(url)) {
-      final String path = url.substring(JDBC_URL_PREFIX.length());
-      return OfflineConnectionUtility.newOfflineConnection(Path.of(path));
+  public Connection connect(final String connectionUrl, final Properties info) throws SQLException {
+    if (acceptsURL(connectionUrl)) {
+      final String path = connectionUrl.replaceFirst("^" + JDBC_URL_PREFIX + "(?://)?", "");
+      final Path databasePath = Path.of(path);
+      return OfflineConnectionUtility.newOfflineConnection(databasePath);
     }
     return null;
   }
