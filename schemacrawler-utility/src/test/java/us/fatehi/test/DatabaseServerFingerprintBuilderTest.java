@@ -24,6 +24,51 @@ import us.fatehi.utility.jdbc.serverfingerprint.FingerprintConfidence;
 public class DatabaseServerFingerprintBuilderTest {
 
   @Test
+  public void buildFingerprintChangesWhenDatabaseNameChanges() {
+    final DatabaseInformation databaseInformation =
+        new DatabaseInformation("PostgreSQL", "16.2", "sa");
+
+    final DatabaseServerFingerprint first =
+        DatabaseServerFingerprintBuilder.builder("jdbc:postgresql://db.example.com:5432/appdb")
+            .withDatabaseProductVersion(databaseInformation)
+            .build();
+    final DatabaseServerFingerprint second =
+        DatabaseServerFingerprintBuilder.builder("jdbc:postgresql://db.example.com:5432/otherdb")
+            .withDatabaseProductVersion(databaseInformation)
+            .build();
+
+    assertThat(first.fingerprint(), is(not(second.fingerprint())));
+  }
+
+  @Test
+  public void buildFingerprintFromBlankJdbcUrl() {
+
+    final DatabaseServerFingerprint fingerprint =
+        DatabaseServerFingerprintBuilder.builder(null).build();
+
+    assertThat(fingerprint, is(notNullValue()));
+    assertThat(fingerprint.databaseSystemIdentifier(), is(""));
+    assertThat(fingerprint.fingerprint(), matchesPattern(NOT_BLANK));
+    assertThat(fingerprint.confidence(), is(FingerprintConfidence.LOW));
+  }
+
+  @Test
+  public void buildFingerprintFromLocalhostJdbcUrlIsMediumConfidence() {
+    final DatabaseInformation databaseInformation =
+        new DatabaseInformation("PostgreSQL", "16.2", "sa");
+
+    final DatabaseServerFingerprint fingerprint =
+        DatabaseServerFingerprintBuilder.builder("jdbc:postgresql://localhost:5432/appdb")
+            .withDatabaseProductVersion(databaseInformation)
+            .build();
+
+    assertThat(fingerprint, is(notNullValue()));
+    assertThat(fingerprint.databaseSystemIdentifier(), is("postgresql"));
+    assertThat(fingerprint.fingerprint(), matchesPattern(NOT_BLANK));
+    assertThat(fingerprint.confidence(), is(FingerprintConfidence.MEDIUM));
+  }
+
+  @Test
   public void buildFingerprintFromParsedJdbcUrl() {
     final DatabaseInformation databaseInformation =
         new DatabaseInformation("PostgreSQL", "16.2", "sa");
@@ -34,22 +79,9 @@ public class DatabaseServerFingerprintBuilderTest {
             .build();
 
     assertThat(fingerprint, is(notNullValue()));
+    assertThat(fingerprint.databaseSystemIdentifier(), is("postgresql"));
     assertThat(fingerprint.fingerprint(), matchesPattern(NOT_BLANK));
     assertThat(fingerprint.confidence(), is(FingerprintConfidence.HIGH));
-  }
-
-  @Test
-  public void buildFingerprintFromSparseJdbcUrlIsLowerConfidence() {
-    final DatabaseInformation databaseInformation =
-        new DatabaseInformation("SQLite", "3.45.0", "sa");
-
-    final DatabaseServerFingerprint fingerprint =
-        DatabaseServerFingerprintBuilder.builder("jdbc:sqlite::memory:")
-            .withDatabaseProductVersion(databaseInformation)
-            .build();
-
-    assertThat(fingerprint, is(notNullValue()));
-    assertThat(fingerprint.confidence(), is(FingerprintConfidence.MEDIUM));
   }
 
   @Test
@@ -63,6 +95,24 @@ public class DatabaseServerFingerprintBuilderTest {
             .build();
 
     assertThat(fingerprint, is(notNullValue()));
+    assertThat(fingerprint.databaseSystemIdentifier(), is("postgresql"));
+    assertThat(fingerprint.fingerprint(), matchesPattern(NOT_BLANK));
+    assertThat(fingerprint.confidence(), is(FingerprintConfidence.MEDIUM));
+  }
+
+  @Test
+  public void buildFingerprintFromSparseJdbcUrlIsLowerConfidence() {
+    final DatabaseInformation databaseInformation =
+        new DatabaseInformation("SQLite", "3.45.0", "sa");
+
+    final DatabaseServerFingerprint fingerprint =
+        DatabaseServerFingerprintBuilder.builder("jdbc:sqlite::memory:")
+            .withDatabaseProductVersion(databaseInformation)
+            .build();
+
+    assertThat(fingerprint, is(notNullValue()));
+    assertThat(fingerprint.databaseSystemIdentifier(), is("sqlite"));
+    assertThat(fingerprint.fingerprint(), matchesPattern(NOT_BLANK));
     assertThat(fingerprint.confidence(), is(FingerprintConfidence.MEDIUM));
   }
 
@@ -84,36 +134,5 @@ public class DatabaseServerFingerprintBuilderTest {
     assertThat(second, is(notNullValue()));
     assertThat(first.fingerprint(), is(second.fingerprint()));
     assertThat(first.confidence(), is(second.confidence()));
-  }
-
-  @Test
-  public void buildFingerprintChangesWhenDatabaseNameChanges() {
-    final DatabaseInformation databaseInformation =
-        new DatabaseInformation("PostgreSQL", "16.2", "sa");
-
-    final DatabaseServerFingerprint first =
-        DatabaseServerFingerprintBuilder.builder("jdbc:postgresql://db.example.com:5432/appdb")
-            .withDatabaseProductVersion(databaseInformation)
-            .build();
-    final DatabaseServerFingerprint second =
-        DatabaseServerFingerprintBuilder.builder("jdbc:postgresql://db.example.com:5432/otherdb")
-            .withDatabaseProductVersion(databaseInformation)
-            .build();
-
-    assertThat(first.fingerprint(), is(not(second.fingerprint())));
-  }
-
-  @Test
-  public void buildFingerprintFromLocalhostJdbcUrlIsMediumConfidence() {
-    final DatabaseInformation databaseInformation =
-        new DatabaseInformation("PostgreSQL", "16.2", "sa");
-
-    final DatabaseServerFingerprint fingerprint =
-        DatabaseServerFingerprintBuilder.builder("jdbc:postgresql://localhost:5432/appdb")
-            .withDatabaseProductVersion(databaseInformation)
-            .build();
-
-    assertThat(fingerprint, is(notNullValue()));
-    assertThat(fingerprint.confidence(), is(FingerprintConfidence.MEDIUM));
   }
 }
