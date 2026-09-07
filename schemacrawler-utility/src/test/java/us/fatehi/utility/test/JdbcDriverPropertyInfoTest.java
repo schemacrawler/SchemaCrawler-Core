@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import us.fatehi.utility.database.JdbcDriverProperty;
+import us.fatehi.utility.jdbc.driver.JdbcDriverProperty;
 
 public class JdbcDriverPropertyInfoTest {
 

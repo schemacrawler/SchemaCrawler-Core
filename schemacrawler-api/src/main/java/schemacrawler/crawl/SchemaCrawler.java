@@ -67,8 +67,8 @@ import schemacrawler.schemacrawler.exceptions.DatabaseAccessException;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
 import us.fatehi.utility.database.DatabaseInformation;
-import us.fatehi.utility.database.JdbcDriverInformation;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
+import us.fatehi.utility.jdbc.driver.JdbcDriverInformation;
 import us.fatehi.utility.string.StringFormat;
 
 /** SchemaCrawler uses database meta-data to get the details about the schema. */

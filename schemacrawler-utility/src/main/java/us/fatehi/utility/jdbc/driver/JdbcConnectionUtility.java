@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package us.fatehi.utility.database;
+package us.fatehi.utility.jdbc.driver;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

@@ -2,6 +2,25 @@
 
 SchemaCrawler Core release notes.
 
+
+<a name="v17.15.1"></a>
+## Release v17.15.1 - 2026-09-07
+
+- Fix issue with loading offline databases
+- Reorganize code that works with JDBC
+- Make offline database connector a lightweight connector
+- Remove the offline jar
+
+
+<a name="v17.15.0"></a>
+## Release v17.15.0 - 2026-09-06
+
+- Rewrite database server finger-printing to parse more JDBC connection URL types
+- Do not output JDBC connection URL, since it may contain sensitive information
+- Create a new schema importance model for tables, using graph metrics
+- Crate a new importance command to produce a report
+
+
 <a name="v17.14.2"></a>
 ## Release v17.14.2 - 2026-09-10
 

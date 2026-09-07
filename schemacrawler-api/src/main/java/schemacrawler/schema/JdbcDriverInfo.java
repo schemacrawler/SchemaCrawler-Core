@@ -10,7 +10,7 @@ package schemacrawler.schema;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import us.fatehi.utility.database.JdbcDriverProperty;
+import us.fatehi.utility.jdbc.driver.JdbcDriverProperty;
 import us.fatehi.utility.property.ProductVersion;
 import us.fatehi.utility.property.VersionNumber;
 

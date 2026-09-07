@@ -16,6 +16,11 @@ import java.sql.SQLException;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import us.fatehi.utility.jdbc.driver.JdbcConnectionUtility;
+import us.fatehi.utility.jdbc.driver.JdbcDriver;
+import us.fatehi.utility.jdbc.driver.JdbcDriverInformation;
+import us.fatehi.utility.jdbc.driver.JdbcDriverMetadata;
+import us.fatehi.utility.jdbc.driver.JdbcDriverRegistry;
 import us.fatehi.utility.property.VersionNumber;
 
 public final class ConnectionInfoBuilder {

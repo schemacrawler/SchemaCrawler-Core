@@ -20,8 +20,8 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import us.fatehi.test.utility.TestDatabaseDriver;
-import us.fatehi.utility.database.JdbcDriverMetadata;
-import us.fatehi.utility.database.JdbcDriverRegistry;
+import us.fatehi.utility.jdbc.driver.JdbcDriverMetadata;
+import us.fatehi.utility.jdbc.driver.JdbcDriverRegistry;
 import us.fatehi.utility.property.PropertyName;
 
 public class JdbcDriverRegistryTest {
@@ -63,7 +63,7 @@ public class JdbcDriverRegistryTest {
     assertThat(metadata.jdbcDriver().driverClassName(), is(TestDatabaseDriver.class.getName()));
     final List<String> propertyNames =
         metadata.properties().stream()
-            .map(us.fatehi.utility.database.JdbcDriverProperty::name)
+            .map(us.fatehi.utility.jdbc.driver.JdbcDriverProperty::name)
             .collect(Collectors.toList());
     assertThat(propertyNames, hasItem("publishedJdbcDriverProperty"));
     assertThat(metadata.properties(), is(notNullValue()));
