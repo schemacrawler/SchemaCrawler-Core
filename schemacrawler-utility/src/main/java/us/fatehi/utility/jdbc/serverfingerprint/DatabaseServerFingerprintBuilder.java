@@ -8,8 +8,7 @@
 
 package us.fatehi.utility.jdbc.serverfingerprint;
 
-import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.requireNotBlank;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,7 +37,6 @@ import us.fatehi.utility.property.ProductVersion;
 public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseServerFingerprint> {
 
   public static DatabaseServerFingerprintBuilder builder(final String connectionUrl) {
-    requireNonNull(connectionUrl, "No JDBC connection URL provided");
     return new DatabaseServerFingerprintBuilder(connectionUrl);
   }
 
@@ -46,7 +44,8 @@ public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseS
   private final String connectionUrl;
 
   private DatabaseServerFingerprintBuilder(final String connectionUrl) {
-    this.connectionUrl = requireNotBlank(connectionUrl, "No database connection JDBC URL provided");
+    // Support blank connection URLs
+    this.connectionUrl = trimToEmpty(connectionUrl);
     databaseInformation = null;
   }
 
