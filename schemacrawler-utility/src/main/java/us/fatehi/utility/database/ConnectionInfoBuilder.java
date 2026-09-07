@@ -39,26 +39,6 @@ public final class ConnectionInfoBuilder {
     }
   }
 
-  /**
-   * Get database connection URL.
-   *
-   * <p>NOTE: Some databases such as Hive may throw an exception. See issue #910.
-   *
-   * @param dbMetaData Database metadata.
-   * @return Database connection URL
-   */
-  private static String getConnectionUrl(final DatabaseMetaData dbMetaData) {
-    if (dbMetaData == null) {
-      return "";
-    }
-    try {
-      return dbMetaData.getURL();
-    } catch (final SQLException e) {
-      LOGGER.log(Level.WARNING, "Could not obtain the database connection URL", e);
-      return "";
-    }
-  }
-
   private final DatabaseMetaData dbMetaData;
 
   private ConnectionInfoBuilder(final Connection connection) throws SQLException {
@@ -75,7 +55,7 @@ public final class ConnectionInfoBuilder {
   }
 
   public JdbcDriverInformation buildJdbcDriverInformation() throws SQLException {
-    final String connectionUrl = getConnectionUrl(dbMetaData);
+    final String connectionUrl = JdbcConnectionUtility.getConnectionUrl(dbMetaData);
     final JdbcDriverMetadata jdbcDriverMetadata =
         JdbcDriverRegistry.getRegistry().inspectMetadata(connectionUrl);
     final JdbcDriver jdbcDriver;

@@ -32,6 +32,7 @@ import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import us.fatehi.utility.database.DatabaseUtility;
+import us.fatehi.utility.database.JdbcConnectionUtility;
 import us.fatehi.utility.database.JdbcDriverMetadata;
 import us.fatehi.utility.database.JdbcDriverRegistry;
 import us.fatehi.utility.logging.UtilityLogger;
@@ -187,11 +188,11 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
 
     try (final Connection connection =
         getRetrieverConnection().getConnection("additional JDBC driver information"); ) {
-      final DatabaseMetaData dbMetaData = connection.getMetaData();
-      final String url = dbMetaData.getURL();
+      final String connectionUrl = JdbcConnectionUtility.getConnectionUrl(connection);
 
       final JdbcDriverRegistry jdbcDriverRegistry = JdbcDriverRegistry.getRegistry();
-      final JdbcDriverMetadata jdbcDriverMetadata = jdbcDriverRegistry.inspectMetadata(url);
+      final JdbcDriverMetadata jdbcDriverMetadata =
+          jdbcDriverRegistry.inspectMetadata(connectionUrl);
       if (jdbcDriverMetadata == null
           || isBlank(jdbcDriverMetadata.jdbcDriver().driverClassName())) {
         LOGGER.log(Level.INFO, "No JDBC driver found");

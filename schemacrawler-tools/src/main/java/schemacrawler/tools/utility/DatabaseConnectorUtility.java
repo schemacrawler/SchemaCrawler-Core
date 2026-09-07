@@ -23,6 +23,7 @@ import schemacrawler.tools.databaseconnector.DatabaseConnector;
 import schemacrawler.tools.databaseconnector.DatabaseConnectorRegistry;
 import us.fatehi.utility.UtilityMarker;
 import us.fatehi.utility.database.DatabaseUtility;
+import us.fatehi.utility.database.JdbcConnectionUtility;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 import us.fatehi.utility.datasource.DatabaseServerType;
 import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
@@ -88,7 +89,7 @@ public final class DatabaseConnectorUtility {
     requireNonNull(connection, "No database connection provided");
 
     // Resolve database type from JDBC URL, then look up the matching connector.
-    final String connectionUrl = getConnectionUrl(connection);
+    final String connectionUrl = JdbcConnectionUtility.getConnectionUrl(connection);
     final DatabaseServerFingerprint serverFingerprint =
         DatabaseServerFingerprintBuilder.builder(connectionUrl).build();
     final String databaseSystemIdentifier = serverFingerprint.databaseSystemIdentifier();
@@ -111,20 +112,6 @@ public final class DatabaseConnectorUtility {
     }
 
     return dbConnector;
-  }
-
-  private static String getConnectionUrl(final Connection connection) {
-    requireNonNull(connection, "No connection provided");
-    final String url;
-    try {
-      // JDBC metadata URL is the canonical source for connector resolution.
-      url = connection.getMetaData().getURL();
-    } catch (final SQLException e) {
-      // Callers treat blank URL as "cannot infer connector from URL".
-      LOGGER.log(Level.CONFIG, "Could not obtain the database connection URL");
-      return "";
-    }
-    return url;
   }
 
   private static String normalizedIdentifier(final String databaseSystemIdentifier) {
