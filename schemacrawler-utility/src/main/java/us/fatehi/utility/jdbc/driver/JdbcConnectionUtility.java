@@ -25,7 +25,7 @@ public final class JdbcConnectionUtility {
    *
    * <p>NOTE: Some connections such as an offline connection may throw an exception.
    *
-   * @param dbMetaData Database metadata.
+   * @param connection Database connection.
    * @return Database connection URL
    */
   public static String getConnectionUrl(final Connection connection) {

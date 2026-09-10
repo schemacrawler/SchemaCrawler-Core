@@ -1,6 +1,13 @@
 # SchemaCrawler Core Change History
 
 SchemaCrawler Core release notes.
+[SchemaCrawler Changelog](https://www.schemacrawler.com/changes-report.html)
+
+
+<a name="v17.15.2"></a>
+## Release v17.15.2 - 2026-09-10
+
+- Future updates will be in [SchemaCrawler Changelog](https://www.schemacrawler.com/changes-report.html)
 
 
 <a name="v17.15.1"></a>
