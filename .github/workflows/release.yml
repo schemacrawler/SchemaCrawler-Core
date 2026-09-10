@@ -1,8 +1,5 @@
 name: Create Release
 
-permissions:
-  contents: write
-
 on:
   workflow_dispatch:
   push:
@@ -37,11 +34,10 @@ jobs:
 # SETUP BUILD ENVIRONMENT
     - id: prepare-maven-build
       name: Prepare Maven build
-      uses: sualeh/prepare-maven-build@v1.8.0
+      uses: sualeh/prepare-maven-build@v1.8.2
       with:
         java-version: 17
         gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-        gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
 # BUILD FOR DISTRIBUTION
     - id: build
@@ -79,9 +75,9 @@ jobs:
       name: Publish to Central Repository
       if: startsWith(github.ref, 'refs/tags/')
       env:
-        MAVEN_USERNAME: ${{ secrets.NEXUS_USERNAME }}
-        MAVEN_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-        MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+        NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
       shell: bash
       run: |
         # Publish to Central Repository
