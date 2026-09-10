@@ -93,13 +93,12 @@ public record CatalogStats(
    * @param schemas total number of schemas
    * @param dataTypes total number of data types across all schemas
    * @param tables total number of table objects (including views) across all schemas
+   * @param views number of views
+   * @param foreignKeys de-duplicated number of foreign keys across all tables
    * @param columns total number of columns across all tables and views
    * @param routines total number of routines across all schemas
    * @param synonyms total number of synonyms across all schemas
    * @param sequences total number of sequences across all schemas
-   * @param tableCount number of non-view tables (excludes views)
-   * @param views number of views
-   * @param foreignKeys deduplicated number of foreign keys across all tables
    */
   public record CatalogCounts(
       Integer schemas,
