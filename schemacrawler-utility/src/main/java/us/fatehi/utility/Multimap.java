@@ -31,6 +31,6 @@ public class Multimap<K, V> extends ConcurrentHashMap<K, List<V>> {
     if (key == null) {
       return null;
     }
-    return super.get(key);
+    return List.copyOf(super.get(key));
   }
 }
