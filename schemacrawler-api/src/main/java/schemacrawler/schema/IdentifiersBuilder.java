@@ -103,11 +103,6 @@ public class IdentifiersBuilder implements OptionsBuilder<IdentifiersBuilder, Id
     quoteMixedCaseIdentifiers = true;
   }
 
-  public IdentifiersBuilder doNotQuoteMixedCaseIdentifiers() {
-    quoteMixedCaseIdentifiers = false;
-    return this;
-  }
-
   /**
    * Constructs a list of database object identifiers from SQL 2003 keywords, and from the database
    * server. Also obtains the identifier quote string from the database server.
@@ -156,11 +151,6 @@ public class IdentifiersBuilder implements OptionsBuilder<IdentifiersBuilder, Id
 
   public boolean isIdentifierQuoteStringSet() {
     return identifierQuoteString != null;
-  }
-
-  public IdentifiersBuilder quoteMixedCaseIdentifiers() {
-    quoteMixedCaseIdentifiers = true;
-    return this;
   }
 
   @Override
