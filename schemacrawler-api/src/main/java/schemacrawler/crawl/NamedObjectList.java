@@ -72,13 +72,13 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
     for (final Iterator<Entry<NamedObjectKey, N>> iterator = entrySet.iterator();
         iterator.hasNext(); ) {
       final Entry<NamedObjectKey, N> entry = iterator.next();
-      final NamedObjectKey namedObjectKey = entry.getKey();
+      final NamedObjectKey key = entry.getKey();
       final N namedObject = entry.getValue();
       if (!predicate.test(namedObject)) {
         // Filter object by moving it to the filtered objects map
         iterator.remove();
-        filteredObjects.put(namedObjectKey, namedObject);
-        if (namedObject instanceof AttributedObject attributedObject) {
+        filteredObjects.put(key, namedObject);
+        if (namedObject instanceof final AttributedObject attributedObject) {
           attributedObject.setAttribute(SCHEMACRAWLER_FILTERED_OUT, true);
         }
       }
@@ -122,11 +122,11 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
     for (final Iterator<Entry<NamedObjectKey, N>> iterator = entrySet.iterator();
         iterator.hasNext(); ) {
       final Entry<NamedObjectKey, N> entry = iterator.next();
-      final NamedObjectKey namedObjectKey = entry.getKey();
+      final NamedObjectKey key = entry.getKey();
       final N namedObject = entry.getValue();
-      objects.put(namedObjectKey, namedObject);
+      objects.put(key, namedObject);
       iterator.remove();
-      if (namedObject instanceof AttributedObject attributedObject) {
+      if (namedObject instanceof final AttributedObject attributedObject) {
         attributedObject.removeAttribute(SCHEMACRAWLER_FILTERED_OUT);
       }
     }
@@ -135,7 +135,7 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return values().stream().map(item -> item.toString()).collect(Collectors.joining(", "));
+    return values().stream().map(NamedObject::toString).collect(Collectors.joining(", "));
   }
 
   /**
@@ -166,11 +166,11 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
   /**
    * Looks up a named object by lookup key.
    *
-   * @param lookupKey Internal lookup key
+   * @param key Internal lookup key
    * @return Named object
    */
-  Optional<N> lookup(final NamedObjectKey lookupKey) {
-    return internalGet(lookupKey);
+  Optional<N> lookup(final NamedObjectKey key) {
+    return internalGet(key);
   }
 
   N remove(final N namedObject) {
