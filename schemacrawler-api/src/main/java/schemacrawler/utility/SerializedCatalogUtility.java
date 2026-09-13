@@ -30,6 +30,7 @@ public final class SerializedCatalogUtility {
 
   private static final List<Pattern> CATALOG_CLASS_PATTERNS =
       List.of(
+          Pattern.compile("us\\.fatehi\\.utility\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.property\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.database\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.jdbc\\.driver\\.[A-Z].*"),
