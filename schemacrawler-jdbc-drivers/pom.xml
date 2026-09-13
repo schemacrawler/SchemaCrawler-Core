@@ -31,12 +31,12 @@
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
-      <version>13.4.0.jre11</version>
+      <version>13.6.0.jre11</version>
     </dependency>
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc_auth</artifactId>
-      <version>13.4.0.x86</version>
+      <version>13.6.0.x86</version>
       <type>dll</type>
     </dependency>
     <dependency>
