@@ -16,14 +16,19 @@ public class TaskRunners {
 
   private static final Logger LOGGER = Logger.getLogger(TaskRunners.class.getName());
 
+  private static final int DEFAULT_TASK_TIMEOUT_SECONDS = 3600;
+
   public static TaskRunner getTaskRunner(final String id, final int maxThreadsSuggested) {
-    final boolean isSingleThreaded =
-        new SystemPropertiesConfig().getBooleanValue("SC_SINGLE_THREADED");
+    final SystemPropertiesConfig systemPropertiesConfig = new SystemPropertiesConfig();
+    final boolean isSingleThreaded = systemPropertiesConfig.getBooleanValue("SC_SINGLE_THREADED");
     if (isSingleThreaded) {
       LOGGER.log(Level.CONFIG, "Loading database schema in the main thread");
       return new MainThreadTaskRunner(id);
     }
     LOGGER.log(Level.CONFIG, "Loading database schema using multiple threads");
-    return new MultiThreadedTaskRunner(id, maxThreadsSuggested);
+    final int timeoutSeconds =
+        systemPropertiesConfig.getIntegerValue(
+            "SC_TASK_TIMEOUT_SECONDS", DEFAULT_TASK_TIMEOUT_SECONDS);
+    return new MultiThreadedTaskRunner(id, maxThreadsSuggested, timeoutSeconds);
   }
 }

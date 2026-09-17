@@ -70,11 +70,23 @@ class TimedTask implements Callable<TimedTaskResult> {
     return timedTaskResult;
   }
 
+  /**
+   * Returns null if the task has not started.
+   *
+   * @return Start time
+   */
+  public ZonedDateTime getStart() {
+    if (start == null) {
+      return null;
+    }
+    return start.atZone(ZoneId.systemDefault());
+  }
+
   public String getTaskName() {
     return taskDefinition.getTaskName();
   }
 
-  public ZonedDateTime getStart() {
-    return start.atZone(ZoneId.systemDefault());
+  public boolean isStarted() {
+    return start != null;
   }
 }

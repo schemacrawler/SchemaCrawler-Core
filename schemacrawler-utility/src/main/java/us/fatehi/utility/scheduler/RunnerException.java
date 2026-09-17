@@ -14,6 +14,10 @@ public class RunnerException extends Exception {
 
   @Serial private static final long serialVersionUID = -8904255341894856632L;
 
+  public RunnerException(final String message) {
+    super(message);
+  }
+
   public RunnerException(final Throwable cause) {
     super(cause);
   }
