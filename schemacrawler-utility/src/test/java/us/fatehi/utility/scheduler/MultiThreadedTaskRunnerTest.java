@@ -12,6 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +21,8 @@ public class MultiThreadedTaskRunnerTest {
 
   @Test
   public void completesFastTaskWithTimeout() throws Exception {
-    try (final TaskRunner taskRunner = new MultiThreadedTaskRunner("test", 1, 1)) {
+    try (final TaskRunner taskRunner =
+        new MultiThreadedTaskRunner("test", new ThreadingOptions(1, 1))) {
       taskRunner.add(new TaskDefinition("fast task"));
       taskRunner.submit();
     }
@@ -27,7 +30,8 @@ public class MultiThreadedTaskRunnerTest {
 
   @Test
   public void completesSlowTaskWhenNegativeTimeoutDisabled() throws Exception {
-    try (final TaskRunner taskRunner = new MultiThreadedTaskRunner("test", 1, -1)) {
+    try (final TaskRunner taskRunner =
+        new MultiThreadedTaskRunner("test", new ThreadingOptions(1, -1))) {
       taskRunner.add(new TaskDefinition("slow task", () -> Thread.sleep(100)));
       taskRunner.submit();
     }
@@ -35,7 +39,8 @@ public class MultiThreadedTaskRunnerTest {
 
   @Test
   public void completesSlowTaskWhenTimeoutDisabled() throws Exception {
-    try (final TaskRunner taskRunner = new MultiThreadedTaskRunner("test", 1, 0)) {
+    try (final TaskRunner taskRunner =
+        new MultiThreadedTaskRunner("test", new ThreadingOptions(1, 0))) {
       taskRunner.add(new TaskDefinition("slow task", () -> Thread.sleep(1000)));
       taskRunner.submit();
     }
@@ -43,7 +48,11 @@ public class MultiThreadedTaskRunnerTest {
 
   @Test
   public void reportsTimedOutTaskAsFailure() throws Exception {
-    try (final TaskRunner taskRunner = new MultiThreadedTaskRunner("test", 1, 1)) {
+    final ThreadingOptions threadingOptions = mock(ThreadingOptions.class);
+    when(threadingOptions.maxThreads()).thenReturn(1);
+    when(threadingOptions.timeoutSeconds()).thenReturn(1);
+
+    try (final TaskRunner taskRunner = new MultiThreadedTaskRunner("test", threadingOptions)) {
       taskRunner.add(new TaskDefinition("slow task", () -> Thread.sleep(5000)));
 
       final TaskTimeoutException exception =

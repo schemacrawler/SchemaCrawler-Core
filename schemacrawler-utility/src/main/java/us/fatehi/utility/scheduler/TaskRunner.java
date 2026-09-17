@@ -13,9 +13,6 @@ import java.util.function.Supplier;
 
 public interface TaskRunner extends AutoCloseable {
 
-  int MIN_THREADS = 1;
-  int MAX_THREADS = 10;
-
   /** Add a task definition to the list of tasks to run. */
   void add(TaskDefinition taskDefinition) throws Exception;
 

@@ -8,6 +8,8 @@
 
 package us.fatehi.utility.scheduler;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -26,14 +28,17 @@ final class MultiThreadedTaskRunner extends AbstractTaskRunner {
   private static final Logger LOGGER = Logger.getLogger(MultiThreadedTaskRunner.class.getName());
 
   private final ExecutorService executorService;
-  private final int timeoutSeconds;
+  private final ThreadingOptions threadingOptions;
 
-  MultiThreadedTaskRunner(
-      final String id, final int maxThreadsSuggested, final int timeoutSeconds) {
+  MultiThreadedTaskRunner(final String id, final ThreadingOptions threadingOptions) {
     super(id);
 
-    this.timeoutSeconds = timeoutSeconds;
-    final int maxThreads = Math.min(Math.max(maxThreadsSuggested, MIN_THREADS), MAX_THREADS);
+    this.threadingOptions = requireNonNull(threadingOptions, "No threading options provided");
+    LOGGER.log(
+        Level.CONFIG,
+        new StringFormat("Starting multi-threaded task-runner with <%s>", threadingOptions));
+
+    final int maxThreads = threadingOptions.maxThreads();
     executorService = Executors.newFixedThreadPool(maxThreads);
     LOGGER.log(
         Level.INFO,
@@ -72,10 +77,19 @@ final class MultiThreadedTaskRunner extends AbstractTaskRunner {
 
       final List<TimedTaskResult> runTaskResults = new CopyOnWriteArrayList<>();
 
-      final List<Future<TimedTaskResult>> futureResults =
-          timeoutSeconds <= 0
-              ? executorService.invokeAll(timedTasks)
-              : executorService.invokeAll(timedTasks, timeoutSeconds, TimeUnit.SECONDS);
+      final int timeoutSeconds = threadingOptions.timeoutSeconds();
+      final List<Future<TimedTaskResult>> futureResults;
+      if (timeoutSeconds <= 0) {
+        LOGGER.log(
+            Level.FINE, new StringFormat("Invoking tasks with no timeout <%s>", taskDefinitions));
+        futureResults = executorService.invokeAll(timedTasks);
+      } else {
+        LOGGER.log(
+            Level.FINE,
+            new StringFormat(
+                "Invoking tasks <%s> with timeout <%d>", taskDefinitions, timeoutSeconds));
+        futureResults = executorService.invokeAll(timedTasks, timeoutSeconds, TimeUnit.SECONDS);
+      }
       for (int i = 0; i < futureResults.size(); i++) {
         final Future<TimedTaskResult> futureResult = futureResults.get(i);
         if (!futureResult.isCancelled()) {
