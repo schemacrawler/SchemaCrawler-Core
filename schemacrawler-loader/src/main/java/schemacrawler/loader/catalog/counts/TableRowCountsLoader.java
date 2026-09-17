@@ -56,7 +56,7 @@ public class TableRowCountsLoader extends AbstractCatalogLoader<TableRowCountsLo
     }
 
     LOGGER.log(Level.INFO, "Retrieving table row counts");
-    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadTableRowCounts", 1); ) {
+    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadTableRowCounts", 1)) {
       final Catalog catalog = getCatalog();
       final TableRowCountsRetriever rowCountsRetriever =
           new TableRowCountsRetriever(getConnectionSource(), catalog);
