@@ -8,41 +8,72 @@
 
 package schemacrawler.test;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
 
 import org.junit.jupiter.api.Test;
+import schemacrawler.schemacrawler.InfoLevel;
+import schemacrawler.schemacrawler.LoadOptions;
 import schemacrawler.schemacrawler.LoadOptionsBuilder;
-import us.fatehi.utility.scheduler.TaskRunner;
+import schemacrawler.schemacrawler.SchemaInfoLevel;
+import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 
 public class LoadOptionsBuilderTest {
 
   @Test
-  public void maxThreads() {
-    final LoadOptionsBuilder loadOptionsBuilder = LoadOptionsBuilder.builder();
+  public void fromOptions() {
+    final LoadOptions options =
+        LoadOptionsBuilder.builder().withInfoLevel(InfoLevel.detailed).toOptions();
 
-    // Default
-    assertThat(loadOptionsBuilder.toOptions().maxThreads(), is(TaskRunner.MAX_THREADS));
+    final LoadOptionsBuilder builder = LoadOptionsBuilder.builder().fromOptions(options);
+    assertThat(builder.toOptions().schemaInfoLevel(), is(options.schemaInfoLevel()));
 
-    loadOptionsBuilder.withMaxThreads(Integer.MIN_VALUE);
-    assertThat(loadOptionsBuilder.toOptions().maxThreads(), is(TaskRunner.MIN_THREADS));
+    final LoadOptionsBuilder builderNull = LoadOptionsBuilder.builder().fromOptions(null);
+    assertThat(builderNull.toOptions().schemaInfoLevel(), is(SchemaInfoLevelBuilder.standard()));
+  }
 
-    loadOptionsBuilder.withMaxThreads(-2);
-    assertThat(loadOptionsBuilder.toOptions().maxThreads(), is(TaskRunner.MIN_THREADS));
+  @Test
+  public void newOptions() {
+    assertThat(
+        LoadOptionsBuilder.newLoadOptions().schemaInfoLevel(),
+        is(SchemaInfoLevelBuilder.standard()));
+  }
 
-    loadOptionsBuilder.withMaxThreads(0);
-    assertThat(loadOptionsBuilder.toOptions().maxThreads(), is(TaskRunner.MIN_THREADS));
+  @Test
+  public void withInfoLevel() {
+    final LoadOptionsBuilder builder = LoadOptionsBuilder.builder();
 
-    loadOptionsBuilder.withMaxThreads(1);
-    assertThat(loadOptionsBuilder.toOptions().maxThreads(), is(TaskRunner.MIN_THREADS));
+    assertThat(builder.withInfoLevel(InfoLevel.maximum), is(sameInstance(builder)));
+    assertThat(builder.toOptions().schemaInfoLevel(), is(SchemaInfoLevelBuilder.maximum()));
 
-    loadOptionsBuilder.withMaxThreads(2);
-    assertThat(loadOptionsBuilder.toOptions().maxThreads(), is(2));
+    builder.withInfoLevel(null);
+    assertThat(builder.toOptions().schemaInfoLevel(), is(SchemaInfoLevelBuilder.maximum()));
+  }
 
-    loadOptionsBuilder.withMaxThreads(11);
-    assertThat(loadOptionsBuilder.toOptions().maxThreads(), is(TaskRunner.MAX_THREADS));
+  @Test
+  public void withSchemaInfoLevel() {
+    final LoadOptionsBuilder builder = LoadOptionsBuilder.builder();
+    final SchemaInfoLevel schemaInfoLevel = SchemaInfoLevelBuilder.minimum();
 
-    loadOptionsBuilder.withMaxThreads(Integer.MAX_VALUE);
-    assertThat(loadOptionsBuilder.toOptions().maxThreads(), is(TaskRunner.MAX_THREADS));
+    assertThat(builder.withSchemaInfoLevel(schemaInfoLevel), is(sameInstance(builder)));
+    assertThat(builder.toOptions().schemaInfoLevel(), is(schemaInfoLevel));
+
+    builder.withSchemaInfoLevel(null);
+    assertThat(builder.toOptions().schemaInfoLevel(), is(schemaInfoLevel));
+  }
+
+  @Test
+  public void withSchemaInfoLevelBuilder() {
+    final LoadOptionsBuilder builder = LoadOptionsBuilder.builder();
+    final SchemaInfoLevelBuilder schemaInfoLevelBuilder =
+        SchemaInfoLevelBuilder.builder().withInfoLevel(InfoLevel.standard);
+
+    assertThat(
+        builder.withSchemaInfoLevelBuilder(schemaInfoLevelBuilder), is(sameInstance(builder)));
+    assertThat(builder.toOptions().schemaInfoLevel(), is(schemaInfoLevelBuilder.toOptions()));
+
+    builder.withSchemaInfoLevelBuilder(null);
+    assertThat(builder.toOptions().schemaInfoLevel(), is(schemaInfoLevelBuilder.toOptions()));
   }
 }

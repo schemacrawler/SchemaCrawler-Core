@@ -16,11 +16,13 @@ public class TaskRunners {
 
   private static final Logger LOGGER = Logger.getLogger(TaskRunners.class.getName());
 
-  private static final int DEFAULT_TASK_TIMEOUT_SECONDS = 3600;
+  private static final String SC_SINGLE_THREADED = "SC_SINGLE_THREADED";
+  private static final String SC_LOAD_TIMEOUT_SECONDS = "SC_LOAD_TIMEOUT_SECONDS";
+  private static final int DEFAULT_LOAD_TIMEOUT_SECONDS = 3600;
 
-  public static TaskRunner getTaskRunner(final String id, final int maxThreadsSuggested) {
+  public static TaskRunner getTaskRunner(final String id) {
     final SystemPropertiesConfig systemPropertiesConfig = new SystemPropertiesConfig();
-    final boolean isSingleThreaded = systemPropertiesConfig.getBooleanValue("SC_SINGLE_THREADED");
+    final boolean isSingleThreaded = systemPropertiesConfig.getBooleanValue(SC_SINGLE_THREADED);
     if (isSingleThreaded) {
       LOGGER.log(Level.CONFIG, "Loading database schema in the main thread");
       return new MainThreadTaskRunner(id);
@@ -28,7 +30,8 @@ public class TaskRunners {
     LOGGER.log(Level.CONFIG, "Loading database schema using multiple threads");
     final int timeoutSeconds =
         systemPropertiesConfig.getIntegerValue(
-            "SC_TASK_TIMEOUT_SECONDS", DEFAULT_TASK_TIMEOUT_SECONDS);
+            SC_LOAD_TIMEOUT_SECONDS, DEFAULT_LOAD_TIMEOUT_SECONDS);
+    final int maxThreadsSuggested = 0;
     return new MultiThreadedTaskRunner(id, maxThreadsSuggested, timeoutSeconds);
   }
 }

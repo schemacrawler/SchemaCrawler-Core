@@ -30,12 +30,12 @@ final class RetrievalTaskRunner {
   private final TaskRunner taskRunner;
   private final SchemaInfoLevel infoLevel;
 
-  RetrievalTaskRunner(final String runId, final SchemaInfoLevel infoLevel, final int maxThreads) {
+  RetrievalTaskRunner(final String runId, final SchemaInfoLevel infoLevel) {
 
     requireNotBlank(runId, "No SchemaCrawler run id provided");
     this.infoLevel = requireNonNull(infoLevel, "No info-level provided");
 
-    taskRunner = TaskRunners.getTaskRunner(runId, maxThreads);
+    taskRunner = TaskRunners.getTaskRunner(runId);
   }
 
   public RetrievalTaskRunner add(

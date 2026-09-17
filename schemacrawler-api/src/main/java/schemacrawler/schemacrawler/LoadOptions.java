@@ -14,8 +14,7 @@ import org.jspecify.annotations.NonNull;
 import us.fatehi.utility.Options;
 
 /** Options controlling how schema information is loaded. */
-public record LoadOptions(@NonNull SchemaInfoLevel schemaInfoLevel, int maxThreads)
-    implements Options {
+public record LoadOptions(@NonNull SchemaInfoLevel schemaInfoLevel) implements Options {
 
   public LoadOptions {
     schemaInfoLevel = requireNonNull(schemaInfoLevel, "No schema info level provided");

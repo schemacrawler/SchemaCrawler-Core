@@ -32,21 +32,21 @@ public class MainThreadTaskRunnerTest {
 
   @Test
   public void getTaskRunnerReturnsSingleThreaded() {
-    final TaskRunner runner = TaskRunners.getTaskRunner("test-main", 4);
+    final TaskRunner runner = TaskRunners.getTaskRunner("test-main");
     assertThat(runner, is(not(nullValue())));
     assertThat(runner, instanceOf(MainThreadTaskRunner.class));
   }
 
   @Test
   public void mainThreadRunnerIsNotStopped() throws Exception {
-    try (final TaskRunner runner = TaskRunners.getTaskRunner("test-main-run", 4)) {
+    try (final TaskRunner runner = TaskRunners.getTaskRunner("test-main-run")) {
       assertThat(runner.isStopped(), is(false));
     }
   }
 
   @Test
   public void mainThreadRunnerRunsTask() throws Exception {
-    try (final TaskRunner runner = TaskRunners.getTaskRunner("test-main-task", 4)) {
+    try (final TaskRunner runner = TaskRunners.getTaskRunner("test-main-task")) {
       final boolean[] executed = {false};
       runner.add(new TaskDefinition("task1", () -> executed[0] = true));
       runner.submit();
@@ -56,7 +56,7 @@ public class MainThreadTaskRunnerTest {
 
   @Test
   public void mainThreadRunnerStop() throws Exception {
-    try (final TaskRunner runner = TaskRunners.getTaskRunner("test-main-stop", 4)) {
+    try (final TaskRunner runner = TaskRunners.getTaskRunner("test-main-stop")) {
       assertThat(runner.isStopped(), is(false));
       runner.stop();
       // After stop, isStopped should still return false for MainThreadTaskRunner (no-op stop)

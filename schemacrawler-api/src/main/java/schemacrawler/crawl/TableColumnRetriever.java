@@ -252,7 +252,7 @@ final class TableColumnRetriever extends AbstractRetriever {
       final Set<NamedObjectKey> hiddenTableColumnsLookupKeys)
       throws SQLException {
     try (final TaskRunner taskRunner =
-        TaskRunners.getTaskRunner("retrieve-table-columns-from-metadata", 5); ) {
+        TaskRunners.getTaskRunner("retrieve-table-columns-from-metadata")) {
       final String name = "table columns from metadata";
       final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
       for (final MutableTable table : allTables) {

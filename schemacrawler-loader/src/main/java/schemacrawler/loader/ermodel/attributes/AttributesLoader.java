@@ -63,7 +63,7 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
 
     LOGGER.log(Level.INFO, "Retrieving catalog attributes");
     final String catalogAttributesFile = commandOptions.catalogAttributesFile();
-    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadAttributes", 1)) {
+    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadAttributes")) {
       final Catalog catalog = getCatalog();
       final ERModel erModel = getERModel();
       final TaskDefinition.TaskRunnable taskRunnable =
