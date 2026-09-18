@@ -60,7 +60,7 @@ final class ImplicitAssociationsLoader
 
     LOGGER.log(Level.INFO, "Loading implicit associations into ER model");
 
-    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadImplicitAssociations", 1)) {
+    try (final TaskRunner taskRunner = TaskRunners.getTaskRunner("loadImplicitAssociations")) {
       taskRunner.add(
           new TaskDefinition("loadImplicitAssociations", this::loadImplicitAssociations));
       taskRunner.submit();

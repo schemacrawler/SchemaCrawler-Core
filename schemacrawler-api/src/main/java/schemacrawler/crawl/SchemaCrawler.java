@@ -79,7 +79,6 @@ public final class SchemaCrawler {
   private final SchemaCrawlerOptions options;
   private final RetrieverConnection retrieverConnection;
   private final SchemaInfoLevel infoLevel;
-  private final int maxThreads;
   private RetrievalTaskRunner taskRunner;
   private MutableCatalog catalog;
 
@@ -100,7 +99,6 @@ public final class SchemaCrawler {
 
       final LoadOptions loadOptions = options.loadOptions();
       infoLevel = loadOptions.schemaInfoLevel();
-      maxThreads = loadOptions.maxThreads();
 
     } catch (final SQLException e) {
       throw new DatabaseAccessException(e);
@@ -134,7 +132,7 @@ public final class SchemaCrawler {
       }
 
       final String runId = catalog.getCrawlInfo().getRunId();
-      taskRunner = new RetrievalTaskRunner(runId, infoLevel, maxThreads);
+      taskRunner = new RetrievalTaskRunner(runId, infoLevel);
 
       crawlDatabaseInfo();
       LOGGER.log(Level.INFO, "%n%s".formatted(catalog.getCrawlInfo()));

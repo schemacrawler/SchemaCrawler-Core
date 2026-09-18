@@ -8,6 +8,9 @@
 
 package us.fatehi.utility.scheduler;
 
+import static java.util.Objects.requireNonNull;
+
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -25,11 +28,17 @@ final class MultiThreadedTaskRunner extends AbstractTaskRunner {
   private static final Logger LOGGER = Logger.getLogger(MultiThreadedTaskRunner.class.getName());
 
   private final ExecutorService executorService;
+  private final ThreadingOptions threadingOptions;
 
-  MultiThreadedTaskRunner(final String id, final int maxThreadsSuggested) {
+  MultiThreadedTaskRunner(final String id, final ThreadingOptions threadingOptions) {
     super(id);
 
-    final int maxThreads = Math.min(Math.max(maxThreadsSuggested, MIN_THREADS), MAX_THREADS);
+    this.threadingOptions = requireNonNull(threadingOptions, "No threading options provided");
+    LOGGER.log(
+        Level.CONFIG,
+        new StringFormat("Starting multi-threaded task-runner with <%s>", threadingOptions));
+
+    final int maxThreads = threadingOptions.maxThreads();
     executorService = Executors.newFixedThreadPool(maxThreads);
     LOGGER.log(
         Level.INFO,
@@ -68,27 +77,45 @@ final class MultiThreadedTaskRunner extends AbstractTaskRunner {
 
       final List<TimedTaskResult> runTaskResults = new CopyOnWriteArrayList<>();
 
-      final List<Future<TimedTaskResult>> futureResults =
-          executorService.invokeAll(timedTasks, 1, TimeUnit.HOURS);
+      final int timeoutSeconds = threadingOptions.timeoutSeconds();
+      final List<Future<TimedTaskResult>> futureResults;
+      if (timeoutSeconds <= 0) {
+        LOGGER.log(
+            Level.FINE, new StringFormat("Invoking tasks with no timeout <%s>", taskDefinitions));
+        futureResults = executorService.invokeAll(timedTasks);
+      } else {
+        LOGGER.log(
+            Level.FINE,
+            new StringFormat(
+                "Invoking tasks <%s> with timeout <%d>", taskDefinitions, timeoutSeconds));
+        futureResults = executorService.invokeAll(timedTasks, timeoutSeconds, TimeUnit.SECONDS);
+      }
       for (int i = 0; i < futureResults.size(); i++) {
         final Future<TimedTaskResult> futureResult = futureResults.get(i);
-        if (futureResult.isCancelled()) {
+        if (!futureResult.isCancelled()) {
+          final TimedTaskResult timedTaskResult = futureResult.get();
+          runTaskResults.add(timedTaskResult);
+        } else {
           final TimedTask cancelledTask = timedTasks.get(i);
+          final String taskName = cancelledTask.getTaskName();
+          final TimedTaskResult canceledTaskResult =
+              new TimedTaskResult(
+                  taskName,
+                  Duration.ZERO,
+                  new TaskTimeoutException(taskName, cancelledTask.getStart(), timeoutSeconds));
+          runTaskResults.add(canceledTaskResult);
           LOGGER.log(
               Level.WARNING,
               new StringFormat(
                   "Task <%s> started at %s but was cancelled, possibly due to timeout",
-                  cancelledTask.getTaskName(), cancelledTask.getStart()));
-          continue;
+                  taskName, cancelledTask.getStart()));
         }
-        final TimedTaskResult timedTaskResult = futureResult.get();
-        runTaskResults.add(timedTaskResult);
       }
 
       return runTaskResults;
     } catch (final ExecutionException e) {
       final Throwable cause = e.getCause();
-      if (cause instanceof Exception exception) {
+      if (cause instanceof final Exception exception) {
         throw exception;
       }
       throw new RunnerException(cause);

@@ -32,6 +32,26 @@ public class SystemPropertiesConfigTest {
   }
 
   @Test
+  @WithSystemProperty(key = TEST_KEY, value = "42")
+  public void getIntegerValueForKnownKey() {
+    final SystemPropertiesConfig config = new SystemPropertiesConfig();
+    assertThat(config.getIntegerValue(TEST_KEY, 7), is(42));
+  }
+
+  @Test
+  @WithSystemProperty(key = TEST_KEY, value = "not-an-integer")
+  public void getIntegerValueForMalformedKeyReturnsDefault() {
+    final SystemPropertiesConfig config = new SystemPropertiesConfig();
+    assertThat(config.getIntegerValue(TEST_KEY, 7), is(7));
+  }
+
+  @Test
+  public void getIntegerValueForMissingKeyReturnsDefault() {
+    final SystemPropertiesConfig config = new SystemPropertiesConfig();
+    assertThat(config.getIntegerValue("schemacrawler.test.nonexistent", 7), is(7));
+  }
+
+  @Test
   @WithSystemProperty(key = TEST_KEY, value = "test-value")
   public void getStringValueForKnownKey() {
     final SystemPropertiesConfig config = new SystemPropertiesConfig();

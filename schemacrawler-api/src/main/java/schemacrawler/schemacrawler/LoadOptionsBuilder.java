@@ -8,9 +8,6 @@
 
 package schemacrawler.schemacrawler;
 
-import static us.fatehi.utility.scheduler.TaskRunner.MAX_THREADS;
-import static us.fatehi.utility.scheduler.TaskRunner.MIN_THREADS;
-
 import us.fatehi.utility.OptionsBuilder;
 
 public final class LoadOptionsBuilder implements OptionsBuilder<LoadOptionsBuilder, LoadOptions> {
@@ -24,12 +21,10 @@ public final class LoadOptionsBuilder implements OptionsBuilder<LoadOptionsBuild
   }
 
   private SchemaInfoLevel schemaInfoLevel;
-  private int maxThreads;
 
   /** Default options. */
   private LoadOptionsBuilder() {
     schemaInfoLevel = SchemaInfoLevelBuilder.standard();
-    maxThreads = MAX_THREADS;
   }
 
   @Override
@@ -39,31 +34,19 @@ public final class LoadOptionsBuilder implements OptionsBuilder<LoadOptionsBuild
     }
 
     schemaInfoLevel = options.schemaInfoLevel();
-    maxThreads = options.maxThreads();
 
     return this;
   }
 
   @Override
   public LoadOptions toOptions() {
-    return new LoadOptions(schemaInfoLevel, maxThreads);
+    return new LoadOptions(schemaInfoLevel);
   }
 
   public LoadOptionsBuilder withInfoLevel(final InfoLevel infoLevel) {
     if (infoLevel != null) {
-      this.schemaInfoLevel = infoLevel.toSchemaInfoLevel();
+      schemaInfoLevel = infoLevel.toSchemaInfoLevel();
     }
-    return this;
-  }
-
-  /**
-   * IMPORTANT: Multi-threading is not implemented. It is possibly future functionality.
-   *
-   * @param maxThreads Maximum number of threads for multi-threaded operation.
-   * @return Maximum number of threads.
-   */
-  public LoadOptionsBuilder withMaxThreads(final int maxThreads) {
-    this.maxThreads = Math.min(Math.max(maxThreads, MIN_THREADS), MAX_THREADS);
     return this;
   }
 
@@ -77,7 +60,7 @@ public final class LoadOptionsBuilder implements OptionsBuilder<LoadOptionsBuild
   public LoadOptionsBuilder withSchemaInfoLevelBuilder(
       final SchemaInfoLevelBuilder schemaInfoLevelBuilder) {
     if (schemaInfoLevelBuilder != null) {
-      this.schemaInfoLevel = schemaInfoLevelBuilder.toOptions();
+      schemaInfoLevel = schemaInfoLevelBuilder.toOptions();
     }
     return this;
   }
