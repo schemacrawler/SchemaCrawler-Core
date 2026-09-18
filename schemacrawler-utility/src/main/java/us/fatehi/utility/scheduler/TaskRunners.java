@@ -19,6 +19,7 @@ public class TaskRunners {
   private static final String SC_SINGLE_THREADED = "SC_SINGLE_THREADED";
   private static final String SC_LOAD_MAX_THREADS = "SC_LOAD_MAX_THREADS";
   private static final String SC_LOAD_TIMEOUT_SECONDS = "SC_LOAD_TIMEOUT_SECONDS";
+  private static final int DEFAULT_LOAD_TIMEOUT_SECONDS = 3600;
 
   public static TaskRunner getTaskRunner(final String id) {
     final boolean isSingleThreaded =
@@ -35,7 +36,8 @@ public class TaskRunners {
   private static ThreadingOptions getThreadingOptions() {
     final int maxThreads = new SystemPropertiesConfig().getIntegerValue(SC_LOAD_MAX_THREADS, 0);
     final int timeoutSeconds =
-        new SystemPropertiesConfig().getIntegerValue(SC_LOAD_TIMEOUT_SECONDS, 0);
+        new SystemPropertiesConfig()
+            .getIntegerValue(SC_LOAD_TIMEOUT_SECONDS, DEFAULT_LOAD_TIMEOUT_SECONDS);
     return new ThreadingOptions(maxThreads, timeoutSeconds);
   }
 }
