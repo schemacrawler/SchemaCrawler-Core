@@ -20,8 +20,6 @@ public record ThreadingOptions(int maxThreads, int timeoutSeconds) {
 
   public ThreadingOptions {
     maxThreads = Math.min(Math.max(maxThreads, MIN_THREADS), MAX_THREADS);
-    if (timeoutSeconds < 0) {
-      timeoutSeconds = 0;
-    }
+    timeoutSeconds = Math.max(timeoutSeconds, 0);
   }
 }
