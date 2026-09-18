@@ -15,35 +15,62 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 public class MultiThreadedTaskRunnerTest {
 
   @Test
   public void completesFastTaskWithTimeout() throws Exception {
+    final AtomicBoolean taskCompleted = new AtomicBoolean();
     try (final TaskRunner taskRunner =
         new MultiThreadedTaskRunner("test", new ThreadingOptions(1, 1))) {
-      taskRunner.add(new TaskDefinition("fast task"));
+      taskRunner.add(new TaskDefinition("fast task", () -> taskCompleted.set(true)));
       taskRunner.submit();
     }
+    assertThat(taskCompleted.get(), is(true));
   }
 
   @Test
   public void completesSlowTaskWhenNegativeTimeoutDisabled() throws Exception {
+    final AtomicBoolean taskCompleted = new AtomicBoolean();
     try (final TaskRunner taskRunner =
         new MultiThreadedTaskRunner("test", new ThreadingOptions(1, -1))) {
-      taskRunner.add(new TaskDefinition("slow task", () -> Thread.sleep(100)));
+      taskRunner.add(
+          new TaskDefinition(
+              "slow task",
+              () -> {
+                Thread.sleep(100);
+                taskCompleted.set(true);
+              }));
       taskRunner.submit();
     }
+    assertThat(taskCompleted.get(), is(true));
   }
 
   @Test
   public void completesSlowTaskWhenTimeoutDisabled() throws Exception {
+    final AtomicBoolean taskCompleted = new AtomicBoolean();
     try (final TaskRunner taskRunner =
         new MultiThreadedTaskRunner("test", new ThreadingOptions(1, 0))) {
-      taskRunner.add(new TaskDefinition("slow task", () -> Thread.sleep(1000)));
+      taskRunner.add(
+          new TaskDefinition(
+              "slow task",
+              () -> {
+                Thread.sleep(1000);
+                taskCompleted.set(true);
+              }));
       taskRunner.submit();
     }
+    assertThat(taskCompleted.get(), is(true));
+  }
+
+  @Test
+  public void preservesConfiguredTimeoutValues() {
+    assertThat(new ThreadingOptions(1, 1).timeoutSeconds(), is(1));
+    assertThat(new ThreadingOptions(1, 0).timeoutSeconds(), is(0));
+    assertThat(new ThreadingOptions(1, -1).timeoutSeconds(), is(0));
+    assertThat(new ThreadingOptions(1, 3600).timeoutSeconds(), is(3600));
   }
 
   @Test
@@ -51,15 +78,23 @@ public class MultiThreadedTaskRunnerTest {
     final ThreadingOptions threadingOptions = mock(ThreadingOptions.class);
     when(threadingOptions.maxThreads()).thenReturn(1);
     when(threadingOptions.timeoutSeconds()).thenReturn(1);
+    final AtomicBoolean taskCompleted = new AtomicBoolean();
 
     try (final TaskRunner taskRunner = new MultiThreadedTaskRunner("test", threadingOptions)) {
-      taskRunner.add(new TaskDefinition("slow task", () -> Thread.sleep(5000)));
+      taskRunner.add(
+          new TaskDefinition(
+              "slow task",
+              () -> {
+                Thread.sleep(5000);
+                taskCompleted.set(true);
+              }));
 
       final TaskTimeoutException exception =
           assertThrows(TaskTimeoutException.class, taskRunner::submit);
       assertThat(exception.getMessage(), containsString("slow_task"));
       assertThat(exception.getMessage(), containsString("<1> seconds"));
     }
+    assertThat(taskCompleted.get(), is(false));
   }
 
   @Test
