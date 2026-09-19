@@ -26,7 +26,7 @@ class CombinedFiltersTest {
     final LightTable sales = new LightTable("sales");
     final LightTable inventory = new LightTable("inventory");
     final Predicate<schemacrawler.schema.NamedObject> notSales =
-        NamedObjectFilters.normalizedNameRegex("sales").negate();
+        NamedObjectFilters.nameRegex("sales").negate();
 
     assertThat(notSales.test(sales), is(false));
     assertThat(notSales.test(inventory), is(true));
@@ -39,8 +39,7 @@ class CombinedFiltersTest {
     final Table inventoryView = viewTypeTable("inventory_view");
 
     final Predicate<Table> salesViewsOnly =
-        NamedObjectFilters.tableTypes("view")
-            .and(NamedObjectFilters.normalizedNameRegex(".*sales.*"));
+        NamedObjectFilters.tableTypes("view").and(NamedObjectFilters.nameRegex(".*sales.*"));
 
     assertThat(salesViewsOnly.test(salesView), is(true));
     assertThat(salesViewsOnly.test(salesTable), is(false));

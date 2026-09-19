@@ -28,69 +28,65 @@ import schemacrawler.test.utility.crawl.LightTable;
 class NamedObjectFiltersTest {
 
   @Test
-  void testnormalizedNameRegex() {
+  void testNameRegex() {
     final LightTable table = new LightTable("sales");
 
-    assertThat(NamedObjectFilters.normalizedNameRegex(".*sales").test(table), is(true));
-    assertThat(NamedObjectFilters.normalizedNameRegex(".*inventory").test(table), is(false));
+    assertThat(NamedObjectFilters.nameRegex(".*sales").test(table), is(true));
+    assertThat(NamedObjectFilters.nameRegex(".*inventory").test(table), is(false));
   }
 
   @Test
   void testNullNamedObjectIsExcluded() {
-    assertThat(NamedObjectFilters.normalizedNameRegex(".*").test(null), is(false));
-    assertThat(NamedObjectFilters.normalizedFullNameRegex(".*").test(null), is(false));
+    assertThat(NamedObjectFilters.nameRegex(".*").test(null), is(false));
+    assertThat(NamedObjectFilters.fullNameRegex(".*").test(null), is(false));
   }
 
   @Test
   void testNullRegexThrowsIllegalArgumentException() {
-    assertThrows(
-        IllegalArgumentException.class, () -> NamedObjectFilters.normalizedNameRegex(null));
-    assertThrows(
-        IllegalArgumentException.class, () -> NamedObjectFilters.normalizedFullNameRegex(null));
+    assertThrows(IllegalArgumentException.class, () -> NamedObjectFilters.nameRegex(null));
+    assertThrows(IllegalArgumentException.class, () -> NamedObjectFilters.fullNameRegex(null));
   }
 
   @Test
-  void testNormalizedNameStripsQuoting() {
+  void testNameRegexStripsQuoting() {
     final LightTable table = new LightTable("\"Sales.Table\"");
 
     // The quoted name is normalized (quotes stripped, lower-cased) before matching, so the
     // regex is matched against the unquoted, lower-case value.
-    assertThat(NamedObjectFilters.normalizedNameRegex("Sales\\.Table").test(table), is(true));
-    assertThat(NamedObjectFilters.normalizedNameRegex("sales\\.table").test(table), is(true));
-    assertThat(NamedObjectFilters.normalizedNameRegex("sales table").test(table), is(false));
+    assertThat(NamedObjectFilters.nameRegex("Sales\\.Table").test(table), is(true));
+    assertThat(NamedObjectFilters.nameRegex("sales\\.table").test(table), is(true));
+    assertThat(NamedObjectFilters.nameRegex("sales table").test(table), is(false));
   }
 
   @Test
-  void testNormalizedNameRegexAlsoAcceptsQuotedRawRegexIntent() {
+  void testNameRegexAlsoAcceptsQuotedRawRegexIntent() {
     final LightTable table = new LightTable("\"Sales.Table\"");
 
     // The pattern is also matched against the object's original (raw, still-quoted) name, so a
     // regex written to look like the raw, quoted identifier matches too - not just a regex
     // written for the normalized, unquoted value.
-    assertThat(NamedObjectFilters.normalizedNameRegex("\"Sales\\.Table\"").test(table), is(true));
+    assertThat(NamedObjectFilters.nameRegex("\"Sales\\.Table\"").test(table), is(true));
   }
 
   @Test
-  void testNormalizedFullNameStripsQuoting() {
+  void testFullNameRegexStripsQuoting() {
     final LightTable table = new LightTable("\"Sales.Table\"");
 
-    assertThat(NamedObjectFilters.normalizedFullNameRegex(".*sales\\.table").test(table), is(true));
-    assertThat(NamedObjectFilters.normalizedFullNameRegex(".*sales table").test(table), is(false));
+    assertThat(NamedObjectFilters.fullNameRegex(".*sales\\.table").test(table), is(true));
+    assertThat(NamedObjectFilters.fullNameRegex(".*sales table").test(table), is(false));
   }
 
   @Test
-  void testNormalizedFullNameRegexAlsoAcceptsQuotedRawRegexIntent() {
+  void testFullNameRegexAlsoAcceptsQuotedRawRegexIntent() {
     final LightTable table = new LightTable("\"Sales.Table\"");
 
     // Matched against the raw, still-quoted full name, in addition to the normalized full name.
-    assertThat(
-        NamedObjectFilters.normalizedFullNameRegex(".*\"Sales\\.Table\"").test(table), is(true));
-    assertThat(
-        NamedObjectFilters.normalizedFullNameRegex(".*\".*\\.Table\"").test(table), is(true));
+    assertThat(NamedObjectFilters.fullNameRegex(".*\"Sales\\.Table\"").test(table), is(true));
+    assertThat(NamedObjectFilters.fullNameRegex(".*\".*\\.Table\"").test(table), is(true));
   }
 
   @Test
-  void testNormalizedFullNamePreservesLiteralDotsInsideQuotedParts() {
+  void testFullNameRegexPreservesLiteralDotsInsideQuotedParts() {
     // Each part of the schema-qualified name is quoted, and itself contains a literal dot.
     // Naively stripping quotes from the whole concatenated full name (or splitting on dots
     // before un-quoting) would corrupt the value. Normalizing each key part individually,
@@ -99,25 +95,22 @@ class NamedObjectFiltersTest {
     final Schema schema = new SchemaReference(null, "\"My.Schema\"");
     final LightTable table = new LightTable(schema, "\"My.Table\"");
 
-    assertThat(
-        NamedObjectFilters.normalizedFullNameRegex("my\\.schema\\.my\\.table").test(table),
-        is(true));
+    assertThat(NamedObjectFilters.fullNameRegex("my\\.schema\\.my\\.table").test(table), is(true));
     // A pattern that treats the whole qualified name as a single quoted identifier does not
     // match, since the raw full name actually consists of two separately-quoted parts (each
     // with its own surrounding quotes), not one quoted string spanning both parts; and the
     // normalized full name has no quote characters at all.
     assertThat(
-        NamedObjectFilters.normalizedFullNameRegex("\"my\\.schema\\.my\\.table\"").test(table),
-        is(false));
+        NamedObjectFilters.fullNameRegex("\"my\\.schema\\.my\\.table\"").test(table), is(false));
   }
 
   @Test
-  void testNormalizedNameHandlesBracketAndBacktickQuoting() {
+  void testNameRegexHandlesBracketAndBacktickQuoting() {
     final LightTable bracketed = new LightTable("[Sales]");
     final LightTable backticked = new LightTable("`Sales`");
 
-    assertThat(NamedObjectFilters.normalizedNameRegex("sales").test(bracketed), is(true));
-    assertThat(NamedObjectFilters.normalizedNameRegex("sales").test(backticked), is(true));
+    assertThat(NamedObjectFilters.nameRegex("sales").test(bracketed), is(true));
+    assertThat(NamedObjectFilters.nameRegex("sales").test(backticked), is(true));
   }
 
   @Test

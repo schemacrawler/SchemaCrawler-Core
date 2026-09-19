@@ -26,18 +26,11 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class NamedObjectFilters {
 
-  /** Creates a filter based on an inclusion rule, tested against a named object's full name. */
-  public static <N extends NamedObject> NamedObjectFilter<N> inclusionRule(
-      final InclusionRule inclusionRule) {
-    requireNonNull(inclusionRule, "No inclusion rule provided");
-    return new InclusionRuleFilter<>(inclusionRule, true);
-  }
-
   /**
    * Creates a filter for a whole full-name regex, matched against both the original (raw) full name
    * and the normalized full name.
    */
-  public static NamedObjectFilter<NamedObject> normalizedFullNameRegex(final String regex) {
+  public static NamedObjectFilter<NamedObject> fullNameRegex(final String regex) {
     requireNotBlank(regex, "No regular expression provided");
     final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     return namedObject -> {
@@ -57,11 +50,18 @@ public final class NamedObjectFilters {
     };
   }
 
+  /** Creates a filter based on an inclusion rule, tested against a named object's full name. */
+  public static <N extends NamedObject> NamedObjectFilter<N> inclusionRule(
+      final InclusionRule inclusionRule) {
+    requireNonNull(inclusionRule, "No inclusion rule provided");
+    return new InclusionRuleFilter<>(inclusionRule, true);
+  }
+
   /**
    * Creates a filter for a whole name regex, matched against both the original (raw) name and the
    * normalized name.
    */
-  public static NamedObjectFilter<NamedObject> normalizedNameRegex(final String regex) {
+  public static NamedObjectFilter<NamedObject> nameRegex(final String regex) {
     requireNotBlank(regex, "No regular expression provided");
     final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     return namedObject -> {
@@ -98,10 +98,6 @@ public final class NamedObjectFilters {
   /** Creates a filter for table types, by table type name. */
   public static NamedObjectFilter<Table> tableTypes(final String... tableTypes) {
     return new TableTypesFilter(tableTypes);
-  }
-
-  private static boolean matches(final Pattern pattern, final String value) {
-    return value != null && pattern.matcher(value).matches();
   }
 
   private NamedObjectFilters() {

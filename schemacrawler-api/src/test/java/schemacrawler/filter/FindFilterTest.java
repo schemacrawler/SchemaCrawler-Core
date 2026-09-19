@@ -55,11 +55,9 @@ class FindFilterTest {
     final CatalogSearcher searcher = CatalogSearcher.search(catalog);
 
     assertThat(
-        searcher.findColumnDataTypes(NamedObjectFilters.normalizedNameRegex("INTEGER")),
+        searcher.findColumnDataTypes(NamedObjectFilters.nameRegex("INTEGER")),
         contains(integerType));
-    assertThat(
-        searcher.findColumnDataTypes(NamedObjectFilters.normalizedNameRegex("MISSING")),
-        hasSize(0));
+    assertThat(searcher.findColumnDataTypes(NamedObjectFilters.nameRegex("MISSING")), hasSize(0));
   }
 
   @Test
@@ -71,10 +69,8 @@ class FindFilterTest {
     final CatalogSearcher searcher = CatalogSearcher.search(catalog);
 
     assertThat(
-        searcher.findRoutines(NamedObjectFilters.normalizedNameRegex("list_sales")),
-        contains(listSales));
-    assertThat(
-        searcher.findRoutines(NamedObjectFilters.normalizedNameRegex("missing")), hasSize(0));
+        searcher.findRoutines(NamedObjectFilters.nameRegex("list_sales")), contains(listSales));
+    assertThat(searcher.findRoutines(NamedObjectFilters.nameRegex("missing")), hasSize(0));
   }
 
   @Test
@@ -86,9 +82,8 @@ class FindFilterTest {
     final CatalogSearcher searcher = CatalogSearcher.search(catalog);
 
     assertThat(
-        searcher.findSchemas(NamedObjectFilters.normalizedNameRegex("sales_schema")),
-        contains(salesSchema));
-    assertThat(searcher.findSchemas(NamedObjectFilters.normalizedNameRegex("missing")), hasSize(0));
+        searcher.findSchemas(NamedObjectFilters.nameRegex("sales_schema")), contains(salesSchema));
+    assertThat(searcher.findSchemas(NamedObjectFilters.nameRegex("missing")), hasSize(0));
   }
 
   @Test
@@ -104,10 +99,8 @@ class FindFilterTest {
     final CatalogSearcher searcher = CatalogSearcher.search(catalog);
 
     assertThat(
-        searcher.findSequences(NamedObjectFilters.normalizedNameRegex("sales_seq")),
-        contains(salesSequence));
-    assertThat(
-        searcher.findSequences(NamedObjectFilters.normalizedNameRegex("missing")), hasSize(0));
+        searcher.findSequences(NamedObjectFilters.nameRegex("sales_seq")), contains(salesSequence));
+    assertThat(searcher.findSequences(NamedObjectFilters.nameRegex("missing")), hasSize(0));
   }
 
   @Test
@@ -123,25 +116,18 @@ class FindFilterTest {
     final CatalogSearcher searcher = CatalogSearcher.search(catalog);
 
     assertThat(
-        searcher.findSynonyms(NamedObjectFilters.normalizedNameRegex("sales_syn")),
-        contains(salesSynonym));
-    assertThat(
-        searcher.findSynonyms(NamedObjectFilters.normalizedNameRegex("missing")), hasSize(0));
+        searcher.findSynonyms(NamedObjectFilters.nameRegex("sales_syn")), contains(salesSynonym));
+    assertThat(searcher.findSynonyms(NamedObjectFilters.nameRegex("missing")), hasSize(0));
   }
 
   @Test
   void testFindTables() {
     final CatalogSearcher searcher = CatalogSearcher.search(catalog);
 
-    assertThat(
-        searcher.findTables(NamedObjectFilters.normalizedNameRegex("sales")), contains(sales));
-    assertThat(
-        searcher.findColumns(NamedObjectFilters.normalizedFullNameRegex(".*\\.amount")),
-        hasSize(1));
-    assertThat(
-        searcher.findColumns(NamedObjectFilters.normalizedFullNameRegex(".*internal_id")),
-        hasSize(0));
-    assertThat(searcher.findTables(NamedObjectFilters.normalizedNameRegex("missing")), hasSize(0));
+    assertThat(searcher.findTables(NamedObjectFilters.nameRegex("sales")), contains(sales));
+    assertThat(searcher.findColumns(NamedObjectFilters.fullNameRegex(".*\\.amount")), hasSize(1));
+    assertThat(searcher.findColumns(NamedObjectFilters.fullNameRegex(".*internal_id")), hasSize(0));
+    assertThat(searcher.findTables(NamedObjectFilters.nameRegex("missing")), hasSize(0));
     assertThat(
         searcher.findTables(
             NamedObjectFilters.tableGrep(
@@ -150,7 +136,6 @@ class FindFilterTest {
                         new schemacrawler.inclusionrule.RegularExpressionInclusionRule("inventory"))
                     .toOptions())),
         contains(inventory));
-    assertThat(
-        searcher.findTables(NamedObjectFilters.normalizedNameRegex("sales")), contains(sales));
+    assertThat(searcher.findTables(NamedObjectFilters.nameRegex("sales")), contains(sales));
   }
 }
