@@ -11,7 +11,6 @@ package schemacrawler.filter;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.inclusionrule.InclusionRule;
@@ -20,7 +19,7 @@ import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.GrepOptions;
 import us.fatehi.utility.string.StringFormat;
 
-class TableGrepFilter implements Predicate<Table> {
+class TableGrepFilter implements NamedObjectFilter<Table> {
 
   private static final Logger LOGGER = Logger.getLogger(TableGrepFilter.class.getName());
 

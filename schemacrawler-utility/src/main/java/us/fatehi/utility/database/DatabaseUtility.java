@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.UtilityMarker;
@@ -104,6 +105,23 @@ public final class DatabaseUtility {
     } catch (final SQLException e) {
       throw new SQLException("%s%n%s".formatted(e.getMessage(), sql), e);
     }
+  }
+
+  public static String normalizeDatabaseObjectName(final String name) {
+    if (name == null) {
+      return null;
+    }
+    String normalized = name;
+    if (normalized.length() >= 2) {
+      final char first = normalized.charAt(0);
+      final char last = normalized.charAt(normalized.length() - 1);
+      final boolean paired =
+          first == '"' && last == '"' || first == '`' && last == '`' || first == '[' && last == ']';
+      if (paired) {
+        normalized = normalized.substring(1, normalized.length() - 1);
+      }
+    }
+    return normalized.toLowerCase(Locale.ROOT);
   }
 
   public static long readResultsForLong(final String sql, final ResultSet resultSet)
