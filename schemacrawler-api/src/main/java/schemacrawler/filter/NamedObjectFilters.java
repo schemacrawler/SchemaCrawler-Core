@@ -35,12 +35,16 @@ public final class NamedObjectFilters {
 
   /** Creates a filter for a whole normalized full-name regex. */
   public static NamedObjectFilter<NamedObject> normalizedFullNameRegex(final String regex) {
-    return regexFilter(regex, NamedObject::getFullName);
+    // Normalize each name part (schema, table, etc.) individually via the object's key - which
+    // was built up from separately-captured parts, never by concatenating then splitting a
+    // single string - before joining with ".". This avoids ambiguity when a quoted identifier
+    // part itself contains a literal dot, since that dot is never mistaken for a separator.
+    return regexFilter(regex, namedObject -> namedObject.key().normalized().join());
   }
 
   /** Creates a filter for a whole normalized name regex. */
   public static NamedObjectFilter<NamedObject> normalizedNameRegex(final String regex) {
-    return regexFilter(regex, NamedObject::getName);
+    return regexFilter(regex, namedObject -> normalizeDatabaseObjectName(namedObject.getName()));
   }
 
   /** Creates a compound routine grep filter. */
@@ -67,18 +71,17 @@ public final class NamedObjectFilters {
   }
 
   private static NamedObjectFilter<NamedObject> regexFilter(
-      final String regex, final Function<NamedObject, String> projection) {
+      final String regex, final Function<NamedObject, String> normalizedValueProjection) {
     requireNotBlank(regex, "No regular expression provided");
     final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     return namedObject -> {
       if (namedObject == null) {
         return false;
       }
-      String value = projection.apply(namedObject);
+      final String value = normalizedValueProjection.apply(namedObject);
       if (value == null) {
         return false;
       }
-      value = normalizeDatabaseObjectName(value);
       return pattern.matcher(value).matches();
     };
   }

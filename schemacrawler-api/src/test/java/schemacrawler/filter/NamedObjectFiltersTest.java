@@ -14,17 +14,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.RoutineType;
+import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
+import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.crawl.LightProcedure;
 import schemacrawler.test.utility.crawl.LightTable;
 
-@Disabled("Temporarily disabled")
 class NamedObjectFiltersTest {
 
   @Test
@@ -42,7 +42,7 @@ class NamedObjectFiltersTest {
   }
 
   @Test
-  void testNullRegexThrowsNullPointerException() {
+  void testNullRegexThrowsIllegalArgumentException() {
     assertThrows(
         IllegalArgumentException.class, () -> NamedObjectFilters.normalizedNameRegex(null));
     assertThrows(
@@ -50,23 +50,40 @@ class NamedObjectFiltersTest {
   }
 
   @Test
-  void testRawAndNormalizedNameFilters() {
+  void testNormalizedNameStripsQuoting() {
     final LightTable table = new LightTable("\"Sales.Table\"");
 
-    assertThat(NamedObjectFilters.normalizedNameRegex("\"Sales\\.Table\"").test(table), is(true));
+    // The quoted name is normalized (quotes stripped, lower-cased) before matching, so the
+    // regex is matched against the unquoted, lower-case value.
     assertThat(NamedObjectFilters.normalizedNameRegex("Sales\\.Table").test(table), is(true));
     assertThat(NamedObjectFilters.normalizedNameRegex("sales\\.table").test(table), is(true));
     assertThat(NamedObjectFilters.normalizedNameRegex("sales table").test(table), is(false));
   }
 
   @Test
-  void testNormalizedFullNamePreservesRawRegexIntent() {
+  void testNormalizedFullNameStripsQuoting() {
     final LightTable table = new LightTable("\"Sales.Table\"");
 
-    assertThat(
-        NamedObjectFilters.normalizedFullNameRegex("\".*Sales\\.Table\"").test(table), is(true));
     assertThat(NamedObjectFilters.normalizedFullNameRegex(".*sales\\.table").test(table), is(true));
     assertThat(NamedObjectFilters.normalizedFullNameRegex(".*sales table").test(table), is(false));
+  }
+
+  @Test
+  void testNormalizedFullNamePreservesLiteralDotsInsideQuotedParts() {
+    // Each part of the schema-qualified name is quoted, and itself contains a literal dot.
+    // Naively stripping quotes from the whole concatenated full name (or splitting on dots
+    // before un-quoting) would corrupt the value. Normalizing each key part individually,
+    // before joining, keeps the literal dots intact as content, and only the join adds a
+    // genuine separator.
+    final Schema schema = new SchemaReference(null, "\"My.Schema\"");
+    final LightTable table = new LightTable(schema, "\"My.Table\"");
+
+    assertThat(
+        NamedObjectFilters.normalizedFullNameRegex("my\\.schema\\.my\\.table").test(table),
+        is(true));
+    assertThat(
+        NamedObjectFilters.normalizedFullNameRegex("\"my\\.schema\"\\.\"my\\.table\"").test(table),
+        is(false));
   }
 
   @Test

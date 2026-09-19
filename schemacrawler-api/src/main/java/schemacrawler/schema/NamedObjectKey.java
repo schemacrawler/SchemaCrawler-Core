@@ -53,6 +53,30 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
     return Arrays.hashCode(key);
   }
 
+  /**
+   * Joins the individual key parts with '.', skipping any parts that are null or empty. Since each
+   * part was captured separately when the key was built up (never by splitting a single
+   * concatenated name), a delimiter character embedded within an individual part (for example, a
+   * literal dot inside a quoted identifier) is preserved as content and is never mistaken for a
+   * separator between parts.
+   *
+   * @return Joined key parts, or an empty string if there are no non-blank parts
+   */
+  public String join() {
+    final String delimiter = ".";
+    final StringBuilder buffer = new StringBuilder();
+    for (final String part : key) {
+      if (part == null || part.isEmpty()) {
+        continue;
+      }
+      if (!buffer.isEmpty()) {
+        buffer.append(delimiter);
+      }
+      buffer.append(part);
+    }
+    return buffer.toString();
+  }
+
   public NamedObjectKey normalized() {
     final String[] normalizedKey = new String[key.length];
     for (int i = 0; i < key.length; i++) {
