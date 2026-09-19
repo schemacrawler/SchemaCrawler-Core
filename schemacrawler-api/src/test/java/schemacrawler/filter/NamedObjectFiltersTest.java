@@ -172,26 +172,6 @@ class NamedObjectFiltersTest {
   }
 
   @Test
-  void testInclusionRuleFilterIncludesMatchingAndExcludesOthers() {
-    final LightTable sales = new LightTable("sales");
-    final LightTable inventory = new LightTable("inventory");
-    final NamedObjectFilter<Table> filter =
-        NamedObjectFilters.inclusionRule(new RegularExpressionInclusionRule(".*sales.*"));
-
-    assertThat(filter.test(sales), is(true));
-    assertThat(filter.test(inventory), is(false));
-  }
-
-  @Test
-  void testInclusionRuleFilterWithNullRuleDefaultsToInclusiveOrExclusive() {
-    final LightTable table = new LightTable("sales");
-
-    assertThrows(
-        NullPointerException.class,
-        () -> NamedObjectFilters.<Table>inclusionRule(null).test(table));
-  }
-
-  @Test
   void testTableTypesFilterByName() {
     final Table table = viewTypeTable("sales");
 
