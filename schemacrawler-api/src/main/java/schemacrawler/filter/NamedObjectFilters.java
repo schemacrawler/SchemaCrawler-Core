@@ -13,6 +13,8 @@ import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.regex.Pattern;
+import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
@@ -46,22 +48,8 @@ public final class NamedObjectFilters {
   public static NamedObjectFilter<NamedObject> fullNameRegex(final String regex) {
     requireNotBlank(regex, "No regular expression provided");
     final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-    return namedObject -> {
-      if (namedObject == null) {
-        return false;
-      }
-      final String fullName = namedObject.getFullName();
-      // IMPORTANT: Schema names may be blank. Do not do a blank check at this point.
-      if (fullName == null) {
-        return false;
-      }
-      // Also test the qualified-name key (schema, table, etc. parts joined with "."), exactly as
-      // captured when the object was created. This lets an unquoted regular expression match a
-      // full name that includes quoting added purely for display, without making the match
-      // case-insensitive.
-      final String unquotedFullName = NamedObjectUtility.unquotedFullName(namedObject);
-      return pattern.matcher(fullName).matches() || pattern.matcher(unquotedFullName).matches();
-    };
+    final InclusionRule inclusionRule = new RegularExpressionInclusionRule(pattern);
+    return new InclusionRuleFilter<>(inclusionRule, false);
   }
 
   /**
