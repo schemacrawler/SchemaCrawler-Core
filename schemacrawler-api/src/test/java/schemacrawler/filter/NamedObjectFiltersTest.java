@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import schemacrawler.filter.NamedObjectFilters.SimpleTableType;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
@@ -188,8 +189,8 @@ class NamedObjectFiltersTest {
   void testTableTypesFilterByName() {
     final Table table = viewTypeTable("sales");
 
-    assertThat(NamedObjectFilters.tableTypes("view").test(table), is(true));
-    assertThat(NamedObjectFilters.tableTypes("table").test(table), is(false));
+    assertThat(NamedObjectFilters.tableTypes(SimpleTableType.view).test(table), is(true));
+    assertThat(NamedObjectFilters.tableTypes(SimpleTableType.table).test(table), is(false));
   }
 
   @Test
