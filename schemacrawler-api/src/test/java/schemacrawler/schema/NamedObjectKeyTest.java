@@ -10,27 +10,10 @@ package schemacrawler.schema;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
 
 public class NamedObjectKeyTest {
-
-  @Test
-  public void normalizedKeyPreservesComponents() {
-    final NamedObjectKey key = new NamedObjectKey("\"Catalog\"", "`Schema`", "[A.B]");
-
-    assertThat(key.normalized(), equalTo(new NamedObjectKey("catalog", "schema", "a.b")));
-    assertThat(key, equalTo(new NamedObjectKey("\"Catalog\"", "`Schema`", "[A.B]")));
-    assertThat(key.equals(key.normalized()), is(false));
-  }
-
-  @Test
-  public void normalizedKeyPreservesInteriorWhitespaceAndPunctuation() {
-    final NamedObjectKey key = new NamedObjectKey("\"A B\"", "\"A-B\"");
-
-    assertThat(key.normalized(), equalTo(new NamedObjectKey("a b", "a-b")));
-  }
 
   @Test
   public void joinCombinesAllNonBlankPartsWithDot() {
@@ -64,9 +47,24 @@ public class NamedObjectKeyTest {
   }
 
   @Test
-  public void joinOfNormalizedKeyStripsQuotingFromEachPartBeforeJoining() {
-    final NamedObjectKey key = new NamedObjectKey("\"My.Schema\"", "\"My.Table\"");
+  public void withoutLastDropsOnlyTheFinalPart() {
+    final NamedObjectKey key = new NamedObjectKey("catalog", "schema", "name", "specificName");
 
-    assertThat(key.normalized().join(), equalTo("my.schema.my.table"));
+    assertThat(key.withoutLast().join(), equalTo("catalog.schema.name"));
+  }
+
+  @Test
+  public void withoutLastOnSinglePartKeyReturnsEmptyKey() {
+    final NamedObjectKey key = new NamedObjectKey("onlyPart");
+
+    assertThat(key.withoutLast(), equalTo(new NamedObjectKey()));
+    assertThat(key.withoutLast().join(), equalTo(""));
+  }
+
+  @Test
+  public void withoutLastOnEmptyKeyIsANoOp() {
+    final NamedObjectKey key = new NamedObjectKey();
+
+    assertThat(key.withoutLast().join(), equalTo(""));
   }
 }

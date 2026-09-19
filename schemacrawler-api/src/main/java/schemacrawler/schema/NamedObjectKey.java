@@ -9,7 +9,6 @@
 package schemacrawler.schema;
 
 import static us.fatehi.utility.Utility.convertForComparison;
-import static us.fatehi.utility.database.DatabaseUtility.normalizeDatabaseObjectName;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -77,14 +76,6 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
     return buffer.toString();
   }
 
-  public NamedObjectKey normalized() {
-    final String[] normalizedKey = new String[key.length];
-    for (int i = 0; i < key.length; i++) {
-      normalizedKey[i] = normalizeDatabaseObjectName(key[i]);
-    }
-    return new NamedObjectKey(normalizedKey);
-  }
-
   public String slug() {
     if (key.length == 0) {
       return "";
@@ -102,6 +93,20 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
     final int currentLength = key.length;
     final String[] newKey = Arrays.copyOf(key, currentLength + 1);
     newKey[currentLength] = name;
+    return new NamedObjectKey(newKey);
+  }
+
+  /**
+   * Returns a new key with its last part removed, symmetric to {@link #with(String)}. A no-op
+   * (returns an equivalent empty key) when this key already has no parts.
+   *
+   * @return a new key without its last part, or an empty key if this key is already empty
+   */
+  public NamedObjectKey withoutLast() {
+    if (key.length == 0) {
+      return this;
+    }
+    final String[] newKey = Arrays.copyOf(key, key.length - 1);
     return new NamedObjectKey(newKey);
   }
 }

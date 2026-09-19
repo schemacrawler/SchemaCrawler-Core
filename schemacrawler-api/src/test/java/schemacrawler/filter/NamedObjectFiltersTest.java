@@ -16,6 +16,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
+import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -48,39 +50,33 @@ class NamedObjectFiltersTest {
   }
 
   @Test
-  void testNameRegexStripsQuoting() {
+  void testNameRegexMatchesRawNameOnly() {
     final LightTable table = new LightTable("\"Sales.Table\"");
 
-    // The quoted name is normalized (quotes stripped, lower-cased) before matching, so the
-    // regex is matched against the unquoted, lower-case value.
-    assertThat(NamedObjectFilters.nameRegex("Sales\\.Table").test(table), is(true));
-    assertThat(NamedObjectFilters.nameRegex("sales\\.table").test(table), is(true));
-    assertThat(NamedObjectFilters.nameRegex("sales table").test(table), is(false));
-  }
-
-  @Test
-  void testNameRegexAlsoAcceptsQuotedRawRegexIntent() {
-    final LightTable table = new LightTable("\"Sales.Table\"");
-
-    // The pattern is also matched against the object's original (raw, still-quoted) name, so a
-    // regex written to look like the raw, quoted identifier matches too - not just a regex
-    // written for the normalized, unquoted value.
+    // There is no dequoting or lower-casing transform, so a regex must match the raw name,
+    // quote characters and all, to succeed. Matching is still case-insensitive via the
+    // pattern's own compilation flags.
     assertThat(NamedObjectFilters.nameRegex("\"Sales\\.Table\"").test(table), is(true));
+    assertThat(NamedObjectFilters.nameRegex("\"sales\\.table\"").test(table), is(true));
+    // A regex written for the unquoted, dequoted value no longer matches, since the name is
+    // never dequoted before matching.
+    assertThat(NamedObjectFilters.nameRegex("Sales\\.Table").test(table), is(false));
   }
 
   @Test
-  void testFullNameRegexStripsQuoting() {
-    final LightTable table = new LightTable("\"Sales.Table\"");
+  void testFullNameRegexMatchesRawFullNameAndJoinedKey() {
+    final LightTable table = new LightTable("sales");
 
-    assertThat(NamedObjectFilters.fullNameRegex(".*sales\\.table").test(table), is(true));
-    assertThat(NamedObjectFilters.fullNameRegex(".*sales table").test(table), is(false));
+    assertThat(NamedObjectFilters.fullNameRegex(".*sales").test(table), is(true));
+    assertThat(NamedObjectFilters.fullNameRegex(".*inventory").test(table), is(false));
   }
 
   @Test
   void testFullNameRegexAlsoAcceptsQuotedRawRegexIntent() {
     final LightTable table = new LightTable("\"Sales.Table\"");
 
-    // Matched against the raw, still-quoted full name, in addition to the normalized full name.
+    // Matched against the raw, still-quoted full name and the joined key parts, both of which
+    // retain the literal quote characters, since no dequoting transform is applied.
     assertThat(NamedObjectFilters.fullNameRegex(".*\"Sales\\.Table\"").test(table), is(true));
     assertThat(NamedObjectFilters.fullNameRegex(".*\".*\\.Table\"").test(table), is(true));
   }
@@ -88,20 +84,15 @@ class NamedObjectFiltersTest {
   @Test
   void testFullNameRegexPreservesLiteralDotsInsideQuotedParts() {
     // Each part of the schema-qualified name is quoted, and itself contains a literal dot.
-    // Naively stripping quotes from the whole concatenated full name (or splitting on dots
-    // before un-quoting) would corrupt the value. Normalizing each key part individually,
-    // before joining, keeps the literal dots intact as content, and only the join adds a
-    // genuine separator.
+    // The key is built from separately-captured parts (never by concatenating then splitting a
+    // single string), so joining them keeps the literal dots intact as content, and only the
+    // join adds a genuine separator.
     final Schema schema = new SchemaReference(null, "\"My.Schema\"");
     final LightTable table = new LightTable(schema, "\"My.Table\"");
 
-    assertThat(NamedObjectFilters.fullNameRegex("my\\.schema\\.my\\.table").test(table), is(true));
-    // A pattern that treats the whole qualified name as a single quoted identifier does not
-    // match, since the raw full name actually consists of two separately-quoted parts (each
-    // with its own surrounding quotes), not one quoted string spanning both parts; and the
-    // normalized full name has no quote characters at all.
     assertThat(
-        NamedObjectFilters.fullNameRegex("\"my\\.schema\\.my\\.table\"").test(table), is(false));
+        NamedObjectFilters.fullNameRegex(".*\"My\\.Schema\"\\.\"My\\.Table\"").test(table),
+        is(true));
   }
 
   @Test
@@ -109,8 +100,30 @@ class NamedObjectFiltersTest {
     final LightTable bracketed = new LightTable("[Sales]");
     final LightTable backticked = new LightTable("`Sales`");
 
-    assertThat(NamedObjectFilters.nameRegex("sales").test(bracketed), is(true));
-    assertThat(NamedObjectFilters.nameRegex("sales").test(backticked), is(true));
+    // Names are matched raw (with brackets/backticks intact); the pattern is still
+    // case-insensitive via the pattern's own compilation flags.
+    assertThat(NamedObjectFilters.nameRegex("\\[Sales\\]").test(bracketed), is(true));
+    assertThat(NamedObjectFilters.nameRegex("`Sales`").test(backticked), is(true));
+  }
+
+  @Test
+  void testFullNameRegexForRoutineExcludesSpecificNameFromJoinedKey() {
+    // A routine's identifier key carries a trailing specific-name-disambiguating component that
+    // its full name never has. fullNameRegex must derive the joined-key candidate from the
+    // qualified name (without that trailing component), not the raw key.
+    final Routine procedure = mock(Routine.class);
+    when(procedure.getFullName()).thenReturn("sales_schema.list_sales");
+    when(procedure.key())
+        .thenReturn(new NamedObjectKey("sales_schema", "list_sales", "list_sales_17"));
+
+    assertThat(
+        NamedObjectFilters.fullNameRegex(".*sales_schema\\.list_sales").test(procedure), is(true));
+    // The specific name is never part of the routine's full name, so a regex requiring it as a
+    // trailing joined-key segment must not match.
+    assertThat(
+        NamedObjectFilters.fullNameRegex(".*sales_schema\\.list_sales\\.list_sales_17")
+            .test(procedure),
+        is(false));
   }
 
   @Test
