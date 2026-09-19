@@ -10,7 +10,6 @@ package schemacrawler.filter;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.inclusionrule.InclusionRule;
@@ -18,7 +17,7 @@ import schemacrawler.schema.Routine;
 import schemacrawler.schemacrawler.GrepOptions;
 import us.fatehi.utility.string.StringFormat;
 
-class RoutineGrepFilter implements Predicate<Routine> {
+class RoutineGrepFilter implements NamedObjectFilter<Routine> {
 
   private static final Logger LOGGER = Logger.getLogger(RoutineGrepFilter.class.getName());
 

@@ -8,13 +8,12 @@
 
 package schemacrawler.filter;
 
-import java.util.function.Predicate;
 import schemacrawler.inclusionrule.ExcludeAll;
 import schemacrawler.inclusionrule.IncludeAll;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.NamedObject;
 
-public class InclusionRuleFilter<N extends NamedObject> implements Predicate<N> {
+public class InclusionRuleFilter<N extends NamedObject> implements NamedObjectFilter<N> {
 
   private final InclusionRule inclusionRule;
 

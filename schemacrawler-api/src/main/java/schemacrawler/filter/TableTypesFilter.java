@@ -10,12 +10,11 @@ package schemacrawler.filter;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.function.Predicate;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableTypes;
 import schemacrawler.schemacrawler.LimitOptions;
 
-public class TableTypesFilter implements Predicate<Table> {
+public class TableTypesFilter implements NamedObjectFilter<Table> {
 
   private final TableTypes tableTypes;
 

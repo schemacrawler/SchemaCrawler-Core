@@ -9,11 +9,11 @@
 package schemacrawler.schema;
 
 import static us.fatehi.utility.Utility.convertForComparison;
+import static us.fatehi.utility.database.DatabaseUtility.normalizeDatabaseObjectName;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Locale;
 
 public final class NamedObjectKey implements Serializable, Comparable<NamedObjectKey> {
 
@@ -53,6 +53,38 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
     return Arrays.hashCode(key);
   }
 
+  /**
+   * Joins the individual key parts with '.', skipping any parts that are null or empty. Since each
+   * part was captured separately when the key was built up (never by splitting a single
+   * concatenated name), a delimiter character embedded within an individual part (for example, a
+   * literal dot inside a quoted identifier) is preserved as content and is never mistaken for a
+   * separator between parts.
+   *
+   * @return Joined key parts, or an empty string if there are no non-blank parts
+   */
+  public String join() {
+    final String delimiter = ".";
+    final StringBuilder buffer = new StringBuilder();
+    for (final String part : key) {
+      if (part == null || part.isEmpty()) {
+        continue;
+      }
+      if (!buffer.isEmpty()) {
+        buffer.append(delimiter);
+      }
+      buffer.append(part);
+    }
+    return buffer.toString();
+  }
+
+  public NamedObjectKey normalized() {
+    final String[] normalizedKey = new String[key.length];
+    for (int i = 0; i < key.length; i++) {
+      normalizedKey[i] = normalizeDatabaseObjectName(key[i]);
+    }
+    return new NamedObjectKey(normalizedKey);
+  }
+
   public String slug() {
     if (key.length == 0) {
       return "";
@@ -71,28 +103,5 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
     final String[] newKey = Arrays.copyOf(key, currentLength + 1);
     newKey[currentLength] = name;
     return new NamedObjectKey(newKey);
-  }
-
-  public NamedObjectKey normalized() {
-    final String[] normalizedKey = new String[key.length];
-    for (int i = 0; i < key.length; i++) {
-      normalizedKey[i] = normalizeComponent(key[i]);
-    }
-    return new NamedObjectKey(normalizedKey);
-  }
-
-  private static String normalizeComponent(final String component) {
-    if (component == null || component.length() < 2) {
-      return component;
-    }
-
-    final char first = component.charAt(0);
-    final char last = component.charAt(component.length() - 1);
-    if ((first == '"' && last == '"')
-        || (first == '`' && last == '`')
-        || (first == '[' && last == ']')) {
-      return component.substring(1, component.length() - 1).toLowerCase(Locale.ROOT);
-    }
-    return component.toLowerCase(Locale.ROOT);
   }
 }

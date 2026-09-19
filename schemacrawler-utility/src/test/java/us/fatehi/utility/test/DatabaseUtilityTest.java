@@ -289,6 +289,18 @@ public class DatabaseUtilityTest {
   }
 
   @Test
+  public void normalizeDatabaseObjectName() {
+    assertThat(DatabaseUtility.normalizeDatabaseObjectName(null), is(nullValue()));
+    assertThat(DatabaseUtility.normalizeDatabaseObjectName("ABC"), is("abc"));
+    assertThat(DatabaseUtility.normalizeDatabaseObjectName(""), is(""));
+    assertThat(DatabaseUtility.normalizeDatabaseObjectName("\""), is("\""));
+    assertThat(DatabaseUtility.normalizeDatabaseObjectName("\"ABC\""), is("abc"));
+    assertThat(DatabaseUtility.normalizeDatabaseObjectName("`ABC`"), is("abc"));
+    assertThat(DatabaseUtility.normalizeDatabaseObjectName("[ABC]"), is("abc"));
+    assertThat(DatabaseUtility.normalizeDatabaseObjectName("\"ABC]"), is("\"abc]"));
+  }
+
+  @Test
   public void readResultsVector() throws SQLException {
     final Statement statement = connection.createStatement();
 

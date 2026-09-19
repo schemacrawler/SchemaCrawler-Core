@@ -10,14 +10,13 @@ package schemacrawler.filter;
 
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForSchemaInclusion;
 
-import java.util.function.Predicate;
 import schemacrawler.inclusionrule.IncludeAll;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion;
 import schemacrawler.schemacrawler.LimitOptions;
 
-final class DatabaseObjectFilter<D extends DatabaseObject> implements Predicate<D> {
+final class DatabaseObjectFilter<D extends DatabaseObject> implements NamedObjectFilter<D> {
 
   private final InclusionRule databaseObjectInclusionRule;
   private final InclusionRule schemaInclusionRule;
