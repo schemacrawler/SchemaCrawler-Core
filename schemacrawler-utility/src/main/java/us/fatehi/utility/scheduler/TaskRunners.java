@@ -16,12 +16,28 @@ public class TaskRunners {
 
   private static final Logger LOGGER = Logger.getLogger(TaskRunners.class.getName());
 
+  /**
+   * Set to {@code true} to run tasks on the main thread. This setting may be provided as an
+   * environment variable or a Java system property.
+   */
   private static final String SC_SINGLE_THREADED = "SC_SINGLE_THREADED";
 
+  /**
+   * Sets the maximum number of threads used to load the database catalog. This setting may be
+   * provided as an environment variable or a Java system property. The default is 5 threads, and
+   * the maximum is 10.
+   */
   private static final String SC_LOAD_MAX_THREADS = "SC_LOAD_MAX_THREADS";
+
   private static final int DEFAULT_LOAD_MAX_THREADS = 5;
 
+  /**
+   * Sets the per-batch task timeout in seconds. This setting may be provided as an environment
+   * variable or a Java system property. The default is 3600 seconds but a value of 0 or less
+   * disables the timeout.
+   */
   private static final String SC_LOAD_TIMEOUT_SECONDS = "SC_LOAD_TIMEOUT_SECONDS";
+
   private static final int DEFAULT_LOAD_TIMEOUT_SECONDS = 3600;
 
   public static TaskRunner getTaskRunner(final String id) {
