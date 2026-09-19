@@ -23,7 +23,9 @@ import java.util.function.Function;
 public final class TableType implements Serializable, Comparable<TableType> {
 
   @Serial private static final long serialVersionUID = -8172248482959041873L;
+
   public static final TableType UNKNOWN = new TableType("unknown");
+
   private final String tableType;
 
   /** Constructor for table type. Table type is case-sensitive. */
@@ -76,6 +78,21 @@ public final class TableType implements Serializable, Comparable<TableType> {
       return other.tableType == null;
     }
     return tableType.equalsIgnoreCase(other.tableType);
+  }
+
+  /**
+   * The simple table type, as an enum.
+   *
+   * @return The table type
+   */
+  public SimpleTableType getSimpleTableType() {
+    if (equals(UNKNOWN)) {
+      return SimpleTableType.unknown;
+    }
+    if (isView()) {
+      return SimpleTableType.view;
+    }
+    return SimpleTableType.table;
   }
 
   /**

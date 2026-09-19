@@ -10,12 +10,19 @@ package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.schema.SimpleTableType;
+import schemacrawler.schema.Table;
+import schemacrawler.schema.TableType;
 import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.crawl.LightTable;
 import us.fatehi.utility.OptionalBoolean;
 
 public class TableEntityModelInferrerTest {
@@ -179,7 +186,12 @@ public class TableEntityModelInferrerTest {
   @Test
   public void testInferEntityTypeNonEntity() {
     final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final MutableTable table = new MutableTable(schema, "NO_PK");
+    final Table table = spy(new LightTable(schema, "NO_PK"));
+    final TableType tableType = mock(TableType.class);
+    when(tableType.isView()).thenReturn(false);
+    when(tableType.getSimpleTableType()).thenReturn(SimpleTableType.table);
+    when(table.getTableType()).thenReturn(tableType);
+
     final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
     assertThat(model.inferEntityType(), is(EntityType.non_entity));
   }

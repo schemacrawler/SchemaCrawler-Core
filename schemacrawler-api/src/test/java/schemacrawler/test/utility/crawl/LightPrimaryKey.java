@@ -17,7 +17,7 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableConstraintType;
 
-public final class LightPrimaryKey extends AbstractLightDatabaseObject implements PrimaryKey {
+public class LightPrimaryKey extends AbstractLightDatabaseObject implements PrimaryKey {
 
   @Serial private static final long serialVersionUID = -8327896738506432571L;
 

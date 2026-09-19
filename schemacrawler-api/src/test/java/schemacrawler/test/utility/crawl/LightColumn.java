@@ -25,7 +25,7 @@ import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 
-public final class LightColumn extends AbstractLightDatabaseObject implements Column {
+public class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Serial private static final long serialVersionUID = -1931193814458050468L;
 

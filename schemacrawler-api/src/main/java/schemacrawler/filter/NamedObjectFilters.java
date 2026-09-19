@@ -18,6 +18,7 @@ import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
+import schemacrawler.schema.SimpleTableType;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.GrepOptions;
 import us.fatehi.utility.UtilityMarker;
@@ -33,23 +34,6 @@ import us.fatehi.utility.UtilityMarker;
  */
 @UtilityMarker
 public final class NamedObjectFilters {
-
-  public enum SimpleTableType {
-    table {
-      @Override
-      public boolean matchesType(final Table table) {
-        return table != null && !table.getTableType().isView();
-      }
-    },
-    view {
-      @Override
-      public boolean matchesType(final Table table) {
-        return table != null && table.getTableType().isView();
-      }
-    };
-
-    public abstract boolean matchesType(final Table table);
-  }
 
   /**
    * Creates a filter that matches a named object's full (schema-qualified) name against a regular
@@ -151,7 +135,7 @@ public final class NamedObjectFilters {
    */
   public static NamedObjectFilter<Table> tableTypes(final SimpleTableType tableType) {
     requireNonNull(tableType, "No table type provided");
-    return table -> tableType.matchesType(table);
+    return table -> table != null && table.getTableType().getSimpleTableType() == tableType;
   }
 
   private NamedObjectFilters() {

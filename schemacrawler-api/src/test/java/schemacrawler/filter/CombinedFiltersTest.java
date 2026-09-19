@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
-import schemacrawler.filter.NamedObjectFilters.SimpleTableType;
+import schemacrawler.schema.SimpleTableType;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
 import schemacrawler.test.utility.crawl.LightTable;

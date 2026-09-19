@@ -30,7 +30,7 @@ import schemacrawler.schema.TableType;
 import schemacrawler.schema.Trigger;
 import schemacrawler.schemacrawler.SchemaReference;
 
-public final class LightTable extends AbstractLightDatabaseObject implements Table {
+public class LightTable extends AbstractLightDatabaseObject implements Table {
 
   @Serial private static final long serialVersionUID = -309232480533750613L;
 

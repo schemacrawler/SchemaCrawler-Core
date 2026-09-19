@@ -15,12 +15,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.filter.NamedObjectFilters.SimpleTableType;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
+import schemacrawler.schema.SimpleTableType;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;

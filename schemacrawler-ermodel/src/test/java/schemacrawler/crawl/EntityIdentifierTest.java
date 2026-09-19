@@ -10,14 +10,21 @@ package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.schema.SimpleTableType;
+import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
+import schemacrawler.schema.TableType;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.crawl.LightForeignKey;
+import schemacrawler.test.utility.crawl.LightTable;
 import us.fatehi.utility.OptionalBoolean;
 
 public class EntityIdentifierTest {
@@ -37,11 +44,16 @@ public class EntityIdentifierTest {
   @Test
   public void testNonEntity() {
     final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final MutableTable table = new MutableTable(schema, "TABLE_NON_ENTITY");
-    table.addColumn(new MutableColumn(table, "COLUMN1"));
-    table.addColumn(new MutableColumn(table, "COLUMN2"));
+    final LightTable lightTable = new LightTable(schema, "TABLE_NON_ENTITY");
+    lightTable.addColumn(new MutableColumn(lightTable, "COLUMN1"));
+    lightTable.addColumn(new MutableColumn(lightTable, "COLUMN2"));
+    final Table table = spy(lightTable);
+    final TableType tableType = mock(TableType.class);
+    when(tableType.isView()).thenReturn(false);
+    when(tableType.getSimpleTableType()).thenReturn(SimpleTableType.table);
+    when(table.getTableType()).thenReturn(tableType);
 
-    final EntityType entityType = new TableEntityModelInferrer(table).inferEntityType();
+    final EntityType entityType = new TableEntityModelInferrer(lightTable).inferEntityType();
     assertThat(entityType, is(EntityType.non_entity));
   }
 

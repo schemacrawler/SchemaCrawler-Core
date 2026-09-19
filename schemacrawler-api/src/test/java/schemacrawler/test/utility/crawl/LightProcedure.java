@@ -24,7 +24,7 @@ import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.SchemaReference;
 
-public final class LightProcedure extends AbstractLightDatabaseObject implements Procedure {
+public class LightProcedure extends AbstractLightDatabaseObject implements Procedure {
 
   @Serial private static final long serialVersionUID = 1L;
 

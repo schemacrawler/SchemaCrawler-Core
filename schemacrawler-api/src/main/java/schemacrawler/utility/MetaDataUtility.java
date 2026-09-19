@@ -14,7 +14,6 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -37,7 +36,6 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TypedObject;
-import schemacrawler.schema.View;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
@@ -54,12 +52,6 @@ public final class MetaDataUtility {
   }
 
   private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
-
-  public static final Predicate<Table> IS_VIEW =
-      table ->
-          table != null
-              && !isPartial(table)
-              && (table instanceof View || table.getTableType().isView());
 
   private static final List<Pattern> SYSTEM_GENERATED_NAME_PATTERNS =
       List.of(
@@ -155,8 +147,7 @@ public final class MetaDataUtility {
       return SimpleDatabaseObjectType.procedure;
     }
     if (databaseObject instanceof final Table table) {
-      // NOTE: Check View before Table, since View is a subclass of Table
-      if (isView(table)) {
+      if (table.getTableType().isView()) {
         return SimpleDatabaseObjectType.view;
       }
       return SimpleDatabaseObjectType.table;
@@ -213,10 +204,6 @@ public final class MetaDataUtility {
 
   public static boolean isPartial(final DatabaseObject databaseObject) {
     return databaseObject == null || databaseObject instanceof PartialDatabaseObject;
-  }
-
-  public static boolean isView(final Table table) {
-    return IS_VIEW.test(table);
   }
 
   public static String joinColumns(
