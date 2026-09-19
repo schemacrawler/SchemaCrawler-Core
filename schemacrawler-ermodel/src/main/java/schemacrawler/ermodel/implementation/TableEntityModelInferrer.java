@@ -338,20 +338,6 @@ public final class TableEntityModelInferrer {
     return !isNotValid;
   }
 
-  private Set<Column> resolveImportedKeys(final TableReference fk) {
-    requireNonNull(fk, "No foreign key provided");
-    final Set<Column> importedColumns = importedColumnsMap.get(fk.key());
-    if (importedColumns != null) {
-      return importedColumns;
-    }
-    // Resolve imported keys from implicit associations, which have not been
-    // pre-computed (only foreign keys are pre-computed)
-    // Keep this instance immutable: do not mutate lookup maps, but still
-    // return an immutable set
-    return Set.copyOf(
-        fk.getColumnReferences().stream().map(ColumnReference::getForeignKeyColumn).toList());
-  }
-
   /**
    * Strong entities have self-sufficient primary keys (no FK columns in PK) and low referential
    * connectivity. A table with FK columns in its PK, or foreign keys to 2 or more distinct parent
@@ -396,5 +382,19 @@ public final class TableEntityModelInferrer {
         && parentPkColumns.equals(fkParentColumns)
         && tablePkColumns.containsAll(fkChildColumns)
         && tablePkColumns.size() > fkChildColumns.size();
+  }
+
+  private Set<Column> resolveImportedKeys(final TableReference fk) {
+    requireNonNull(fk, "No foreign key provided");
+    final Set<Column> importedColumns = importedColumnsMap.get(fk.key());
+    if (importedColumns != null) {
+      return importedColumns;
+    }
+    // Resolve imported keys from implicit associations, which have not been
+    // pre-computed (only foreign keys are pre-computed)
+    // Keep this instance immutable: do not mutate lookup maps, but still
+    // return an immutable set
+    return Set.copyOf(
+        fk.getColumnReferences().stream().map(ColumnReference::getForeignKeyColumn).toList());
   }
 }

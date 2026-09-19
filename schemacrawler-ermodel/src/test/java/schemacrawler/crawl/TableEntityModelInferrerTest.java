@@ -22,6 +22,8 @@ import schemacrawler.schema.SimpleTableType;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
 import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.crawl.LightColumn;
+import schemacrawler.test.utility.crawl.LightPrimaryKey;
 import schemacrawler.test.utility.crawl.LightTable;
 import us.fatehi.utility.OptionalBoolean;
 
@@ -199,11 +201,9 @@ public class TableEntityModelInferrerTest {
   @Test
   public void testInferEntityTypeStrongEntity() {
     final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final MutableTable table = new MutableTable(schema, "STRONG");
-    final MutableColumn id = new MutableColumn(table, "ID");
-    table.addColumn(id);
-    final MutablePrimaryKey pk = MutablePrimaryKey.newPrimaryKey(table, "PK");
-    pk.addColumn(new MutableTableConstraintColumn(pk, id));
+    final LightTable table = new LightTable(schema, "STRONG");
+    final LightColumn id = table.addColumn("ID");
+    final LightPrimaryKey pk = new LightPrimaryKey(id);
     table.setPrimaryKey(pk);
 
     final TableEntityModelInferrer model = new TableEntityModelInferrer(table);

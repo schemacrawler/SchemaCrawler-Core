@@ -10,20 +10,16 @@ package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.ermodel.implementation.TableEntityModelInferrer;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.RelationshipCardinality;
-import schemacrawler.schema.SimpleTableType;
-import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
-import schemacrawler.schema.TableType;
 import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.crawl.LightColumn;
 import schemacrawler.test.utility.crawl.LightForeignKey;
+import schemacrawler.test.utility.crawl.LightPrimaryKey;
 import schemacrawler.test.utility.crawl.LightTable;
 import us.fatehi.utility.OptionalBoolean;
 
@@ -45,13 +41,8 @@ public class EntityIdentifierTest {
   public void testNonEntity() {
     final SchemaReference schema = new SchemaReference("catalog", "schema");
     final LightTable lightTable = new LightTable(schema, "TABLE_NON_ENTITY");
-    lightTable.addColumn(new MutableColumn(lightTable, "COLUMN1"));
-    lightTable.addColumn(new MutableColumn(lightTable, "COLUMN2"));
-    final Table table = spy(lightTable);
-    final TableType tableType = mock(TableType.class);
-    when(tableType.isView()).thenReturn(false);
-    when(tableType.getSimpleTableType()).thenReturn(SimpleTableType.table);
-    when(table.getTableType()).thenReturn(tableType);
+    lightTable.addColumn("COLUMN1");
+    lightTable.addColumn("COLUMN2");
 
     final EntityType entityType = new TableEntityModelInferrer(lightTable).inferEntityType();
     assertThat(entityType, is(EntityType.non_entity));
@@ -70,13 +61,11 @@ public class EntityIdentifierTest {
   @Test
   public void testStrongEntity() {
     final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final MutableTable table = new MutableTable(schema, "TABLE_STRONG");
-    final MutableColumn id = new MutableColumn(table, "ID");
-    table.addColumn(id);
-    table.addColumn(new MutableColumn(table, "NAME"));
+    final LightTable table = new LightTable(schema, "TABLE_STRONG");
+    final LightColumn id = table.addColumn("ID");
+    table.addColumn("NAME");
 
-    final MutablePrimaryKey pk = MutablePrimaryKey.newPrimaryKey(table, "PK_STRONG");
-    pk.addColumn(new MutableTableConstraintColumn(pk, id));
+    final LightPrimaryKey pk = new LightPrimaryKey(id);
     table.setPrimaryKey(pk);
 
     final EntityType entityType = new TableEntityModelInferrer(table).inferEntityType();
