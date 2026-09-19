@@ -18,6 +18,7 @@ import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
+import schemacrawler.schema.SimpleTableType;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.GrepOptions;
 import us.fatehi.utility.UtilityMarker;
@@ -124,16 +125,17 @@ public final class NamedObjectFilters {
   }
 
   /**
-   * Creates a filter that accepts only tables whose table type name (for example, "table" or
-   * "view") is one of the given values, matched case-insensitively. Use this to restrict output to
-   * specific kinds of tables, such as views only; it can be combined with name-based filters. Pass
-   * no arguments to exclude all tables via this filter.
+   * Creates a filter that accepts only routines of a given {@link SimpleTableType} - for example,
+   * table only, or views only. Use this to restrict output to one kind of table; it can be combined
+   * with name-based or grep filters.
    *
-   * @param tableTypes table type names to accept; may be empty
-   * @return a filter that accepts only tables whose table type name is in the given list
+   * @param tableType the table type to accept
+   * @return a filter that accepts only table of the given type
+   * @throws NullPointerException if the table type is null
    */
-  public static NamedObjectFilter<Table> tableTypes(final String... tableTypes) {
-    return new TableTypesFilter(tableTypes);
+  public static NamedObjectFilter<Table> tableTypes(final SimpleTableType tableType) {
+    requireNonNull(tableType, "No table type provided");
+    return table -> table != null && table.getTableType().getSimpleTableType() == tableType;
   }
 
   private NamedObjectFilters() {

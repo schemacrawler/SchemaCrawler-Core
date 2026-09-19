@@ -18,7 +18,7 @@ import schemacrawler.schema.Procedure;
 import schemacrawler.schema.ProcedureParameter;
 import schemacrawler.schema.Schema;
 
-public final class LightProcedureParameter extends AbstractLightDatabaseObject
+public class LightProcedureParameter extends AbstractLightDatabaseObject
     implements ProcedureParameter {
 
   @Serial private static final long serialVersionUID = 1L;

@@ -25,7 +25,7 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableConstraintType;
 
-public final class LightForeignKey extends AbstractLightDatabaseObject implements ForeignKey {
+public class LightForeignKey extends AbstractLightDatabaseObject implements ForeignKey {
 
   @Serial private static final long serialVersionUID = -5359990477303202179L;
 

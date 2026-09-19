@@ -20,6 +20,7 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
+import schemacrawler.schema.SimpleTableType;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
@@ -188,8 +189,8 @@ class NamedObjectFiltersTest {
   void testTableTypesFilterByName() {
     final Table table = viewTypeTable("sales");
 
-    assertThat(NamedObjectFilters.tableTypes("view").test(table), is(true));
-    assertThat(NamedObjectFilters.tableTypes("table").test(table), is(false));
+    assertThat(NamedObjectFilters.tableTypes(SimpleTableType.view).test(table), is(true));
+    assertThat(NamedObjectFilters.tableTypes(SimpleTableType.table).test(table), is(false));
   }
 
   @Test

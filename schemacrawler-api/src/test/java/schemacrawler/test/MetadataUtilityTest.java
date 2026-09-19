@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static schemacrawler.schema.IdentifierQuotingStrategy.quote_all;
@@ -45,17 +46,16 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
+import schemacrawler.schema.SimpleTableType;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.TypedObject;
-import schemacrawler.schema.View;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -134,32 +134,6 @@ public class MetadataUtilityTest {
   }
 
   @Test
-  public void detectsViewByInstanceAndTableType() {
-    assertThat(MetaDataUtility.isView(null), is(false));
-
-    final Table baseTable = mock(Table.class);
-    when(baseTable.getTableType()).thenReturn(new TableType("TABLE"));
-    assertThat(MetaDataUtility.isView(baseTable), is(false));
-
-    final Table nonPartialViewTypedTable = mock(Table.class);
-    when(nonPartialViewTypedTable.getTableType()).thenReturn(new TableType("VIEW"));
-    assertThat(MetaDataUtility.isView(nonPartialViewTypedTable), is(true));
-
-    final Table partialViewTypedTable =
-        mock(Table.class, withSettings().extraInterfaces(PartialDatabaseObject.class));
-    when(partialViewTypedTable.getTableType()).thenReturn(TableType.UNKNOWN);
-    assertThat(MetaDataUtility.isView(partialViewTypedTable), is(false));
-
-    final Table partialBaseTypedTable =
-        mock(Table.class, withSettings().extraInterfaces(PartialDatabaseObject.class));
-    when(partialBaseTypedTable.getTableType()).thenReturn(new TableType("TABLE"));
-    assertThat(MetaDataUtility.isView(partialBaseTypedTable), is(false));
-
-    final View view = mock(View.class);
-    assertThat(MetaDataUtility.isView(view), is(true));
-  }
-
-  @Test
   public void inclusionRuleString() {
     assertThat(MetaDataUtility.inclusionRuleString(null), is(".*"));
 
@@ -233,6 +207,13 @@ public class MetadataUtilityTest {
 
   @Test
   public void simpleTypeName() {
+
+    final Table view = spy(new LightTable("view"));
+    final TableType tableType = mock(TableType.class);
+    when(tableType.isView()).thenReturn(true);
+    when(tableType.getSimpleTableType()).thenReturn(SimpleTableType.view);
+    when(view.getTableType()).thenReturn(tableType);
+
     assertThat(
         MetaDataUtility.getSimpleTypeName(null),
         is(MetaDataUtility.SimpleDatabaseObjectType.unknown));
@@ -255,8 +236,7 @@ public class MetadataUtilityTest {
         MetaDataUtility.getSimpleTypeName(mock(Procedure.class)),
         is(MetaDataUtility.SimpleDatabaseObjectType.procedure));
     assertThat(
-        MetaDataUtility.getSimpleTypeName(mock(View.class)),
-        is(MetaDataUtility.SimpleDatabaseObjectType.view));
+        MetaDataUtility.getSimpleTypeName(view), is(MetaDataUtility.SimpleDatabaseObjectType.view));
     assertThat(
         MetaDataUtility.getSimpleTypeName(new LightTable("table")),
         is(MetaDataUtility.SimpleDatabaseObjectType.table));
