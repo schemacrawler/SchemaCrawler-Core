@@ -27,7 +27,6 @@ import schemacrawler.schema.AttributedObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.ReducibleCollection;
-import us.fatehi.utility.Multimap;
 
 /**
  * Ordered list of named objects, that can be searched associatively. NamedObjectList has the
@@ -61,7 +60,6 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
 
   private final Map<NamedObjectKey, N> objects = new ConcurrentHashMap<>();
   private final Map<NamedObjectKey, N> filteredObjects = new ConcurrentHashMap<>();
-  private final Multimap<NamedObjectKey, NamedObjectKey> caseInsensitiveMap = new Multimap<>();
 
   /** {@inheritDoc} */
   @Override
@@ -127,7 +125,6 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
       final NamedObjectKey key = entry.getKey();
       final N namedObject = entry.getValue();
       objects.put(key, namedObject);
-      caseInsensitiveMap.add(key.normalized(), key);
       iterator.remove();
       if (namedObject instanceof final AttributedObject attributedObject) {
         attributedObject.removeAttribute(SCHEMACRAWLER_FILTERED_OUT);
@@ -150,7 +147,6 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
     requireNonNull(namedObject, "Cannot add a null object to the list");
     final NamedObjectKey key = makeLookupKey(namedObject);
     objects.put(key, namedObject);
-    caseInsensitiveMap.add(key.normalized(), key);
     return true;
   }
 
@@ -202,20 +198,6 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
   }
 
   private Optional<N> internalGet(final NamedObjectKey key) {
-    // Prefer the exact key so callers can retrieve an object even when normalized keys collide
-    if (objects.containsKey(key)) {
-      return Optional.ofNullable(objects.get(key));
-    }
-
-    // Fall back to a normalized lookup only when there is exactly one possible exact key
-    final NamedObjectKey caseInsensitiveKey = key.normalized();
-    if (caseInsensitiveMap.containsKey(caseInsensitiveKey)) {
-      final List<NamedObjectKey> mappedKeys = caseInsensitiveMap.get(caseInsensitiveKey);
-      if (mappedKeys != null && mappedKeys.size() == 1) {
-        final NamedObjectKey firstKey = mappedKeys.get(0);
-        return Optional.ofNullable(objects.get(firstKey));
-      }
-    }
-    return Optional.empty();
+    return Optional.ofNullable(objects.get(key));
   }
 }

@@ -11,7 +11,6 @@ package schemacrawler.filter;
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
-import static us.fatehi.utility.database.DatabaseUtility.normalizeDatabaseObjectName;
 
 import java.util.regex.Pattern;
 import schemacrawler.schema.NamedObject;
@@ -29,21 +28,21 @@ public final class NamedObjectFilters {
    * Creates a filter that tests a named object's full (schema-qualified) name against a regular
    * expression. The pattern is matched, case-insensitively, against two candidate strings and
    * accepted if either matches: the object's original (raw) full name, exactly as returned by
-   * {@link NamedObject#getFullName()}, and a normalized full name built by stripping quoting
-   * (double quotes, backticks, or brackets) and lower-casing each name part - schema, table, and so
-   * on - individually, then joining the parts with a "." separator.
+   * {@link NamedObject#getFullName()} (which may include quoting added for display), and the
+   * object's identifier key parts - schema, table, and so on - joined with a "." separator, exactly
+   * as captured when the object was created.
    *
-   * <p>Matching against both forms means a single regex can be written either the way a user would
-   * type an unquoted, lower-case identifier, or the way the database itself would print a quoted,
-   * case-sensitive identifier, without the caller having to know or guess which form a particular
-   * database driver returns.
+   * <p>Matching against both forms means a single regex can be written either the way a plain,
+   * unquoted identifier would look, or the way the database itself would print a quoted identifier
+   * for display, without the caller having to know or guess which form a particular database driver
+   * returns.
    *
    * <p>Use this filter when tables, routines, or other named objects need to be included or
    * excluded based on their fully qualified name - for example, "sales.orders" or a catalog- and
    * schema-qualified name - rather than just the simple (unqualified) name. For simple-name-only
    * matching, prefer {@link #nameRegex(String)}.
    *
-   * @param regex regular expression to match against the raw and normalized full name
+   * @param regex regular expression to match against the raw full name and the joined key
    * @return a filter that accepts named objects whose full name matches the regex
    * @throws IllegalArgumentException if the regex is blank
    */
@@ -54,37 +53,30 @@ public final class NamedObjectFilters {
       if (namedObject == null) {
         return false;
       }
-      // Normalize each name part (schema, table, etc.) individually via the object's key - which
-      // was built up from separately-captured parts, never by concatenating then splitting a
-      // single string - before joining with ".". This avoids ambiguity when a quoted identifier
-      // part itself contains a literal dot, since that dot is never mistaken for a separator.
+      // Join each name part (schema, table, etc.) individually via the object's key - which was
+      // built up from separately-captured parts, never by concatenating then splitting a single
+      // string - with ".". This avoids ambiguity when a name part itself contains a literal dot,
+      // since that dot is never mistaken for a separator.
       final String fullName = namedObject.getFullName();
       if (isBlank(fullName)) {
         return false;
       }
-      final String normalizedFullName = namedObject.key().normalized().join();
-      return pattern.matcher(fullName).matches() || pattern.matcher(normalizedFullName).matches();
+      final String joinedKey = namedObject.key().join();
+      return pattern.matcher(fullName).matches() || pattern.matcher(joinedKey).matches();
     };
   }
 
   /**
    * Creates a filter that tests a named object's simple (unqualified) name against a regular
-   * expression. The pattern is matched, case-insensitively, against two candidate strings and
-   * accepted if either matches: the object's original (raw) name, exactly as returned by {@link
-   * NamedObject#getName()}, and a normalized name with quoting (double quotes, backticks, or
-   * brackets) stripped and the value lower-cased.
-   *
-   * <p>Matching against both forms means a single regex can be written either the way a user would
-   * type an unquoted, lower-case identifier, or the way the database itself would print a quoted,
-   * case-sensitive identifier, without the caller having to know or guess which form a particular
-   * database driver returns.
+   * expression. The pattern is matched, case-insensitively, against the object's original (raw)
+   * name, exactly as returned by {@link NamedObject#getName()}.
    *
    * <p>Use this filter when named objects need to be included or excluded by their simple name
    * alone - for example, matching any table named "orders" regardless of which schema it is in.
    * When the schema (or other qualifying parts) of the name also matter, use {@link
    * #fullNameRegex(String)} instead, since this filter never looks beyond the simple name.
    *
-   * @param regex regular expression to match against the raw and normalized name
+   * @param regex regular expression to match against the name
    * @return a filter that accepts named objects whose simple name matches the regex
    * @throws IllegalArgumentException if the regex is blank
    */
@@ -99,8 +91,7 @@ public final class NamedObjectFilters {
       if (isBlank(name)) {
         return false;
       }
-      final String normalizedName = normalizeDatabaseObjectName(name);
-      return pattern.matcher(name).matches() || pattern.matcher(normalizedName).matches();
+      return pattern.matcher(name).matches();
     };
   }
 

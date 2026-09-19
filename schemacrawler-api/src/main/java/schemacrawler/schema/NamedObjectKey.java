@@ -9,7 +9,6 @@
 package schemacrawler.schema;
 
 import static us.fatehi.utility.Utility.convertForComparison;
-import static us.fatehi.utility.database.DatabaseUtility.normalizeDatabaseObjectName;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -75,14 +74,6 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
       buffer.append(part);
     }
     return buffer.toString();
-  }
-
-  public NamedObjectKey normalized() {
-    final String[] normalizedKey = new String[key.length];
-    for (int i = 0; i < key.length; i++) {
-      normalizedKey[i] = normalizeDatabaseObjectName(key[i]);
-    }
-    return new NamedObjectKey(normalizedKey);
   }
 
   public String slug() {
