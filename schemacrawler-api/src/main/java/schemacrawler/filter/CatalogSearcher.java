@@ -24,13 +24,13 @@ import schemacrawler.schema.Table;
 /** Searches the current, visible contents of a catalog without changing it. */
 public final class CatalogSearcher {
 
+  /** Creates a searcher for a catalog. */
   public static CatalogSearcher search(final Catalog catalog) {
     return new CatalogSearcher(catalog);
   }
 
   private final Catalog catalog;
 
-  /** Creates a searcher for a catalog. */
   private CatalogSearcher(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
   }

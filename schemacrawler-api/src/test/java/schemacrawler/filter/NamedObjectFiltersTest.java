@@ -16,6 +16,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
+import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -102,6 +104,26 @@ class NamedObjectFiltersTest {
     // case-insensitive via the pattern's own compilation flags.
     assertThat(NamedObjectFilters.nameRegex("\\[Sales\\]").test(bracketed), is(true));
     assertThat(NamedObjectFilters.nameRegex("`Sales`").test(backticked), is(true));
+  }
+
+  @Test
+  void testFullNameRegexForRoutineExcludesSpecificNameFromJoinedKey() {
+    // A routine's identifier key carries a trailing specific-name-disambiguating component that
+    // its full name never has. fullNameRegex must derive the joined-key candidate from the
+    // qualified name (without that trailing component), not the raw key.
+    final Routine procedure = mock(Routine.class);
+    when(procedure.getFullName()).thenReturn("sales_schema.list_sales");
+    when(procedure.key())
+        .thenReturn(new NamedObjectKey("sales_schema", "list_sales", "list_sales_17"));
+
+    assertThat(
+        NamedObjectFilters.fullNameRegex(".*sales_schema\\.list_sales").test(procedure), is(true));
+    // The specific name is never part of the routine's full name, so a regex requiring it as a
+    // trailing joined-key segment must not match.
+    assertThat(
+        NamedObjectFilters.fullNameRegex(".*sales_schema\\.list_sales\\.list_sales_17")
+            .test(procedure),
+        is(false));
   }
 
   @Test

@@ -95,4 +95,18 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
     newKey[currentLength] = name;
     return new NamedObjectKey(newKey);
   }
+
+  /**
+   * Returns a new key with its last part removed, symmetric to {@link #with(String)}. A no-op
+   * (returns an equivalent empty key) when this key already has no parts.
+   *
+   * @return a new key without its last part, or an empty key if this key is already empty
+   */
+  public NamedObjectKey withoutLast() {
+    if (key.length == 0) {
+      return this;
+    }
+    final String[] newKey = Arrays.copyOf(key, key.length - 1);
+    return new NamedObjectKey(newKey);
+  }
 }

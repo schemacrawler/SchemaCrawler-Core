@@ -20,29 +20,26 @@ import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.GrepOptions;
 import us.fatehi.utility.UtilityMarker;
 
-/** Factory methods for filters over named objects. */
+/**
+ * Factory methods for filters over named database objects (tables, routines, and so on).
+ *
+ * <p>Use {@link #nameRegex(String)} or {@link #fullNameRegex(String)} to select objects by name;
+ * use {@link #tableGrep(GrepOptions)} or {@link #routineGrep(GrepOptions)} to also search inside an
+ * object's columns, parameters, remarks, or definition; and use {@link #tableTypes(String...)} or
+ * {@link #routineTypes(RoutineType)} to restrict output to specific kinds of objects. Filters can
+ * be combined as needed.
+ */
 @UtilityMarker
 public final class NamedObjectFilters {
 
   /**
-   * Creates a filter that tests a named object's full (schema-qualified) name against a regular
-   * expression. The pattern is matched, case-insensitively, against two candidate strings and
-   * accepted if either matches: the object's original (raw) full name, exactly as returned by
-   * {@link NamedObject#getFullName()} (which may include quoting added for display), and the
-   * object's identifier key parts - schema, table, and so on - joined with a "." separator, exactly
-   * as captured when the object was created.
+   * Creates a filter that matches a named object's full (schema-qualified) name against a regular
+   * expression - for example, to select "sales.orders" or a catalog- and schema-qualified name.
+   * Matching is case-insensitive, and works whether or not the regex accounts for quoting (such as
+   * quotes added around names with special characters). Use {@link #nameRegex(String)} instead if
+   * only the simple (unqualified) name matters.
    *
-   * <p>Matching against both forms means a single regex can be written either the way a plain,
-   * unquoted identifier would look, or the way the database itself would print a quoted identifier
-   * for display, without the caller having to know or guess which form a particular database driver
-   * returns.
-   *
-   * <p>Use this filter when tables, routines, or other named objects need to be included or
-   * excluded based on their fully qualified name - for example, "sales.orders" or a catalog- and
-   * schema-qualified name - rather than just the simple (unqualified) name. For simple-name-only
-   * matching, prefer {@link #nameRegex(String)}.
-   *
-   * @param regex regular expression to match against the raw full name and the joined key
+   * @param regex regular expression to match against the full name
    * @return a filter that accepts named objects whose full name matches the regex
    * @throws IllegalArgumentException if the regex is blank
    */
@@ -53,28 +50,25 @@ public final class NamedObjectFilters {
       if (namedObject == null) {
         return false;
       }
-      // Join each name part (schema, table, etc.) individually via the object's key - which was
-      // built up from separately-captured parts, never by concatenating then splitting a single
-      // string - with ".". This avoids ambiguity when a name part itself contains a literal dot,
-      // since that dot is never mistaken for a separator.
       final String fullName = namedObject.getFullName();
-      if (isBlank(fullName)) {
+      // IMPORTANT: Schema names may be blank. Do not do a blank check at this point.
+      if (fullName == null) {
         return false;
       }
-      final String joinedKey = namedObject.key().join();
-      return pattern.matcher(fullName).matches() || pattern.matcher(joinedKey).matches();
+      // Also test the qualified-name key (schema, table, etc. parts joined with "."), exactly as
+      // captured when the object was created. This lets an unquoted regular expression match a
+      // full name that includes quoting added purely for display, without making the match
+      // case-insensitive.
+      final String unquotedFullName = NamedObjectUtility.unquotedFullName(namedObject);
+      return pattern.matcher(fullName).matches() || pattern.matcher(unquotedFullName).matches();
     };
   }
 
   /**
-   * Creates a filter that tests a named object's simple (unqualified) name against a regular
-   * expression. The pattern is matched, case-insensitively, against the object's original (raw)
-   * name, exactly as returned by {@link NamedObject#getName()}.
-   *
-   * <p>Use this filter when named objects need to be included or excluded by their simple name
-   * alone - for example, matching any table named "orders" regardless of which schema it is in.
-   * When the schema (or other qualifying parts) of the name also matter, use {@link
-   * #fullNameRegex(String)} instead, since this filter never looks beyond the simple name.
+   * Creates a filter that matches a named object's simple (unqualified) name against a regular
+   * expression - for example, to select any table named "orders", regardless of which schema it is
+   * in. Matching is case-insensitive. Use {@link #fullNameRegex(String)} instead when the schema
+   * (or other qualifying parts) of the name also matter.
    *
    * @param regex regular expression to match against the name
    * @return a filter that accepts named objects whose simple name matches the regex
@@ -96,14 +90,11 @@ public final class NamedObjectFilters {
   }
 
   /**
-   * Creates a compound filter over routines built from {@link GrepOptions}, which can, for example,
-   * include or exclude routines whose definition (source text) matches a pattern, in addition to
-   * name-based inclusion rules.
-   *
-   * <p>Use this filter when routine selection needs to look inside the routine's definition (or
-   * other grep-able content), not just its name - typically driven by a "grep" style command-line
-   * or configuration option. For filtering purely by name, prefer {@link #nameRegex(String)},
-   * {@link #fullNameRegex(String)}.
+   * Creates a "grep" style filter over routines, using {@link GrepOptions} to match a routine's
+   * definition (source text), parameters, or remarks, in addition to any name-based inclusion
+   * rules. Use this when routine selection needs to search inside the routine, not just its name;
+   * for name-only matching, use {@link #nameRegex(String)} or {@link #fullNameRegex(String)}
+   * instead.
    *
    * @param grepOptions options describing what content of a routine to search, and with what
    *     patterns
@@ -116,15 +107,11 @@ public final class NamedObjectFilters {
   }
 
   /**
-   * Creates a filter that accepts only routines of a given {@link RoutineType} (for example,
-   * procedures versus functions).
+   * Creates a filter that accepts only routines of a given {@link RoutineType} - for example,
+   * procedures only, or functions only. Use this to restrict output to one kind of routine; it can
+   * be combined with name-based or grep filters.
    *
-   * <p>Use this filter to restrict crawling or reporting to just one kind of routine, independent
-   * of any name-based filtering, which can be composed alongside it.
-   *
-   * @param routineType the routine type to accept; a null routine is never matched, but a null
-   *     {@code routineType} results in an exception rather than a permissive filter, since a
-   *     missing type usually indicates a configuration error
+   * @param routineType the routine type to accept
    * @return a filter that accepts only routines of the given type
    * @throws NullPointerException if the routine type is null
    */
@@ -134,14 +121,10 @@ public final class NamedObjectFilters {
   }
 
   /**
-   * Creates a compound filter over tables built from {@link GrepOptions}, which can, for example,
-   * include or exclude tables whose column definitions or remarks match a pattern, in addition to
-   * name-based inclusion rules.
-   *
-   * <p>Use this filter when table selection needs to look inside the table's columns, remarks, or
-   * other grep-able content, not just its name - typically driven by a "grep" style command-line or
-   * configuration option. For filtering purely by name, prefer {@link #nameRegex(String)}, {@link
-   * #fullNameRegex(String)}.
+   * Creates a "grep" style filter over tables, using {@link GrepOptions} to match a table's
+   * columns, remarks, or definition, in addition to any name-based inclusion rules. Use this when
+   * table selection needs to search inside the table, not just its name; for name-only matching,
+   * use {@link #nameRegex(String)} or {@link #fullNameRegex(String)} instead.
    *
    * @param grepOptions options describing what content of a table to search, and with what patterns
    * @return a compound table grep filter
@@ -154,14 +137,11 @@ public final class NamedObjectFilters {
 
   /**
    * Creates a filter that accepts only tables whose table type name (for example, "table" or
-   * "view") is one of the given values.
+   * "view") is one of the given values, matched case-insensitively. Use this to restrict output to
+   * specific kinds of tables, such as views only; it can be combined with name-based filters. Pass
+   * no arguments to exclude all tables via this filter.
    *
-   * <p>Use this filter to restrict crawling or reporting to specific kinds of tables, such as views
-   * only, independent of any name-based filtering, which can be composed alongside it. An empty (or
-   * unspecified) list of table types matches no tables; pass no arguments only when the intent is
-   * to exclude all tables via this filter.
-   *
-   * @param tableTypes table type names to accept, matched case-insensitively; may be empty
+   * @param tableTypes table type names to accept; may be empty
    * @return a filter that accepts only tables whose table type name is in the given list
    */
   public static NamedObjectFilter<Table> tableTypes(final String... tableTypes) {

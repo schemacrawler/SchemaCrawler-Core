@@ -38,11 +38,17 @@ public class InclusionRuleFilter<N extends NamedObject> implements NamedObjectFi
     if (namedObject == null) {
       return false;
     }
-    // Schema names may be null
-    if (namedObject.getFullName() == null) {
+    final String fullName = namedObject.getFullName();
+    // IMPORTANT: Schema names may be blank. Do not do a blank check at this point.
+    if (fullName == null) {
       return false;
     }
-    return inclusionRule.test(namedObject.getFullName());
+    // Also test the qualified-name key (schema, table, etc. parts joined with "."), exactly as
+    // captured when the object was created. This lets an unquoted regular expression match a
+    // full name that includes quoting added purely for display, without making the match
+    // case-insensitive.
+    final String unquotedFullName = NamedObjectUtility.unquotedFullName(namedObject);
+    return inclusionRule.test(fullName) || inclusionRule.test(unquotedFullName);
   }
 
   @Override

@@ -11,6 +11,7 @@ package schemacrawler.crawl;
 import java.io.Serial;
 import java.util.Collection;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineBodyType;
@@ -23,6 +24,8 @@ abstract sealed class RoutinePartial extends AbstractDatabaseObject
 
   @Serial private static final long serialVersionUID = 1508498300413360531L;
 
+  private transient NamedObjectKey key;
+
   /**
    * Effective Java - Item 17 - Minimize Mutability - Package-private constructors make a class
    * effectively final
@@ -34,21 +37,25 @@ abstract sealed class RoutinePartial extends AbstractDatabaseObject
     super(schema, name);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final String getDefinition() {
     throw new NotLoadedException(this);
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<? extends DatabaseObject> getReferencedObjects() {
     throw new NotLoadedException(this);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final RoutineBodyType getRoutineBodyType() {
     throw new NotLoadedException(this);
   }
 
+  /** {@inheritDoc} */
   @Override
   public final String getSpecificName() {
     throw new NotLoadedException(this);
@@ -60,8 +67,28 @@ abstract sealed class RoutinePartial extends AbstractDatabaseObject
     return getRoutineType();
   }
 
+  /** {@inheritDoc} */
   @Override
   public final boolean hasDefinition() {
     throw new NotLoadedException(this);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public NamedObjectKey key() {
+    buildKey();
+    return key;
+  }
+
+  /**
+   * Appends a trailing {@code null} part, so this key has the same 4-part shape (catalog, schema,
+   * name, specific-name-or-null) as {@link MutableRoutine}'s key, even though a partial routine
+   * never has a real specific name to report.
+   */
+  private void buildKey() {
+    if (key != null) {
+      return;
+    }
+    key = super.key().with(/* no specific name available */ null);
   }
 }

@@ -87,6 +87,9 @@ class TableGrepFilter implements NamedObjectFilter<Table> {
   }
 
   private boolean checkIncludeForTables(final Table table) {
-    return options.isGrepTables() && options.grepTableInclusionRule().test(table.getFullName());
+    if (!options.isGrepTables()) {
+      return false;
+    }
+    return new InclusionRuleFilter<Table>(options.grepTableInclusionRule(), false).test(table);
   }
 }

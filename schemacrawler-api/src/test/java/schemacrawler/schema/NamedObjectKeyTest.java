@@ -45,4 +45,26 @@ public class NamedObjectKeyTest {
 
     assertThat(key.join(), equalTo("my.schema.my.table"));
   }
+
+  @Test
+  public void withoutLastDropsOnlyTheFinalPart() {
+    final NamedObjectKey key = new NamedObjectKey("catalog", "schema", "name", "specificName");
+
+    assertThat(key.withoutLast().join(), equalTo("catalog.schema.name"));
+  }
+
+  @Test
+  public void withoutLastOnSinglePartKeyReturnsEmptyKey() {
+    final NamedObjectKey key = new NamedObjectKey("onlyPart");
+
+    assertThat(key.withoutLast(), equalTo(new NamedObjectKey()));
+    assertThat(key.withoutLast().join(), equalTo(""));
+  }
+
+  @Test
+  public void withoutLastOnEmptyKeyIsANoOp() {
+    final NamedObjectKey key = new NamedObjectKey();
+
+    assertThat(key.withoutLast().join(), equalTo(""));
+  }
 }
