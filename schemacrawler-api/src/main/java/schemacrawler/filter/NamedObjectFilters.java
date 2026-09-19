@@ -9,10 +9,10 @@
 package schemacrawler.filter;
 
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 import static us.fatehi.utility.database.DatabaseUtility.normalizeDatabaseObjectName;
 
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.NamedObject;
@@ -33,18 +33,48 @@ public final class NamedObjectFilters {
     return new InclusionRuleFilter<>(inclusionRule, true);
   }
 
-  /** Creates a filter for a whole normalized full-name regex. */
+  /**
+   * Creates a filter for a whole full-name regex, matched against both the original (raw) full name
+   * and the normalized full name.
+   */
   public static NamedObjectFilter<NamedObject> normalizedFullNameRegex(final String regex) {
-    // Normalize each name part (schema, table, etc.) individually via the object's key - which
-    // was built up from separately-captured parts, never by concatenating then splitting a
-    // single string - before joining with ".". This avoids ambiguity when a quoted identifier
-    // part itself contains a literal dot, since that dot is never mistaken for a separator.
-    return regexFilter(regex, namedObject -> namedObject.key().normalized().join());
+    requireNotBlank(regex, "No regular expression provided");
+    final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    return namedObject -> {
+      if (namedObject == null) {
+        return false;
+      }
+      // Normalize each name part (schema, table, etc.) individually via the object's key - which
+      // was built up from separately-captured parts, never by concatenating then splitting a
+      // single string - before joining with ".". This avoids ambiguity when a quoted identifier
+      // part itself contains a literal dot, since that dot is never mistaken for a separator.
+      final String fullName = namedObject.getFullName();
+      if (isBlank(fullName)) {
+        return false;
+      }
+      final String normalizedFullName = namedObject.key().normalized().join();
+      return pattern.matcher(fullName).matches() || pattern.matcher(normalizedFullName).matches();
+    };
   }
 
-  /** Creates a filter for a whole normalized name regex. */
+  /**
+   * Creates a filter for a whole name regex, matched against both the original (raw) name and the
+   * normalized name.
+   */
   public static NamedObjectFilter<NamedObject> normalizedNameRegex(final String regex) {
-    return regexFilter(regex, namedObject -> normalizeDatabaseObjectName(namedObject.getName()));
+    requireNotBlank(regex, "No regular expression provided");
+    final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    return namedObject -> {
+      if (namedObject == null) {
+        return false;
+      }
+      final String name = namedObject.getName();
+      if (isBlank(name)) {
+        return false;
+      }
+      final String normalizedName = normalizeDatabaseObjectName(name);
+      return pattern.matcher(name).matches() || pattern.matcher(normalizedName).matches();
+    };
   }
 
   /** Creates a compound routine grep filter. */
@@ -70,20 +100,8 @@ public final class NamedObjectFilters {
     return new TableTypesFilter(tableTypes);
   }
 
-  private static NamedObjectFilter<NamedObject> regexFilter(
-      final String regex, final Function<NamedObject, String> normalizedValueProjection) {
-    requireNotBlank(regex, "No regular expression provided");
-    final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-    return namedObject -> {
-      if (namedObject == null) {
-        return false;
-      }
-      final String value = normalizedValueProjection.apply(namedObject);
-      if (value == null) {
-        return false;
-      }
-      return pattern.matcher(value).matches();
-    };
+  private static boolean matches(final Pattern pattern, final String value) {
+    return value != null && pattern.matcher(value).matches();
   }
 
   private NamedObjectFilters() {
