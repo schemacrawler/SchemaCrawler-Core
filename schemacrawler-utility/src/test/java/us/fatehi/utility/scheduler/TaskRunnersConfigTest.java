@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.nullValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-public class RunnersConfigTest {
+public class TaskRunnersConfigTest {
 
   @Test
   public void invalidThreadingSettingsUseDefaults() {
