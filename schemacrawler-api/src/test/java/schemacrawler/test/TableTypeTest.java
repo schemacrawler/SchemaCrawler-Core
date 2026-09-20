@@ -46,8 +46,8 @@ public class TableTypeTest {
   public void tableTypeCompare3() throws Exception {
     final TableType tableType1 = new TableType("view");
     final TableType tableType2 = new TableType("materialized view");
-    assertThat(tableType1, lessThan(tableType2));
-    assertThat(tableType2, greaterThan(tableType1));
+    assertThat(tableType2, lessThan(tableType1));
+    assertThat(tableType1, greaterThan(tableType2));
   }
 
   @Test
@@ -56,5 +56,21 @@ public class TableTypeTest {
     final TableType tableType2 = new TableType("view");
     assertThat(tableType1, lessThan(tableType2));
     assertThat(tableType2, greaterThan(tableType1));
+  }
+
+  @Test
+  public void tableTypeCompare5() throws Exception {
+    final TableType tableType = new TableType("table");
+    final TableType view = new TableType("view");
+    final TableType unknown = new TableType("unknown");
+    assertThat(tableType, lessThan(view));
+    assertThat(view, lessThan(unknown));
+  }
+
+  @Test
+  public void tableTypeCompare6() throws Exception {
+    final TableType lower = new TableType("materialized view");
+    final TableType upper = new TableType("MATERIALIZED VIEW");
+    assertThat(lower, comparesEqualTo(upper));
   }
 }
