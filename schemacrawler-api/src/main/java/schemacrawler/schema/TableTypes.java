@@ -179,7 +179,7 @@ public final class TableTypes implements Iterable<TableType> {
     if (isIncludeAll()) {
       return null;
     }
-    return tableTypes.stream().map(TableType::getTableType).toArray(String[]::new);
+    return tableTypes.stream().map(TableType::getName).toArray(String[]::new);
   }
 
   /** {@inheritDoc} */

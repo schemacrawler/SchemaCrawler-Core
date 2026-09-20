@@ -31,6 +31,9 @@ import schemacrawler.schemacrawler.LimitOptions;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 
 public class LimitOptionsBuilderTest {
+
+  private static final String[] TABLE_TYPES_ORDERED = {"BASE TABLE", "TABLE", "VIEW"};
+
   @Test
   public void inclusionRules() {
 
@@ -275,12 +278,9 @@ public class LimitOptionsBuilderTest {
 
     // 1. Test defaults
     limitOptions = limitOptionsBuilder.toOptions();
-    assertThat(
-        limitOptions.tableTypes().toArray(), is(new String[] {"TABLE", "VIEW", "BASE TABLE"}));
+    assertThat(limitOptions.tableTypes().toArray(), is(TABLE_TYPES_ORDERED));
     limitOptionsPlayback = LimitOptionsBuilder.builder().fromOptions(limitOptions).toOptions();
-    assertThat(
-        limitOptionsPlayback.tableTypes().toArray(),
-        is(new String[] {"TABLE", "VIEW", "BASE TABLE"}));
+    assertThat(limitOptionsPlayback.tableTypes().toArray(), is(TABLE_TYPES_ORDERED));
 
     // 2. Test empty collection
     limitOptionsBuilder.tableTypes(new ArrayList<>());
@@ -315,8 +315,7 @@ public class LimitOptionsBuilderTest {
     assertThat(
         limitOptions.routineTypes(), is(EnumSet.of(RoutineType.function, RoutineType.procedure)));
     assertThat(
-        asList(limitOptions.tableTypes().toArray()),
-        containsInAnyOrder("TABLE", "VIEW", "BASE TABLE"));
+        asList(limitOptions.tableTypes().toArray()), containsInAnyOrder(TABLE_TYPES_ORDERED));
 
     final IncludeAll includeAll = new IncludeAll();
     final ExcludeAll excludeAll = new ExcludeAll();

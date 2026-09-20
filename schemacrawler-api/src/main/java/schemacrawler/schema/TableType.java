@@ -13,7 +13,7 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.function.Function;
+import java.util.Comparator;
 
 /**
  * Represents a type of table in the database. Examples could be a base table, a view, a global
@@ -25,6 +25,18 @@ public final class TableType implements Serializable, Comparable<TableType> {
   @Serial private static final long serialVersionUID = -8172248482959041873L;
 
   public static final TableType UNKNOWN = new TableType("unknown");
+
+  private static final Comparator<TableType> comparator =
+      Comparator.comparing(
+              TableType::getSimpleTableType,
+              Comparator.comparingInt(
+                  simpleTableType ->
+                      switch (simpleTableType) {
+                        case table -> 0;
+                        case view -> 1;
+                        case unknown -> 2;
+                      }))
+          .thenComparing(TableType::toString);
 
   private final String tableType;
 
@@ -40,28 +52,7 @@ public final class TableType implements Serializable, Comparable<TableType> {
     if (other == null) {
       return -1;
     }
-
-    final String thisStr = toString();
-    final String otherStr = other.toString();
-
-    if (thisStr.equalsIgnoreCase(otherStr)) {
-      return 0;
-    }
-
-    final Function<String, Integer> tableTypePriority =
-        tableType ->
-            switch (tableType.toUpperCase()) {
-              case "TABLE" -> 0;
-              case "VIEW" -> 1;
-              default -> 2;
-            };
-
-    final int compare =
-        Integer.compare(tableTypePriority.apply(thisStr), tableTypePriority.apply(otherStr));
-    if (compare != 0) {
-      return compare;
-    }
-    return thisStr.compareTo(otherStr);
+    return comparator.compare(this, other);
   }
 
   /** {@inheritDoc} */
@@ -70,14 +61,22 @@ public final class TableType implements Serializable, Comparable<TableType> {
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || !(obj instanceof TableType)) {
+    if (obj == null || !(obj instanceof final TableType other)) {
       return false;
     }
-    final TableType other = (TableType) obj;
     if (tableType == null) {
       return other.tableType == null;
     }
     return tableType.equalsIgnoreCase(other.tableType);
+  }
+
+  /**
+   * The table type name, with the case preserved.
+   *
+   * @return The table type
+   */
+  public String getName() {
+    return tableType;
   }
 
   /**
@@ -99,7 +98,9 @@ public final class TableType implements Serializable, Comparable<TableType> {
    * The table type, with the case preserved.
    *
    * @return The table type
+   * @deprecated See {@code getName()}
    */
+  @Deprecated
   public String getTableType() {
     return tableType;
   }
@@ -108,7 +109,7 @@ public final class TableType implements Serializable, Comparable<TableType> {
   @Override
   public int hashCode() {
     final int prime = 31;
-    int result = 1;
+    final int result = 1;
     return prime * result + (tableType == null ? 0 : tableType.toLowerCase().hashCode());
   }
 

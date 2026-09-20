@@ -31,6 +31,6 @@ class TableTypesFilter implements NamedObjectFilter<Table> {
    */
   @Override
   public boolean test(final Table table) {
-    return tableTypes.lookupTableType(table.getTableType().getTableType()).isPresent();
+    return tableTypes.lookupTableType(table.getTableType().getName()).isPresent();
   }
 }
