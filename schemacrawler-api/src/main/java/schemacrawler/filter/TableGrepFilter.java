@@ -25,7 +25,7 @@ class TableGrepFilter implements NamedObjectFilter<Table> {
 
   private final GrepOptions options;
 
-  public TableGrepFilter(final GrepOptions options) {
+  TableGrepFilter(final GrepOptions options) {
     this.options = requireNonNull(options, "No grep options provided");
   }
 

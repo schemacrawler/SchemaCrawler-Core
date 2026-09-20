@@ -17,7 +17,7 @@ class RoutineTypesFilter implements NamedObjectFilter<Routine> {
 
   private final Collection<RoutineType> routineTypes;
 
-  public RoutineTypesFilter(final LimitOptions options) {
+  RoutineTypesFilter(final LimitOptions options) {
     if (options != null) {
       routineTypes = options.routineTypes();
     } else {

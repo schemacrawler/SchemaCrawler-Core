@@ -23,7 +23,7 @@ class RoutineGrepFilter implements NamedObjectFilter<Routine> {
 
   private final GrepOptions options;
 
-  public RoutineGrepFilter(final GrepOptions options) {
+  RoutineGrepFilter(final GrepOptions options) {
     this.options = requireNonNull(options, "No grep options provided");
   }
 

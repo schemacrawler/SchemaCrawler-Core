@@ -22,7 +22,7 @@ import schemacrawler.schema.Routine;
  *
  * @param <N> named-object type
  */
-public class QuoteTolerantFullNameInclusionRuleFilter<N extends NamedObject>
+class QuoteTolerantFullNameInclusionRuleFilter<N extends NamedObject>
     implements NamedObjectFilter<N> {
 
   private static String unquotedFullName(final NamedObject namedObject) {
@@ -36,8 +36,7 @@ public class QuoteTolerantFullNameInclusionRuleFilter<N extends NamedObject>
   private final Pattern exclusionPattern;
   private final Pattern inclusionPattern;
 
-  public QuoteTolerantFullNameInclusionRuleFilter(
-      final InclusionRuleWithRegularExpression inclusionRule) {
+  QuoteTolerantFullNameInclusionRuleFilter(final InclusionRuleWithRegularExpression inclusionRule) {
     if (inclusionRule == null) {
       throw new NullPointerException("No inclusion rule provided");
     }
