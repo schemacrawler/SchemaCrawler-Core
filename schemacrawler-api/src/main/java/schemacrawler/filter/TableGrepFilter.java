@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.GrepOptions;
@@ -90,6 +91,10 @@ class TableGrepFilter implements NamedObjectFilter<Table> {
     if (!options.isGrepTables()) {
       return false;
     }
-    return new InclusionRuleFilter<Table>(options.grepTableInclusionRule(), false).test(table);
+    final InclusionRule rule = options.grepTableInclusionRule();
+    if (rule instanceof InclusionRuleWithRegularExpression expression) {
+      return new RegularExpressionInclusionRuleFilter<Table>(expression).test(table);
+    }
+    return new InclusionRuleFilter<Table>(rule, false).test(table);
   }
 }

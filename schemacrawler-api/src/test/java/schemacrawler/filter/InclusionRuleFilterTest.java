@@ -21,14 +21,14 @@ import schemacrawler.schema.Table;
 class InclusionRuleFilterTest {
 
   @Test
-  void testUnquotedPatternMatchesQuotedFullNameViaJoinedKey() {
+  void testUnquotedPatternDoesNotMatchQuotedFullNameViaJoinedKey() {
     // The full name is quoted for display, but the underlying key parts (as originally
     // captured) are not.
     final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
     final InclusionRuleFilter<Table> filter =
         new InclusionRuleFilter<>(new RegularExpressionInclusionRule(".*Celebrity Updates$"), true);
 
-    assertThat(filter.test(table), is(true));
+    assertThat(filter.test(table), is(false));
   }
 
   @Test

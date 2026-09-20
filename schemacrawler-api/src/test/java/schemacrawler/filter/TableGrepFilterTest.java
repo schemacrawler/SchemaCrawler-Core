@@ -10,11 +10,14 @@ package schemacrawler.filter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
+import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.GrepOptions;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
@@ -92,6 +95,39 @@ class TableGrepFilterTest {
     final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
 
     assertThat(tableGrepFilter.test(table), is(true));
+  }
+
+  @Test
+  void testTableGrepFilterWithQuotedAndUnquotedFullNamePatterns() {
+    final NamedObjectKey key = new NamedObjectKey("books", "Celebrity Updates");
+    final Table table = mock(Table.class);
+    when(table.getFullName()).thenReturn("books.\"Celebrity Updates\"");
+    when(table.key()).thenReturn(key);
+
+    assertThat(
+        new TableGrepFilter(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedTables(
+                        new RegularExpressionInclusionRule(".*\\\"Celebrity Updates\\\"$"))
+                    .toOptions())
+            .test(table),
+        is(true));
+    assertThat(
+        new TableGrepFilter(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedTables(
+                        new RegularExpressionInclusionRule(".*Celebrity Updates$"))
+                    .toOptions())
+            .test(table),
+        is(true));
+    assertThat(
+        new TableGrepFilter(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedTables(
+                        new RegularExpressionInclusionRule(".*celebrity updates$"))
+                    .toOptions())
+            .test(table),
+        is(false));
   }
 
   @Test

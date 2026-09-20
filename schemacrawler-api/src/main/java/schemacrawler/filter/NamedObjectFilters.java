@@ -13,7 +13,6 @@ import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.regex.Pattern;
-import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Routine;
@@ -49,8 +48,9 @@ public final class NamedObjectFilters {
   public static NamedObjectFilter<NamedObject> fullNameRegex(final String regex) {
     requireNotBlank(regex, "No regular expression provided");
     final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-    final InclusionRule inclusionRule = new RegularExpressionInclusionRule(pattern);
-    return new InclusionRuleFilter<>(inclusionRule, false);
+    final RegularExpressionInclusionRule inclusionRule =
+        new RegularExpressionInclusionRule(pattern);
+    return new RegularExpressionInclusionRuleFilter<>(inclusionRule);
   }
 
   /**
