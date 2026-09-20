@@ -16,18 +16,28 @@ import us.fatehi.utility.readconfig.SystemConfig;
  * Creates task runners for database loading.
  *
  * <p>Configure task execution with environment variables or Java system properties using the names
- * below. A system property takes precedence when both are set:
+ * below. A system property takes precedence when both are set. For example, you can set:
  *
  * <pre>
  * SC_SINGLE_THREADED=true
+ * <pre>
+ *
+ * or
+ *
+ * <pre>
  * SC_LOAD_MAX_THREADS=8
  * SC_LOAD_TIMEOUT_SECONDS=600
  * </pre>
  *
  * <p>For Java system properties, pass the same values with {@code -D}, for example {@code
- * -DSC_SINGLE_THREADED=true}. The default is multi-threaded loading with up to 5 threads and a
+ * -DSC_SINGLE_THREADED=true}.
+ *
+ * {@code SC_SINGLE_THREADED} takes precedence, and uses the main thread for processing.
+ *
+ * The default is multi-threaded loading with up to 5 threads and a
  * 3600-second timeout. Set {@code SC_LOAD_TIMEOUT_SECONDS} to {@code 0} or a negative value to
- * disable the timeout.
+ * disable the timeout. These settings are per batch of tasks, and not for the overall load
+ * of the database metadata.
  */
 public class TaskRunners {
 
