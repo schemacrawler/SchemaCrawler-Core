@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
@@ -70,6 +71,29 @@ class NamedObjectFiltersTest {
 
     assertThat(NamedObjectFilters.fullNameRegex(".*sales").test(table), is(true));
     assertThat(NamedObjectFilters.fullNameRegex(".*inventory").test(table), is(false));
+  }
+
+  @Test
+  void testFullNameFactoryKeepsNonRegexRulesOnDisplayedFullName() {
+    final Table table = mock(Table.class);
+    when(table.getFullName()).thenReturn("books.\"Celebrity Updates\"");
+    when(table.key()).thenReturn(new NamedObjectKey("books", "Celebrity Updates"));
+    final InclusionRule rule = text -> text.endsWith("Celebrity Updates");
+
+    assertThat(NamedObjectFilters.<Table>fullName(rule).test(table), is(false));
+  }
+
+  @Test
+  void testFullNameFactoryUsesQuoteTolerantFilterForRegexRules() {
+    final Table table = mock(Table.class);
+    when(table.getFullName()).thenReturn("books.\"Celebrity Updates\"");
+    when(table.key()).thenReturn(new NamedObjectKey("books", "Celebrity Updates"));
+
+    assertThat(
+        NamedObjectFilters.<Table>fullName(
+                new RegularExpressionInclusionRule(".*Celebrity Updates$"))
+            .test(table),
+        is(true));
   }
 
   @Test

@@ -25,7 +25,7 @@ class TableGrepFilter implements NamedObjectFilter<Table> {
 
   private final GrepOptions options;
 
-  public TableGrepFilter(final GrepOptions options) {
+  TableGrepFilter(final GrepOptions options) {
     this.options = requireNonNull(options, "No grep options provided");
   }
 
@@ -90,6 +90,7 @@ class TableGrepFilter implements NamedObjectFilter<Table> {
     if (!options.isGrepTables()) {
       return false;
     }
-    return new InclusionRuleFilter<Table>(options.grepTableInclusionRule(), false).test(table);
+    return FullNameInclusionRuleFilters.<Table>fullName(options.grepTableInclusionRule())
+        .test(table);
   }
 }
