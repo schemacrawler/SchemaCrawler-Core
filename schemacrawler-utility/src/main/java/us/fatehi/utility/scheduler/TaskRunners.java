@@ -20,7 +20,7 @@ import us.fatehi.utility.readconfig.SystemConfig;
  *
  * <pre>
  * SC_SINGLE_THREADED=true
- * <pre>
+ * </pre>
  *
  * or
  *
@@ -32,12 +32,11 @@ import us.fatehi.utility.readconfig.SystemConfig;
  * <p>For Java system properties, pass the same values with {@code -D}, for example {@code
  * -DSC_SINGLE_THREADED=true}.
  *
- * {@code SC_SINGLE_THREADED} takes precedence, and uses the main thread for processing.
+ * <p>{@code SC_SINGLE_THREADED} takes precedence, and uses the main thread for processing.
  *
- * The default is multi-threaded loading with up to 5 threads and a
- * 3600-second timeout. Set {@code SC_LOAD_TIMEOUT_SECONDS} to {@code 0} or a negative value to
- * disable the timeout. These settings are per batch of tasks, and not for the overall load
- * of the database metadata.
+ * <p>The default is multi-threaded loading with up to 5 threads and a 3600-second timeout. Set
+ * {@code SC_LOAD_TIMEOUT_SECONDS} to {@code 0} or a negative value to disable the timeout. These
+ * settings are per batch of tasks, and not for the overall load of the database metadata.
  */
 public class TaskRunners {
 
@@ -63,8 +62,7 @@ public class TaskRunners {
   private static final int DEFAULT_LOAD_TIMEOUT_SECONDS = 3600;
 
   public static TaskRunner getTaskRunner(final String id) {
-    final boolean isSingleThreaded = new SystemConfig().getBooleanValue(SC_SINGLE_THREADED);
-    if (isSingleThreaded) {
+    if (isSingleThreaded()) {
       LOGGER.log(Level.CONFIG, "Loading database schema in the main thread");
       return new MainThreadTaskRunner(id);
     }
@@ -73,11 +71,15 @@ public class TaskRunners {
     return new MultiThreadedTaskRunner(id, threadingOptions);
   }
 
-  private static ThreadingOptions getThreadingOptions() {
+  static ThreadingOptions getThreadingOptions() {
     final int maxThreads =
         new SystemConfig().getIntegerValue(SC_LOAD_MAX_THREADS, DEFAULT_LOAD_MAX_THREADS);
     final int timeoutSeconds =
         new SystemConfig().getIntegerValue(SC_LOAD_TIMEOUT_SECONDS, DEFAULT_LOAD_TIMEOUT_SECONDS);
     return new ThreadingOptions(maxThreads, timeoutSeconds);
+  }
+
+  static boolean isSingleThreaded() {
+    return new SystemConfig().getBooleanValue(SC_SINGLE_THREADED);
   }
 }
