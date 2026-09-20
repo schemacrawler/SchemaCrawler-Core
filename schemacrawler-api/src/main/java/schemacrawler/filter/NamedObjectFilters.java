@@ -13,6 +13,7 @@ import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.regex.Pattern;
+import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Routine;
@@ -27,12 +28,25 @@ import us.fatehi.utility.UtilityMarker;
  *
  * <p>Use {@link #nameRegex(String)} or {@link #fullNameRegex(String)} to select objects by name;
  * use {@link #tableGrep(GrepOptions)} or {@link #routineGrep(GrepOptions)} to also search inside an
- * object's columns, parameters, remarks, or definition; and use {@link #tableTypes(String...)} or
- * {@link #routineTypes(RoutineType)} to restrict output to specific kinds of objects. Filters can
- * be combined as needed.
+ * object's columns, parameters, remarks, or definition; and use {@link
+ * #tableTypes(SimpleTableType)} or {@link #routineTypes(RoutineType)} to restrict output to
+ * specific kinds of objects. Filters can be combined as needed.
  */
 @UtilityMarker
 public final class NamedObjectFilters {
+
+  /**
+   * Creates a filter that matches a named object's full (schema-qualified) name against an
+   * inclusion rule. Regular-expression rules are matched against both displayed and unquoted full
+   * names; other rule types are matched only against the displayed full name.
+   *
+   * @param inclusionRule inclusion rule to match against the full name
+   * @return a filter that accepts named objects whose full name matches the rule
+   */
+  public static <N extends NamedObject> NamedObjectFilter<N> fullName(
+      final InclusionRule inclusionRule) {
+    return FullNameInclusionRuleFilters.fullName(inclusionRule);
+  }
 
   /**
    * Creates a filter that matches a named object's full (schema-qualified) name against a regular
@@ -50,7 +64,7 @@ public final class NamedObjectFilters {
     final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     final RegularExpressionInclusionRule inclusionRule =
         new RegularExpressionInclusionRule(pattern);
-    return new RegularExpressionInclusionRuleFilter<>(inclusionRule);
+    return fullName(inclusionRule);
   }
 
   /**

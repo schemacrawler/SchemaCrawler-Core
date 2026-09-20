@@ -19,13 +19,13 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Table;
 
-class RegularExpressionInclusionRuleFilterTest {
+class QuoteTolerantFullNameInclusionRuleFilterTest {
 
   @Test
   void testUnquotedPatternMatchesQuotedFullNameViaJoinedKey() {
     final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
-    final RegularExpressionInclusionRuleFilter<Table> filter =
-        new RegularExpressionInclusionRuleFilter<>(
+    final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
+        new QuoteTolerantFullNameInclusionRuleFilter<>(
             new RegularExpressionRule(".*Celebrity Updates$", null));
 
     assertThat(filter.test(table), is(true));
@@ -34,8 +34,8 @@ class RegularExpressionInclusionRuleFilterTest {
   @Test
   void testPatternDifferingOnlyInCaseDoesNotMatch() {
     final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
-    final RegularExpressionInclusionRuleFilter<Table> filter =
-        new RegularExpressionInclusionRuleFilter<>(
+    final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
+        new QuoteTolerantFullNameInclusionRuleFilter<>(
             new RegularExpressionRule(".*celebrity updates$", null));
 
     assertThat(filter.test(table), is(false));
@@ -44,8 +44,8 @@ class RegularExpressionInclusionRuleFilterTest {
   @Test
   void testExclusionMatchingEitherCandidateWins() {
     final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
-    final RegularExpressionInclusionRuleFilter<Table> filter =
-        new RegularExpressionInclusionRuleFilter<>(
+    final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
+        new QuoteTolerantFullNameInclusionRuleFilter<>(
             new RegularExpressionRule(".*Celebrity Updates$", ".*\"Celebrity Updates\"$"));
 
     assertThat(filter.test(table), is(false));
@@ -54,8 +54,8 @@ class RegularExpressionInclusionRuleFilterTest {
   @Test
   void testUnquotedExclusionAlsoWins() {
     final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
-    final RegularExpressionInclusionRuleFilter<Table> filter =
-        new RegularExpressionInclusionRuleFilter<>(
+    final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
+        new QuoteTolerantFullNameInclusionRuleFilter<>(
             new RegularExpressionRule(".*Celebrity Updates$", ".*Celebrity Updates$"));
 
     assertThat(filter.test(table), is(false));
@@ -67,8 +67,8 @@ class RegularExpressionInclusionRuleFilterTest {
     when(routine.getFullName()).thenReturn("sales_schema.list_sales");
     when(routine.key())
         .thenReturn(new NamedObjectKey("sales_schema", "list_sales", "list_sales_17"));
-    final RegularExpressionInclusionRuleFilter<Routine> filter =
-        new RegularExpressionInclusionRuleFilter<>(
+    final QuoteTolerantFullNameInclusionRuleFilter<Routine> filter =
+        new QuoteTolerantFullNameInclusionRuleFilter<>(
             new RegularExpressionRule(".*sales_schema\\.list_sales$", null));
 
     assertThat(filter.test(routine), is(true));
@@ -76,8 +76,8 @@ class RegularExpressionInclusionRuleFilterTest {
 
   @Test
   void testNullNamedObjectAndFullNameAreExcluded() {
-    final RegularExpressionInclusionRuleFilter<Table> filter =
-        new RegularExpressionInclusionRuleFilter<>(new RegularExpressionRule(".*", null));
+    final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
+        new QuoteTolerantFullNameInclusionRuleFilter<>(new RegularExpressionRule(".*", null));
     final Table table = mock(Table.class);
     when(table.getFullName()).thenReturn(null);
 

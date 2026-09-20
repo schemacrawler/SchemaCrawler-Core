@@ -15,20 +15,28 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 
 /**
- * Matches regular-expression inclusion rules against displayed and unquoted named-object names.
+ * Matches regular-expression inclusion rules against displayed and unquoted full names.
  *
  * <p>Unlike {@link InclusionRuleFilter}, this filter evaluates the regular-expression patterns
  * directly so exclusions apply to both name representations.
  *
  * @param <N> named-object type
  */
-public class RegularExpressionInclusionRuleFilter<N extends NamedObject>
+public class QuoteTolerantFullNameInclusionRuleFilter<N extends NamedObject>
     implements NamedObjectFilter<N> {
+
+  private static String unquotedFullName(final NamedObject namedObject) {
+    NamedObjectKey key = namedObject.key();
+    if (namedObject instanceof Routine) {
+      key = key.withoutLast();
+    }
+    return key.join();
+  }
 
   private final Pattern exclusionPattern;
   private final Pattern inclusionPattern;
 
-  public RegularExpressionInclusionRuleFilter(
+  public QuoteTolerantFullNameInclusionRuleFilter(
       final InclusionRuleWithRegularExpression inclusionRule) {
     if (inclusionRule == null) {
       throw new NullPointerException("No inclusion rule provided");
@@ -47,9 +55,13 @@ public class RegularExpressionInclusionRuleFilter<N extends NamedObject>
       return false;
     }
     final String unquotedFullName = unquotedFullName(namedObject);
+    // Test inclusion against both forms so an unquoted CLI regex can match a full
+    // name that is quoted only for display.
     final boolean included =
         inclusionPattern.matcher(fullName).matches()
             || inclusionPattern.matcher(unquotedFullName).matches();
+    // Test exclusion against both forms before accepting the object, so a match on
+    // one form cannot bypass an exclusion on the other.
     final boolean excluded =
         exclusionPattern.matcher(fullName).matches()
             || exclusionPattern.matcher(unquotedFullName).matches();
@@ -64,13 +76,5 @@ public class RegularExpressionInclusionRuleFilter<N extends NamedObject>
             System.identityHashCode(this),
             inclusionPattern.pattern(),
             exclusionPattern.pattern());
-  }
-
-  private static String unquotedFullName(final NamedObject namedObject) {
-    NamedObjectKey key = namedObject.key();
-    if (namedObject instanceof Routine) {
-      key = key.withoutLast();
-    }
-    return key.join();
   }
 }
