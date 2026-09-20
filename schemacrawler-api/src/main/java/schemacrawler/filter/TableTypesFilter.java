@@ -14,21 +14,13 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableTypes;
 import schemacrawler.schemacrawler.LimitOptions;
 
-public class TableTypesFilter implements NamedObjectFilter<Table> {
+class TableTypesFilter implements NamedObjectFilter<Table> {
 
   private final TableTypes tableTypes;
 
-  public TableTypesFilter() {
-    tableTypes = TableTypes.includeAll();
-  }
-
-  public TableTypesFilter(final LimitOptions options) {
+  TableTypesFilter(final LimitOptions options) {
     requireNonNull(options, "No limit options provided");
     tableTypes = options.tableTypes();
-  }
-
-  public TableTypesFilter(final String... tableTypesFiltered) {
-    tableTypes = TableTypes.from(tableTypesFiltered);
   }
 
   /**
