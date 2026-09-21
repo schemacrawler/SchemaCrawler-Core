@@ -6,14 +6,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.schema;
+package schemacrawler.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.jupiter.api.Test;
 
-public class NamedObjectKeyTest {
+import schemacrawler.schema.NamedObjectKey;
+
+public class NamedObjectKeyJoinTest {
 
   @Test
   public void joinCombinesAllNonBlankPartsWithDot() {
