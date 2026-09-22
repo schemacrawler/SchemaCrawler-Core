@@ -54,6 +54,13 @@
             <goals>
               <goal>test-jar</goal>
             </goals>
+            <configuration>
+              <excludes>
+                <exclude>schemacrawler/ermodel/associations/**</exclude>
+                <exclude>schemacrawler/ermodel/model/**</exclude>
+                <exclude>schemacrawler/ermodel/utility/**</exclude>
+              </excludes>
+            </configuration>
           </execution>
         </executions>
       </plugin>

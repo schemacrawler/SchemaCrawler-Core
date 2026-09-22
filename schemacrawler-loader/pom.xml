@@ -58,6 +58,14 @@
             <goals>
               <goal>test-jar</goal>
             </goals>
+            <configuration>
+              <excludes>
+                <exclude>schemacrawler/loader/catalog/model/**</exclude>
+                <exclude>schemacrawler/loader/catalog/summary/**</exclude>
+                <exclude>schemacrawler/loader/ermodel/summary/**</exclude>
+                <exclude>schemacrawler/loader/utility/**</exclude>
+              </excludes>
+            </configuration>
           </execution>
         </executions>
       </plugin>

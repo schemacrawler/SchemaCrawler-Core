@@ -38,6 +38,17 @@
             <goals>
               <goal>test-jar</goal>
             </goals>
+            <configuration>
+              <excludes>
+                <exclude>schemacrawler/schema/**</exclude>
+                <exclude>schemacrawler/schemacrawler/**</exclude>
+                <exclude>schemacrawler/schemacrawler/exceptions/**</exclude>
+                <exclude>schemacrawler/filter/**</exclude>
+                <exclude>schemacrawler/inclusionrule/**</exclude>
+                <exclude>schemacrawler/plugin/**</exclude>
+                <exclude>schemacrawler/utility/**</exclude>
+              </excludes>
+            </configuration>
           </execution>
         </executions>
       </plugin>

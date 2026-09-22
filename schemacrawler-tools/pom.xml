@@ -50,6 +50,19 @@
             <goals>
               <goal>test-jar</goal>
             </goals>
+            <configuration>
+              <excludes>
+                <exclude>schemacrawler/tools/databaseconnector/**</exclude>
+                <exclude>schemacrawler/tools/command/**</exclude>
+                <exclude>schemacrawler/tools/executable/**</exclude>
+                <exclude>schemacrawler/tools/executable/commandline/**</exclude>
+                <exclude>schemacrawler/loader/catalog/**</exclude>
+                <exclude>schemacrawler/loader/ermodel/**</exclude>
+                <exclude>schemacrawler/tools/options/**</exclude>
+                <exclude>schemacrawler/tools/state/**</exclude>
+                <exclude>schemacrawler/tools/utility/**</exclude>
+              </excludes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
