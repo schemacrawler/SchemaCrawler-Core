@@ -17,7 +17,7 @@ import us.fatehi.utility.UtilityMarker;
 final class FullNameInclusionRuleFilters {
 
   static <N extends NamedObject> NamedObjectFilter<N> fullName(final InclusionRule inclusionRule) {
-    if (inclusionRule instanceof InclusionRuleWithRegularExpression expression) {
+    if (inclusionRule instanceof final InclusionRuleWithRegularExpression expression) {
       return new QuoteTolerantFullNameInclusionRuleFilter<>(expression);
     }
     return new InclusionRuleFilter<>(inclusionRule, false);

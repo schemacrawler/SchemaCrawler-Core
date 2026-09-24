@@ -32,9 +32,9 @@ final class DatabaseObjectFilter<D extends DatabaseObject> implements NamedObjec
     }
 
     if (databaseObjectRuleForInclusion != null) {
-      this.databaseObjectInclusionRule = options.get(databaseObjectRuleForInclusion);
+      databaseObjectInclusionRule = options.get(databaseObjectRuleForInclusion);
     } else {
-      this.databaseObjectInclusionRule = new IncludeAll();
+      databaseObjectInclusionRule = new IncludeAll();
     }
   }
 
@@ -42,8 +42,8 @@ final class DatabaseObjectFilter<D extends DatabaseObject> implements NamedObjec
    * Check for database object limiting rules.
    *
    * <p>Matches against the schema's and the database object's full names in a quote-tolerant
-   * manner, so a regular-expression inclusion rule can match whether or not it accounts for
-   * quoting added around names that require it (such as names containing spaces).
+   * manner, so a regular-expression inclusion rule can match whether or not it accounts for quoting
+   * added around names that require it (such as names containing spaces).
    *
    * @param databaseObject Database object to check
    * @return Whether the table should be included
@@ -62,7 +62,9 @@ final class DatabaseObjectFilter<D extends DatabaseObject> implements NamedObjec
               .test(databaseObject.getSchema());
     }
     if (include && databaseObjectInclusionRule != null) {
-      include = FullNameInclusionRuleFilters.<D>fullName(databaseObjectInclusionRule).test(databaseObject);
+      include =
+          FullNameInclusionRuleFilters.<D>fullName(databaseObjectInclusionRule)
+              .test(databaseObject);
     }
 
     return include;

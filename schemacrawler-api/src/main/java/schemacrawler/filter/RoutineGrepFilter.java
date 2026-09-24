@@ -11,23 +11,13 @@ package schemacrawler.filter;
 import java.util.stream.Stream;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.Routine;
+import schemacrawler.schema.RoutineParameter;
 import schemacrawler.schemacrawler.GrepOptions;
 
 class RoutineGrepFilter extends AbstractGrepFilter<Routine> {
 
   RoutineGrepFilter(final GrepOptions options) {
     super(options);
-  }
-
-  @Override
-  protected Stream<String> definitionTexts(final Routine routine) {
-    final Stream.Builder<String> definitionTexts = Stream.builder();
-    definitionTexts.add(routine.getRemarks());
-    definitionTexts.add(routine.getDefinition());
-    routine.getParameters().stream()
-        .map(parameter -> parameter.getRemarks())
-        .forEach(definitionTexts::add);
-    return definitionTexts.build();
   }
 
   @Override
@@ -38,6 +28,17 @@ class RoutineGrepFilter extends AbstractGrepFilter<Routine> {
   @Override
   protected boolean checkIncludeForNamedObjects(final Routine routine) {
     return checkIncludeForRoutines(routine);
+  }
+
+  @Override
+  protected Stream<String> definitionTexts(final Routine routine) {
+    final Stream.Builder<String> definitionTexts = Stream.builder();
+    definitionTexts.add(routine.getRemarks());
+    definitionTexts.add(routine.getDefinition());
+    routine.getParameters().stream()
+        .map(RoutineParameter::getRemarks)
+        .forEach(definitionTexts::add);
+    return definitionTexts.build();
   }
 
   @Override

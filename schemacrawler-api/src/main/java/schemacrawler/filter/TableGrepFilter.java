@@ -22,16 +22,6 @@ class TableGrepFilter extends AbstractGrepFilter<Table> {
   }
 
   @Override
-  protected Stream<String> definitionTexts(final Table table) {
-    final Stream.Builder<String> definitionTexts = Stream.builder();
-    definitionTexts.add(table.getRemarks());
-    definitionTexts.add(table.getDefinition());
-    table.getColumns().stream().map(Column::getRemarks).forEach(definitionTexts::add);
-    table.getTriggers().stream().map(Trigger::getActionStatement).forEach(definitionTexts::add);
-    return definitionTexts.build();
-  }
-
-  @Override
   protected boolean checkIncludeForMembers(final Table table) {
     return checkIncludeForColumns(table);
   }
@@ -39,6 +29,16 @@ class TableGrepFilter extends AbstractGrepFilter<Table> {
   @Override
   protected boolean checkIncludeForNamedObjects(final Table table) {
     return checkIncludeForTables(table);
+  }
+
+  @Override
+  protected Stream<String> definitionTexts(final Table table) {
+    final Stream.Builder<String> definitionTexts = Stream.builder();
+    definitionTexts.add(table.getRemarks());
+    definitionTexts.add(table.getDefinition());
+    table.getColumns().stream().map(Column::getRemarks).forEach(definitionTexts::add);
+    table.getTriggers().stream().map(Trigger::getActionStatement).forEach(definitionTexts::add);
+    return definitionTexts.build();
   }
 
   @Override
