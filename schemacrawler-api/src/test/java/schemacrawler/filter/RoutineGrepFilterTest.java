@@ -207,4 +207,15 @@ class RoutineGrepFilterTest {
 
     assertThat(filter.test(noParamRoutine), is(true));
   }
+
+  @Test
+  void testRoutineGrepFilterWithNoParametersMatchesParameterGrep() {
+    final LightProcedure noParamRoutine = new LightProcedure("no_param_routine");
+    final InclusionRule rule = new RegularExpressionInclusionRule("non_matching_parameter");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder().includeGreppedRoutineParameters(rule).toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(noParamRoutine), is(true));
+  }
 }

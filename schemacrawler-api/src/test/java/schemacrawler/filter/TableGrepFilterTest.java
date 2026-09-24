@@ -31,7 +31,7 @@ class TableGrepFilterTest {
   @BeforeEach
   public void setUp() {
     final LightTable table = new LightTable("test_table");
-    table.addColumn("test_column");
+    table.addColumn("test_column").setRemarks("test_column_remarks");
     table.setDefinition("test_definition");
     table.setRemarks("test_remarks");
 
@@ -214,6 +214,19 @@ class TableGrepFilterTest {
   void testTableGrepFilterWithRemarksInclusionRule() {
     final InclusionRule grepDefinitionInclusionRule =
         new RegularExpressionInclusionRule("test_remarks");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder()
+            .includeGreppedDefinitions(grepDefinitionInclusionRule)
+            .toOptions();
+    final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
+
+    assertThat(tableGrepFilter.test(table), is(true));
+  }
+
+  @Test
+  void testTableGrepFilterWithColumnRemarksInclusionRule() {
+    final InclusionRule grepDefinitionInclusionRule =
+        new RegularExpressionInclusionRule("test_column_remarks");
     final GrepOptions grepOptions =
         GrepOptionsBuilder.builder()
             .includeGreppedDefinitions(grepDefinitionInclusionRule)
