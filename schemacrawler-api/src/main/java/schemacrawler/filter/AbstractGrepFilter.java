@@ -74,8 +74,7 @@ abstract class AbstractGrepFilter<N extends NamedObject> implements NamedObjectF
 
   protected final boolean checkIncludeForMembers(
       final Collection<? extends BaseColumn<?>> members, final InclusionRule rule) {
-    return members.isEmpty()
-        || members.stream().anyMatch(member -> rule.test(member.getFullName()));
+    return members.stream().anyMatch(member -> rule.test(member.getFullName()));
   }
 
   protected abstract boolean checkIncludeForMembers(N namedObject);

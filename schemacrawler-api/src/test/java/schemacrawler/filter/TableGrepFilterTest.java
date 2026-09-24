@@ -71,7 +71,7 @@ class TableGrepFilterTest {
         GrepOptionsBuilder.builder().includeGreppedColumns(grepColumnInclusionRule).toOptions();
     final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
 
-    assertThat(tableGrepFilter.test(table), is(true));
+    assertThat(tableGrepFilter.test(table), is(false));
   }
 
   @Test
