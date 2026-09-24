@@ -12,9 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Routine;
@@ -142,21 +140,69 @@ class RoutineGrepFilterTest {
     assertThat(filter.test(routine), is(true));
   }
 
-  /**
-   * EXPOSES A BUG: "grep routine parameters" is being relied on elsewhere (for example, by
-   * SchemaCrawler AI's DescribeRoutinesFunctionExecutor) as a way to match a routine by its own
-   * name. But a routine with no parameters can never match, no matter how well its name matches
-   * the inclusion rule, because there are no parameter full names to test against. This currently
-   * FAILS, documenting the bug - a parameterless routine whose own name matches the rule is
-   * incorrectly excluded.
-   */
   @Test
-  @Disabled
-  void testRoutineGrepFilterWithNoParametersDoesNotMatchRoutineName() {
+  void testRoutineGrepFilterWithRoutineInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule(".*test_routine");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(routine), is(true));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithNonMatchingRoutineInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule(".*other_routine");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(routine), is(false));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithInvertMatchForRoutineInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule(".*test_routine");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).invertGrepMatch(true).toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(routine), is(false));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithInvertMatchForNonMatchingRoutineInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule(".*other_routine");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).invertGrepMatch(true).toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(routine), is(true));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithRoutineInclusionRuleCombinedWithParameterInclusionRule() {
+    // Routine name pattern does not match, but parameter pattern does - the routine should
+    // still be included, since matching any one of the active grep criteria is sufficient.
+    final InclusionRule routineRule = new RegularExpressionInclusionRule(".*other_routine");
+    final InclusionRule parameterRule =
+        new RegularExpressionInclusionRule("test_routine\\.test_param");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder()
+            .includeGreppedRoutines(routineRule)
+            .includeGreppedRoutineParameters(parameterRule)
+            .toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(routine), is(true));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithNoParametersMatchesRoutineName() {
     final LightProcedure noParamRoutine = new LightProcedure("no_param_routine");
     final InclusionRule rule = new RegularExpressionInclusionRule(".*no_param_routine.*");
     final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder().includeGreppedRoutineParameters(rule).toOptions();
+        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).toOptions();
     final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
 
     assertThat(filter.test(noParamRoutine), is(true));

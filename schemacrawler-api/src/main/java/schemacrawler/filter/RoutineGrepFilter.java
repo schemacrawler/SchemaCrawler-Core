@@ -28,18 +28,20 @@ class RoutineGrepFilter implements NamedObjectFilter<Routine> {
   }
 
   /**
-   * Special case for "grep" like functionality. Handle routine if a routine parameter inclusion
-   * rule is found, and at least one parameter matches the rule.
+   * Special case for "grep" like functionality. Handle routine if a routine name, routine
+   * parameter, or definition inclusion rule is found, and the routine's own full name matches, or
+   * at least one parameter, remark, or the definition matches the rule.
    *
    * @param routine Routine to check
    * @return Whether the routine should be included
    */
   @Override
   public boolean test(final Routine routine) {
+    final boolean checkIncludeForRoutines = options.isGrepRoutines();
     final boolean checkIncludeForParameters = options.isGrepRoutineParameters();
     final boolean checkIncludeForDefinitions = options.isGrepDefinitions();
 
-    if (!checkIncludeForParameters && !checkIncludeForDefinitions) {
+    if (!checkIncludeForRoutines && !checkIncludeForParameters && !checkIncludeForDefinitions) {
       if (options.isGrepInvertMatch()) {
         LOGGER.log(
             Level.FINE,
@@ -51,12 +53,13 @@ class RoutineGrepFilter implements NamedObjectFilter<Routine> {
       return true;
     }
 
+    final boolean includeForRoutines = checkIncludeForRoutines && checkIncludeForRoutines(routine);
     final boolean includeForParameters =
         checkIncludeForParameters && checkIncludeForParameters(routine);
     final boolean includeForDefinitions =
         checkIncludeForDefinitions && checkIncludeForDefinitions(routine);
 
-    boolean include = includeForParameters || includeForDefinitions;
+    boolean include = includeForRoutines || includeForParameters || includeForDefinitions;
     if (options.isGrepInvertMatch()) {
       include = !include;
     }
@@ -77,5 +80,13 @@ class RoutineGrepFilter implements NamedObjectFilter<Routine> {
   private boolean checkIncludeForParameters(final Routine routine) {
     final InclusionRule rule = options.grepRoutineParameterInclusionRule();
     return routine.getParameters().stream().anyMatch(p -> rule.test(p.getFullName()));
+  }
+
+  private boolean checkIncludeForRoutines(final Routine routine) {
+    if (!options.isGrepRoutines()) {
+      return false;
+    }
+    return FullNameInclusionRuleFilters.<Routine>fullName(options.grepRoutineInclusionRule())
+        .test(routine);
   }
 }
