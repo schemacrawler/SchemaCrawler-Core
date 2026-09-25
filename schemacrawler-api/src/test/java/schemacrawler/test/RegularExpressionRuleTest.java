@@ -68,8 +68,8 @@ public class RegularExpressionRuleTest {
   public void test() {
     final RegularExpressionRule rule1 = new RegularExpressionRule((String) null, (String) null);
     assertThat(rule1.getInclusionPattern().pattern(), is(".*"));
-    assertThat(rule1.getExclusionPattern().pattern(), is(""));
-    assertThat(rule1.toString(), endsWith("{+/.*/ -//}"));
+    assertThat(rule1.getExclusionPattern().pattern(), is("(?!)"));
+    assertThat(rule1.toString(), endsWith("{+/.*/ -/(?!)/}"));
     assertThat(rule1.test(null), is(false));
     assertThat(rule1.test(""), is(false));
     assertThat(rule1.test("inc"), is(true));
@@ -88,8 +88,8 @@ public class RegularExpressionRuleTest {
 
     final RegularExpressionRule rule3 = new RegularExpressionRule("inc", (String) null);
     assertThat(rule3.getInclusionPattern().pattern(), is("inc"));
-    assertThat(rule3.getExclusionPattern().pattern(), is(""));
-    assertThat(rule3.toString(), endsWith("{+/inc/ -//}"));
+    assertThat(rule3.getExclusionPattern().pattern(), is("(?!)"));
+    assertThat(rule3.toString(), endsWith("{+/inc/ -/(?!)/}"));
     assertThat(rule3.test(null), is(false));
     assertThat(rule3.test(""), is(false));
     assertThat(rule3.test("inc"), is(true));
@@ -113,8 +113,8 @@ public class RegularExpressionRuleTest {
 
     final RegularExpressionRule rule1 = new RegularExpressionRule(".*inc.*", (String) null);
     assertThat(rule1.getInclusionPattern().pattern(), is(".*inc.*"));
-    assertThat(rule1.getExclusionPattern().pattern(), is(""));
-    assertThat(rule1.toString(), endsWith("{+/.*inc.*/ -//}"));
+    assertThat(rule1.getExclusionPattern().pattern(), is("(?!)"));
+    assertThat(rule1.toString(), endsWith("{+/.*inc.*/ -/(?!)/}"));
     assertThat(rule1.test(null), is(false));
     assertThat(rule1.test(""), is(false));
     assertThat(rule1.test("inc"), is(true));

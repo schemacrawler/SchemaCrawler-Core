@@ -141,7 +141,7 @@ public class MetadataUtilityTest {
     assertThat(MetaDataUtility.inclusionRuleString(includeAll), is(".*"));
 
     final InclusionRule excludeAll = new ExcludeAll();
-    assertThat(MetaDataUtility.inclusionRuleString(excludeAll), is(".*"));
+    assertThat(MetaDataUtility.inclusionRuleString(excludeAll), is("(?!)"));
 
     final InclusionRule listExclusionRule = new ListExclusionRule(List.of("BOOKS"));
     assertThat(MetaDataUtility.inclusionRuleString(listExclusionRule), is(".*"));
