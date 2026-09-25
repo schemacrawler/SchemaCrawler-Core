@@ -92,7 +92,8 @@ public final class DatabaseConnectorUtility {
     final String connectionUrl = JdbcConnectionUtility.getConnectionUrl(connection);
     final DatabaseServerFingerprint serverFingerprint =
         DatabaseServerFingerprintBuilder.builder(connectionUrl).build();
-    final String databaseSystemIdentifier = serverFingerprint.databaseSystemIdentifier();
+    final String databaseSystemIdentifier =
+        normalizedIdentifier(serverFingerprint.databaseSystemIdentifier());
 
     final DatabaseConnectorRegistry registry = DatabaseConnectorRegistry.getRegistry();
     final DatabaseConnector dbConnector = registry.getDatabaseConnector(databaseSystemIdentifier);
