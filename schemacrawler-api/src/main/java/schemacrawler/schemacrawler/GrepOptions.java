@@ -16,6 +16,7 @@ import us.fatehi.utility.Options;
 public record GrepOptions(
     @Nullable InclusionRule grepTableInclusionRule,
     @Nullable InclusionRule grepColumnInclusionRule,
+    @Nullable InclusionRule grepRoutineInclusionRule,
     @Nullable InclusionRule grepRoutineParameterInclusionRule,
     @Nullable InclusionRule grepDefinitionInclusionRule,
     boolean grepInvertMatch)
@@ -40,6 +41,10 @@ public record GrepOptions(
 
   public boolean isGrepRoutineParameters() {
     return grepRoutineParameterInclusionRule != null;
+  }
+
+  public boolean isGrepRoutines() {
+    return grepRoutineInclusionRule != null;
   }
 
   public boolean isGrepTables() {

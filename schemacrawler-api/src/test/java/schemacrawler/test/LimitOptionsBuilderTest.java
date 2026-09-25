@@ -39,7 +39,7 @@ public class LimitOptionsBuilderTest {
 
     final IncludeAll includeAll = new IncludeAll();
     final ExcludeAll excludeAll = new ExcludeAll();
-    final RegularExpressionRule inclusionRule = new RegularExpressionRule(".*PUBLIC.*", "");
+    final RegularExpressionRule inclusionRule = new RegularExpressionRule(".*PUBLIC.*", "(?!)");
     final Pattern pattern = Pattern.compile(".*PUBLIC.*");
 
     final LimitOptionsBuilder limitOptionsBuilder = LimitOptionsBuilder.builder();

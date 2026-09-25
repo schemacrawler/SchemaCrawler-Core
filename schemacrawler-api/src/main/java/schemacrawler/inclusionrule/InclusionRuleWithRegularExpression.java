@@ -20,7 +20,7 @@ public interface InclusionRuleWithRegularExpression extends InclusionRule {
    * @return Regular expression for the exclusion rule
    */
   default Pattern getExclusionPattern() {
-    return Pattern.compile("");
+    return Pattern.compile("(?!)");
   }
 
   /**

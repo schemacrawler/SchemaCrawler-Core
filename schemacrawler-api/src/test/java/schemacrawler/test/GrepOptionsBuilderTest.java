@@ -28,6 +28,7 @@ public class GrepOptionsBuilderTest {
     builder1
         .includeGreppedColumns(new IncludeAll())
         .includeGreppedDefinitions(new IncludeAll())
+        .includeGreppedRoutines(new IncludeAll())
         .includeGreppedRoutineParameters(new IncludeAll())
         .invertGrepMatch(true);
     final GrepOptionsBuilder builder =
@@ -37,6 +38,7 @@ public class GrepOptionsBuilderTest {
     final GrepOptions grepOptions = builder.toOptions();
     assertThat(grepOptions.grepColumnInclusionRule(), is(not(nullValue())));
     assertThat(grepOptions.grepDefinitionInclusionRule(), is(not(nullValue())));
+    assertThat(grepOptions.grepRoutineInclusionRule(), is(not(nullValue())));
     assertThat(grepOptions.grepRoutineParameterInclusionRule(), is(not(nullValue())));
 
     final GrepOptionsBuilder builderNull = GrepOptionsBuilder.builder().fromOptions(null);
@@ -122,6 +124,32 @@ public class GrepOptionsBuilderTest {
   }
 
   @Test
+  public void includeGreppedRoutines() {
+    final GrepOptionsBuilder builder = GrepOptionsBuilder.builder();
+    checkAllDefaults(builder.toOptions());
+
+    builder.includeGreppedRoutines(new ExcludeAll());
+    // Check after setting the value
+    assertThat(builder.toOptions().grepRoutineInclusionRule(), is(new ExcludeAll()));
+    assertThat(builder.toOptions().isGrepRoutines(), is(true));
+  }
+
+  @Test
+  public void includeGreppedRoutinesPattern() {
+    final GrepOptionsBuilder builder = GrepOptionsBuilder.builder();
+    checkAllDefaults(builder.toOptions());
+
+    builder.includeGreppedRoutines(Pattern.compile(".*"));
+    // Check after setting the value
+    assertThat(builder.toOptions().grepRoutineInclusionRule(), is(not(nullValue())));
+
+    builder.includeGreppedRoutines((Pattern) null);
+    // Check after setting the value
+    assertThat(builder.toOptions().grepRoutineInclusionRule(), is(nullValue()));
+    checkAllDefaults(builder.toOptions());
+  }
+
+  @Test
   public void isGrepInvertMatch() {
     final GrepOptionsBuilder builder = GrepOptionsBuilder.builder();
     checkAllDefaults(builder.toOptions());
@@ -140,11 +168,13 @@ public class GrepOptionsBuilderTest {
   private void checkAllDefaults(final GrepOptions grepOptionsNew) {
     assertThat(grepOptionsNew.grepColumnInclusionRule(), is(nullValue()));
     assertThat(grepOptionsNew.grepDefinitionInclusionRule(), is(nullValue()));
+    assertThat(grepOptionsNew.grepRoutineInclusionRule(), is(nullValue()));
     assertThat(grepOptionsNew.grepRoutineParameterInclusionRule(), is(nullValue()));
 
     // Additional tests for synthetic methods
     assertThat(grepOptionsNew.isGrepColumns(), is(false));
     assertThat(grepOptionsNew.isGrepDefinitions(), is(false));
+    assertThat(grepOptionsNew.isGrepRoutines(), is(false));
     assertThat(grepOptionsNew.isGrepRoutineParameters(), is(false));
     assertThat(grepOptionsNew.isGrepInvertMatch(), is(false));
   }

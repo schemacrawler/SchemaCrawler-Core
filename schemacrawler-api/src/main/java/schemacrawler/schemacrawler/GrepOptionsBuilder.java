@@ -29,12 +29,14 @@ public final class GrepOptionsBuilder implements OptionsBuilder<GrepOptionsBuild
   private Optional<InclusionRule> grepColumnInclusionRule;
   private Optional<InclusionRule> grepDefinitionInclusionRule;
   private boolean grepInvertMatch;
+  private Optional<InclusionRule> grepRoutineInclusionRule;
   private Optional<InclusionRule> grepRoutineParameterInclusionRule;
 
   /** Default options. */
   private GrepOptionsBuilder() {
     grepTableInclusionRule = Optional.empty();
     grepColumnInclusionRule = Optional.empty();
+    grepRoutineInclusionRule = Optional.empty();
     grepRoutineParameterInclusionRule = Optional.empty();
     grepDefinitionInclusionRule = Optional.empty();
   }
@@ -47,6 +49,7 @@ public final class GrepOptionsBuilder implements OptionsBuilder<GrepOptionsBuild
 
     grepTableInclusionRule = Optional.ofNullable(options.grepTableInclusionRule());
     grepColumnInclusionRule = Optional.ofNullable(options.grepColumnInclusionRule());
+    grepRoutineInclusionRule = Optional.ofNullable(options.grepRoutineInclusionRule());
     grepRoutineParameterInclusionRule =
         Optional.ofNullable(options.grepRoutineParameterInclusionRule());
     grepDefinitionInclusionRule = Optional.ofNullable(options.grepDefinitionInclusionRule());
@@ -102,6 +105,21 @@ public final class GrepOptionsBuilder implements OptionsBuilder<GrepOptionsBuild
     return this;
   }
 
+  public GrepOptionsBuilder includeGreppedRoutines(final InclusionRule grepRoutineInclusionRule) {
+    this.grepRoutineInclusionRule = Optional.ofNullable(grepRoutineInclusionRule);
+    return this;
+  }
+
+  public GrepOptionsBuilder includeGreppedRoutines(final Pattern grepRoutinePattern) {
+    if (grepRoutinePattern == null) {
+      grepRoutineInclusionRule = Optional.empty();
+    } else {
+      grepRoutineInclusionRule =
+          Optional.of(new RegularExpressionInclusionRule(grepRoutinePattern));
+    }
+    return this;
+  }
+
   public GrepOptionsBuilder includeGreppedTables(final InclusionRule grepTableInclusionRule) {
     this.grepTableInclusionRule = Optional.ofNullable(grepTableInclusionRule);
     return this;
@@ -127,6 +145,7 @@ public final class GrepOptionsBuilder implements OptionsBuilder<GrepOptionsBuild
         new GrepOptions(
             grepTableInclusionRule.orElse(null),
             grepColumnInclusionRule.orElse(null),
+            grepRoutineInclusionRule.orElse(null),
             grepRoutineParameterInclusionRule.orElse(null),
             grepDefinitionInclusionRule.orElse(null),
             grepInvertMatch);

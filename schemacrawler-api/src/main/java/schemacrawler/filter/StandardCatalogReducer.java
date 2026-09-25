@@ -36,7 +36,7 @@ final class StandardCatalogReducer implements CatalogReducer {
   }
 
   private static Predicate<Schema> schemaFilter(final SchemaCrawlerOptions options) {
-    return new InclusionRuleFilter<>(options.limitOptions().get(ruleForSchemaInclusion), true);
+    return NamedObjectFilters.fullName(options.limitOptions().get(ruleForSchemaInclusion));
   }
 
   private static Predicate<Sequence> sequenceFilter(final SchemaCrawlerOptions options) {

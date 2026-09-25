@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.ProcedureParameter;
 import schemacrawler.schema.ProcedureReturnType;
@@ -24,15 +25,17 @@ import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.SchemaReference;
 
-public class LightProcedure extends AbstractLightDatabaseObject implements Procedure {
+public final class LightProcedure extends AbstractLightDatabaseObject implements Procedure {
 
   @Serial private static final long serialVersionUID = 1L;
 
   private final List<ProcedureParameter> parameters = new ArrayList<>();
+  private final String specificName;
   private String definition;
 
   public LightProcedure(final Schema schema, final String name) {
     super(schema, name);
+    specificName = name + "_specific";
   }
 
   public LightProcedure(final String name) {
@@ -77,7 +80,12 @@ public class LightProcedure extends AbstractLightDatabaseObject implements Proce
 
   @Override
   public String getSpecificName() {
-    return null;
+    return specificName;
+  }
+
+  @Override
+  public NamedObjectKey key() {
+    return super.key().with(specificName);
   }
 
   @Override

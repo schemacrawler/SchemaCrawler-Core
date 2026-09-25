@@ -13,6 +13,7 @@ import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleFor
 import schemacrawler.inclusionrule.IncludeAll;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion;
 import schemacrawler.schemacrawler.LimitOptions;
 
@@ -31,14 +32,18 @@ final class DatabaseObjectFilter<D extends DatabaseObject> implements NamedObjec
     }
 
     if (databaseObjectRuleForInclusion != null) {
-      this.databaseObjectInclusionRule = options.get(databaseObjectRuleForInclusion);
+      databaseObjectInclusionRule = options.get(databaseObjectRuleForInclusion);
     } else {
-      this.databaseObjectInclusionRule = new IncludeAll();
+      databaseObjectInclusionRule = new IncludeAll();
     }
   }
 
   /**
    * Check for database object limiting rules.
+   *
+   * <p>Matches against the schema's and the database object's full names in a quote-tolerant
+   * manner, so a regular-expression inclusion rule can match whether or not it accounts for quoting
+   * added around names that require it (such as names containing spaces).
    *
    * @param databaseObject Database object to check
    * @return Whether the table should be included
@@ -52,10 +57,14 @@ final class DatabaseObjectFilter<D extends DatabaseObject> implements NamedObjec
     boolean include = true;
 
     if (include && schemaInclusionRule != null) {
-      include = schemaInclusionRule.test(databaseObject.getSchema().getFullName());
+      include =
+          FullNameInclusionRuleFilters.<Schema>fullName(schemaInclusionRule)
+              .test(databaseObject.getSchema());
     }
     if (include && databaseObjectInclusionRule != null) {
-      include = databaseObjectInclusionRule.test(databaseObject.getFullName());
+      include =
+          FullNameInclusionRuleFilters.<D>fullName(databaseObjectInclusionRule)
+              .test(databaseObject);
     }
 
     return include;
