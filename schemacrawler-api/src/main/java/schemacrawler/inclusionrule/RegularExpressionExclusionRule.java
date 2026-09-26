@@ -8,6 +8,8 @@
 
 package schemacrawler.inclusionrule;
 
+import static java.util.regex.Pattern.DOTALL;
+
 import java.io.Serial;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -41,7 +43,7 @@ public final class RegularExpressionExclusionRule implements InclusionRuleWithRe
    * @param patternExclude Exclusion pattern. If null, excludes nothing.
    */
   public RegularExpressionExclusionRule(final String patternExclude) {
-    this(patternExclude == null ? null : Pattern.compile(patternExclude));
+    this(patternExclude == null ? null : Pattern.compile(patternExclude, DOTALL));
   }
 
   @Override
