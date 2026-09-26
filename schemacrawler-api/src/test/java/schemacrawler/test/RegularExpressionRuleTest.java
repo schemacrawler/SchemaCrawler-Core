@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.RegularExpressionRule;
 
@@ -129,5 +130,13 @@ public class RegularExpressionRuleTest {
     assertThat(rule2.test("inc"), is(true));
     assertThat(rule2.test("exc"), is(false));
     assertThat(rule2.test(multilineText), is(false));
+  }
+
+  @Test
+  public void testNullExclusionPattern() {
+    final RegularExpressionRule rule = new RegularExpressionRule(Pattern.compile(".*"), null);
+
+    assertThat(rule.getExclusionPattern().pattern(), is("(?!)"));
+    assertThat(rule.test("included"), is(true));
   }
 }

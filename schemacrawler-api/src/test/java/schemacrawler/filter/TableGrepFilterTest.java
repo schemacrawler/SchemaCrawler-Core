@@ -88,6 +88,20 @@ class TableGrepFilterTest {
   }
 
   @Test
+  void testTableGrepFilterWithMultilineDefinitionInclusionRule() {
+    final LightTable multilineTable = new LightTable("test_table");
+    multilineTable.setDefinition("first line\nsecond line");
+
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder()
+            .includeGreppedDefinitions(new RegularExpressionInclusionRule(".*first.*second.*"))
+            .toOptions();
+    final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
+
+    assertThat(tableGrepFilter.test(multilineTable), is(true));
+  }
+
+  @Test
   void testTableGrepFilterWithInclusionRule() {
     final InclusionRule grepTableInclusionRule = new RegularExpressionInclusionRule("test_table");
     final GrepOptions grepOptions =
