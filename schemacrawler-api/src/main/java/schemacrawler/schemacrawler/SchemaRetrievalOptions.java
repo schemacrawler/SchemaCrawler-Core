@@ -9,6 +9,7 @@
 package schemacrawler.schemacrawler;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElseGet;
 
 import java.sql.Connection;
 import java.util.EnumMap;
@@ -43,7 +44,7 @@ public final class SchemaRetrievalOptions implements Options {
 
   protected SchemaRetrievalOptions(final SchemaRetrievalOptionsBuilder builder) {
     final SchemaRetrievalOptionsBuilder bldr =
-        builder == null ? SchemaRetrievalOptionsBuilder.builder() : builder;
+        requireNonNullElseGet(builder, SchemaRetrievalOptionsBuilder::builder);
 
     dbServerType = bldr.dbServerType;
     supportsCatalogs = bldr.overridesSupportsCatalogs.toBoolean(bldr.supportsCatalogs);

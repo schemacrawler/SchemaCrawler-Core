@@ -9,6 +9,7 @@
 package us.fatehi.utility.html;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.html.TagOutputFormat.html;
 import static us.fatehi.utility.html.TagOutputFormat.tsv;
@@ -46,7 +47,7 @@ public class Tag {
       final Map<String, String> attributes) {
     this.tagName = requireNonNull(tagName);
     this.styleClass = styleClass;
-    this.text = text == null ? "" : text;
+    this.text = requireNonNullElse(text, "");
     this.escapeText = escapeText;
     this.characterWidth = characterWidth;
     this.align = align;

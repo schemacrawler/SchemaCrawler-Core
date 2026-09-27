@@ -8,6 +8,7 @@
 
 package us.fatehi.utility.jdbc.driver;
 
+import static java.util.Objects.requireNonNullElseGet;
 import static us.fatehi.utility.Utility.isBlank;
 
 import us.fatehi.utility.property.VersionNumber;
@@ -22,8 +23,7 @@ public record JdbcDriver(
 
   public JdbcDriver {
     driverClassName = isBlank(driverClassName) ? "" : driverClassName;
-    driverVersionNumber =
-        driverVersionNumber == null ? new VersionNumber(0, 0) : driverVersionNumber;
+    driverVersionNumber = requireNonNullElseGet(driverVersionNumber, () -> new VersionNumber(0, 0));
   }
 
   public JdbcDriver() {

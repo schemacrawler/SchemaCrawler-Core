@@ -8,6 +8,8 @@
 
 package us.fatehi.utility.graph;
 
+import static java.util.Objects.requireNonNullElse;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -51,7 +53,7 @@ public class TreeNode<T> {
           .append("- ")
           .append(node.name)
           .append(": ")
-          .append(node.value == null ? "" : node.value)
+          .append(requireNonNullElse(node.value, ""))
           .append("\n");
 
       if (!node.children.isEmpty()) {
