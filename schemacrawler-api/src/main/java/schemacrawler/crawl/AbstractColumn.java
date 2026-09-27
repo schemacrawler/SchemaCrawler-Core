@@ -105,11 +105,15 @@ abstract sealed class AbstractColumn<P extends DatabaseObject> extends AbstractD
       return "";
     }
 
-    final ColumnDataType columnDataType = getColumnDataType();
-
-    if (size <= 0 || size >= 2_000_000_000) {
+    // Do not report unknown sizes - some JDBC drivers have specific values
+    // to indicate an unknown value
+    // H2 uses 1_000_000_000
+    // SQLite uses 2_000_000_000
+    if (size <= 0 || size >= 1_000_000_000) {
       return "";
     }
+
+    final ColumnDataType columnDataType = getColumnDataType();
 
     final JavaSqlTypeGroup sqlDataTypeGroup = columnDataType.getJavaSqlType().getJavaSqlTypeGroup();
     final boolean needWidth =
