@@ -9,6 +9,7 @@
 package us.fatehi.utility.jdbc.driver;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElseGet;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
@@ -156,8 +157,7 @@ public final class JdbcDriverRegistry extends BasePluginRegistry {
   public Connection createConnection(
       final String connectionUrl, final Properties connectionProperties) throws SQLException {
     requireNotBlank(connectionUrl, "No JDBC connection URL provided");
-    final Properties properties =
-        connectionProperties == null ? new Properties() : connectionProperties;
+    final Properties properties = requireNonNullElseGet(connectionProperties, Properties::new);
     final Optional<Driver> jdbcDriverOptional = lookupDriver(connectionUrl);
     if (jdbcDriverOptional.isEmpty()) {
       throw new SQLException(

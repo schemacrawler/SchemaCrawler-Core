@@ -9,6 +9,7 @@
 package us.fatehi.utility.jdbc.serverfingerprint;
 
 import static java.net.InetAddress.getByName;
+import static java.util.Objects.requireNonNullElse;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.net.InetAddress;
@@ -474,8 +475,7 @@ final class JdbcUrlTokenizer {
     }
 
     final String databaseName = matcher.group("databaseName");
-    return new EmbeddedOrHost(
-        host, port, databaseName == null ? "" : databaseName, classifyHost(host));
+    return new EmbeddedOrHost(host, port, requireNonNullElse(databaseName, ""), classifyHost(host));
   }
 
   private static String normalizeOracleAuthorityMarker(final String value) {
