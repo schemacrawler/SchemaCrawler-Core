@@ -119,6 +119,9 @@ public final class DatabaseConnectorUtility {
     if ("mariadb".equalsIgnoreCase(databaseSystemIdentifier)) {
       return "mysql";
     }
+    if ("h2".equalsIgnoreCase(databaseSystemIdentifier)) {
+      return "hsqldb";
+    }
     return databaseSystemIdentifier;
   }
 
@@ -129,14 +132,20 @@ public final class DatabaseConnectorUtility {
     }
 
     final List<String> connectorsRequired =
-        List.of("db2", "hsqldb", "mariadb", "mysql", "oracle", "postgresql", "sqlite", "sqlserver");
+        List.of(
+            "db2",
+            "h2",
+            "hsqldb",
+            "mariadb",
+            "mysql",
+            "oracle",
+            "postgresql",
+            "sqlite",
+            "sqlserver");
     final String allowedDatabaseConnector =
         normalizedIdentifier(
             new SystemPropertiesConfig().getStringValue("SC_WITHOUT_DATABASE_PLUGIN"));
-    final boolean isAllowed =
-        databaseSystemIdentifier.equalsIgnoreCase(allowedDatabaseConnector)
-            || "mariadb".equalsIgnoreCase(databaseSystemIdentifier)
-                && "mysql".equalsIgnoreCase(allowedDatabaseConnector);
+    final boolean isAllowed = databaseSystemIdentifier.equalsIgnoreCase(allowedDatabaseConnector);
 
     // Fail fast when a known database should have a plugin but none is available,
     // unless that database is explicitly allow-listed via
@@ -144,12 +153,6 @@ public final class DatabaseConnectorUtility {
     if (dbServerType.isUnknownDatabaseSystem()
         && connectorsRequired.contains(databaseSystemIdentifier)
         && !isAllowed) {
-      final String pluginId;
-      if ("mariadb".equalsIgnoreCase(databaseSystemIdentifier)) {
-        pluginId = "mysql";
-      } else {
-        pluginId = databaseSystemIdentifier;
-      }
       throw new InternalRuntimeException(
           """
           Add the SchemaCrawler database connector plugin for <%s> to the CLASSPATH
@@ -157,7 +160,7 @@ public final class DatabaseConnectorUtility {
           SC_WITHOUT_DATABASE_PLUGIN=%s
           either as an environmental variable or as a Java system property
           """
-              .formatted(pluginId, pluginId));
+              .formatted(databaseSystemIdentifier, databaseSystemIdentifier));
     }
   }
 
