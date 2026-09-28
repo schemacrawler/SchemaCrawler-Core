@@ -19,7 +19,6 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.NamedObject;
@@ -119,8 +118,12 @@ public class LightCatalogUtility {
           final String productName = "Test Database";
           switch (methodName) {
             case "getDatabaseProductName":
+            case "getProductName":
+            case "getName":
               return productName;
             case "getDatabaseProductVersion":
+            case "getProductVersion":
+            case "getVaue":
               return productVersion;
             default:
               final Class<?> returnType = method.getReturnType();

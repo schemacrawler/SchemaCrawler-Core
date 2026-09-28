@@ -342,6 +342,9 @@ public class TestObjectUtility {
     if (returnType == Character.class) {
       return Character.valueOf('\0');
     }
+    if (returnType == String.class) {
+      return "";
+    }
 
     throw new UnsupportedOperationException(method.toString());
   }
