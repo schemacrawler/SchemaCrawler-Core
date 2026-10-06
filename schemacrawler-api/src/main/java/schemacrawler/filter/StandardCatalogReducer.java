@@ -63,7 +63,7 @@ final class StandardCatalogReducer implements CatalogReducer {
     requireNonNull(catalog, "No catalog provided");
 
     catalog.reduce(Schema.class, new FilteringReducer<>(schemaFilter(options)));
-    catalog.reduce(Table.class, new TablesReducer(tableFilter(options)));
+    catalog.reduce(Table.class, new FilteringReducer<>(tableFilter(options)));
     catalog.reduce(Routine.class, new FilteringReducer<>(routineFilter(options)));
     catalog.reduce(Synonym.class, new FilteringReducer<>(synonymFilter(options)));
     catalog.reduce(Sequence.class, new FilteringReducer<>(sequenceFilter(options)));
@@ -74,7 +74,7 @@ final class StandardCatalogReducer implements CatalogReducer {
     requireNonNull(catalog, "No catalog provided");
 
     catalog.undo(Schema.class, new FilteringReducer<>(schemaFilter(options)));
-    catalog.undo(Table.class, new TablesReducer(tableFilter(options)));
+    catalog.undo(Table.class, new FilteringReducer<>(tableFilter(options)));
     catalog.undo(Routine.class, new FilteringReducer<>(routineFilter(options)));
     catalog.undo(Synonym.class, new FilteringReducer<>(synonymFilter(options)));
     catalog.undo(Sequence.class, new FilteringReducer<>(sequenceFilter(options)));
