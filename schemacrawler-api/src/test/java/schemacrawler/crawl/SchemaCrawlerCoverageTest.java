@@ -78,6 +78,7 @@ public class SchemaCrawlerCoverageTest {
             .anyMatch(
                 method -> method.getName().equals("reduce") || method.getName().equals("undo"));
     assertThat(catalogExposesReduction, is(false));
+    assertThat(Catalog.class.isAssignableFrom(Reducible.class), is(false));
     assertThat(catalog instanceof Reducible, is(true));
 
     final Reducible reducibleCatalog = (Reducible) catalog;

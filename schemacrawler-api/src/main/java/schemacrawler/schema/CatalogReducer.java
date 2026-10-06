@@ -12,7 +12,7 @@ package schemacrawler.schema;
  * Reduces a catalog by applying inclusion/exclusion filter options to each schema object type. Call
  * {@link #reduce(Reducible)} to apply the reduction, and {@link #undo(Reducible)} to restore the
  * catalog to its full, unfiltered state. Instances are created via {@code
- * ReducerFactory.getCatalogReducer(SchemaCrawlerOptions)}.
+ * ReducerFactory.getCatalogReducer(CrawlOptions)}.
  */
 public interface CatalogReducer {
 

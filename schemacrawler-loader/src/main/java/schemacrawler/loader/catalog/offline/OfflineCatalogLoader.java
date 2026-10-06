@@ -8,7 +8,7 @@
 
 package schemacrawler.loader.catalog.offline;
 
-import static schemacrawler.filter.ReducerFactory.getCatalogReducerForLoad;
+import static schemacrawler.filter.ReducerFactory.getCatalogReducer;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -67,7 +67,7 @@ final class OfflineCatalogLoader extends AbstractCatalogLoader<OfflineCatalogLoa
       if (!(catalog instanceof final Reducible reducibleCatalog)) {
         throw new ExecutionRuntimeException("Offline catalog does not support reduction");
       }
-      getCatalogReducerForLoad(schemaCrawlerOptions).reduce(reducibleCatalog);
+      getCatalogReducer(schemaCrawlerOptions.crawlOptions()).reduce(reducibleCatalog);
 
     } catch (final IOException e) {
       throw new UncheckedIOException("Could not load offline database", e);

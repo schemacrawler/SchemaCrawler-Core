@@ -9,7 +9,7 @@
 package schemacrawler.crawl;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.filter.ReducerFactory.getCatalogReducerForLoad;
+import static schemacrawler.filter.ReducerFactory.getCatalogReducer;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForColumnInclusion;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForRoutineInclusion;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForRoutineParameterInclusion;
@@ -244,7 +244,7 @@ public final class SchemaCrawler {
             "limitAndSortRoutines",
             () -> {
               // Apply crawl limits to the routines
-              getCatalogReducerForLoad(options).reduce(catalog);
+              getCatalogReducer(options.crawlOptions()).reduce(catalog);
             })
         .submit();
 
@@ -263,7 +263,7 @@ public final class SchemaCrawler {
         .submit();
 
     taskRunner
-        .add("limitAndSortSchemas", () -> getCatalogReducerForLoad(options).reduce(catalog))
+        .add("limitAndSortSchemas", () -> getCatalogReducer(options.crawlOptions()).reduce(catalog))
         .submit();
 
     final NamedObjectList<SchemaReference> schemas = retriever.getAllSchemas();
@@ -294,7 +294,9 @@ public final class SchemaCrawler {
         .submit();
 
     taskRunner
-        .add("limitAndSortSequences", () -> getCatalogReducerForLoad(options).reduce(catalog))
+        .add(
+            "limitAndSortSequences",
+            () -> getCatalogReducer(options.crawlOptions()).reduce(catalog))
         .submit();
   }
 
@@ -319,7 +321,8 @@ public final class SchemaCrawler {
         .submit();
 
     taskRunner
-        .add("limitAndSortSynonyms", () -> getCatalogReducerForLoad(options).reduce(catalog))
+        .add(
+            "limitAndSortSynonyms", () -> getCatalogReducer(options.crawlOptions()).reduce(catalog))
         .submit();
   }
 
@@ -411,7 +414,7 @@ public final class SchemaCrawler {
             "limitAndSortTables",
             () -> {
               // Apply crawl limits before sorting the remaining tables
-              getCatalogReducerForLoad(options).reduce(catalog);
+              getCatalogReducer(options.crawlOptions()).reduce(catalog);
 
               // Sort the remaining tables
               final TablesGraph tablesGraph = new TablesGraph(allTables);

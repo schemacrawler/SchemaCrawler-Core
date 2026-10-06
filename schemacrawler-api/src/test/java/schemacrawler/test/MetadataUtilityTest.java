@@ -191,7 +191,8 @@ public class MetadataUtilityTest {
             .withLimitOptions(limitOptionsBuilder.toOptions());
 
     // Reduce catalog
-    final CatalogReducer reducer = ReducerFactory.getCatalogReducer(schemaCrawlerOptions);
+    final CatalogReducer reducer =
+        ReducerFactory.getCatalogReducer(schemaCrawlerOptions.crawlOptions());
     final Reducible reducibleCatalog = (Reducible) catalog;
     reducer.reduce(reducibleCatalog);
 

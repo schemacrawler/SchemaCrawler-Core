@@ -8,20 +8,18 @@
 
 package schemacrawler.filter;
 
+import static java.util.Objects.requireNonNull;
+
 import schemacrawler.schema.CatalogReducer;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.schemacrawler.CrawlOptions;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
 public final class ReducerFactory {
 
-  public static CatalogReducer getCatalogReducer(final SchemaCrawlerOptions options) {
-    return new StandardCatalogReducer(options.crawlOptions());
-  }
-
-  /** Creates a reducer that applies crawl limits without command filter or grep options. */
-  public static CatalogReducer getCatalogReducerForLoad(final SchemaCrawlerOptions options) {
-    return getCatalogReducer(options);
+  public static CatalogReducer getCatalogReducer(final CrawlOptions options) {
+    requireNonNull(options, "No options provided");
+    return new StandardCatalogReducer(options);
   }
 
   private ReducerFactory() {

@@ -8,8 +8,8 @@
 
 package schemacrawler.schema;
 
-/** A catalog that supports reduction and undo operations. */
-public interface Reducible extends Catalog {
+/** A mutable catalog capability that supports reduction and undo operations. */
+public interface Reducible {
 
   <N extends NamedObject> void reduce(Class<N> clazz, Reducer<N> reducer);
 
