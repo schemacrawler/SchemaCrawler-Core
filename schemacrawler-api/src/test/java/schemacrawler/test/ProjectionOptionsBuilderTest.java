@@ -12,17 +12,16 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.schemacrawler.CatalogProjectionOptions;
-import schemacrawler.schemacrawler.CatalogProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.FilterOptionsBuilder;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
+import schemacrawler.schemacrawler.ProjectionOptions;
+import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 
-public class CatalogProjectionOptionsBuilderTest {
+public class ProjectionOptionsBuilderTest {
 
   @Test
   public void defaults() {
-    final CatalogProjectionOptions options =
-        CatalogProjectionOptionsBuilder.newCatalogProjectionOptions();
+    final ProjectionOptions options = ProjectionOptionsBuilder.newProjectionOptions();
 
     assertThat(options.filterOptions(), is(FilterOptionsBuilder.newFilterOptions()));
     assertThat(options.grepOptions(), is(GrepOptionsBuilder.newGrepOptions()));
@@ -30,8 +29,8 @@ public class CatalogProjectionOptionsBuilderTest {
 
   @Test
   public void fromOptions() {
-    final CatalogProjectionOptions options =
-        CatalogProjectionOptionsBuilder.builder()
+    final ProjectionOptions options =
+        ProjectionOptionsBuilder.builder()
             .withFilterOptions(
                 FilterOptionsBuilder.builder()
                     .childTableFilterDepth(1)
@@ -40,16 +39,14 @@ public class CatalogProjectionOptionsBuilderTest {
             .withGrepOptions(GrepOptionsBuilder.builder().invertGrepMatch(true).toOptions())
             .toOptions();
 
-    assertThat(
-        CatalogProjectionOptionsBuilder.builder().fromOptions(options).toOptions(), is(options));
+    assertThat(ProjectionOptionsBuilder.builder().fromOptions(options).toOptions(), is(options));
   }
 
   @Test
   public void nullOptionsKeepDefaults() {
-    final CatalogProjectionOptions defaults =
-        CatalogProjectionOptionsBuilder.newCatalogProjectionOptions();
-    final CatalogProjectionOptions options =
-        CatalogProjectionOptionsBuilder.builder()
+    final ProjectionOptions defaults = ProjectionOptionsBuilder.newProjectionOptions();
+    final ProjectionOptions options =
+        ProjectionOptionsBuilder.builder()
             .withFilterOptions(null)
             .withGrepOptions(null)
             .fromOptions(null)

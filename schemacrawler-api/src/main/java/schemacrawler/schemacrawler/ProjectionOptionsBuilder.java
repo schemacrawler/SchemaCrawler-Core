@@ -13,27 +13,27 @@ import static java.util.Objects.requireNonNull;
 import us.fatehi.utility.OptionsBuilder;
 
 /** Builds immutable options for selecting a catalog projection. */
-public final class CatalogProjectionOptionsBuilder
-    implements OptionsBuilder<CatalogProjectionOptionsBuilder, CatalogProjectionOptions> {
+public final class ProjectionOptionsBuilder
+    implements OptionsBuilder<ProjectionOptionsBuilder, ProjectionOptions> {
 
-  public static CatalogProjectionOptionsBuilder builder() {
-    return new CatalogProjectionOptionsBuilder();
+  public static ProjectionOptionsBuilder builder() {
+    return new ProjectionOptionsBuilder();
   }
 
-  public static CatalogProjectionOptions newCatalogProjectionOptions() {
+  public static ProjectionOptions newProjectionOptions() {
     return builder().toOptions();
   }
 
   private FilterOptions filterOptions;
   private GrepOptions grepOptions;
 
-  private CatalogProjectionOptionsBuilder() {
+  private ProjectionOptionsBuilder() {
     filterOptions = FilterOptionsBuilder.newFilterOptions();
     grepOptions = GrepOptionsBuilder.newGrepOptions();
   }
 
   @Override
-  public CatalogProjectionOptionsBuilder fromOptions(final CatalogProjectionOptions options) {
+  public ProjectionOptionsBuilder fromOptions(final ProjectionOptions options) {
     if (options != null) {
       filterOptions = options.filterOptions();
       grepOptions = options.grepOptions();
@@ -41,14 +41,14 @@ public final class CatalogProjectionOptionsBuilder
     return this;
   }
 
-  public CatalogProjectionOptionsBuilder withFilterOptions(final FilterOptions filterOptions) {
+  public ProjectionOptionsBuilder withFilterOptions(final FilterOptions filterOptions) {
     if (filterOptions != null) {
       this.filterOptions = filterOptions;
     }
     return this;
   }
 
-  public CatalogProjectionOptionsBuilder withGrepOptions(final GrepOptions grepOptions) {
+  public ProjectionOptionsBuilder withGrepOptions(final GrepOptions grepOptions) {
     if (grepOptions != null) {
       this.grepOptions = grepOptions;
     }
@@ -56,8 +56,8 @@ public final class CatalogProjectionOptionsBuilder
   }
 
   @Override
-  public CatalogProjectionOptions toOptions() {
-    return new CatalogProjectionOptions(
+  public ProjectionOptions toOptions() {
+    return new ProjectionOptions(
         requireNonNull(filterOptions, "No filter options provided"),
         requireNonNull(grepOptions, "No grep options provided"));
   }

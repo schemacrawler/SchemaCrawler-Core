@@ -13,10 +13,10 @@ import static java.util.Objects.requireNonNull;
 import us.fatehi.utility.Options;
 
 /** Options for selecting a catalog projection after metadata has been loaded. */
-public record CatalogProjectionOptions(FilterOptions filterOptions, GrepOptions grepOptions)
+public record ProjectionOptions(FilterOptions filterOptions, GrepOptions grepOptions)
     implements Options {
 
-  public CatalogProjectionOptions {
+  public ProjectionOptions {
     requireNonNull(filterOptions, "No filter options provided");
     requireNonNull(grepOptions, "No grep options provided");
   }

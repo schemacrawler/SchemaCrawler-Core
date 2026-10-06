@@ -19,18 +19,13 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.CrawlInfo;
-import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
-import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
@@ -39,11 +34,9 @@ import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableRelationshipType;
-import schemacrawler.schemacrawler.CatalogProjectionOptions;
-import schemacrawler.schemacrawler.CatalogProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.FilterOptions;
-import schemacrawler.schemacrawler.GrepOptions;
-import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.schemacrawler.ProjectionOptions;
+import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 
 /** Builds immutable catalog projections from an already loaded catalog. */
 public final class CatalogProjectionBuilder {
@@ -60,27 +53,23 @@ public final class CatalogProjectionBuilder {
   }
 
   private final Catalog catalog;
-  private CatalogProjectionOptions projectionOptions;
+  private ProjectionOptions projectionOptions;
   private Predicate<Schema> schemaPredicate;
   private boolean schemaPredicateSpecified;
   private Predicate<Table> tablePredicate;
   private Predicate<Routine> routinePredicate;
   private Predicate<Sequence> sequencePredicate;
   private Predicate<Synonym> synonymPredicate;
-  private Predicate<ColumnDataType> columnDataTypePredicate;
-  private Predicate<DatabaseUser> databaseUserPredicate;
 
   private CatalogProjectionBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
-    projectionOptions = CatalogProjectionOptionsBuilder.newCatalogProjectionOptions();
+    projectionOptions = ProjectionOptionsBuilder.newProjectionOptions();
     schemaPredicate = schema -> true;
     schemaPredicateSpecified = false;
     tablePredicate = table -> true;
     routinePredicate = routine -> true;
     sequencePredicate = sequence -> true;
     synonymPredicate = synonym -> true;
-    columnDataTypePredicate = columnDataType -> true;
-    databaseUserPredicate = databaseUser -> true;
   }
 
   /** Builds an immutable projection from the source catalog. */
@@ -101,43 +90,30 @@ public final class CatalogProjectionBuilder {
     final List<Synonym> synonyms =
         selectDatabaseObjects(
             catalog.getSynonyms(), schemaKeys, sourceHasSchemas, synonymPredicate);
-    final List<ColumnDataType> columnDataTypes =
-        sortedCopy(catalog.getColumnDataTypes().stream().filter(columnDataTypePredicate).toList());
-    final List<DatabaseUser> databaseUsers =
-        sortedCopy(catalog.getDatabaseUsers().stream().filter(databaseUserPredicate).toList());
+    final List<ColumnDataType> columnDataTypes = sortedCopy(catalog.getColumnDataTypes());
+    final List<DatabaseUser> databaseUsers = sortedCopy(catalog.getDatabaseUsers());
 
-    return new ImmutableCatalogProjection(
-        catalog, schemas, tables, routines, sequences, synonyms, columnDataTypes, databaseUsers);
+    return new CatalogProjection(
+        catalog.getName(),
+        catalog.getFullName(),
+        catalog.key(),
+        catalog.getCrawlInfo(),
+        catalog.getDatabaseInfo(),
+        catalog.getJdbcDriverInfo(),
+        catalog.getAttributes(),
+        schemas,
+        tables,
+        routines,
+        sequences,
+        synonyms,
+        columnDataTypes,
+        databaseUsers);
   }
 
-  /** Sets filter and grep options for the projection. */
-  public CatalogProjectionBuilder withOptions(final CatalogProjectionOptions projectionOptions) {
+  /** Sets composed filter and grep options for the projection. */
+  public CatalogProjectionBuilder withOptions(final ProjectionOptions projectionOptions) {
     if (projectionOptions != null) {
       this.projectionOptions = projectionOptions;
-    }
-    return this;
-  }
-
-  /** Sets filter options for related-table expansion. */
-  public CatalogProjectionBuilder withFilterOptions(final FilterOptions filterOptions) {
-    if (filterOptions != null) {
-      projectionOptions =
-          CatalogProjectionOptionsBuilder.builder()
-              .fromOptions(projectionOptions)
-              .withFilterOptions(filterOptions)
-              .toOptions();
-    }
-    return this;
-  }
-
-  /** Sets grep options for object selection. */
-  public CatalogProjectionBuilder withGrepOptions(final GrepOptions grepOptions) {
-    if (grepOptions != null) {
-      projectionOptions =
-          CatalogProjectionOptionsBuilder.builder()
-              .fromOptions(projectionOptions)
-              .withGrepOptions(grepOptions)
-              .toOptions();
     }
     return this;
   }
@@ -178,22 +154,6 @@ public final class CatalogProjectionBuilder {
     return this;
   }
 
-  /** Adds a predicate for column data types. */
-  public CatalogProjectionBuilder withColumnDataTypePredicate(
-      final Predicate<? super ColumnDataType> columnDataTypePredicate) {
-    this.columnDataTypePredicate =
-        this.columnDataTypePredicate.and(requireNonNull(columnDataTypePredicate));
-    return this;
-  }
-
-  /** Adds a predicate for database users. */
-  public CatalogProjectionBuilder withDatabaseUserPredicate(
-      final Predicate<? super DatabaseUser> databaseUserPredicate) {
-    this.databaseUserPredicate =
-        this.databaseUserPredicate.and(requireNonNull(databaseUserPredicate));
-    return this;
-  }
-
   private List<Schema> selectSchemas(final Collection<Schema> eligibleSchemas) {
     return sortedCopy(eligibleSchemas.stream().filter(schemaPredicate).toList());
   }
@@ -208,7 +168,7 @@ public final class CatalogProjectionBuilder {
         allTables.stream()
             .filter(table -> isSchemaSelected(table, schemaKeys, sourceHasSchemas))
             .filter(tableFilter)
-            .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+            .collect(Collectors.toCollection(LinkedHashSet::new));
 
     final FilterOptions filterOptions = projectionOptions.filterOptions();
     final Set<Table> parentTables =
@@ -290,295 +250,10 @@ public final class CatalogProjectionBuilder {
     return !schemaPredicateSpecified || schemaPredicate.test(schema);
   }
 
-  private static <N extends DatabaseObject> Map<NamedObjectKey, N> indexBySchemaAndName(
-      final Collection<N> objects) {
-    final Map<NamedObjectKey, N> index = new java.util.HashMap<>();
-    for (final N object : objects) {
-      final Schema schema = object.getSchema();
-      if (schema != null) {
-        index.putIfAbsent(schema.key().with(object.getName()), object);
-      }
-    }
-    return Map.copyOf(index);
-  }
-
-  private static <N extends DatabaseObject> Optional<N> lookupDatabaseObject(
-      final Map<NamedObjectKey, N> index, final Schema schema, final String name) {
-    if (schema == null || name == null) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(index.get(schema.key().with(name)));
-  }
-
   private static <N extends NamedObject> Set<NamedObjectKey> keys(
       final Collection<N> namedObjects) {
     final Set<NamedObjectKey> keys = new HashSet<>();
     namedObjects.stream().map(NamedObject::key).forEach(keys::add);
     return Set.copyOf(keys);
-  }
-
-  private static final class ImmutableCatalogProjection implements Catalog {
-
-    private final Catalog source;
-    private final List<Schema> schemas;
-    private final Map<String, Schema> schemasByName;
-    private final List<Table> tables;
-    private final Map<NamedObjectKey, Table> tablesBySchemaAndName;
-    private final List<Routine> routines;
-    private final Map<NamedObjectKey, Routine> routinesBySchemaAndName;
-    private final List<Sequence> sequences;
-    private final Map<NamedObjectKey, Sequence> sequencesBySchemaAndName;
-    private final List<Synonym> synonyms;
-    private final Map<NamedObjectKey, Synonym> synonymsBySchemaAndName;
-    private final List<ColumnDataType> columnDataTypes;
-    private final Map<NamedObjectKey, ColumnDataType> columnDataTypesBySchemaAndName;
-    private final List<DatabaseUser> databaseUsers;
-
-    ImmutableCatalogProjection(
-        final Catalog source,
-        final List<Schema> schemas,
-        final List<Table> tables,
-        final List<Routine> routines,
-        final List<Sequence> sequences,
-        final List<Synonym> synonyms,
-        final List<ColumnDataType> columnDataTypes,
-        final List<DatabaseUser> databaseUsers) {
-      this.source = source;
-      this.schemas = List.copyOf(schemas);
-      schemasByName =
-          this.schemas.stream()
-              .collect(
-                  java.util.stream.Collectors.toUnmodifiableMap(
-                      Schema::getFullName, schema -> schema, (first, second) -> first));
-      this.tables = List.copyOf(tables);
-      tablesBySchemaAndName = indexBySchemaAndName(this.tables);
-      this.routines = List.copyOf(routines);
-      routinesBySchemaAndName = indexBySchemaAndName(this.routines);
-      this.sequences = List.copyOf(sequences);
-      sequencesBySchemaAndName = indexBySchemaAndName(this.sequences);
-      this.synonyms = List.copyOf(synonyms);
-      synonymsBySchemaAndName = indexBySchemaAndName(this.synonyms);
-      this.columnDataTypes = List.copyOf(columnDataTypes);
-      columnDataTypesBySchemaAndName = indexBySchemaAndName(this.columnDataTypes);
-      this.databaseUsers = List.copyOf(databaseUsers);
-    }
-
-    @Override
-    public Collection<ColumnDataType> getColumnDataTypes() {
-      return columnDataTypes;
-    }
-
-    @Override
-    public Collection<ColumnDataType> getColumnDataTypes(final Schema schema) {
-      return columnDataTypes.stream()
-          .filter(columnDataType -> schema != null && schema.equals(columnDataType.getSchema()))
-          .toList();
-    }
-
-    @Override
-    public CrawlInfo getCrawlInfo() {
-      return source.getCrawlInfo();
-    }
-
-    @Override
-    public DatabaseInfo getDatabaseInfo() {
-      return source.getDatabaseInfo();
-    }
-
-    @Override
-    public Collection<DatabaseUser> getDatabaseUsers() {
-      return databaseUsers;
-    }
-
-    @Override
-    public JdbcDriverInfo getJdbcDriverInfo() {
-      return source.getJdbcDriverInfo();
-    }
-
-    @Override
-    public Collection<Routine> getRoutines() {
-      return routines;
-    }
-
-    @Override
-    public Collection<Routine> getRoutines(final Schema schema) {
-      return routines.stream()
-          .filter(routine -> schema != null && schema.equals(routine.getSchema()))
-          .toList();
-    }
-
-    @Override
-    public Collection<Routine> getRoutines(final Schema schema, final String routineName) {
-      return routines.stream()
-          .filter(routine -> schema != null && schema.equals(routine.getSchema()))
-          .filter(routine -> routineName != null && routineName.equals(routine.getName()))
-          .toList();
-    }
-
-    @Override
-    public Collection<Schema> getSchemas() {
-      return schemas;
-    }
-
-    @Override
-    public Collection<Sequence> getSequences() {
-      return sequences;
-    }
-
-    @Override
-    public Collection<Sequence> getSequences(final Schema schema) {
-      return sequences.stream()
-          .filter(sequence -> schema != null && schema.equals(sequence.getSchema()))
-          .toList();
-    }
-
-    @Override
-    public Collection<Synonym> getSynonyms() {
-      return synonyms;
-    }
-
-    @Override
-    public Collection<Synonym> getSynonyms(final Schema schema) {
-      return synonyms.stream()
-          .filter(synonym -> schema != null && schema.equals(synonym.getSchema()))
-          .toList();
-    }
-
-    @Override
-    public Collection<ColumnDataType> getSystemColumnDataTypes() {
-      return source.getSystemColumnDataTypes().stream()
-          .filter(
-              columnDataType ->
-                  columnDataTypesBySchemaAndName.containsKey(
-                      columnDataType.getSchema().key().with(columnDataType.getName())))
-          .toList();
-    }
-
-    @Override
-    public Collection<Table> getTables() {
-      return tables;
-    }
-
-    @Override
-    public Collection<Table> getTables(final Schema schema) {
-      return tables.stream()
-          .filter(table -> schema != null && schema.equals(table.getSchema()))
-          .toList();
-    }
-
-    @Override
-    public Optional<Column> lookupColumn(
-        final Schema schema, final String tableName, final String name) {
-      return lookupDatabaseObject(tablesBySchemaAndName, schema, tableName)
-          .flatMap(table -> table.lookupColumn(name));
-    }
-
-    @Override
-    public <C extends ColumnDataType> Optional<C> lookupColumnDataType(
-        final Schema schema, final String dataTypeName) {
-      return (Optional<C>)
-          lookupDatabaseObject(columnDataTypesBySchemaAndName, schema, dataTypeName);
-    }
-
-    @Override
-    public <R extends Routine> Optional<R> lookupRoutine(final Schema schema, final String name) {
-      return (Optional<R>) lookupDatabaseObject(routinesBySchemaAndName, schema, name);
-    }
-
-    @Override
-    public <S extends Schema> Optional<S> lookupSchema(final String name) {
-      return (Optional<S>) Optional.ofNullable(schemasByName.get(name));
-    }
-
-    @Override
-    public <S extends Sequence> Optional<S> lookupSequence(final Schema schema, final String name) {
-      return (Optional<S>) lookupDatabaseObject(sequencesBySchemaAndName, schema, name);
-    }
-
-    @Override
-    public <S extends Synonym> Optional<S> lookupSynonym(final Schema schema, final String name) {
-      return (Optional<S>) lookupDatabaseObject(synonymsBySchemaAndName, schema, name);
-    }
-
-    @Override
-    public <C extends ColumnDataType> Optional<C> lookupSystemColumnDataType(final String name) {
-      return (Optional<C>)
-          lookupDatabaseObject(columnDataTypesBySchemaAndName, new SchemaReference(), name);
-    }
-
-    @Override
-    public <T extends Table> Optional<T> lookupTable(final Schema schema, final String name) {
-      return (Optional<T>) lookupDatabaseObject(tablesBySchemaAndName, schema, name);
-    }
-
-    @Override
-    public String getFullName() {
-      return source.getFullName();
-    }
-
-    @Override
-    public String getName() {
-      return source.getName();
-    }
-
-    @Override
-    public int compareTo(final NamedObject other) {
-      return source.compareTo(other);
-    }
-
-    @Override
-    public NamedObjectKey key() {
-      return source.key();
-    }
-
-    @Override
-    public String getRemarks() {
-      return source.getRemarks();
-    }
-
-    @Override
-    public boolean hasRemarks() {
-      return source.hasRemarks();
-    }
-
-    @Override
-    public void setRemarks(final String remarks) {
-      source.setRemarks(remarks);
-    }
-
-    @Override
-    public <T> T getAttribute(final String name) {
-      return source.getAttribute(name);
-    }
-
-    @Override
-    public <T> T getAttribute(final String name, final T defaultValue) {
-      return source.getAttribute(name, defaultValue);
-    }
-
-    @Override
-    public java.util.Map<String, Object> getAttributes() {
-      return source.getAttributes();
-    }
-
-    @Override
-    public boolean hasAttribute(final String name) {
-      return source.hasAttribute(name);
-    }
-
-    @Override
-    public <T> Optional<T> lookupAttribute(final String name) {
-      return source.lookupAttribute(name);
-    }
-
-    @Override
-    public void removeAttribute(final String name) {
-      source.removeAttribute(name);
-    }
-
-    @Override
-    public <T> void setAttribute(final String name, final T value) {
-      source.setAttribute(name, value);
-    }
   }
 }

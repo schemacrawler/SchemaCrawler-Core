@@ -42,9 +42,9 @@ import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TableType;
-import schemacrawler.schemacrawler.CatalogProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.FilterOptionsBuilder;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
+import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.crawl.LightCatalogUtility;
 import schemacrawler.test.utility.crawl.LightForeignKey;
@@ -178,10 +178,14 @@ public class CatalogProjectionBuilderTest {
 
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
-            .withGrepOptions(
-                GrepOptionsBuilder.builder()
-                    .includeGreppedColumns(
-                        new RegularExpressionInclusionRule(Pattern.compile(".*wanted_column")))
+            .withOptions(
+                ProjectionOptionsBuilder.builder()
+                    .withGrepOptions(
+                        GrepOptionsBuilder.builder()
+                            .includeGreppedColumns(
+                                new RegularExpressionInclusionRule(
+                                    Pattern.compile(".*wanted_column")))
+                            .toOptions())
                     .toOptions())
             .build();
 
@@ -223,10 +227,14 @@ public class CatalogProjectionBuilderTest {
 
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
-            .withGrepOptions(
-                GrepOptionsBuilder.builder()
-                    .includeGreppedRoutineParameters(
-                        new RegularExpressionInclusionRule(Pattern.compile(".*wanted_parameter")))
+            .withOptions(
+                ProjectionOptionsBuilder.builder()
+                    .withGrepOptions(
+                        GrepOptionsBuilder.builder()
+                            .includeGreppedRoutineParameters(
+                                new RegularExpressionInclusionRule(
+                                    Pattern.compile(".*wanted_parameter")))
+                            .toOptions())
                     .toOptions())
             .build();
 
@@ -236,8 +244,14 @@ public class CatalogProjectionBuilderTest {
   @Test
   public void routineCollectionLookupRetainsOverloads() {
     final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
-    final Routine firstOverload = new LightProcedure(schema, "overloaded");
-    final Routine secondOverload = new LightProcedure(schema, "overloaded");
+    final Routine firstOverload = mock(Routine.class);
+    when(firstOverload.getSchema()).thenReturn(schema);
+    when(firstOverload.getName()).thenReturn("overloaded");
+    when(firstOverload.key()).thenReturn(schema.key().with("overloaded").with("specific_one"));
+    final Routine secondOverload = mock(Routine.class);
+    when(secondOverload.getSchema()).thenReturn(schema);
+    when(secondOverload.getName()).thenReturn("overloaded");
+    when(secondOverload.key()).thenReturn(schema.key().with("overloaded").with("specific_two"));
     final Catalog source = mockCatalogWithRoutines(schema, firstOverload, secondOverload);
     final Catalog projection = CatalogProjectionBuilder.builder(source).build();
 
@@ -262,11 +276,17 @@ public class CatalogProjectionBuilderTest {
 
     final Catalog matches =
         CatalogProjectionBuilder.builder(source)
-            .withGrepOptions(grepOptionsBuilder.toOptions())
+            .withOptions(
+                ProjectionOptionsBuilder.builder()
+                    .withGrepOptions(grepOptionsBuilder.toOptions())
+                    .toOptions())
             .build();
     final Catalog invertedMatches =
         CatalogProjectionBuilder.builder(source)
-            .withGrepOptions(grepOptionsBuilder.invertGrepMatch(true).toOptions())
+            .withOptions(
+                ProjectionOptionsBuilder.builder()
+                    .withGrepOptions(grepOptionsBuilder.invertGrepMatch(true).toOptions())
+                    .toOptions())
             .build();
 
     assertThat(matches.getTables(), containsInAnyOrder(remarksMatch, definitionMatch));
@@ -314,7 +334,7 @@ public class CatalogProjectionBuilderTest {
         CatalogProjectionBuilder.builder(source)
             .withTablePredicate(table -> table == seed)
             .withOptions(
-                CatalogProjectionOptionsBuilder.builder()
+                ProjectionOptionsBuilder.builder()
                     .withFilterOptions(
                         FilterOptionsBuilder.builder()
                             .parentTableFilterDepth(2)
@@ -350,6 +370,25 @@ public class CatalogProjectionBuilderTest {
         contains(table));
   }
 
+  @Test
+  public void projectionAttributesAreIndependentFromSourceCatalog() {
+    final Catalog source = mockCatalogWithTables(new LightTable("table"), new LightTable("unused"));
+    when(source.getAttributes())
+        .thenReturn(Map.of("baseline", "before", "REMARKS", "baseline remarks"));
+    final Catalog projection = CatalogProjectionBuilder.builder(source).build();
+
+    assertThrows(
+        UnsupportedOperationException.class, () -> projection.setAttribute("new", "value"));
+    assertThrows(UnsupportedOperationException.class, () -> projection.removeAttribute("baseline"));
+    assertThrows(UnsupportedOperationException.class, () -> projection.setRemarks("changed"));
+    assertThrows(
+        UnsupportedOperationException.class, () -> projection.getAttributes().put("new", "value"));
+    assertThat(source.hasAttribute("projection"), is(false));
+    assertThat(projection.getAttribute("baseline", ""), is("before"));
+    assertThat(projection.hasAttribute("REMARKS"), is(false));
+    assertThat(projection.getRemarks(), is("baseline remarks"));
+  }
+
   private void assertUnmodifiable(final Collection<?> collection) {
     assertThrows(UnsupportedOperationException.class, collection::clear);
   }
@@ -365,6 +404,7 @@ public class CatalogProjectionBuilderTest {
   private <T extends NamedObject> T namedObject(final Class<T> objectClass, final String name) {
     final T namedObject = mock(objectClass);
     when(namedObject.getName()).thenReturn(name);
+    when(namedObject.key()).thenReturn(new NamedObjectKey(name));
     return namedObject;
   }
 
