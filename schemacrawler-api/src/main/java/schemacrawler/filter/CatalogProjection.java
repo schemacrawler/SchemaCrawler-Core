@@ -8,20 +8,23 @@
 
 package schemacrawler.filter;
 
-import static java.util.Objects.compare;
 import static schemacrawler.utility.NamedObjectSort.alphabetical;
-import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+
+import static java.util.Objects.compare;
+
+import static us.fatehi.utility.Utility.isBlank;
+
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -101,32 +104,20 @@ final class CatalogProjection implements Catalog {
       .toList();
   }
 
-  private final String name;
-  private final String fullName;
-  private final NamedObjectKey key;
   private final CrawlInfo crawlInfo;
   private final DatabaseInfo databaseInfo;
   private final JdbcDriverInfo jdbcDriverInfo;
   private final String remarks;
   private final Map<String, Object> attributes;
   private final LinkedHashMap<String, Schema> schemas;
-
   private final LinkedHashMap<NamedObjectKey, Table> tables;
-
   private final LinkedHashMap<NamedObjectKey, Routine> routines;
-
   private final LinkedHashMap<NamedObjectKey, Sequence> sequences;
-
   private final LinkedHashMap<NamedObjectKey, Synonym> synonyms;
-
   private final LinkedHashMap<NamedObjectKey, ColumnDataType> columnDataTypes;
-
   private final LinkedHashMap<NamedObjectKey, DatabaseUser> databaseUsers;
 
   CatalogProjection(
-      final String name,
-      final String fullName,
-      final NamedObjectKey key,
       final CrawlInfo crawlInfo,
       final DatabaseInfo databaseInfo,
       final JdbcDriverInfo jdbcDriverInfo,
@@ -138,9 +129,6 @@ final class CatalogProjection implements Catalog {
       final Collection<Synonym> synonyms,
       final Collection<ColumnDataType> columnDataTypes,
       final Collection<DatabaseUser> databaseUsers) {
-    this.name = name;
-    this.fullName = fullName;
-    this.key = key;
     this.crawlInfo = crawlInfo;
     this.databaseInfo = databaseInfo;
     this.jdbcDriverInfo = jdbcDriverInfo;
@@ -158,7 +146,7 @@ final class CatalogProjection implements Catalog {
             }
           });
     }
-    this.attributes = Map.copyOf(attributesCopy);
+    attributes = Map.copyOf(attributesCopy);
     this.schemas = indexSchemas(schemas);
     this.tables = indexBySchemaAndName(tables);
     this.routines = indexRoutines(routines);
@@ -215,7 +203,7 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public String getFullName() {
-    return fullName;
+    return getName();
   }
 
   @Override
@@ -225,7 +213,7 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public String getName() {
-    return name;
+    return "catalog-projection";
   }
 
   @Override
@@ -312,7 +300,7 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public NamedObjectKey key() {
-    return key;
+    return new NamedObjectKey();
   }
 
   @Override
