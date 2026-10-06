@@ -14,7 +14,10 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schemacrawler.ProjectionOptions;
+import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
@@ -101,8 +104,11 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
         buildERModel();
       }
 
+      final Catalog selectedCatalog = selectCatalog(getCatalog());
+
       // Prepare to execute
       transferState(scCommand);
+      scCommand.setCatalog(selectedCatalog);
 
       // Execute
       LOGGER.log(Level.INFO, new StringFormat("Executing SchemaCrawler command <%s>", command));
@@ -171,6 +177,15 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
             getConnectionSource(), schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
     requireNonNull(catalog, "Catalog could not be retrieved");
     setCatalog(catalog);
+  }
+
+  private Catalog selectCatalog(final Catalog catalog) {
+    final ProjectionOptions options =
+        ProjectionOptionsBuilder.builder()
+            .withFilterOptions(schemaCrawlerOptions.filterOptions())
+            .withGrepOptions(schemaCrawlerOptions.grepOptions())
+            .toOptions();
+    return CatalogProjectionBuilder.builder(catalog).withOptions(options).build();
   }
 
   private SchemaCrawlerCommand<?> loadCommand() {

@@ -11,6 +11,8 @@ package schemacrawler.test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -22,10 +24,18 @@ import static schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder.newSchemaC
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
+import schemacrawler.filter.CatalogProjectionBuilder;
+import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ResultsColumns;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.GrepOptions;
+import schemacrawler.schemacrawler.GrepOptionsBuilder;
+import schemacrawler.schemacrawler.LimitOptionsBuilder;
+import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
+import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.DatabaseAccessException;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
 import schemacrawler.test.utility.WithTestDatabase;
@@ -50,6 +60,40 @@ public class SchemaCrawlerUtilityTest {
     assertThat(catalog, is(not(nullValue())));
     final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
     assertThat("Schema count does not match", schemas, arrayWithSize(6));
+  }
+
+  @Test
+  @WithSystemProperty(key = "SC_WITHOUT_DATABASE_PLUGIN", value = "hsqldb")
+  public void getCatalogReturnsLimitedBaselineBeforeGrep(
+      final DatabaseConnectionSource connectionSource) throws Exception {
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder()
+            .includeGreppedColumns(
+                new RegularExpressionInclusionRule(Pattern.compile(".*NEVER_MATCH.*")))
+            .toOptions();
+    final SchemaCrawlerOptions options =
+        newSchemaCrawlerOptions()
+            .withLimitOptions(
+                LimitOptionsBuilder.builder()
+                    .includeTables(Pattern.compile(".*BOOKAUTHORS"))
+                    .toOptions())
+            .withGrepOptions(grepOptions);
+
+    final Catalog baseline = SchemaCrawlerUtility.getCatalog(connectionSource, options);
+    final Schema schema = baseline.lookupSchema("PUBLIC.BOOKS").orElseThrow();
+    assertThat(baseline.getTables(schema), hasSize(1));
+    assertThat(baseline.lookupTable(schema, "BOOKS").isEmpty(), is(true));
+
+    final Catalog unrestrictedProjection = CatalogProjectionBuilder.builder(baseline).build();
+    assertThat(unrestrictedProjection.getTables(schema), hasSize(1));
+    assertThat(unrestrictedProjection.lookupTable(schema, "BOOKS").isEmpty(), is(true));
+
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(baseline)
+            .withOptions(
+                ProjectionOptionsBuilder.builder().withGrepOptions(grepOptions).toOptions())
+            .build();
+    assertThat(projection.getTables(schema), is(empty()));
   }
 
   @Test

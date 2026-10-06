@@ -9,6 +9,7 @@
 package schemacrawler.filter;
 
 import schemacrawler.schema.CatalogReducer;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import us.fatehi.utility.UtilityMarker;
 
@@ -16,7 +17,13 @@ import us.fatehi.utility.UtilityMarker;
 public final class ReducerFactory {
 
   public static CatalogReducer getCatalogReducer(final SchemaCrawlerOptions options) {
-    return new StandardCatalogReducer(options);
+    return new StandardCatalogReducer(
+        new CrawlOptions(options.loadOptions(), options.limitOptions()));
+  }
+
+  /** Creates a reducer that applies crawl limits without command filter or grep options. */
+  public static CatalogReducer getCatalogReducerForLoad(final SchemaCrawlerOptions options) {
+    return getCatalogReducer(options);
   }
 
   private ReducerFactory() {

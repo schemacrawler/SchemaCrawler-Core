@@ -21,6 +21,8 @@ import static us.fatehi.test.utility.extensions.FileHasContent.outputOf;
 import java.sql.Connection;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import schemacrawler.filter.CatalogProjectionBuilder;
+import schemacrawler.filter.NamedObjectFilters;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
@@ -31,6 +33,7 @@ import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.FilterOptionsBuilder;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
+import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
@@ -54,7 +57,25 @@ public class SchemaCrawlerGrepTest {
           SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
               .withGrepOptions(grepOptionsBuilder.toOptions());
 
-      final Catalog catalog = getCatalog(connection, schemaCrawlerOptions);
+      final Catalog baseline = getCatalog(connection, schemaCrawlerOptions);
+      final Schema booksSchema = baseline.lookupSchema("PUBLIC.BOOKS").orElseThrow();
+      final Table bookAuthors = baseline.lookupTable(booksSchema, "BOOKAUTHORS").orElseThrow();
+      assertThat(
+          NamedObjectFilters.tableGrep(grepOptionsBuilder.toOptions()).test(bookAuthors), is(true));
+      assertThat(
+          CatalogProjectionBuilder.builder(baseline)
+              .build()
+              .lookupTable(booksSchema, "BOOKAUTHORS")
+              .isPresent(),
+          is(true));
+
+      final Catalog catalog =
+          CatalogProjectionBuilder.builder(baseline)
+              .withOptions(
+                  ProjectionOptionsBuilder.builder()
+                      .withGrepOptions(grepOptionsBuilder.toOptions())
+                      .toOptions())
+              .build();
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(6));
       for (final Schema schema : schemas) {
@@ -89,7 +110,7 @@ public class SchemaCrawlerGrepTest {
     Schema schema;
     Table table;
 
-    catalog = getCatalog(connection, schemaCrawlerOptions);
+    catalog = projectCatalog(connection, schemaCrawlerOptions);
     schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
     assertThat("Schema PUBLIC.BOOKS not found", schema, notNullValue());
     assertThat(catalog.getTables(schema), hasSize(1));
@@ -97,7 +118,7 @@ public class SchemaCrawlerGrepTest {
     assertThat("Table BOOKAUTHORS not found", table, notNullValue());
 
     schemaCrawlerOptions = schemaCrawlerOptions.withFilterOptions(filterOptionsBuilder.toOptions());
-    catalog = getCatalog(connection, schemaCrawlerOptions);
+    catalog = projectCatalog(connection, schemaCrawlerOptions);
     schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
     assertThat("Schema PUBLIC.BOOKS not found", schema, notNullValue());
     assertThat(catalog.getTables(schema).size(), is(3));
@@ -122,7 +143,7 @@ public class SchemaCrawlerGrepTest {
           SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
               .withGrepOptions(grepOptionsBuilder.toOptions());
 
-      final Catalog catalog = getCatalog(connection, schemaCrawlerOptions);
+      final Catalog catalog = projectCatalog(connection, schemaCrawlerOptions);
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(6));
       for (final Schema schema : schemas) {
@@ -154,7 +175,7 @@ public class SchemaCrawlerGrepTest {
           SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
               .withGrepOptions(grepOptionsBuilder.toOptions());
 
-      final Catalog catalog = getCatalog(connection, schemaCrawlerOptions);
+      final Catalog catalog = projectCatalog(connection, schemaCrawlerOptions);
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(6));
       for (final Schema schema : schemas) {
@@ -189,7 +210,7 @@ public class SchemaCrawlerGrepTest {
               .withLimitOptions(limitOptionsBuilder.toOptions())
               .withGrepOptions(grepOptionsBuilder.toOptions());
 
-      final Catalog catalog = getCatalog(connection, schemaCrawlerOptions);
+      final Catalog catalog = projectCatalog(connection, schemaCrawlerOptions);
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(6));
       for (final Schema schema : schemas) {
@@ -207,5 +228,16 @@ public class SchemaCrawlerGrepTest {
     }
     assertThat(
         outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+  }
+
+  private Catalog projectCatalog(final Connection connection, final SchemaCrawlerOptions options) {
+    final Catalog baseline = getCatalog(connection, options);
+    return CatalogProjectionBuilder.builder(baseline)
+        .withOptions(
+            ProjectionOptionsBuilder.builder()
+                .withFilterOptions(options.filterOptions())
+                .withGrepOptions(options.grepOptions())
+                .toOptions())
+        .build();
   }
 }

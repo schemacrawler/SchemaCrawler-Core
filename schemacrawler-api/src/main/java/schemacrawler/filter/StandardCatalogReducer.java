@@ -23,41 +23,39 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.LimitOptions;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 
 final class StandardCatalogReducer implements CatalogReducer {
 
-  private static Predicate<Routine> routineFilter(final SchemaCrawlerOptions options) {
+  private static Predicate<Routine> routineFilter(final CrawlOptions options) {
     final LimitOptions limitOptions = options.limitOptions();
     return new RoutineTypesFilter(limitOptions)
-        .and(new DatabaseObjectFilter<>(limitOptions, ruleForRoutineInclusion))
-        .and(new RoutineGrepFilter(options.grepOptions()));
+        .and(new DatabaseObjectFilter<>(limitOptions, ruleForRoutineInclusion));
   }
 
-  private static Predicate<Schema> schemaFilter(final SchemaCrawlerOptions options) {
+  private static Predicate<Schema> schemaFilter(final CrawlOptions options) {
     return NamedObjectFilters.fullName(options.limitOptions().get(ruleForSchemaInclusion));
   }
 
-  private static Predicate<Sequence> sequenceFilter(final SchemaCrawlerOptions options) {
+  private static Predicate<Sequence> sequenceFilter(final CrawlOptions options) {
     return new DatabaseObjectFilter<>(options.limitOptions(), ruleForSequenceInclusion);
   }
 
-  private static Predicate<Synonym> synonymFilter(final SchemaCrawlerOptions options) {
+  private static Predicate<Synonym> synonymFilter(final CrawlOptions options) {
     return new DatabaseObjectFilter<>(options.limitOptions(), ruleForSynonymInclusion);
   }
 
-  private static Predicate<Table> tableFilter(final SchemaCrawlerOptions options) {
+  private static Predicate<Table> tableFilter(final CrawlOptions options) {
     final LimitOptions limitOptions = options.limitOptions();
     return new TableTypesFilter(limitOptions)
-        .and(new DatabaseObjectFilter<>(limitOptions, ruleForTableInclusion))
-        .and(new TableGrepFilter(options.grepOptions()));
+        .and(new DatabaseObjectFilter<>(limitOptions, ruleForTableInclusion));
   }
 
-  private final SchemaCrawlerOptions options;
+  private final CrawlOptions options;
 
-  StandardCatalogReducer(final SchemaCrawlerOptions options) {
-    this.options = requireNonNull(options, "No SchemaCrawler options provided");
+  StandardCatalogReducer(final CrawlOptions options) {
+    this.options = requireNonNull(options, "No crawl options provided");
   }
 
   @Override
@@ -65,7 +63,7 @@ final class StandardCatalogReducer implements CatalogReducer {
     requireNonNull(catalog, "No catalog provided");
 
     catalog.reduce(Schema.class, new FilteringReducer<>(schemaFilter(options)));
-    catalog.reduce(Table.class, new TablesReducer(options, tableFilter(options)));
+    catalog.reduce(Table.class, new TablesReducer(tableFilter(options)));
     catalog.reduce(Routine.class, new FilteringReducer<>(routineFilter(options)));
     catalog.reduce(Synonym.class, new FilteringReducer<>(synonymFilter(options)));
     catalog.reduce(Sequence.class, new FilteringReducer<>(sequenceFilter(options)));
@@ -76,7 +74,7 @@ final class StandardCatalogReducer implements CatalogReducer {
     requireNonNull(catalog, "No catalog provided");
 
     catalog.undo(Schema.class, new FilteringReducer<>(schemaFilter(options)));
-    catalog.undo(Table.class, new TablesReducer(options, tableFilter(options)));
+    catalog.undo(Table.class, new TablesReducer(tableFilter(options)));
     catalog.undo(Routine.class, new FilteringReducer<>(routineFilter(options)));
     catalog.undo(Synonym.class, new FilteringReducer<>(synonymFilter(options)));
     catalog.undo(Sequence.class, new FilteringReducer<>(sequenceFilter(options)));

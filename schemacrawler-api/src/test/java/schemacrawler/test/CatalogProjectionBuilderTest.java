@@ -194,6 +194,37 @@ public class CatalogProjectionBuilderTest {
   }
 
   @Test
+  public void publicTableNameGrepAndInversionSelectMatchingTables() {
+    final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
+    final Table matchingTable = new LightTable(schema, "matching");
+    final Table nonMatchingTable = new LightTable(schema, "non_matching");
+    final Catalog source = LightCatalogUtility.lightCatalog(matchingTable, nonMatchingTable);
+    final GrepOptionsBuilder grepOptionsBuilder =
+        GrepOptionsBuilder.builder()
+            .includeGreppedTables(
+                new RegularExpressionInclusionRule(Pattern.compile(".*\\.matching$")));
+
+    final Catalog matchingProjection =
+        CatalogProjectionBuilder.builder(source)
+            .withTablePredicate(NamedObjectFilters.tableTypes(SimpleTableType.table))
+            .withOptions(
+                ProjectionOptionsBuilder.builder()
+                    .withGrepOptions(grepOptionsBuilder.toOptions())
+                    .toOptions())
+            .build();
+    final Catalog invertedProjection =
+        CatalogProjectionBuilder.builder(source)
+            .withOptions(
+                ProjectionOptionsBuilder.builder()
+                    .withGrepOptions(grepOptionsBuilder.invertGrepMatch(true).toOptions())
+                    .toOptions())
+            .build();
+
+    assertThat(matchingProjection.getTables(), contains(matchingTable));
+    assertThat(invertedProjection.getTables(), contains(nonMatchingTable));
+  }
+
+  @Test
   public void publicQuotedNameAndTypeFiltersCompose() {
     final SchemaReference schema = new SchemaReference(null, "books");
     final Table matchingTable = mock(Table.class);

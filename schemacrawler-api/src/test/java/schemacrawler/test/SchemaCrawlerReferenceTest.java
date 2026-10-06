@@ -18,6 +18,7 @@ import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import java.sql.Connection;
 import java.util.Collection;
 import org.junit.jupiter.api.Test;
+import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
@@ -26,6 +27,7 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
+import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.NotLoadedException;
@@ -42,7 +44,8 @@ public class SchemaCrawlerReferenceTest {
         DatabaseTestUtility.schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
 
     int fkReferenceCount = 0;
-    final Catalog catalog = getCatalog(connection, schemaCrawlerOptions);
+    final Catalog catalog =
+        projectCatalog(getCatalog(connection, schemaCrawlerOptions), schemaCrawlerOptions);
     final Collection<Table> tables = catalog.getTables();
     for (final Table table : tables) {
       final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
@@ -74,7 +77,8 @@ public class SchemaCrawlerReferenceTest {
             .withGrepOptions(grepOptionsBuilder.toOptions());
 
     int fkReferenceCount = 0;
-    final Catalog catalog = getCatalog(connection, schemaCrawlerOptions);
+    final Catalog catalog =
+        projectCatalog(getCatalog(connection, schemaCrawlerOptions), schemaCrawlerOptions);
     final Collection<Table> tables = catalog.getTables();
     for (final Table table : tables) {
       final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
@@ -106,7 +110,8 @@ public class SchemaCrawlerReferenceTest {
             .withGrepOptions(grepOptionsBuilder.toOptions());
 
     int fkReferenceCount = 0;
-    final Catalog catalog = getCatalog(connection, schemaCrawlerOptions);
+    final Catalog catalog =
+        projectCatalog(getCatalog(connection, schemaCrawlerOptions), schemaCrawlerOptions);
     final Collection<Table> tables = catalog.getTables();
     for (final Table table : tables) {
       final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
@@ -133,7 +138,8 @@ public class SchemaCrawlerReferenceTest {
             .withGrepOptions(grepOptionsBuilder.toOptions());
 
     int fkReferenceCount = 0;
-    final Catalog catalog = getCatalog(connection, schemaCrawlerOptions);
+    final Catalog catalog =
+        projectCatalog(getCatalog(connection, schemaCrawlerOptions), schemaCrawlerOptions);
     final Collection<Table> tables = catalog.getTables();
     for (final Table table : tables) {
       final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
@@ -160,7 +166,8 @@ public class SchemaCrawlerReferenceTest {
             .withGrepOptions(grepOptionsBuilder.toOptions());
 
     int fkReferenceCount = 0;
-    final Catalog catalog = getCatalog(connection, schemaCrawlerOptions);
+    final Catalog catalog =
+        projectCatalog(getCatalog(connection, schemaCrawlerOptions), schemaCrawlerOptions);
     final Collection<Table> tables = catalog.getTables();
     for (final Table table : tables) {
       final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
@@ -209,5 +216,15 @@ public class SchemaCrawlerReferenceTest {
         table == catalog.lookupTable(table.getSchema(), table.getName()).get());
     assertThat(
         "Column references do not match", column == table.lookupColumn(column.getName()).get());
+  }
+
+  private Catalog projectCatalog(final Catalog baseline, final SchemaCrawlerOptions options) {
+    return CatalogProjectionBuilder.builder(baseline)
+        .withOptions(
+            ProjectionOptionsBuilder.builder()
+                .withFilterOptions(options.filterOptions())
+                .withGrepOptions(options.grepOptions())
+                .toOptions())
+        .build();
   }
 }
