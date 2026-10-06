@@ -13,7 +13,9 @@ import static schemacrawler.utility.NamedObjectSort.alphabetical;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,6 +46,61 @@ final class CatalogProjection implements Catalog {
   private static final String REMARKS_ATTRIBUTE = "REMARKS";
   private static final NamedObjectKey SYSTEM_SCHEMA_KEY = new SchemaReference().key();
 
+  private static LinkedHashMap<NamedObjectKey, DatabaseUser> indexByKey(
+      final Collection<DatabaseUser> values) {
+    final Map<NamedObjectKey, DatabaseUser> sorted = new TreeMap<>();
+    values.forEach(databaseUser -> sorted.putIfAbsent(databaseUser.key(), databaseUser));
+    return new LinkedHashMap<>(sorted);
+  }
+
+  private static <N extends DatabaseObject> LinkedHashMap<NamedObjectKey, N> indexBySchemaAndName(
+      final Collection<N> values) {
+    final Map<NamedObjectKey, N> sorted = new TreeMap<>();
+    values.forEach(
+        value -> {
+          final Schema schema = value.getSchema();
+          if (schema != null) {
+            sorted.putIfAbsent(schema.key().with(value.getName()), value);
+          }
+        });
+    return new LinkedHashMap<>(sorted);
+  }
+
+  private static LinkedHashMap<NamedObjectKey, Routine> indexRoutines(
+      final Collection<Routine> values) {
+    final Map<NamedObjectKey, Routine> sorted = new TreeMap<>();
+    values.forEach(routine -> sorted.putIfAbsent(routine.key(), routine));
+    return new LinkedHashMap<>(sorted);
+  }
+
+  private static LinkedHashMap<String, Schema> indexSchemas(final Collection<Schema> values) {
+    final List<Schema> sortedSchemas = new ArrayList<>(values);
+    sortedSchemas.sort(Comparator.naturalOrder());
+    final LinkedHashMap<String, Schema> index = new LinkedHashMap<>();
+    sortedSchemas.forEach(schema -> index.putIfAbsent(schema.getFullName(), schema));
+    return index;
+  }
+
+  private static <N extends DatabaseObject> Optional<N> lookupBySchemaAndName(
+      final Map<NamedObjectKey, N> index, final Schema schema, final String name) {
+    if (schema == null || name == null) {
+      return Optional.empty();
+    }
+    return Optional.ofNullable(index.get(schema.key().with(name)));
+  }
+
+  private static <N extends DatabaseObject> List<N> valuesForSchema(
+      final Map<NamedObjectKey, N> index, final Schema schema) {
+    if (schema == null) {
+      return List.of();
+    }
+    return index.values().stream()
+      .filter(
+        value ->
+          value.getSchema() != null && schema.key().equals(value.getSchema().key()))
+      .toList();
+  }
+
   private final String name;
   private final String fullName;
   private final NamedObjectKey key;
@@ -53,11 +110,17 @@ final class CatalogProjection implements Catalog {
   private final String remarks;
   private final Map<String, Object> attributes;
   private final LinkedHashMap<String, Schema> schemas;
+
   private final LinkedHashMap<NamedObjectKey, Table> tables;
+
   private final LinkedHashMap<NamedObjectKey, Routine> routines;
+
   private final LinkedHashMap<NamedObjectKey, Sequence> sequences;
+
   private final LinkedHashMap<NamedObjectKey, Synonym> synonyms;
+
   private final LinkedHashMap<NamedObjectKey, ColumnDataType> columnDataTypes;
+
   private final LinkedHashMap<NamedObjectKey, DatabaseUser> databaseUsers;
 
   CatalogProjection(
@@ -106,6 +169,26 @@ final class CatalogProjection implements Catalog {
   }
 
   @Override
+  public int compareTo(final NamedObject other) {
+    return compare(this, other, alphabetical);
+  }
+
+  @Override
+  public <T> T getAttribute(final String name) {
+    return getAttribute(name, null);
+  }
+
+  @Override
+  public <T> T getAttribute(final String name, final T defaultValue) {
+    return (T) attributes.getOrDefault(name, defaultValue);
+  }
+
+  @Override
+  public Map<String, Object> getAttributes() {
+    return Collections.unmodifiableMap(new TreeMap<>(attributes));
+  }
+
+  @Override
   public Collection<ColumnDataType> getColumnDataTypes() {
     return List.copyOf(columnDataTypes.values());
   }
@@ -131,8 +214,23 @@ final class CatalogProjection implements Catalog {
   }
 
   @Override
+  public String getFullName() {
+    return fullName;
+  }
+
+  @Override
   public JdbcDriverInfo getJdbcDriverInfo() {
     return jdbcDriverInfo;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String getRemarks() {
+    return remarks;
   }
 
   @Override
@@ -148,7 +246,11 @@ final class CatalogProjection implements Catalog {
   @Override
   public Collection<Routine> getRoutines(final Schema schema, final String routineName) {
     return routines.values().stream()
-        .filter(routine -> schema != null && schema.equals(routine.getSchema()))
+      .filter(
+        routine ->
+          schema != null
+            && routine.getSchema() != null
+            && schema.key().equals(routine.getSchema().key()))
         .filter(routine -> isBlank(routineName) || routineName.equals(routine.getName()))
         .toList();
   }
@@ -199,6 +301,29 @@ final class CatalogProjection implements Catalog {
   }
 
   @Override
+  public boolean hasAttribute(final String name) {
+    return attributes.containsKey(name);
+  }
+
+  @Override
+  public boolean hasRemarks() {
+    return !isBlank(remarks);
+  }
+
+  @Override
+  public NamedObjectKey key() {
+    return key;
+  }
+
+  @Override
+  public <T> Optional<T> lookupAttribute(final String name) {
+    if (name == null) {
+      return Optional.empty();
+    }
+    return Optional.ofNullable(getAttribute(name));
+  }
+
+  @Override
   public Optional<Column> lookupColumn(
       final Schema schema, final String tableName, final String name) {
     return lookupBySchemaAndName(tables, schema, tableName)
@@ -242,69 +367,6 @@ final class CatalogProjection implements Catalog {
   }
 
   @Override
-  public String getFullName() {
-    return fullName;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public int compareTo(final NamedObject other) {
-    return compare(this, other, alphabetical);
-  }
-
-  @Override
-  public NamedObjectKey key() {
-    return key;
-  }
-
-  @Override
-  public String getRemarks() {
-    return remarks;
-  }
-
-  @Override
-  public boolean hasRemarks() {
-    return !isBlank(remarks);
-  }
-
-  @Override
-  public void setRemarks(final String remarks) {
-    throw new UnsupportedOperationException("Catalog projection remarks are immutable");
-  }
-
-  @Override
-  public <T> T getAttribute(final String name) {
-    return getAttribute(name, null);
-  }
-
-  @Override
-  public <T> T getAttribute(final String name, final T defaultValue) {
-    return (T) attributes.getOrDefault(name, defaultValue);
-  }
-
-  @Override
-  public Map<String, Object> getAttributes() {
-    return Collections.unmodifiableMap(new TreeMap<>(attributes));
-  }
-
-  @Override
-  public boolean hasAttribute(final String name) {
-    return attributes.containsKey(name);
-  }
-
-  @Override
-  public <T> Optional<T> lookupAttribute(final String name) {
-    if (name == null) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(getAttribute(name));
-  }
-
-  @Override
   public void removeAttribute(final String name) {
     throw new UnsupportedOperationException("Catalog projection attributes are immutable");
   }
@@ -314,52 +376,8 @@ final class CatalogProjection implements Catalog {
     throw new UnsupportedOperationException("Catalog projection attributes are immutable");
   }
 
-  private static LinkedHashMap<String, Schema> indexSchemas(final Collection<Schema> values) {
-    final Map<String, Schema> sorted = new TreeMap<>();
-    values.forEach(schema -> sorted.putIfAbsent(schema.getFullName(), schema));
-    return new LinkedHashMap<>(sorted);
-  }
-
-  private static <N extends DatabaseObject> LinkedHashMap<NamedObjectKey, N> indexBySchemaAndName(
-      final Collection<N> values) {
-    final Map<NamedObjectKey, N> sorted = new TreeMap<>();
-    values.forEach(
-        value -> {
-          final Schema schema = value.getSchema();
-          if (schema != null) {
-            sorted.putIfAbsent(schema.key().with(value.getName()), value);
-          }
-        });
-    return new LinkedHashMap<>(sorted);
-  }
-
-  private static LinkedHashMap<NamedObjectKey, Routine> indexRoutines(
-      final Collection<Routine> values) {
-    final Map<NamedObjectKey, Routine> sorted = new TreeMap<>();
-    values.forEach(routine -> sorted.putIfAbsent(routine.key(), routine));
-    return new LinkedHashMap<>(sorted);
-  }
-
-  private static LinkedHashMap<NamedObjectKey, DatabaseUser> indexByKey(
-      final Collection<DatabaseUser> values) {
-    final Map<NamedObjectKey, DatabaseUser> sorted = new TreeMap<>();
-    values.forEach(databaseUser -> sorted.putIfAbsent(databaseUser.key(), databaseUser));
-    return new LinkedHashMap<>(sorted);
-  }
-
-  private static <N extends DatabaseObject> Optional<N> lookupBySchemaAndName(
-      final Map<NamedObjectKey, N> index, final Schema schema, final String name) {
-    if (schema == null || name == null) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(index.get(schema.key().with(name)));
-  }
-
-  private static <N extends DatabaseObject> List<N> valuesForSchema(
-      final Map<NamedObjectKey, N> index, final Schema schema) {
-    if (schema == null) {
-      return List.of();
-    }
-    return index.values().stream().filter(value -> schema.equals(value.getSchema())).toList();
+  @Override
+  public void setRemarks(final String remarks) {
+    throw new UnsupportedOperationException("Catalog projection remarks are immutable");
   }
 }

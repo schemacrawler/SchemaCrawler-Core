@@ -41,15 +41,22 @@ import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 /** Builds immutable catalog projections from an already loaded catalog. */
 public final class CatalogProjectionBuilder {
 
+  /** Creates a projection builder for a catalog. */
+  public static CatalogProjectionBuilder builder(final Catalog catalog) {
+    return new CatalogProjectionBuilder(catalog);
+  }
+
+  private static <N extends NamedObject> Set<NamedObjectKey> keys(
+      final Collection<N> namedObjects) {
+    final Set<NamedObjectKey> keys = new HashSet<>();
+    namedObjects.stream().map(NamedObject::key).forEach(keys::add);
+    return Set.copyOf(keys);
+  }
+
   private static <N extends NamedObject> List<N> sortedCopy(final Collection<N> objects) {
     final List<N> sortedObjects = new ArrayList<>(objects);
     sortedObjects.sort(Comparator.naturalOrder());
     return List.copyOf(sortedObjects);
-  }
-
-  /** Creates a projection builder for a catalog. */
-  public static CatalogProjectionBuilder builder(final Catalog catalog) {
-    return new CatalogProjectionBuilder(catalog);
   }
 
   private final Catalog catalog;
@@ -59,6 +66,7 @@ public final class CatalogProjectionBuilder {
   private Predicate<Table> tablePredicate;
   private Predicate<Routine> routinePredicate;
   private Predicate<Sequence> sequencePredicate;
+
   private Predicate<Synonym> synonymPredicate;
 
   private CatalogProjectionBuilder(final Catalog catalog) {
@@ -118,25 +126,18 @@ public final class CatalogProjectionBuilder {
     return this;
   }
 
+  /** Adds a predicate for routines. */
+  public CatalogProjectionBuilder withRoutinePredicate(
+      final Predicate<? super Routine> routinePredicate) {
+    this.routinePredicate = this.routinePredicate.and(requireNonNull(routinePredicate));
+    return this;
+  }
+
   /** Adds a predicate for schemas. */
   public CatalogProjectionBuilder withSchemaPredicate(
       final Predicate<? super Schema> schemaPredicate) {
     this.schemaPredicate = this.schemaPredicate.and(requireNonNull(schemaPredicate));
     schemaPredicateSpecified = true;
-    return this;
-  }
-
-  /** Adds a predicate for tables. */
-  public CatalogProjectionBuilder withTablePredicate(
-      final Predicate<? super Table> tablePredicate) {
-    this.tablePredicate = this.tablePredicate.and(requireNonNull(tablePredicate));
-    return this;
-  }
-
-  /** Adds a predicate for routines. */
-  public CatalogProjectionBuilder withRoutinePredicate(
-      final Predicate<? super Routine> routinePredicate) {
-    this.routinePredicate = this.routinePredicate.and(requireNonNull(routinePredicate));
     return this;
   }
 
@@ -152,6 +153,69 @@ public final class CatalogProjectionBuilder {
       final Predicate<? super Synonym> synonymPredicate) {
     this.synonymPredicate = this.synonymPredicate.and(requireNonNull(synonymPredicate));
     return this;
+  }
+
+  /** Adds a predicate for tables. */
+  public CatalogProjectionBuilder withTablePredicate(
+      final Predicate<? super Table> tablePredicate) {
+    this.tablePredicate = this.tablePredicate.and(requireNonNull(tablePredicate));
+    return this;
+  }
+
+  private Set<Table> includeRelatedTables(
+      final Set<Table> seedTables,
+      final Set<NamedObjectKey> eligibleTableKeys,
+      final Set<NamedObjectKey> schemaKeys,
+      final boolean sourceHasSchemas,
+      final TableRelationshipType relationshipType,
+      final int depth) {
+    final Set<NamedObjectKey> visited = new HashSet<>(keys(seedTables));
+    final Set<Table> relatedTables = new LinkedHashSet<>();
+    Set<Table> frontier = new HashSet<>(seedTables);
+    for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
+      final Set<Table> nextFrontier = new HashSet<>();
+      for (final Table table : frontier) {
+        for (final Table relatedTable : table.getRelatedTables(relationshipType)) {
+          if (relatedTable != null
+              && eligibleTableKeys.contains(relatedTable.key())
+              && isSchemaSelected(relatedTable, schemaKeys, sourceHasSchemas)
+              && !isPartial(relatedTable)
+              && visited.add(relatedTable.key())) {
+            nextFrontier.add(relatedTable);
+            relatedTables.add(relatedTable);
+          }
+        }
+      }
+      frontier = nextFrontier;
+    }
+    return relatedTables;
+  }
+
+  private boolean isSchemaSelected(
+      final DatabaseObject databaseObject,
+      final Set<NamedObjectKey> schemaKeys,
+      final boolean sourceHasSchemas) {
+    final Schema schema = databaseObject.getSchema();
+    if (schema == null) {
+      return !sourceHasSchemas && !schemaPredicateSpecified;
+    }
+    if (sourceHasSchemas && !schemaKeys.contains(schema.key())) {
+      return false;
+    }
+    return !schemaPredicateSpecified || schemaPredicate.test(schema);
+  }
+
+  private <N extends DatabaseObject> List<N> selectDatabaseObjects(
+      final Collection<N> databaseObjects,
+      final Set<NamedObjectKey> schemaKeys,
+      final boolean sourceHasSchemas,
+      final Predicate<? super N> predicate) {
+    return sortedCopy(
+        databaseObjects.stream()
+            .filter(
+                databaseObject -> isSchemaSelected(databaseObject, schemaKeys, sourceHasSchemas))
+            .filter(predicate)
+            .toList());
   }
 
   private List<Schema> selectSchemas(final Collection<Schema> eligibleSchemas) {
@@ -192,68 +256,5 @@ public final class CatalogProjectionBuilder {
     selectedTables.addAll(parentTables);
     selectedTables.addAll(childTables);
     return sortedCopy(selectedTables);
-  }
-
-  private Set<Table> includeRelatedTables(
-      final Set<Table> seedTables,
-      final Set<NamedObjectKey> eligibleTableKeys,
-      final Set<NamedObjectKey> schemaKeys,
-      final boolean sourceHasSchemas,
-      final TableRelationshipType relationshipType,
-      final int depth) {
-    final Set<NamedObjectKey> visited = new HashSet<>(keys(seedTables));
-    final Set<Table> relatedTables = new LinkedHashSet<>();
-    Set<Table> frontier = new HashSet<>(seedTables);
-    for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
-      final Set<Table> nextFrontier = new HashSet<>();
-      for (final Table table : frontier) {
-        for (final Table relatedTable : table.getRelatedTables(relationshipType)) {
-          if (relatedTable != null
-              && eligibleTableKeys.contains(relatedTable.key())
-              && isSchemaSelected(relatedTable, schemaKeys, sourceHasSchemas)
-              && !isPartial(relatedTable)
-              && visited.add(relatedTable.key())) {
-            nextFrontier.add(relatedTable);
-            relatedTables.add(relatedTable);
-          }
-        }
-      }
-      frontier = nextFrontier;
-    }
-    return relatedTables;
-  }
-
-  private <N extends DatabaseObject> List<N> selectDatabaseObjects(
-      final Collection<N> databaseObjects,
-      final Set<NamedObjectKey> schemaKeys,
-      final boolean sourceHasSchemas,
-      final Predicate<? super N> predicate) {
-    return sortedCopy(
-        databaseObjects.stream()
-            .filter(
-                databaseObject -> isSchemaSelected(databaseObject, schemaKeys, sourceHasSchemas))
-            .filter(predicate)
-            .toList());
-  }
-
-  private boolean isSchemaSelected(
-      final DatabaseObject databaseObject,
-      final Set<NamedObjectKey> schemaKeys,
-      final boolean sourceHasSchemas) {
-    final Schema schema = databaseObject.getSchema();
-    if (schema == null) {
-      return !sourceHasSchemas && !schemaPredicateSpecified;
-    }
-    if (sourceHasSchemas && !schemaKeys.contains(schema.key())) {
-      return false;
-    }
-    return !schemaPredicateSpecified || schemaPredicate.test(schema);
-  }
-
-  private static <N extends NamedObject> Set<NamedObjectKey> keys(
-      final Collection<N> namedObjects) {
-    final Set<NamedObjectKey> keys = new HashSet<>();
-    namedObjects.stream().map(NamedObject::key).forEach(keys::add);
-    return Set.copyOf(keys);
   }
 }
