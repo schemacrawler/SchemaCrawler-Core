@@ -9,65 +9,87 @@
 package schemacrawler.schemacrawler;
 
 import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.trimToEmpty;
 
 import org.jspecify.annotations.NonNull;
 import us.fatehi.utility.Options;
 
 /** SchemaCrawler options. */
 public record SchemaCrawlerOptions(
-    @NonNull String title,
-    @NonNull LimitOptions limitOptions,
-    @NonNull FilterOptions filterOptions,
-    @NonNull GrepOptions grepOptions,
-    @NonNull LoadOptions loadOptions)
+    @NonNull CrawlOptions crawlOptions, @NonNull ProjectionOptions projectionOptions)
     implements Options {
 
   public SchemaCrawlerOptions {
-    title = trimToEmpty(title);
-    requireNonNull(limitOptions, "No limit options provided");
-    requireNonNull(filterOptions, "No filter options provided");
-    requireNonNull(grepOptions, "No grep options provided");
-    requireNonNull(loadOptions, "No load options provided");
+    requireNonNull(crawlOptions, "No crawl options provided");
+    requireNonNull(projectionOptions, "No projection options provided");
   }
 
-  public SchemaCrawlerOptions(
-      @NonNull LimitOptions limitOptions,
-      @NonNull FilterOptions filterOptions,
-      @NonNull GrepOptions grepOptions,
-      @NonNull LoadOptions loadOptions) {
-    this("", limitOptions, filterOptions, grepOptions, loadOptions);
+  public static SchemaCrawlerOptions newSchemaCrawlerOptions() {
+    final CrawlOptions crawlOptions =
+        new CrawlOptions(
+            "", LoadOptionsBuilder.newLoadOptions(), LimitOptionsBuilder.newLimitOptions());
+    final ProjectionOptions projectionOptions =
+        new ProjectionOptions(
+            FilterOptionsBuilder.newFilterOptions(), GrepOptionsBuilder.newGrepOptions());
+    return new SchemaCrawlerOptions(crawlOptions, projectionOptions);
+  }
+
+  public String title() {
+    return crawlOptions.title();
+  }
+
+  public LoadOptions loadOptions() {
+    return crawlOptions.loadOptions();
+  }
+
+  public LimitOptions limitOptions() {
+    return crawlOptions.limitOptions();
+  }
+
+  public FilterOptions filterOptions() {
+    return projectionOptions.filterOptions();
+  }
+
+  public GrepOptions grepOptions() {
+    return projectionOptions.grepOptions();
   }
 
   public SchemaCrawlerOptions withFilterOptions(final FilterOptions filterOptions) {
     if (filterOptions == null) {
       return this;
     }
-    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
+    return new SchemaCrawlerOptions(
+        crawlOptions, new ProjectionOptions(filterOptions, projectionOptions.grepOptions()));
   }
 
   public SchemaCrawlerOptions withGrepOptions(final GrepOptions grepOptions) {
     if (grepOptions == null) {
       return this;
     }
-    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
+    return new SchemaCrawlerOptions(
+        crawlOptions, new ProjectionOptions(projectionOptions.filterOptions(), grepOptions));
   }
 
   public SchemaCrawlerOptions withLimitOptions(final LimitOptions limitOptions) {
     if (limitOptions == null) {
       return this;
     }
-    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
+    return new SchemaCrawlerOptions(
+        new CrawlOptions(crawlOptions.title(), crawlOptions.loadOptions(), limitOptions),
+        projectionOptions);
   }
 
   public SchemaCrawlerOptions withLoadOptions(final LoadOptions loadOptions) {
     if (loadOptions == null) {
       return this;
     }
-    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
+    return new SchemaCrawlerOptions(
+        new CrawlOptions(crawlOptions.title(), loadOptions, crawlOptions.limitOptions()),
+        projectionOptions);
   }
 
   public SchemaCrawlerOptions withTitle(final String title) {
-    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
+    return new SchemaCrawlerOptions(
+        new CrawlOptions(title, crawlOptions.loadOptions(), crawlOptions.limitOptions()),
+        projectionOptions);
   }
 }

@@ -27,7 +27,6 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
-import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.exceptions.NotLoadedException;
@@ -220,11 +219,7 @@ public class SchemaCrawlerReferenceTest {
 
   private Catalog projectCatalog(final Catalog baseline, final SchemaCrawlerOptions options) {
     return CatalogProjectionBuilder.builder(baseline)
-        .withOptions(
-            ProjectionOptionsBuilder.builder()
-                .withFilterOptions(options.filterOptions())
-                .withGrepOptions(options.grepOptions())
-                .toOptions())
+        .withOptions(options.projectionOptions())
         .build();
   }
 }

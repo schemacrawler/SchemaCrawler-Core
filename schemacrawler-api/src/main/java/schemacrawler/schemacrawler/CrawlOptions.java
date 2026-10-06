@@ -9,13 +9,18 @@
 package schemacrawler.schemacrawler;
 
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
+import org.jspecify.annotations.NonNull;
 import us.fatehi.utility.Options;
 
 /** Options for the crawl phase, combining metadata loading and crawl limits. */
-public record CrawlOptions(LoadOptions loadOptions, LimitOptions limitOptions) implements Options {
+public record CrawlOptions(
+    @NonNull String title, @NonNull LoadOptions loadOptions, @NonNull LimitOptions limitOptions)
+    implements Options {
 
   public CrawlOptions {
+    title = trimToEmpty(title);
     requireNonNull(loadOptions, "No load options provided");
     requireNonNull(limitOptions, "No limit options provided");
   }

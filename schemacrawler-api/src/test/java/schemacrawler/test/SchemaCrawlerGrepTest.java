@@ -33,7 +33,6 @@ import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.FilterOptionsBuilder;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
-import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
@@ -71,10 +70,7 @@ public class SchemaCrawlerGrepTest {
 
       final Catalog catalog =
           CatalogProjectionBuilder.builder(baseline)
-              .withOptions(
-                  ProjectionOptionsBuilder.builder()
-                      .withGrepOptions(grepOptionsBuilder.toOptions())
-                      .toOptions())
+              .withOptions(schemaCrawlerOptions.projectionOptions())
               .build();
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(6));
@@ -233,11 +229,7 @@ public class SchemaCrawlerGrepTest {
   private Catalog projectCatalog(final Connection connection, final SchemaCrawlerOptions options) {
     final Catalog baseline = getCatalog(connection, options);
     return CatalogProjectionBuilder.builder(baseline)
-        .withOptions(
-            ProjectionOptionsBuilder.builder()
-                .withFilterOptions(options.filterOptions())
-                .withGrepOptions(options.grepOptions())
-                .toOptions())
+        .withOptions(options.projectionOptions())
         .build();
   }
 }

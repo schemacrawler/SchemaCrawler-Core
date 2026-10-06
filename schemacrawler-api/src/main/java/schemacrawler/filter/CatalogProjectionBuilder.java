@@ -36,7 +36,7 @@ import schemacrawler.schema.Table;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schemacrawler.FilterOptions;
 import schemacrawler.schemacrawler.ProjectionOptions;
-import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
+import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 
 /** Builds immutable catalog projections from an already loaded catalog. */
 public final class CatalogProjectionBuilder {
@@ -71,7 +71,7 @@ public final class CatalogProjectionBuilder {
 
   private CatalogProjectionBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
-    projectionOptions = ProjectionOptionsBuilder.newProjectionOptions();
+    projectionOptions = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions().projectionOptions();
     schemaPredicate = schema -> true;
     schemaPredicateSpecified = false;
     tablePredicate = table -> true;

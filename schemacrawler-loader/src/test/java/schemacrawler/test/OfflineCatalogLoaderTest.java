@@ -41,7 +41,6 @@ import schemacrawler.schemacrawler.GrepOptions;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.LoadOptionsBuilder;
-import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
@@ -170,7 +169,10 @@ public class OfflineCatalogLoaderTest {
 
   private Catalog projectCatalog(final Catalog baseline, final GrepOptions grepOptions) {
     return CatalogProjectionBuilder.builder(baseline)
-        .withOptions(ProjectionOptionsBuilder.builder().withGrepOptions(grepOptions).toOptions())
+        .withOptions(
+            SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                .withGrepOptions(grepOptions)
+                .projectionOptions())
         .build();
   }
 }

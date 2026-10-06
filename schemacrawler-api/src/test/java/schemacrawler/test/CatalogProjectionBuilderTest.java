@@ -42,9 +42,12 @@ import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TableType;
+import schemacrawler.schemacrawler.FilterOptions;
 import schemacrawler.schemacrawler.FilterOptionsBuilder;
+import schemacrawler.schemacrawler.GrepOptions;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
-import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
+import schemacrawler.schemacrawler.ProjectionOptions;
+import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.crawl.LightCatalogUtility;
 import schemacrawler.test.utility.crawl.LightForeignKey;
@@ -179,14 +182,12 @@ public class CatalogProjectionBuilderTest {
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
             .withOptions(
-                ProjectionOptionsBuilder.builder()
-                    .withGrepOptions(
-                        GrepOptionsBuilder.builder()
-                            .includeGreppedColumns(
-                                new RegularExpressionInclusionRule(
-                                    Pattern.compile(".*wanted_column")))
-                            .toOptions())
-                    .toOptions())
+                projectionOptions(
+                    null,
+                    GrepOptionsBuilder.builder()
+                        .includeGreppedColumns(
+                            new RegularExpressionInclusionRule(Pattern.compile(".*wanted_column")))
+                        .toOptions()))
             .build();
 
     assertThat(projection.getTables(), contains(matchingTable));
@@ -207,17 +208,12 @@ public class CatalogProjectionBuilderTest {
     final Catalog matchingProjection =
         CatalogProjectionBuilder.builder(source)
             .withTablePredicate(NamedObjectFilters.tableTypes(SimpleTableType.table))
-            .withOptions(
-                ProjectionOptionsBuilder.builder()
-                    .withGrepOptions(grepOptionsBuilder.toOptions())
-                    .toOptions())
+            .withOptions(projectionOptions(null, grepOptionsBuilder.toOptions()))
             .build();
     final Catalog invertedProjection =
         CatalogProjectionBuilder.builder(source)
             .withOptions(
-                ProjectionOptionsBuilder.builder()
-                    .withGrepOptions(grepOptionsBuilder.invertGrepMatch(true).toOptions())
-                    .toOptions())
+                projectionOptions(null, grepOptionsBuilder.invertGrepMatch(true).toOptions()))
             .build();
 
     assertThat(matchingProjection.getTables(), contains(matchingTable));
@@ -259,14 +255,13 @@ public class CatalogProjectionBuilderTest {
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
             .withOptions(
-                ProjectionOptionsBuilder.builder()
-                    .withGrepOptions(
-                        GrepOptionsBuilder.builder()
-                            .includeGreppedRoutineParameters(
-                                new RegularExpressionInclusionRule(
-                                    Pattern.compile(".*wanted_parameter")))
-                            .toOptions())
-                    .toOptions())
+                projectionOptions(
+                    null,
+                    GrepOptionsBuilder.builder()
+                        .includeGreppedRoutineParameters(
+                            new RegularExpressionInclusionRule(
+                                Pattern.compile(".*wanted_parameter")))
+                        .toOptions()))
             .build();
 
     assertThat(projection.getRoutines(), contains(matchingRoutine));
@@ -307,17 +302,12 @@ public class CatalogProjectionBuilderTest {
 
     final Catalog matches =
         CatalogProjectionBuilder.builder(source)
-            .withOptions(
-                ProjectionOptionsBuilder.builder()
-                    .withGrepOptions(grepOptionsBuilder.toOptions())
-                    .toOptions())
+            .withOptions(projectionOptions(null, grepOptionsBuilder.toOptions()))
             .build();
     final Catalog invertedMatches =
         CatalogProjectionBuilder.builder(source)
             .withOptions(
-                ProjectionOptionsBuilder.builder()
-                    .withGrepOptions(grepOptionsBuilder.invertGrepMatch(true).toOptions())
-                    .toOptions())
+                projectionOptions(null, grepOptionsBuilder.invertGrepMatch(true).toOptions()))
             .build();
 
     assertThat(matches.getTables(), containsInAnyOrder(remarksMatch, definitionMatch));
@@ -365,13 +355,12 @@ public class CatalogProjectionBuilderTest {
         CatalogProjectionBuilder.builder(source)
             .withTablePredicate(table -> table == seed)
             .withOptions(
-                ProjectionOptionsBuilder.builder()
-                    .withFilterOptions(
-                        FilterOptionsBuilder.builder()
-                            .parentTableFilterDepth(2)
-                            .childTableFilterDepth(2)
-                            .toOptions())
-                    .toOptions())
+                projectionOptions(
+                    FilterOptionsBuilder.builder()
+                        .parentTableFilterDepth(2)
+                        .childTableFilterDepth(2)
+                        .toOptions(),
+                    null))
             .build();
 
     assertThat(projection.getTables(), containsInAnyOrder(seed, parent, grandparent, directChild));
@@ -422,6 +411,14 @@ public class CatalogProjectionBuilderTest {
 
   private void assertUnmodifiable(final Collection<?> collection) {
     assertThrows(UnsupportedOperationException.class, collection::clear);
+  }
+
+  private ProjectionOptions projectionOptions(
+      final FilterOptions filterOptions, final GrepOptions grepOptions) {
+    return SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+        .withFilterOptions(filterOptions)
+        .withGrepOptions(grepOptions)
+        .projectionOptions();
   }
 
   private <T extends DatabaseObject> T databaseObject(

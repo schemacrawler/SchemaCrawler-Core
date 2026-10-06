@@ -16,8 +16,6 @@ import java.util.logging.Logger;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schemacrawler.ProjectionOptions;
-import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
@@ -180,12 +178,9 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
   }
 
   private Catalog selectCatalog(final Catalog catalog) {
-    final ProjectionOptions options =
-        ProjectionOptionsBuilder.builder()
-            .withFilterOptions(schemaCrawlerOptions.filterOptions())
-            .withGrepOptions(schemaCrawlerOptions.grepOptions())
-            .toOptions();
-    return CatalogProjectionBuilder.builder(catalog).withOptions(options).build();
+    return CatalogProjectionBuilder.builder(catalog)
+        .withOptions(schemaCrawlerOptions.projectionOptions())
+        .build();
   }
 
   private SchemaCrawlerCommand<?> loadCommand() {

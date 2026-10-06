@@ -34,7 +34,6 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.GrepOptions;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
-import schemacrawler.schemacrawler.ProjectionOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.DatabaseAccessException;
 import schemacrawler.schemacrawler.exceptions.InternalRuntimeException;
@@ -90,8 +89,7 @@ public class SchemaCrawlerUtilityTest {
 
     final Catalog projection =
         CatalogProjectionBuilder.builder(baseline)
-            .withOptions(
-                ProjectionOptionsBuilder.builder().withGrepOptions(grepOptions).toOptions())
+            .withOptions(newSchemaCrawlerOptions().withGrepOptions(grepOptions).projectionOptions())
             .build();
     assertThat(projection.getTables(schema), is(empty()));
   }
