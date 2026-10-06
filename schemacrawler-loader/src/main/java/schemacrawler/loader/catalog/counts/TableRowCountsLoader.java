@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import schemacrawler.loader.catalog.AbstractCatalogLoader;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Reducer;
+import schemacrawler.schema.Reducible;
 import schemacrawler.schema.ReducibleCollection;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
@@ -77,11 +78,14 @@ public class TableRowCountsLoader extends AbstractCatalogLoader<TableRowCountsLo
         LOGGER.log(Level.INFO, "Not removing empty tables");
         return;
       }
+      if (!(catalog instanceof final Reducible reducibleCatalog)) {
+        throw new ExecutionRuntimeException("Catalog does not support reduction");
+      }
       taskRunner.add(
           new TaskDefinition(
               "filterEmptyTables",
               () ->
-                  catalog.reduce(
+                  reducibleCatalog.reduce(
                       Table.class,
                       new TablePredicateReducer(new TableRowCountsFilter(noEmptyTables)))));
       taskRunner.submit();

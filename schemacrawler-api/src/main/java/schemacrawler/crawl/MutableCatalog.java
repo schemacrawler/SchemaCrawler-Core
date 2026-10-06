@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.CrawlInfo;
@@ -26,6 +25,7 @@ import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Reducer;
+import schemacrawler.schema.Reducible;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
@@ -39,7 +39,7 @@ import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder
  * Database and connection information. Created from metadata returned by a JDBC call, and other
  * sources of information.
  */
-final class MutableCatalog extends AbstractNamedObjectWithAttributes implements Catalog {
+final class MutableCatalog extends AbstractNamedObjectWithAttributes implements Reducible {
 
   private static final class FilterBySchema implements Predicate<DatabaseObject> {
 

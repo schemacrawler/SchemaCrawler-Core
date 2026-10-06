@@ -48,6 +48,7 @@ import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Procedure;
+import schemacrawler.schema.Reducible;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
@@ -191,7 +192,8 @@ public class MetadataUtilityTest {
 
     // Reduce catalog
     final CatalogReducer reducer = ReducerFactory.getCatalogReducer(schemaCrawlerOptions);
-    reducer.reduce(catalog);
+    final Reducible reducibleCatalog = (Reducible) catalog;
+    reducer.reduce(reducibleCatalog);
 
     final Schema schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
     assertThat("BOOKS Schema not found", schema, notNullValue());
@@ -199,7 +201,7 @@ public class MetadataUtilityTest {
     assertThat("BOOKS Table not found", catalog.lookupTable(schema, "BOOKS").isEmpty());
 
     // Reset catalog
-    reducer.undo(catalog);
+    reducer.undo(reducibleCatalog);
 
     final Table table = catalog.lookupTable(schema, "BOOKS").get();
     assertThat("BOOKS Table not found", table, notNullValue());

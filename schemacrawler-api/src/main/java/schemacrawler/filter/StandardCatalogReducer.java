@@ -16,8 +16,8 @@ import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleFor
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForTableInclusion;
 
 import java.util.function.Predicate;
-import schemacrawler.schema.Catalog;
 import schemacrawler.schema.CatalogReducer;
+import schemacrawler.schema.Reducible;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
@@ -61,7 +61,7 @@ final class StandardCatalogReducer implements CatalogReducer {
   }
 
   @Override
-  public void reduce(final Catalog catalog) {
+  public void reduce(final Reducible catalog) {
     requireNonNull(catalog, "No catalog provided");
 
     catalog.reduce(Schema.class, new FilteringReducer<>(schemaFilter(options)));
@@ -72,7 +72,7 @@ final class StandardCatalogReducer implements CatalogReducer {
   }
 
   @Override
-  public void undo(final Catalog catalog) {
+  public void undo(final Reducible catalog) {
     requireNonNull(catalog, "No catalog provided");
 
     catalog.undo(Schema.class, new FilteringReducer<>(schemaFilter(options)));

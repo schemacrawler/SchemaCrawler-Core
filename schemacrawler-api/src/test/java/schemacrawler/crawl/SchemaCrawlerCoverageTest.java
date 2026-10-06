@@ -27,6 +27,7 @@ import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
@@ -42,6 +43,7 @@ import schemacrawler.schema.IndexColumnSortSequence;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Reducer;
+import schemacrawler.schema.Reducible;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Table;
@@ -70,14 +72,22 @@ public class SchemaCrawlerCoverageTest {
   private Catalog catalog;
 
   @Test
-  public void catalogReduce() throws Exception {
+  public void catalogReductionCapability() throws Exception {
+    final boolean catalogExposesReduction =
+        Arrays.stream(Catalog.class.getMethods())
+            .anyMatch(
+                method -> method.getName().equals("reduce") || method.getName().equals("undo"));
+    assertThat(catalogExposesReduction, is(false));
+    assertThat(catalog instanceof Reducible, is(true));
+
+    final Reducible reducibleCatalog = (Reducible) catalog;
     final Reducer reducer = spy(Reducer.class);
 
-    catalog.reduce(Catalog.class, (Reducer<Catalog>) reducer);
+    reducibleCatalog.reduce(Catalog.class, (Reducer<Catalog>) reducer);
     verifyNoMoreInteractions(reducer);
 
-    assertThrows(NullPointerException.class, () -> catalog.reduce(null, reducer));
-    assertThrows(NullPointerException.class, () -> catalog.reduce(Table.class, null));
+    assertThrows(NullPointerException.class, () -> reducibleCatalog.reduce(null, reducer));
+    assertThrows(NullPointerException.class, () -> reducibleCatalog.reduce(Table.class, null));
   }
 
   @Test
