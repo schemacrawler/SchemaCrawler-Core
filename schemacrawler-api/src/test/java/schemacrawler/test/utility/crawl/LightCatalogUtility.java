@@ -17,7 +17,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
-import java.util.Map;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DatabaseInfo;
@@ -99,7 +98,6 @@ public class LightCatalogUtility {
             case "getCrawlInfo" -> new LightCrawlInfo();
             case "getJdbcDriverInfo" -> TestObjectUtility.makeTestObject(JdbcDriverInfo.class);
             case "getDatabaseInfo" -> lightDatabaseInfo();
-            case "getAttributes" -> Map.of();
             case "getTables" -> tablesList;
             default -> returnEmpty(method);
           };

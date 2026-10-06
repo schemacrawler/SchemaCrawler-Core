@@ -284,6 +284,9 @@ public class TestObjectUtility {
     if (Optional.class.isAssignableFrom(returnType)) {
       return Optional.empty();
     }
+    if (Map.class.isAssignableFrom(returnType)) {
+      return Map.of();
+    }
     if (Collection.class.isAssignableFrom(returnType)) {
       return List.of();
     }
