@@ -15,7 +15,6 @@ import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,6 +36,7 @@ import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schemacrawler.FilterOptions;
 import schemacrawler.schemacrawler.ProjectionOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
+import schemacrawler.utility.NamedObjectSort;
 
 /** Builds immutable catalog projections from an already loaded catalog. */
 public final class CatalogProjectionBuilder {
@@ -55,7 +55,7 @@ public final class CatalogProjectionBuilder {
 
   private static <N extends NamedObject> List<N> sortedCopy(final Collection<N> objects) {
     final List<N> sortedObjects = new ArrayList<>(objects);
-    sortedObjects.sort(Comparator.naturalOrder());
+    sortedObjects.sort(NamedObjectSort.alphabetical);
     return List.copyOf(sortedObjects);
   }
 

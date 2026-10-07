@@ -8,23 +8,18 @@
 
 package schemacrawler.filter;
 
+import static java.util.Objects.compare;
 import static schemacrawler.utility.NamedObjectSort.alphabetical;
+import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-
-import static java.util.Objects.compare;
-
-import static us.fatehi.utility.Utility.isBlank;
-
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -51,36 +46,34 @@ final class CatalogProjection implements Catalog {
 
   private static LinkedHashMap<NamedObjectKey, DatabaseUser> indexByKey(
       final Collection<DatabaseUser> values) {
-    final Map<NamedObjectKey, DatabaseUser> sorted = new TreeMap<>();
-    values.forEach(databaseUser -> sorted.putIfAbsent(databaseUser.key(), databaseUser));
-    return new LinkedHashMap<>(sorted);
+    final LinkedHashMap<NamedObjectKey, DatabaseUser> index = new LinkedHashMap<>();
+    values.forEach(databaseUser -> index.putIfAbsent(databaseUser.key(), databaseUser));
+    return index;
   }
 
   private static <N extends DatabaseObject> LinkedHashMap<NamedObjectKey, N> indexBySchemaAndName(
       final Collection<N> values) {
-    final Map<NamedObjectKey, N> sorted = new TreeMap<>();
+    final LinkedHashMap<NamedObjectKey, N> index = new LinkedHashMap<>();
     values.forEach(
         value -> {
           final Schema schema = value.getSchema();
           if (schema != null) {
-            sorted.putIfAbsent(schema.key().with(value.getName()), value);
+            index.putIfAbsent(schema.key().with(value.getName()), value);
           }
         });
-    return new LinkedHashMap<>(sorted);
+    return index;
   }
 
   private static LinkedHashMap<NamedObjectKey, Routine> indexRoutines(
       final Collection<Routine> values) {
-    final Map<NamedObjectKey, Routine> sorted = new TreeMap<>();
-    values.forEach(routine -> sorted.putIfAbsent(routine.key(), routine));
-    return new LinkedHashMap<>(sorted);
+    final LinkedHashMap<NamedObjectKey, Routine> index = new LinkedHashMap<>();
+    values.forEach(routine -> index.putIfAbsent(routine.key(), routine));
+    return index;
   }
 
   private static LinkedHashMap<String, Schema> indexSchemas(final Collection<Schema> values) {
-    final List<Schema> sortedSchemas = new ArrayList<>(values);
-    sortedSchemas.sort(Comparator.naturalOrder());
     final LinkedHashMap<String, Schema> index = new LinkedHashMap<>();
-    sortedSchemas.forEach(schema -> index.putIfAbsent(schema.getFullName(), schema));
+    values.forEach(schema -> index.putIfAbsent(schema.getFullName(), schema));
     return index;
   }
 
@@ -98,10 +91,8 @@ final class CatalogProjection implements Catalog {
       return List.of();
     }
     return index.values().stream()
-      .filter(
-        value ->
-          value.getSchema() != null && schema.key().equals(value.getSchema().key()))
-      .toList();
+        .filter(value -> value.getSchema() != null && schema.key().equals(value.getSchema().key()))
+        .toList();
   }
 
   private final CrawlInfo crawlInfo;
@@ -234,11 +225,11 @@ final class CatalogProjection implements Catalog {
   @Override
   public Collection<Routine> getRoutines(final Schema schema, final String routineName) {
     return routines.values().stream()
-      .filter(
-        routine ->
-          schema != null
-            && routine.getSchema() != null
-            && schema.key().equals(routine.getSchema().key()))
+        .filter(
+            routine ->
+                schema != null
+                    && routine.getSchema() != null
+                    && schema.key().equals(routine.getSchema().key()))
         .filter(routine -> isBlank(routineName) || routineName.equals(routine.getName()))
         .toList();
   }
