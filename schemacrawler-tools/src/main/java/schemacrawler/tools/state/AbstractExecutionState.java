@@ -9,9 +9,14 @@
 package schemacrawler.tools.state;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
+import java.util.Set;
+import java.util.function.Predicate;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Table;
 import us.fatehi.utility.Nullable;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
@@ -20,6 +25,7 @@ public abstract class AbstractExecutionState implements ExecutionState {
   private Catalog catalog;
   private ERModel erModel;
   private DatabaseConnectionSource connectionSource;
+  private Predicate<Table> tableVisibilityPredicate = table -> false;
 
   @Override
   public final Catalog getCatalog() {
@@ -34,6 +40,10 @@ public abstract class AbstractExecutionState implements ExecutionState {
   @Override
   public final ERModel getERModel() {
     return erModel;
+  }
+
+  protected final Predicate<Table> getTableVisibilityPredicate() {
+    return tableVisibilityPredicate;
   }
 
   @Override
@@ -54,6 +64,7 @@ public abstract class AbstractExecutionState implements ExecutionState {
   @Override
   public final void setCatalog(@Nullable final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
+    tableVisibilityPredicate = buildTableVisibilityPredicate(catalog);
   }
 
   @Override
@@ -92,9 +103,16 @@ public abstract class AbstractExecutionState implements ExecutionState {
     catalog = null;
     connectionSource = null;
     erModel = null;
+    tableVisibilityPredicate = table -> false;
   }
 
   protected final void clearConnectionSource() {
     connectionSource = null;
+  }
+
+  private static Predicate<Table> buildTableVisibilityPredicate(final Catalog catalog) {
+    final Set<NamedObjectKey> visibleTableKeys =
+        catalog.getTables().stream().map(Table::key).collect(toUnmodifiableSet());
+    return table -> table != null && visibleTableKeys.contains(table.key());
   }
 }
