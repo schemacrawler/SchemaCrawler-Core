@@ -12,6 +12,7 @@ import static java.util.Objects.compare;
 import static java.util.Objects.requireNonNullElse;
 import static schemacrawler.utility.NamedObjectSort.alphabetical;
 import static us.fatehi.utility.Utility.isBlank;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.io.Serial;
 import java.util.Collection;
@@ -96,6 +97,7 @@ final class CatalogProjection implements Catalog {
         .toList();
   }
 
+  private final String name;
   private final CrawlInfo crawlInfo;
   private final DatabaseInfo databaseInfo;
   private final JdbcDriverInfo jdbcDriverInfo;
@@ -109,6 +111,7 @@ final class CatalogProjection implements Catalog {
   private final LinkedHashMap<NamedObjectKey, DatabaseUser> databaseUsers;
 
   CatalogProjection(
+      final String name,
       final CrawlInfo crawlInfo,
       final DatabaseInfo databaseInfo,
       final JdbcDriverInfo jdbcDriverInfo,
@@ -120,6 +123,7 @@ final class CatalogProjection implements Catalog {
       final Collection<Synonym> synonyms,
       final Collection<ColumnDataType> columnDataTypes,
       final Collection<DatabaseUser> databaseUsers) {
+    this.name = trimToEmpty(name);
     this.crawlInfo = crawlInfo;
     this.databaseInfo = databaseInfo;
     this.jdbcDriverInfo = jdbcDriverInfo;
@@ -190,7 +194,7 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public String getName() {
-    return "catalog";
+    return name;
   }
 
   @Override

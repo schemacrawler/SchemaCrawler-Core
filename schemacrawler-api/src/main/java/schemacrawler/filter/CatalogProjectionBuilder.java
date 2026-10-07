@@ -102,6 +102,7 @@ public final class CatalogProjectionBuilder {
     final List<DatabaseUser> databaseUsers = sortedCopy(catalog.getDatabaseUsers());
 
     return new CatalogProjection(
+        catalog.getName(),
         catalog.getCrawlInfo(),
         catalog.getDatabaseInfo(),
         catalog.getJdbcDriverInfo(),
