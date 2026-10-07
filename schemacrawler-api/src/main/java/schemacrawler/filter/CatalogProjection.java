@@ -9,6 +9,7 @@
 package schemacrawler.filter;
 
 import static java.util.Objects.compare;
+import static java.util.Objects.requireNonNullElse;
 import static schemacrawler.utility.NamedObjectSort.alphabetical;
 import static us.fatehi.utility.Utility.isBlank;
 
@@ -98,8 +99,7 @@ final class CatalogProjection implements Catalog {
   private final CrawlInfo crawlInfo;
   private final DatabaseInfo databaseInfo;
   private final JdbcDriverInfo jdbcDriverInfo;
-  private final String remarks;
-  private final Map<String, Object> attributes;
+  private final Map<String, Object> attributesMap;
   private final LinkedHashMap<String, Schema> schemas;
   private final LinkedHashMap<NamedObjectKey, Table> tables;
   private final LinkedHashMap<NamedObjectKey, Routine> routines;
@@ -112,7 +112,7 @@ final class CatalogProjection implements Catalog {
       final CrawlInfo crawlInfo,
       final DatabaseInfo databaseInfo,
       final JdbcDriverInfo jdbcDriverInfo,
-      final Map<String, Object> sourceAttributes,
+      final Map<String, Object> attributesMap,
       final Collection<Schema> schemas,
       final Collection<Table> tables,
       final Collection<Routine> routines,
@@ -123,21 +123,7 @@ final class CatalogProjection implements Catalog {
     this.crawlInfo = crawlInfo;
     this.databaseInfo = databaseInfo;
     this.jdbcDriverInfo = jdbcDriverInfo;
-    final Object sourceRemarks =
-        sourceAttributes == null ? null : sourceAttributes.get(REMARKS_ATTRIBUTE);
-    remarks = sourceRemarks == null ? "" : String.valueOf(sourceRemarks);
-    final Map<String, Object> attributesCopy = new TreeMap<>();
-    if (sourceAttributes != null) {
-      sourceAttributes.forEach(
-          (attributeName, value) -> {
-            if (attributeName != null
-                && value != null
-                && !REMARKS_ATTRIBUTE.equals(attributeName)) {
-              attributesCopy.put(attributeName, value);
-            }
-          });
-    }
-    attributes = Map.copyOf(attributesCopy);
+    this.attributesMap = Map.copyOf(requireNonNullElse(attributesMap, Map.of()));
     this.schemas = indexSchemas(schemas);
     this.tables = indexBySchemaAndName(tables);
     this.routines = indexRoutines(routines);
@@ -159,12 +145,12 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public <T> T getAttribute(final String name, final T defaultValue) {
-    return (T) attributes.getOrDefault(name, defaultValue);
+    return (T) attributesMap.getOrDefault(name, defaultValue);
   }
 
   @Override
   public Map<String, Object> getAttributes() {
-    return Collections.unmodifiableMap(new TreeMap<>(attributes));
+    return Collections.unmodifiableMap(new TreeMap<>(attributesMap));
   }
 
   @Override
@@ -204,12 +190,12 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public String getName() {
-    return "catalog-projection";
+    return "catalog";
   }
 
   @Override
   public String getRemarks() {
-    return remarks;
+    return getAttribute(REMARKS_ATTRIBUTE, "");
   }
 
   @Override
@@ -281,17 +267,17 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public boolean hasAttribute(final String name) {
-    return attributes.containsKey(name);
+    return attributesMap.containsKey(name);
   }
 
   @Override
   public boolean hasRemarks() {
-    return !isBlank(remarks);
+    return !isBlank(getRemarks());
   }
 
   @Override
   public NamedObjectKey key() {
-    return new NamedObjectKey();
+    return new NamedObjectKey(getName());
   }
 
   @Override

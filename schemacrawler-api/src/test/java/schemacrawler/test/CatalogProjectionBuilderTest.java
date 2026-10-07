@@ -65,11 +65,11 @@ public class CatalogProjectionBuilderTest {
 
     final Catalog firstProjection =
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(table -> table.getName().equals("first"))
+            .withTablePredicate(table -> "first".equals(table.getName()))
             .build();
     final Catalog secondProjection =
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(table -> table.getName().equals("second"))
+            .withTablePredicate(table -> "second".equals(table.getName()))
             .build();
 
     assertThat(firstProjection.getTables(), contains(firstTable));
@@ -116,7 +116,7 @@ public class CatalogProjectionBuilderTest {
     final Catalog source = mockCatalogWithTables(selectedTable, hiddenTable);
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(table -> table.getName().equals("selected"))
+            .withTablePredicate(table -> "selected".equals(table.getName()))
             .build();
 
     assertThat(
@@ -418,7 +418,7 @@ public class CatalogProjectionBuilderTest {
         UnsupportedOperationException.class, () -> projection.getAttributes().put("new", "value"));
     assertThat(source.hasAttribute("projection"), is(false));
     assertThat(projection.getAttribute("baseline", ""), is("before"));
-    assertThat(projection.hasAttribute("REMARKS"), is(false));
+    assertThat(projection.hasAttribute("REMARKS"), is(true));
     assertThat(projection.getRemarks(), is("baseline remarks"));
   }
 
