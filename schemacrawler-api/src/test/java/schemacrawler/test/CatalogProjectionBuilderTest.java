@@ -79,7 +79,7 @@ public class CatalogProjectionBuilderTest {
   }
 
   @Test
-  public void collectionsAreImmutableAndAlphabeticallyOrdered() {
+  public void collectionsAreImmutableAndNaturallyOrdered() {
     final Table secondTable = new LightTable("second");
     final Table firstTable = new LightTable("first");
     final Catalog source = LightCatalogUtility.lightCatalog(secondTable, firstTable);
@@ -96,17 +96,16 @@ public class CatalogProjectionBuilderTest {
   }
 
   @Test
-  public void collectionsFollowAlphabeticalFullNameOrder() {
+  public void collectionsFollowNaturalNamedObjectOrder() {
     final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
-    final Table alphabeticallyLaterTable = new LightTable(schema, "Beta");
-    final Table alphabeticallyEarlierTable = new LightTable(schema, "alpha");
+    final Table naturallyEarlierTable = new LightTable(schema, "Beta");
+    final Table naturallyLaterTable = new LightTable(schema, "alpha");
     final Catalog source =
-        LightCatalogUtility.lightCatalog(alphabeticallyLaterTable, alphabeticallyEarlierTable);
+        LightCatalogUtility.lightCatalog(naturallyLaterTable, naturallyEarlierTable);
 
     final Catalog projection = CatalogProjectionBuilder.builder(source).build();
 
-    assertThat(
-        projection.getTables(), contains(alphabeticallyEarlierTable, alphabeticallyLaterTable));
+    assertThat(projection.getTables(), contains(naturallyEarlierTable, naturallyLaterTable));
   }
 
   @Test
