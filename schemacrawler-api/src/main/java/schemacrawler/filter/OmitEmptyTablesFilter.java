@@ -11,7 +11,7 @@ package schemacrawler.filter;
 import schemacrawler.schema.Table;
 
 /** Selects tables whose row count is not known to be zero. */
-final class NoEmptyTablesFilter implements NamedObjectFilter<Table> {
+final class OmitEmptyTablesFilter implements NamedObjectFilter<Table> {
 
   public static final String TABLE_ROW_COUNT_KEY = "schemacrawler.table.row_count";
 

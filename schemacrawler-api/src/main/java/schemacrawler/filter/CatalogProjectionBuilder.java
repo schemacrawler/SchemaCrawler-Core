@@ -224,7 +224,7 @@ public final class CatalogProjectionBuilder {
       final Set<NamedObjectKey> schemaKeys, final boolean sourceHasSchemas) {
     final FilterOptions filterOptions = projectionOptions.filterOptions();
     final Predicate<Table> eligibleTableFilter =
-        filterOptions.noEmptyTables() ? new NoEmptyTablesFilter() : table -> true;
+        filterOptions.omitEmptyTables() ? new OmitEmptyTablesFilter() : table -> true;
     final List<Table> allTables =
         sortedCopy(catalog.getTables().stream().filter(eligibleTableFilter).toList());
     final Set<NamedObjectKey> eligibleTableKeys = keys(allTables);

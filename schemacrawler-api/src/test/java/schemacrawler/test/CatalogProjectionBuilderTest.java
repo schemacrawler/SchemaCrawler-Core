@@ -70,7 +70,7 @@ public class CatalogProjectionBuilderTest {
         LightCatalogUtility.lightCatalog(emptyTable, nonEmptyTable, unknownCountTable);
 
     final FilterOptions filterOptions =
-        FilterOptionsBuilder.builder().noEmptyTables(true).toOptions();
+        FilterOptionsBuilder.builder().omitEmptyTables(true).toOptions();
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
             .withOptions(projectionOptions(filterOptions, null))

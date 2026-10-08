@@ -93,14 +93,13 @@ public final class NamedObjectFilters {
   }
 
   /**
-   * Creates a filter that excludes tables whose known row count is zero.
-   * Tables with a positive or unknown row count are accepted. This filter
-   * does not load or query row counts.
+   * Creates a filter that excludes tables whose known row count is zero. Tables with a positive or
+   * unknown row count are accepted. This filter does not load or query row counts.
    *
    * @return a filter that rejects known-empty tables
    */
-  public static NamedObjectFilter<Table> noEmptyTables() {
-    return new NoEmptyTablesFilter();
+  public static NamedObjectFilter<Table> omitEmptyTables() {
+    return new OmitEmptyTablesFilter();
   }
 
   /**
