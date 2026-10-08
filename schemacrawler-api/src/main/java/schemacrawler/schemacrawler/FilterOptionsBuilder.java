@@ -24,12 +24,19 @@ public final class FilterOptionsBuilder
 
   private int childTableFilterDepth;
   private int parentTableFilterDepth;
+  private boolean noEmptyTables;
 
   /** Default options. */
   private FilterOptionsBuilder() {}
 
   public FilterOptionsBuilder childTableFilterDepth(final int childTableFilterDepth) {
     this.childTableFilterDepth = Math.max(childTableFilterDepth, 0);
+    return this;
+  }
+
+  /** Excludes tables with a known row count of zero. */
+  public FilterOptionsBuilder noEmptyTables(final boolean noEmptyTables) {
+    this.noEmptyTables = noEmptyTables;
     return this;
   }
 
@@ -41,6 +48,7 @@ public final class FilterOptionsBuilder
 
     childTableFilterDepth = options.childTableFilterDepth();
     parentTableFilterDepth = options.parentTableFilterDepth();
+    noEmptyTables = options.noEmptyTables();
 
     return this;
   }
@@ -52,6 +60,6 @@ public final class FilterOptionsBuilder
 
   @Override
   public FilterOptions toOptions() {
-    return new FilterOptions(childTableFilterDepth, parentTableFilterDepth);
+    return new FilterOptions(childTableFilterDepth, parentTableFilterDepth, noEmptyTables);
   }
 }

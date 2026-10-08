@@ -11,6 +11,7 @@ package schemacrawler.test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.is;
+import static schemacrawler.loader.utility.TableRowCountsUtility.getRowCount;
 import static schemacrawler.loader.utility.TableRowCountsUtility.getRowCountMessage;
 import static schemacrawler.loader.utility.TableRowCountsUtility.hasRowCount;
 import static us.fatehi.test.utility.extensions.FileHasContent.classpathResource;
@@ -45,38 +46,21 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 public class TableRowCountsTest {
 
   @Test
-  public void noEmptyTables(
-      final TestContext testContext, final DatabaseConnectionSource connectionSource)
-      throws Exception {
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
+  public void rowCountLoadingLeavesEmptyTablesInBaseline(
+      final DatabaseConnectionSource connectionSource) throws Exception {
+    final SchemaRetrievalOptions schemaRetrievalOptions =
+        DatabaseTestUtility.newSchemaRetrievalOptions();
+    final SchemaCrawlerOptions schemaCrawlerOptions =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
+    final Config additionalConfig = ConfigUtility.newConfig();
+    additionalConfig.put("load-row-counts", true);
 
-      final SchemaRetrievalOptions schemaRetrievalOptions =
-          DatabaseTestUtility.newSchemaRetrievalOptions();
+    final Catalog catalog =
+        SchemaCrawlerUtility.getCatalog(
+            connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
 
-      final SchemaCrawlerOptions schemaCrawlerOptions =
-          SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
-
-      final Config additionalConfig = ConfigUtility.newConfig();
-      additionalConfig.put("load-row-counts", true);
-      additionalConfig.put("no-empty-tables", true);
-
-      final Catalog catalog =
-          SchemaCrawlerUtility.getCatalog(
-              connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
-      final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
-      assertThat("Schema count does not match", schemas, arrayWithSize(6));
-      for (final Schema schema : schemas) {
-        final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
-        for (final Table table : tables) {
-          assertThat(
-              "Table <%s> should have row counts".formatted(table), hasRowCount(table), is(true));
-          out.println("%s [%s]".formatted(table.getFullName(), getRowCountMessage(table)));
-        }
-      }
-    }
-    assertThat(
-        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+    assertThat(catalog.getTables().stream().allMatch(table -> hasRowCount(table)), is(true));
+    assertThat(catalog.getTables().stream().anyMatch(table -> getRowCount(table) == 0L), is(true));
   }
 
   @Test

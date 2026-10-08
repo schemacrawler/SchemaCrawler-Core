@@ -12,13 +12,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Test;
-import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.loader.catalog.CatalogLoaderProvider;
 import schemacrawler.loader.catalog.counts.TableRowCountsLoaderProvider;
 import schemacrawler.loader.catalog.offline.OfflineCatalogLoaderProvider;
 import schemacrawler.loader.ermodel.ERModelLoaderProvider;
 import schemacrawler.loader.ermodel.attributes.AttributesLoaderProvider;
 import schemacrawler.loader.ermodel.implicitassociations.ImplicitAssociationsLoaderProvider;
+import schemacrawler.tools.executable.commandline.PluginCommand;
 
 public class LoaderPluginCommandTest {
 
@@ -29,8 +29,7 @@ public class LoaderPluginCommandTest {
         new TableRowCountsLoaderProvider(),
         """
         PluginCommand[name='countsloader', options=[\
-        PluginCommandOption[name='load-row-counts', valueClass=java.lang.Boolean], \
-        PluginCommandOption[name='no-empty-tables', valueClass=java.lang.Boolean]\
+        PluginCommandOption[name='load-row-counts', valueClass=java.lang.Boolean]\
         ]]\
         """);
 

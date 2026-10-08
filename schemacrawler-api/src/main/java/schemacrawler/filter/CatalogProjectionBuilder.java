@@ -222,7 +222,11 @@ public final class CatalogProjectionBuilder {
 
   private List<Table> selectTables(
       final Set<NamedObjectKey> schemaKeys, final boolean sourceHasSchemas) {
-    final List<Table> allTables = sortedCopy(catalog.getTables());
+    final FilterOptions filterOptions = projectionOptions.filterOptions();
+    final Predicate<Table> eligibleTableFilter =
+        filterOptions.noEmptyTables() ? new NoEmptyTablesFilter() : table -> true;
+    final List<Table> allTables =
+        sortedCopy(catalog.getTables().stream().filter(eligibleTableFilter).toList());
     final Set<NamedObjectKey> eligibleTableKeys = keys(allTables);
     final Predicate<Table> tableFilter =
         tablePredicate.and(NamedObjectFilters.tableGrep(projectionOptions.grepOptions()));
@@ -232,7 +236,6 @@ public final class CatalogProjectionBuilder {
             .filter(tableFilter)
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
-    final FilterOptions filterOptions = projectionOptions.filterOptions();
     final Set<Table> parentTables =
         includeRelatedTables(
             seedTables,

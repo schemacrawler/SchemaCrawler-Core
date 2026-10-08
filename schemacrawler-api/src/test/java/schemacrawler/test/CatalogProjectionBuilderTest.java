@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.filter.NamedObjectFilters;
+import schemacrawler.filter.NoEmptyTablesFilter;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
@@ -56,6 +57,34 @@ import schemacrawler.test.utility.crawl.LightProcedureParameter;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class CatalogProjectionBuilderTest {
+
+  @Test
+  public void noEmptyTablesFilterChangesOnlyProjectionMembership() {
+    final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
+    final Table emptyTable = new LightTable(schema, "empty");
+    emptyTable.setAttribute(NoEmptyTablesFilter.TABLE_ROW_COUNT_KEY, 0L);
+    final Table nonEmptyTable = new LightTable(schema, "non_empty");
+    nonEmptyTable.setAttribute(NoEmptyTablesFilter.TABLE_ROW_COUNT_KEY, 5L);
+    final Table unknownCountTable = new LightTable(schema, "unknown_count");
+    final Catalog source =
+        LightCatalogUtility.lightCatalog(emptyTable, nonEmptyTable, unknownCountTable);
+
+    final FilterOptions filterOptions =
+        FilterOptionsBuilder.builder().noEmptyTables(true).toOptions();
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source)
+            .withOptions(projectionOptions(filterOptions, null))
+            .build();
+    final Catalog unrestrictedProjection = CatalogProjectionBuilder.builder(source).build();
+
+    assertThat(projection.getTables(), containsInAnyOrder(nonEmptyTable, unknownCountTable));
+    assertThat(
+        unrestrictedProjection.getTables(),
+        containsInAnyOrder(emptyTable, nonEmptyTable, unknownCountTable));
+    assertThat(
+        source.getTables(), containsInAnyOrder(emptyTable, nonEmptyTable, unknownCountTable));
+    assertThat(projection.lookupTable(schema, "empty").isEmpty(), is(true));
+  }
 
   @Test
   public void independentImmutableProjection() {
