@@ -17,16 +17,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import schemacrawler.schema.AttributedObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.schema.ReducibleCollection;
 
 /**
  * Ordered list of named objects, that can be searched associatively. NamedObjectList has the
@@ -34,11 +29,9 @@ import schemacrawler.schema.ReducibleCollection;
  * String. Returns values sorted in natural sort order, and is iterable. The iterator does not allow
  * modifications to the underlying data structure.
  */
-final class NamedObjectList<N extends NamedObject> implements Serializable, ReducibleCollection<N> {
+final class NamedObjectList<N extends NamedObject> implements Serializable, Iterable<N> {
 
   @Serial private static final long serialVersionUID = 3257847666804142128L;
-
-  private static final String SCHEMACRAWLER_FILTERED_OUT = "schemacrawler.filtered_out";
 
   private static NamedObjectKey makeLookupKey(final NamedObject namedObject) {
     final NamedObjectKey key;
@@ -59,33 +52,7 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
   }
 
   private final Map<NamedObjectKey, N> objects = new ConcurrentHashMap<>();
-  private final Map<NamedObjectKey, N> filteredObjects = new ConcurrentHashMap<>();
 
-  /** {@inheritDoc} */
-  @Override
-  public synchronized void filter(final Predicate<? super N> predicate) {
-    if (predicate == null) {
-      return;
-    }
-
-    final Set<Entry<NamedObjectKey, N>> entrySet = objects.entrySet();
-    for (final Iterator<Entry<NamedObjectKey, N>> iterator = entrySet.iterator();
-        iterator.hasNext(); ) {
-      final Entry<NamedObjectKey, N> entry = iterator.next();
-      final NamedObjectKey key = entry.getKey();
-      final N namedObject = entry.getValue();
-      if (!predicate.test(namedObject)) {
-        // Filter object by moving it to the filtered objects map
-        iterator.remove();
-        filteredObjects.put(key, namedObject);
-        if (namedObject instanceof final AttributedObject attributedObject) {
-          attributedObject.setAttribute(SCHEMACRAWLER_FILTERED_OUT, true);
-        }
-      }
-    }
-  }
-
-  /** {@inheritDoc} */
   @Override
   public Iterator<N> iterator() {
     final class UnmodifiableIterator implements Iterator<N> {
@@ -113,23 +80,6 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Redu
     }
 
     return new UnmodifiableIterator(values().iterator());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public synchronized void resetFilter() {
-    final Set<Entry<NamedObjectKey, N>> entrySet = filteredObjects.entrySet();
-    for (final Iterator<Entry<NamedObjectKey, N>> iterator = entrySet.iterator();
-        iterator.hasNext(); ) {
-      final Entry<NamedObjectKey, N> entry = iterator.next();
-      final NamedObjectKey key = entry.getKey();
-      final N namedObject = entry.getValue();
-      objects.put(key, namedObject);
-      iterator.remove();
-      if (namedObject instanceof final AttributedObject attributedObject) {
-        attributedObject.removeAttribute(SCHEMACRAWLER_FILTERED_OUT);
-      }
-    }
   }
 
   /** {@inheritDoc} */

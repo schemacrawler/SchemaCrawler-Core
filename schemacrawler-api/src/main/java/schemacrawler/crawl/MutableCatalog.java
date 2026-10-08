@@ -23,10 +23,7 @@ import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.schema.Reducer;
-import schemacrawler.schema.Reducible;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
@@ -40,7 +37,7 @@ import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder
  * Database and connection information. Created from metadata returned by a JDBC call, and other
  * sources of information.
  */
-final class MutableCatalog extends AbstractNamedObjectWithAttributes implements Catalog, Reducible {
+final class MutableCatalog extends AbstractNamedObjectWithAttributes implements Catalog {
 
   private static final class FilterBySchema implements Predicate<DatabaseObject> {
 
@@ -288,58 +285,6 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   @Override
   public Optional<MutableTable> lookupTable(final Schema schemaRef, final String name) {
     return tables.lookup(schemaRef, name);
-  }
-
-  @Override
-  public <N extends NamedObject> void reduce(final Class<N> clazz, final Reducer<N> reducer) {
-    requireNonNull(reducer, "No reducer provided");
-    requireNonNull(clazz, "No lookup class provided");
-
-    if (Schema.class.isAssignableFrom(clazz)) {
-      final Reducer<Schema> schemaReducer = (Reducer<Schema>) reducer;
-      schemaReducer.reduce(schemas);
-    } else if (Table.class.isAssignableFrom(clazz)) {
-      // Filter the list of tables based on grep criteria, and
-      // parent-child relationships
-      final Reducer<Table> tableReducer = (Reducer<Table>) reducer;
-      tableReducer.reduce(tables);
-    } else if (Routine.class.isAssignableFrom(clazz)) {
-      // Filter the list of routines based on grep criteria
-      final Reducer<Routine> routineReducer = (Reducer<Routine>) reducer;
-      routineReducer.reduce(routines);
-    } else if (Synonym.class.isAssignableFrom(clazz)) {
-      final Reducer<Synonym> synonymReducer = (Reducer<Synonym>) reducer;
-      synonymReducer.reduce(synonyms);
-    } else if (Sequence.class.isAssignableFrom(clazz)) {
-      final Reducer<Sequence> sequenceReducer = (Reducer<Sequence>) reducer;
-      sequenceReducer.reduce(sequences);
-    }
-  }
-
-  @Override
-  public <N extends NamedObject> void undo(final Class<N> clazz, final Reducer<N> reducer) {
-    requireNonNull(reducer, "No reducer provided");
-    requireNonNull(clazz, "No lookup class provided");
-
-    if (Schema.class.isAssignableFrom(clazz)) {
-      final Reducer<Schema> schemaReducer = (Reducer<Schema>) reducer;
-      schemaReducer.undo(schemas);
-    } else if (Table.class.isAssignableFrom(clazz)) {
-      // Filter the list of tables based on grep criteria, and
-      // parent-child relationships
-      final Reducer<Table> tableReducer = (Reducer<Table>) reducer;
-      tableReducer.undo(tables);
-    } else if (Routine.class.isAssignableFrom(clazz)) {
-      // Filter the list of routines based on grep criteria
-      final Reducer<Routine> routineReducer = (Reducer<Routine>) reducer;
-      routineReducer.undo(routines);
-    } else if (Synonym.class.isAssignableFrom(clazz)) {
-      final Reducer<Synonym> synonymReducer = (Reducer<Synonym>) reducer;
-      synonymReducer.undo(synonyms);
-    } else if (Sequence.class.isAssignableFrom(clazz)) {
-      final Reducer<Sequence> sequenceReducer = (Reducer<Sequence>) reducer;
-      sequenceReducer.undo(sequences);
-    }
   }
 
   void addColumnDataType(final MutableColumnDataType columnDataType) {
