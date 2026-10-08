@@ -8,11 +8,10 @@
 
 package schemacrawler.filter;
 
-import java.util.function.Predicate;
 import schemacrawler.schema.Table;
 
 /** Selects tables whose row count is not known to be zero. */
-public final class NoEmptyTablesFilter implements Predicate<Table> {
+final class NoEmptyTablesFilter implements NamedObjectFilter<Table> {
 
   public static final String TABLE_ROW_COUNT_KEY = "schemacrawler.table.row_count";
 

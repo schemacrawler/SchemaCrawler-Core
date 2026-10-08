@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static schemacrawler.utility.TableRowCountsUtility.TABLE_ROW_COUNT_KEY;
 
 import java.util.Collection;
 import java.util.EnumMap;
@@ -25,7 +26,6 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.filter.NamedObjectFilters;
-import schemacrawler.filter.NoEmptyTablesFilter;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
@@ -62,9 +62,9 @@ public class CatalogProjectionBuilderTest {
   public void noEmptyTablesFilterChangesOnlyProjectionMembership() {
     final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
     final Table emptyTable = new LightTable(schema, "empty");
-    emptyTable.setAttribute(NoEmptyTablesFilter.TABLE_ROW_COUNT_KEY, 0L);
+    emptyTable.setAttribute(TABLE_ROW_COUNT_KEY, 0L);
     final Table nonEmptyTable = new LightTable(schema, "non_empty");
-    nonEmptyTable.setAttribute(NoEmptyTablesFilter.TABLE_ROW_COUNT_KEY, 5L);
+    nonEmptyTable.setAttribute(TABLE_ROW_COUNT_KEY, 5L);
     final Table unknownCountTable = new LightTable(schema, "unknown_count");
     final Catalog source =
         LightCatalogUtility.lightCatalog(emptyTable, nonEmptyTable, unknownCountTable);

@@ -6,11 +6,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.utility;
+package schemacrawler.utility;
 
-import static java.util.Objects.requireNonNull;
-
-import schemacrawler.filter.NoEmptyTablesFilter;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.UtilityMarker;
 
@@ -18,7 +15,7 @@ import us.fatehi.utility.UtilityMarker;
 public final class TableRowCountsUtility {
 
   private static final long UNKNOWN_TABLE_ROW_COUNT = -1L;
-  public static final String TABLE_ROW_COUNT_KEY = NoEmptyTablesFilter.TABLE_ROW_COUNT_KEY;
+  public static final String TABLE_ROW_COUNT_KEY = "schemacrawler.table.row_count";
 
   public static long getRowCount(final Table table) {
     if (table == null) {
@@ -26,25 +23,6 @@ public final class TableRowCountsUtility {
     }
 
     return table.getAttribute(TABLE_ROW_COUNT_KEY, UNKNOWN_TABLE_ROW_COUNT);
-  }
-
-  /**
-   * Message format for the counts.
-   *
-   * @param number Number value in the message
-   * @return Message format for the counts
-   */
-  public static String getRowCountMessage(final Number number) {
-    requireNonNull(number, "No number provided");
-    final long longValue = number.longValue();
-    if (longValue <= 0) {
-      return "empty";
-    }
-    return "%,d rows".formatted(longValue);
-  }
-
-  public static String getRowCountMessage(final Table table) {
-    return getRowCountMessage(getRowCount(table));
   }
 
   public static boolean hasRowCount(final Table table) {
