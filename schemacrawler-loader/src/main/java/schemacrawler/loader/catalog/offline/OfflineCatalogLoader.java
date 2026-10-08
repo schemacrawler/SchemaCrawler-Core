@@ -8,8 +8,6 @@
 
 package schemacrawler.loader.catalog.offline;
 
-import static schemacrawler.filter.ReducerFactory.getCatalogReducer;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -20,10 +18,7 @@ import java.util.logging.Logger;
 import schemacrawler.loader.catalog.AbstractCatalogLoader;
 import schemacrawler.loader.catalog.offline.OfflineCatalogLoader.OfflineCatalogLoaderOptions;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.Reducible;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.DatabaseAccessException;
-import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.tools.command.CommandOptions;
 import schemacrawler.tools.offline.jdbc.OfflineConnection;
 import schemacrawler.utility.SerializedCatalogUtility;
@@ -61,13 +56,8 @@ final class OfflineCatalogLoader extends AbstractCatalogLoader<OfflineCatalogLoa
 
       final Path offlineDatabasePath = dbConnection.getOfflineDatabasePath();
       LOGGER.log(Level.FINE, "Derserializing from path: " + offlineDatabasePath);
+      // Preserve serialized membership; current crawl limits are not reapplied.
       catalog = SerializedCatalogUtility.deserializeCatalog(offlineDatabasePath);
-
-      final SchemaCrawlerOptions schemaCrawlerOptions = getSchemaCrawlerOptions();
-      if (!(catalog instanceof final Reducible reducibleCatalog)) {
-        throw new ExecutionRuntimeException("Offline catalog does not support reduction");
-      }
-      getCatalogReducer(schemaCrawlerOptions.crawlOptions()).reduce(reducibleCatalog);
 
     } catch (final IOException e) {
       throw new UncheckedIOException("Could not load offline database", e);

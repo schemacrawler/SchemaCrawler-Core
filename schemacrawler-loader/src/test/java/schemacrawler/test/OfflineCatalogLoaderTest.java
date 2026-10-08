@@ -95,6 +95,29 @@ public class OfflineCatalogLoaderTest {
   }
 
   @Test
+  public void getOfflineCatalogIgnoresCurrentLimits() throws Exception {
+    final OfflineConnection offlineConnection =
+        OfflineConnectionUtility.newOfflineConnection(serializedCatalogFile);
+    final DatabaseConnectionSource connectionSource =
+        DatabaseConnectionSources.fromConnection(offlineConnection);
+    final SchemaCrawlerOptions schemaCrawlerOptions =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withLimitOptions(
+                LimitOptionsBuilder.builder()
+                    .includeTables(new RegularExpressionInclusionRule(".*NEVER_MATCH.*"))
+                    .toOptions());
+
+    final Catalog catalog =
+        getCatalog(
+            connectionSource,
+            SchemaRetrievalOptionsBuilder.newSchemaRetrievalOptions(),
+            schemaCrawlerOptions,
+            ConfigUtility.newConfig());
+    validateCatalog(catalog);
+    assertThat(catalog.getTables(), hasSize(20));
+  }
+
+  @Test
   public void getOfflineCatalogDefersGrepUntilProjection() throws Exception {
     final OfflineConnection offlineConnection =
         OfflineConnectionUtility.newOfflineConnection(serializedCatalogFile);
