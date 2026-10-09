@@ -193,9 +193,7 @@ public class OfflineCatalogLoaderTest {
   private Catalog projectCatalog(final Catalog baseline, final GrepOptions grepOptions) {
     return CatalogProjectionBuilder.builder(baseline)
         .withOptions(
-            SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
-                .withGrepOptions(grepOptions)
-                .projectionOptions())
+            SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions().withGrepOptions(grepOptions))
         .build();
   }
 }

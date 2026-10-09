@@ -25,11 +25,13 @@ import static schemacrawler.test.utility.crawl.LightCatalogUtility.lightCatalog;
 import static us.fatehi.utility.IOUtility.createTempFilePath;
 
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
+import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
@@ -139,7 +141,12 @@ public class SchemaCrawlerExecutableTest {
             connectionSource, schemaRetrievalOptionsDefault, options, ConfigUtility.newConfig());
     final Catalog selectedCatalog =
         CatalogProjectionBuilder.builder(baseline)
-            .withTablePredicate(table -> table.getName().equals("BOOKAUTHORS"))
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeTables(Pattern.compile(".*BOOKAUTHORS$"))
+                            .toOptions()))
             .build();
     final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
     executable.setSchemaCrawlerOptions(options);
@@ -166,7 +173,12 @@ public class SchemaCrawlerExecutableTest {
             ConfigUtility.newConfig());
     final Catalog selectedCatalog =
         CatalogProjectionBuilder.builder(baseline)
-            .withTablePredicate(table -> table.getName().equals("BOOKAUTHORS"))
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeTables(Pattern.compile(".*BOOKAUTHORS$"))
+                            .toOptions()))
             .build();
     final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
     executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);

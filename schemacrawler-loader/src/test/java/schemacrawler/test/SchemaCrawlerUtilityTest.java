@@ -89,7 +89,7 @@ public class SchemaCrawlerUtilityTest {
 
     final Catalog projection =
         CatalogProjectionBuilder.builder(baseline)
-            .withOptions(newSchemaCrawlerOptions().withGrepOptions(grepOptions).projectionOptions())
+            .withOptions(newSchemaCrawlerOptions().withGrepOptions(grepOptions))
             .build();
     assertThat(projection.getTables(schema), is(empty()));
   }

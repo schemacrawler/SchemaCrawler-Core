@@ -19,13 +19,13 @@ import static schemacrawler.utility.TableRowCountsUtility.TABLE_ROW_COUNT_KEY;
 
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import schemacrawler.filter.CatalogProjectionBuilder;
-import schemacrawler.filter.NamedObjectFilters;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
@@ -36,9 +36,9 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.PartialDatabaseObject;
 import schemacrawler.schema.Routine;
+import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
-import schemacrawler.schema.SimpleTableType;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableRelationshipType;
@@ -47,10 +47,10 @@ import schemacrawler.schemacrawler.FilterOptions;
 import schemacrawler.schemacrawler.FilterOptionsBuilder;
 import schemacrawler.schemacrawler.GrepOptions;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
-import schemacrawler.schemacrawler.ProjectionOptions;
+import schemacrawler.schemacrawler.LimitOptionsBuilder;
+import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaReference;
-import schemacrawler.test.utility.crawl.LightCatalogUtility;
 import schemacrawler.test.utility.crawl.LightForeignKey;
 import schemacrawler.test.utility.crawl.LightProcedure;
 import schemacrawler.test.utility.crawl.LightProcedureParameter;
@@ -66,8 +66,7 @@ public class CatalogProjectionBuilderTest {
     final Table nonEmptyTable = new LightTable(schema, "non_empty");
     nonEmptyTable.setAttribute(TABLE_ROW_COUNT_KEY, 5L);
     final Table unknownCountTable = new LightTable(schema, "unknown_count");
-    final Catalog source =
-        LightCatalogUtility.lightCatalog(emptyTable, nonEmptyTable, unknownCountTable);
+    final Catalog source = mockCatalogWithTables(emptyTable, nonEmptyTable, unknownCountTable);
 
     final FilterOptions filterOptions =
         FilterOptionsBuilder.builder().omitEmptyTables(true).toOptions();
@@ -87,18 +86,120 @@ public class CatalogProjectionBuilderTest {
   }
 
   @Test
+  public void limitOptionsFilterSchemasTablesAndRoutines() {
+    final Schema includedSchema = new SchemaReference("CATALOG", "PUBLIC");
+    final Schema excludedSchema = new SchemaReference("CATALOG", "INTERNAL");
+    final Table matchingTable = new LightTable(includedSchema, "orders_archive");
+    final Table wrongPatternTable = new LightTable(includedSchema, "customers_archive");
+    final Table wrongTypeTable =
+        new LightTable(includedSchema, "orders_view") {
+          @Override
+          public TableType getTableType() {
+            return new TableType("view");
+          }
+        };
+    final Table excludedSchemaTable = new LightTable(excludedSchema, "orders_archive");
+    final LightProcedure includedProcedure = new LightProcedure(includedSchema, "allowed_proc");
+    final LightProcedure excludedProcedure = new LightProcedure(includedSchema, "rejected_proc");
+    final Routine wrongTypeRoutine =
+        namedRoutine(includedSchema, "allowed_function", RoutineType.function);
+    final Catalog source =
+        mockCatalogWithTables(
+            matchingTable, wrongPatternTable, wrongTypeTable, excludedSchemaTable);
+    when(source.getSchemas()).thenReturn(List.of(includedSchema, excludedSchema));
+    when(source.getRoutines())
+        .thenReturn(List.of(includedProcedure, excludedProcedure, wrongTypeRoutine));
+
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source)
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeSchemas(Pattern.compile(".*PUBLIC$"))
+                            .includeTables(Pattern.compile(".*_archive$"))
+                            .tableNamePattern("%orders%")
+                            .tableTypes(List.of("table"))
+                            .includeRoutines(Pattern.compile(".*allowed.*"))
+                            .routineTypes(List.of(RoutineType.procedure))
+                            .toOptions()))
+            .build();
+
+    assertThat(projection.getSchemas(), contains(includedSchema));
+    assertThat(projection.getTables(), containsInAnyOrder(matchingTable, wrongPatternTable));
+    assertThat(projection.getRoutines(), contains(includedProcedure));
+    assertThat(
+        source.getTables(),
+        containsInAnyOrder(matchingTable, wrongPatternTable, wrongTypeTable, excludedSchemaTable));
+  }
+
+  @Test
+  public void relationshipExpansionCannotRestoreTablesExcludedByCurrentLimits() {
+    final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
+    final RelatedLightTable seed = new RelatedLightTable(schema, "included");
+    final RelatedLightTable excludedRelatedTable = new RelatedLightTable(schema, "excluded");
+    seed.setRelatedTables(TableRelationshipType.parent, List.of(excludedRelatedTable));
+    final Catalog source = mockCatalogWithTables(seed, excludedRelatedTable);
+    final SchemaCrawlerOptions options =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withLimitOptions(
+                LimitOptionsBuilder.builder()
+                    .includeTables(Pattern.compile(".*included$"))
+                    .toOptions())
+            .withFilterOptions(
+                FilterOptionsBuilder.builder().parentTableFilterDepth(1).toOptions());
+
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source).withOptions(options).build();
+
+    assertThat(projection.getTables(), contains(seed));
+    assertThat(source.getTables(), containsInAnyOrder(seed, excludedRelatedTable));
+  }
+
+  @Test
+  public void limitOptionsFilterSequencesAndSynonyms() {
+    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
+    final Sequence includedSequence =
+        namedDatabaseObject(Sequence.class, schema, "allowed_sequence");
+    final Sequence excludedSequence =
+        namedDatabaseObject(Sequence.class, schema, "excluded_sequence");
+    final Synonym includedSynonym = namedDatabaseObject(Synonym.class, schema, "allowed_synonym");
+    final Synonym excludedSynonym = namedDatabaseObject(Synonym.class, schema, "excluded_synonym");
+    final Catalog source =
+        mockCatalogWithTables(new LightTable(schema, "table"), new LightTable(schema, "other"));
+    when(source.getSequences()).thenReturn(List.of(includedSequence, excludedSequence));
+    when(source.getSynonyms()).thenReturn(List.of(includedSynonym, excludedSynonym));
+
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source)
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeSequences(Pattern.compile(".*allowed_sequence$"))
+                            .includeSynonyms(Pattern.compile(".*allowed_synonym$"))
+                            .toOptions()))
+            .build();
+
+    assertThat(projection.getSequences(), contains(includedSequence));
+    assertThat(projection.getSynonyms(), contains(includedSynonym));
+    assertThat(source.getSequences(), contains(includedSequence, excludedSequence));
+    assertThat(source.getSynonyms(), contains(includedSynonym, excludedSynonym));
+  }
+
+  @Test
   public void independentImmutableProjection() {
     final Table firstTable = new LightTable("first");
     final Table secondTable = new LightTable("second");
-    final Catalog source = LightCatalogUtility.lightCatalog(firstTable, secondTable);
+    final Catalog source = mockCatalogWithTables(firstTable, secondTable);
 
     final Catalog firstProjection =
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(table -> "first".equals(table.getName()))
+            .withOptions(tableSelectionOptions(".*first$"))
             .build();
     final Catalog secondProjection =
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(table -> "second".equals(table.getName()))
+            .withOptions(tableSelectionOptions(".*second$"))
             .build();
 
     assertThat(firstProjection.getTables(), contains(firstTable));
@@ -111,8 +212,9 @@ public class CatalogProjectionBuilderTest {
   public void collectionsAreImmutableAndNaturallyOrdered() {
     final Table secondTable = new LightTable("second");
     final Table firstTable = new LightTable("first");
-    final Catalog source = LightCatalogUtility.lightCatalog(secondTable, firstTable);
-    final Catalog projection = CatalogProjectionBuilder.builder(source).build();
+    final Catalog source = mockCatalogWithTables(secondTable, firstTable);
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source).withOptions(projectionOptions(null, null)).build();
 
     assertThat(projection.getTables(), is(List.of(firstTable, secondTable)));
     assertUnmodifiable(projection.getSchemas());
@@ -129,10 +231,10 @@ public class CatalogProjectionBuilderTest {
     final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
     final Table naturallyEarlierTable = new LightTable(schema, "Beta");
     final Table naturallyLaterTable = new LightTable(schema, "alpha");
-    final Catalog source =
-        LightCatalogUtility.lightCatalog(naturallyLaterTable, naturallyEarlierTable);
+    final Catalog source = mockCatalogWithTables(naturallyLaterTable, naturallyEarlierTable);
 
-    final Catalog projection = CatalogProjectionBuilder.builder(source).build();
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source).withOptions(projectionOptions(null, null)).build();
 
     assertThat(projection.getTables(), contains(naturallyEarlierTable, naturallyLaterTable));
   }
@@ -145,7 +247,7 @@ public class CatalogProjectionBuilderTest {
     final Catalog source = mockCatalogWithTables(selectedTable, hiddenTable);
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(table -> "selected".equals(table.getName()))
+            .withOptions(tableSelectionOptions(".*selected$"))
             .build();
 
     assertThat(
@@ -166,8 +268,8 @@ public class CatalogProjectionBuilderTest {
     final SchemaReference systemSchema = new SchemaReference();
     final Table table = new LightTable(schema, "table");
     final Routine routine = new LightProcedure(schema, "routine");
-    final Sequence sequence = databaseObject(Sequence.class, schema, "sequence");
-    final Synonym synonym = databaseObject(Synonym.class, schema, "synonym");
+    final Sequence sequence = namedDatabaseObject(Sequence.class, schema, "sequence");
+    final Synonym synonym = namedDatabaseObject(Synonym.class, schema, "synonym");
     final ColumnDataType columnDataType = databaseObject(ColumnDataType.class, schema, "data_type");
     final ColumnDataType systemColumnDataType =
         databaseObject(ColumnDataType.class, systemSchema, "system_type");
@@ -182,7 +284,8 @@ public class CatalogProjectionBuilderTest {
     when(source.getSystemColumnDataTypes()).thenReturn(List.of(systemColumnDataType));
     when(source.getDatabaseUsers()).thenReturn(List.of(databaseUser));
 
-    final Catalog projection = CatalogProjectionBuilder.builder(source).build();
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source).withOptions(projectionOptions(null, null)).build();
 
     assertThat(projection.lookupSchema(schema.getFullName()).orElseThrow(), is(schema));
     assertThat(projection.lookupTable(schema, "table").orElseThrow(), is(table));
@@ -201,16 +304,46 @@ public class CatalogProjectionBuilderTest {
   }
 
   @Test
-  public void schemaPredicateAppliesWhenSourceSchemaCollectionIsEmpty() {
+  public void schemaBoundObjectsAreExcludedWhenSourceHasNoSchemas() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final Table table = new LightTable(schema, "table");
-    final Catalog source = LightCatalogUtility.lightCatalog(table);
+    final Catalog source = mockCatalogWithTables(table);
+    when(source.getSchemas()).thenReturn(List.of());
 
-    final Catalog projection =
-        CatalogProjectionBuilder.builder(source).withSchemaPredicate(ignored -> false).build();
+    final Catalog projection = CatalogProjectionBuilder.builder(source).build();
 
     assertThat(projection.getTables(), is(List.of()));
     assertThat(projection.lookupTable(schema, "table").isEmpty(), is(true));
+  }
+
+  @Test
+  public void noMatchingSchemaReturnsAnEmptyProjection() {
+    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
+    final Table firstTable = new LightTable(schema, "first_table");
+    final Table secondTable = new LightTable(schema, "second_table");
+    final ColumnDataType columnDataType = databaseObject(ColumnDataType.class, schema, "data_type");
+    final DatabaseUser databaseUser = namedObject(DatabaseUser.class, "user");
+    final Catalog source = mockCatalogWithTables(firstTable, secondTable);
+    when(source.getColumnDataTypes()).thenReturn(List.of(columnDataType));
+    when(source.getDatabaseUsers()).thenReturn(List.of(databaseUser));
+
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source)
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeSchemas(Pattern.compile(".*OTHER$"))
+                            .toOptions()))
+            .build();
+
+    assertThat(projection.getSchemas(), is(List.of()));
+    assertThat(projection.getTables(), is(List.of()));
+    assertThat(projection.getRoutines(), is(List.of()));
+    assertThat(projection.getSequences(), is(List.of()));
+    assertThat(projection.getSynonyms(), is(List.of()));
+    assertThat(projection.getColumnDataTypes(), is(List.of()));
+    assertThat(projection.getDatabaseUsers(), is(List.of()));
   }
 
   @Test
@@ -219,7 +352,7 @@ public class CatalogProjectionBuilderTest {
     matchingTable.addColumn("wanted_column");
     final LightTable nonMatchingTable = new LightTable("non_matching");
     nonMatchingTable.addColumn("other_column");
-    final Catalog source = LightCatalogUtility.lightCatalog(matchingTable, nonMatchingTable);
+    final Catalog source = mockCatalogWithTables(matchingTable, nonMatchingTable);
 
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
@@ -241,7 +374,7 @@ public class CatalogProjectionBuilderTest {
     final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
     final Table matchingTable = new LightTable(schema, "matching");
     final Table nonMatchingTable = new LightTable(schema, "non_matching");
-    final Catalog source = LightCatalogUtility.lightCatalog(matchingTable, nonMatchingTable);
+    final Catalog source = mockCatalogWithTables(matchingTable, nonMatchingTable);
     final GrepOptionsBuilder grepOptionsBuilder =
         GrepOptionsBuilder.builder()
             .includeGreppedTables(
@@ -249,7 +382,6 @@ public class CatalogProjectionBuilderTest {
 
     final Catalog matchingProjection =
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(NamedObjectFilters.tableTypes(SimpleTableType.table))
             .withOptions(projectionOptions(null, grepOptionsBuilder.toOptions()))
             .build();
     final Catalog invertedProjection =
@@ -273,12 +405,17 @@ public class CatalogProjectionBuilderTest {
     when(matchingTable.getTableType()).thenReturn(new TableType("table"));
     final LightTable wrongTypeName =
         new LightTable(new SchemaReference("CATALOG", "PUBLIC"), "Other");
-    final Catalog source = LightCatalogUtility.lightCatalog(matchingTable, wrongTypeName);
+    final Catalog source = mockCatalogWithTables(matchingTable, wrongTypeName);
 
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(NamedObjectFilters.fullNameRegex(".*celebrity updates$")::test)
-            .withTablePredicate(NamedObjectFilters.tableTypes(SimpleTableType.table))
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeTables(Pattern.compile(".*Celebrity Updates$"))
+                            .tableTypes(List.of("table"))
+                            .toOptions()))
             .build();
 
     assertThat(projection.getTables(), contains(matchingTable));
@@ -315,13 +452,18 @@ public class CatalogProjectionBuilderTest {
     final Routine firstOverload = mock(Routine.class);
     when(firstOverload.getSchema()).thenReturn(schema);
     when(firstOverload.getName()).thenReturn("overloaded");
+    when(firstOverload.getRoutineType()).thenReturn(RoutineType.procedure);
+    when(firstOverload.getFullName()).thenReturn("CATALOG.PUBLIC.overloaded");
     when(firstOverload.key()).thenReturn(schema.key().with("overloaded").with("specific_one"));
     final Routine secondOverload = mock(Routine.class);
     when(secondOverload.getSchema()).thenReturn(schema);
     when(secondOverload.getName()).thenReturn("overloaded");
+    when(secondOverload.getRoutineType()).thenReturn(RoutineType.procedure);
+    when(secondOverload.getFullName()).thenReturn("CATALOG.PUBLIC.overloaded");
     when(secondOverload.key()).thenReturn(schema.key().with("overloaded").with("specific_two"));
     final Catalog source = mockCatalogWithRoutines(schema, firstOverload, secondOverload);
-    final Catalog projection = CatalogProjectionBuilder.builder(source).build();
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source).withOptions(projectionOptions(null, null)).build();
 
     assertThat(
         projection.getRoutines(schema, "overloaded"),
@@ -335,8 +477,7 @@ public class CatalogProjectionBuilderTest {
     final LightTable definitionMatch = new LightTable("definition_match");
     definitionMatch.setDefinition("contains secret text");
     final LightTable nonMatch = new LightTable("non_match");
-    final Catalog source =
-        LightCatalogUtility.lightCatalog(remarksMatch, definitionMatch, nonMatch);
+    final Catalog source = mockCatalogWithTables(remarksMatch, definitionMatch, nonMatch);
     final GrepOptionsBuilder grepOptionsBuilder =
         GrepOptionsBuilder.builder()
             .includeGreppedDefinitions(
@@ -360,10 +501,10 @@ public class CatalogProjectionBuilderTest {
   public void nestedProjectionCannotRestoreHiddenTables() {
     final Table firstTable = new LightTable("first");
     final Table secondTable = new LightTable("second");
-    final Catalog baseline = LightCatalogUtility.lightCatalog(firstTable, secondTable);
+    final Catalog baseline = mockCatalogWithTables(firstTable, secondTable);
     final Catalog firstProjection =
         CatalogProjectionBuilder.builder(baseline)
-            .withTablePredicate(table -> table == firstTable)
+            .withOptions(tableSelectionOptions(".*first$"))
             .build();
 
     final Catalog nestedProjection = CatalogProjectionBuilder.builder(firstProjection).build();
@@ -390,19 +531,20 @@ public class CatalogProjectionBuilderTest {
     parent.setRelatedTables(TableRelationshipType.child, List.of(grandchild));
     directChild.setRelatedTables(TableRelationshipType.child, List.of(seed));
     final Catalog source =
-        LightCatalogUtility.lightCatalog(
-            seed, parent, grandparent, grandchild, directChild, partial);
+        mockCatalogWithTables(seed, parent, grandparent, grandchild, directChild, partial);
 
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(table -> table == seed)
             .withOptions(
                 projectionOptions(
                     FilterOptionsBuilder.builder()
                         .parentTableFilterDepth(2)
                         .childTableFilterDepth(2)
                         .toOptions(),
-                    null))
+                    GrepOptionsBuilder.builder()
+                        .includeGreppedTables(
+                            new RegularExpressionInclusionRule(Pattern.compile(".*\\.seed$")))
+                        .toOptions()))
             .build();
 
     assertThat(projection.getTables(), containsInAnyOrder(seed, parent, grandparent, directChild));
@@ -415,21 +557,40 @@ public class CatalogProjectionBuilderTest {
   @Test
   public void sharedObjectSettersDoNotChangeMembership() {
     final Table table = new LightTable("table");
-    final Catalog source = LightCatalogUtility.lightCatalog(table);
+    final Catalog source = mockCatalogWithTables(table);
+    table.setRemarks("before update");
+    final GrepOptions includeBeforeUpdate =
+        GrepOptionsBuilder.builder()
+            .includeGreppedDefinitions(
+                new RegularExpressionInclusionRule(Pattern.compile(".*before update.*")))
+            .toOptions();
     final Catalog emptyProjection =
-        CatalogProjectionBuilder.builder(source).withTablePredicate(Table::hasRemarks).build();
-    final Catalog selectedProjection = CatalogProjectionBuilder.builder(source).build();
+        CatalogProjectionBuilder.builder(source)
+            .withOptions(
+                projectionOptions(
+                    null,
+                    GrepOptionsBuilder.builder()
+                        .includeGreppedDefinitions(
+                            new RegularExpressionInclusionRule(
+                                Pattern.compile(".*before update.*")))
+                        .invertGrepMatch(true)
+                        .toOptions()))
+            .build();
+    final Catalog selectedProjection =
+        CatalogProjectionBuilder.builder(source)
+            .withOptions(projectionOptions(null, includeBeforeUpdate))
+            .build();
 
-    table.setRemarks("updated");
+    table.setRemarks("after update");
 
     assertThat(emptyProjection.getTables(), is(List.of()));
-    assertThat(selectedProjection.getTables().iterator().next().getRemarks(), is("updated"));
+    assertThat(selectedProjection.getTables().iterator().next().getRemarks(), is("after update"));
     assertThat(
         CatalogProjectionBuilder.builder(source)
-            .withTablePredicate(Table::hasRemarks)
+            .withOptions(projectionOptions(null, includeBeforeUpdate))
             .build()
             .getTables(),
-        contains(table));
+        is(List.of()));
   }
 
   @Test
@@ -455,12 +616,25 @@ public class CatalogProjectionBuilderTest {
     assertThrows(UnsupportedOperationException.class, collection::clear);
   }
 
-  private ProjectionOptions projectionOptions(
+  private SchemaCrawlerOptions projectionOptions(
       final FilterOptions filterOptions, final GrepOptions grepOptions) {
     return SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+        .withLimitOptions(
+            LimitOptionsBuilder.builder()
+                .includeAllRoutines()
+                .includeAllSequences()
+                .includeAllSynonyms()
+                .toOptions())
         .withFilterOptions(filterOptions)
-        .withGrepOptions(grepOptions)
-        .projectionOptions();
+        .withGrepOptions(grepOptions);
+  }
+
+  private SchemaCrawlerOptions tableSelectionOptions(final String tableNamePattern) {
+    return SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+        .withLimitOptions(
+            LimitOptionsBuilder.builder()
+                .includeTables(Pattern.compile(tableNamePattern))
+                .toOptions());
   }
 
   private <T extends DatabaseObject> T databaseObject(
@@ -469,6 +643,21 @@ public class CatalogProjectionBuilderTest {
     when(databaseObject.getSchema()).thenReturn(schema);
     when(databaseObject.getName()).thenReturn(name);
     return databaseObject;
+  }
+
+  private <T extends DatabaseObject> T namedDatabaseObject(
+      final Class<T> objectClass, final Schema schema, final String name) {
+    final T databaseObject = databaseObject(objectClass, schema, name);
+    when(databaseObject.getFullName()).thenReturn(schema.getFullName() + "." + name);
+    when(databaseObject.key()).thenReturn(schema.key().with(name));
+    return databaseObject;
+  }
+
+  private Routine namedRoutine(
+      final Schema schema, final String name, final RoutineType routineType) {
+    final Routine routine = namedDatabaseObject(Routine.class, schema, name);
+    when(routine.getRoutineType()).thenReturn(routineType);
+    return routine;
   }
 
   private <T extends NamedObject> T namedObject(final Class<T> objectClass, final String name) {
@@ -492,15 +681,22 @@ public class CatalogProjectionBuilderTest {
 
   private Catalog mockCatalogWithTables(final Table... tables) {
     final Catalog catalog = mock(Catalog.class);
-    when(catalog.getSchemas()).thenReturn(List.of(tables[0].getSchema()));
+    final Map<NamedObjectKey, Schema> schemas = new LinkedHashMap<>();
+    for (final Table table : tables) {
+      if (table.getSchema() != null) {
+        schemas.putIfAbsent(table.getSchema().key(), table.getSchema());
+      }
+    }
+    when(catalog.getSchemas()).thenReturn(List.copyOf(schemas.values()));
     when(catalog.getTables()).thenReturn(List.of(tables));
     when(catalog.getRoutines()).thenReturn(List.of());
     when(catalog.getSequences()).thenReturn(List.of());
     when(catalog.getSynonyms()).thenReturn(List.of());
     when(catalog.getColumnDataTypes()).thenReturn(List.of());
     when(catalog.getDatabaseUsers()).thenReturn(List.of());
-    when(catalog.lookupTable(tables[1].getSchema(), tables[1].getName()))
-        .thenReturn(Optional.of(tables[1]));
+    for (final Table table : tables) {
+      when(catalog.lookupTable(table.getSchema(), table.getName())).thenReturn(Optional.of(table));
+    }
     return catalog;
   }
 

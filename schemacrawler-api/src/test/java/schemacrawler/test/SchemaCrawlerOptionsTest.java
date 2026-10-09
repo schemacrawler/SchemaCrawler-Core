@@ -35,7 +35,7 @@ public class SchemaCrawlerOptionsTest {
   }
 
   @Test
-  public void defaultsGroupCrawlAndProjectionOptions() {
+  public void defaultsExposeDirectOptionsAndDerivedCrawlOptions() {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     assertThat(options.loadOptions(), is(LoadOptionsBuilder.newLoadOptions()));
@@ -45,6 +45,11 @@ public class SchemaCrawlerOptionsTest {
     assertThat(options.limitOptions().tableNamePattern(), is(nullValue()));
     assertThat(options.filterOptions(), is(FilterOptionsBuilder.newFilterOptions()));
     assertThat(options.grepOptions(), is(GrepOptionsBuilder.newGrepOptions()));
+    assertThat(options.crawlOptions().title(), is(options.title()));
+    assertThat(options.crawlOptions().loadOptions(), is(options.loadOptions()));
+    assertThat(options.crawlOptions().limitOptions(), is(options.limitOptions()));
+    assertThat(options.withTitle(options.title()), is(options));
+    assertThat(options.crawlOptions(), is(options.crawlOptions()));
   }
 
   @Test
@@ -74,10 +79,12 @@ public class SchemaCrawlerOptionsTest {
             .withFilterOptions(filterOptions)
             .withGrepOptions(grepOptions);
 
+    assertThat(options.loadOptions(), is(loadOptions));
+    assertThat(options.limitOptions(), is(limitOptions));
+    assertThat(options.filterOptions(), is(filterOptions));
+    assertThat(options.grepOptions(), is(grepOptions));
     assertThat(options.crawlOptions().loadOptions(), is(loadOptions));
     assertThat(options.crawlOptions().limitOptions(), is(limitOptions));
-    assertThat(options.projectionOptions().filterOptions(), is(filterOptions));
-    assertThat(options.projectionOptions().grepOptions(), is(grepOptions));
     assertThat(defaults.grepOptions().isGrepInvertMatch(), is(false));
   }
 }

@@ -9,19 +9,21 @@
 package schemacrawler.filter;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.schema.TableRelationshipType.child;
-import static schemacrawler.schema.TableRelationshipType.parent;
-import static schemacrawler.utility.MetaDataUtility.isPartial;
+import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForRoutineInclusion;
+import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForSchemaInclusion;
+import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForSequenceInclusion;
+import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForSynonymInclusion;
+import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForTableInclusion;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.NonNull;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DatabaseObject;
@@ -33,13 +35,29 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schemacrawler.FilterOptions;
-import schemacrawler.schemacrawler.ProjectionOptions;
+import schemacrawler.schemacrawler.GrepOptions;
+import schemacrawler.schemacrawler.LimitOptions;
+import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 
 /** Builds immutable catalog projections from an already loaded catalog. */
 public final class CatalogProjectionBuilder {
+
+  static final class SchemaFilter<D extends DatabaseObject> implements NamedObjectFilter<D> {
+
+    private final Set<NamedObjectKey> schemaKeys;
+
+    public SchemaFilter(final Set<NamedObjectKey> schemaKeys) {
+      this.schemaKeys = requireNonNull(schemaKeys, "No schema keys provided");
+    }
+
+    @Override
+    public boolean test(final D databaseObject) {
+      final Schema schema = databaseObject.getSchema();
+      return schemaKeys.contains(schema.key());
+    }
+  }
 
   /** Creates a projection builder for a catalog. */
   public static CatalogProjectionBuilder builder(final Catalog catalog) {
@@ -55,29 +73,17 @@ public final class CatalogProjectionBuilder {
 
   private static <N extends NamedObject> List<N> sortedCopy(final Collection<N> objects) {
     final List<N> sortedObjects = new ArrayList<>(objects);
-    sortedObjects.sort(Comparator.naturalOrder());
+    Collections.sort(sortedObjects);
     return List.copyOf(sortedObjects);
   }
 
   private final Catalog catalog;
-  private ProjectionOptions projectionOptions;
-  private Predicate<Schema> schemaPredicate;
-  private boolean schemaPredicateSpecified;
-  private Predicate<Table> tablePredicate;
-  private Predicate<Routine> routinePredicate;
-  private Predicate<Sequence> sequencePredicate;
 
-  private Predicate<Synonym> synonymPredicate;
+  private SchemaCrawlerOptions schemaCrawlerOptions;
 
   private CatalogProjectionBuilder(final Catalog catalog) {
     this.catalog = requireNonNull(catalog, "No catalog provided");
-    projectionOptions = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions().projectionOptions();
-    schemaPredicate = schema -> true;
-    schemaPredicateSpecified = false;
-    tablePredicate = table -> true;
-    routinePredicate = routine -> true;
-    sequencePredicate = sequence -> true;
-    synonymPredicate = synonym -> true;
+    schemaCrawlerOptions = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
   }
 
   /** Builds an immutable projection from the source catalog. */
@@ -86,18 +92,40 @@ public final class CatalogProjectionBuilder {
     final List<Schema> schemas = selectSchemas(eligibleSchemas);
     final Set<NamedObjectKey> schemaKeys = keys(schemas);
     final boolean sourceHasSchemas = !eligibleSchemas.isEmpty();
-    final List<Table> tables = selectTables(schemaKeys, sourceHasSchemas);
+    if (sourceHasSchemas && schemas.isEmpty()) {
+      return new CatalogProjection(
+          catalog.getName(),
+          catalog.getCrawlInfo(),
+          catalog.getDatabaseInfo(),
+          catalog.getJdbcDriverInfo(),
+          catalog.getAttributes());
+    }
+
+    @NonNull final LimitOptions limitOptions = schemaCrawlerOptions.limitOptions();
+    @NonNull final GrepOptions grepOptions = schemaCrawlerOptions.grepOptions();
+
+    final List<Table> tables = selectTables(schemaKeys);
+
+    final Predicate<Routine> routineFilter =
+        new SchemaFilter<Routine>(schemaKeys)
+            .and(new DatabaseObjectFilter<>(limitOptions, ruleForRoutineInclusion))
+            .and(new RoutineTypesFilter(limitOptions))
+            .and(NamedObjectFilters.routineGrep(grepOptions));
     final List<Routine> routines =
-        selectDatabaseObjects(catalog.getRoutines(), schemaKeys, sourceHasSchemas, routinePredicate)
-            .stream()
-            .filter(NamedObjectFilters.routineGrep(projectionOptions.grepOptions()))
-            .toList();
+        sortedCopy(catalog.getRoutines().stream().filter(routineFilter).toList());
+
+    final Predicate<Sequence> sequenceFilter =
+        new SchemaFilter<Sequence>(schemaKeys)
+            .and(new DatabaseObjectFilter<>(limitOptions, ruleForSequenceInclusion));
     final List<Sequence> sequences =
-        selectDatabaseObjects(
-            catalog.getSequences(), schemaKeys, sourceHasSchemas, sequencePredicate);
+        sortedCopy(catalog.getSequences().stream().filter(sequenceFilter).toList());
+
+    final Predicate<Synonym> synonymFilter =
+        new SchemaFilter<Synonym>(schemaKeys)
+            .and(new DatabaseObjectFilter<>(limitOptions, ruleForSynonymInclusion));
     final List<Synonym> synonyms =
-        selectDatabaseObjects(
-            catalog.getSynonyms(), schemaKeys, sourceHasSchemas, synonymPredicate);
+        sortedCopy(catalog.getSynonyms().stream().filter(synonymFilter).toList());
+
     final List<ColumnDataType> columnDataTypes = sortedCopy(catalog.getColumnDataTypes());
     final List<DatabaseUser> databaseUsers = sortedCopy(catalog.getDatabaseUsers());
 
@@ -117,145 +145,44 @@ public final class CatalogProjectionBuilder {
   }
 
   /** Sets composed filter and grep options for the projection. */
-  public CatalogProjectionBuilder withOptions(final ProjectionOptions projectionOptions) {
-    if (projectionOptions != null) {
-      this.projectionOptions = projectionOptions;
+  public CatalogProjectionBuilder withOptions(final SchemaCrawlerOptions schemaCrawlerOptions) {
+    if (schemaCrawlerOptions != null) {
+      this.schemaCrawlerOptions = schemaCrawlerOptions;
     }
     return this;
-  }
-
-  /** Adds a predicate for routines. */
-  public CatalogProjectionBuilder withRoutinePredicate(
-      final Predicate<? super Routine> routinePredicate) {
-    this.routinePredicate = this.routinePredicate.and(requireNonNull(routinePredicate));
-    return this;
-  }
-
-  /** Adds a predicate for schemas. */
-  public CatalogProjectionBuilder withSchemaPredicate(
-      final Predicate<? super Schema> schemaPredicate) {
-    this.schemaPredicate = this.schemaPredicate.and(requireNonNull(schemaPredicate));
-    schemaPredicateSpecified = true;
-    return this;
-  }
-
-  /** Adds a predicate for sequences. */
-  public CatalogProjectionBuilder withSequencePredicate(
-      final Predicate<? super Sequence> sequencePredicate) {
-    this.sequencePredicate = this.sequencePredicate.and(requireNonNull(sequencePredicate));
-    return this;
-  }
-
-  /** Adds a predicate for synonyms. */
-  public CatalogProjectionBuilder withSynonymPredicate(
-      final Predicate<? super Synonym> synonymPredicate) {
-    this.synonymPredicate = this.synonymPredicate.and(requireNonNull(synonymPredicate));
-    return this;
-  }
-
-  /** Adds a predicate for tables. */
-  public CatalogProjectionBuilder withTablePredicate(
-      final Predicate<? super Table> tablePredicate) {
-    this.tablePredicate = this.tablePredicate.and(requireNonNull(tablePredicate));
-    return this;
-  }
-
-  private Set<Table> includeRelatedTables(
-      final Set<Table> seedTables,
-      final Set<NamedObjectKey> eligibleTableKeys,
-      final Set<NamedObjectKey> schemaKeys,
-      final boolean sourceHasSchemas,
-      final TableRelationshipType relationshipType,
-      final int depth) {
-    final Set<NamedObjectKey> visited = new HashSet<>(keys(seedTables));
-    final Set<Table> relatedTables = new LinkedHashSet<>();
-    Set<Table> frontier = new HashSet<>(seedTables);
-    for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
-      final Set<Table> nextFrontier = new HashSet<>();
-      for (final Table table : frontier) {
-        for (final Table relatedTable : table.getRelatedTables(relationshipType)) {
-          if (relatedTable != null
-              && eligibleTableKeys.contains(relatedTable.key())
-              && isSchemaSelected(relatedTable, schemaKeys, sourceHasSchemas)
-              && !isPartial(relatedTable)
-              && visited.add(relatedTable.key())) {
-            nextFrontier.add(relatedTable);
-            relatedTables.add(relatedTable);
-          }
-        }
-      }
-      frontier = nextFrontier;
-    }
-    return relatedTables;
-  }
-
-  private boolean isSchemaSelected(
-      final DatabaseObject databaseObject,
-      final Set<NamedObjectKey> schemaKeys,
-      final boolean sourceHasSchemas) {
-    final Schema schema = databaseObject.getSchema();
-    if (schema == null) {
-      return !sourceHasSchemas && !schemaPredicateSpecified;
-    }
-    if (sourceHasSchemas && !schemaKeys.contains(schema.key())) {
-      return false;
-    }
-    return !schemaPredicateSpecified || schemaPredicate.test(schema);
-  }
-
-  private <N extends DatabaseObject> List<N> selectDatabaseObjects(
-      final Collection<N> databaseObjects,
-      final Set<NamedObjectKey> schemaKeys,
-      final boolean sourceHasSchemas,
-      final Predicate<? super N> predicate) {
-    return sortedCopy(
-        databaseObjects.stream()
-            .filter(
-                databaseObject -> isSchemaSelected(databaseObject, schemaKeys, sourceHasSchemas))
-            .filter(predicate)
-            .toList());
   }
 
   private List<Schema> selectSchemas(final Collection<Schema> eligibleSchemas) {
-    return sortedCopy(eligibleSchemas.stream().filter(schemaPredicate).toList());
+    final Predicate<Schema> schemaLimitFilter =
+        NamedObjectFilters.fullName(
+            schemaCrawlerOptions.limitOptions().get(ruleForSchemaInclusion));
+    return sortedCopy(eligibleSchemas.stream().filter(schemaLimitFilter).toList());
   }
 
-  private List<Table> selectTables(
-      final Set<NamedObjectKey> schemaKeys, final boolean sourceHasSchemas) {
-    final FilterOptions filterOptions = projectionOptions.filterOptions();
-    final Predicate<Table> eligibleTableFilter =
-        filterOptions.omitEmptyTables() ? new OmitEmptyTablesFilter() : table -> true;
-    final List<Table> allTables =
-        sortedCopy(catalog.getTables().stream().filter(eligibleTableFilter).toList());
-    final Set<NamedObjectKey> eligibleTableKeys = keys(allTables);
-    final Predicate<Table> tableFilter =
-        tablePredicate.and(NamedObjectFilters.tableGrep(projectionOptions.grepOptions()));
-    final Set<Table> seedTables =
-        allTables.stream()
-            .filter(table -> isSchemaSelected(table, schemaKeys, sourceHasSchemas))
-            .filter(tableFilter)
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+  private List<Table> selectTables(final Set<NamedObjectKey> schemaKeys) {
+    @NonNull final LimitOptions limitOptions = schemaCrawlerOptions.limitOptions();
+    @NonNull final FilterOptions filterOptions = schemaCrawlerOptions.filterOptions();
+    @NonNull final GrepOptions grepOptions = schemaCrawlerOptions.grepOptions();
 
-    final Set<Table> parentTables =
-        includeRelatedTables(
-            seedTables,
-            eligibleTableKeys,
-            schemaKeys,
-            sourceHasSchemas,
-            parent,
-            filterOptions.parentTableFilterDepth());
-    final Set<Table> childTables =
-        includeRelatedTables(
-            seedTables,
-            eligibleTableKeys,
-            schemaKeys,
-            sourceHasSchemas,
-            child,
+    final Predicate<Table> limitTableFilter =
+        new SchemaFilter<Table>(schemaKeys)
+            .and(new DatabaseObjectFilter<>(limitOptions, ruleForTableInclusion))
+            .and(new TableTypesFilter(limitOptions))
+            .and(filterOptions.omitEmptyTables() ? new OmitEmptyTablesFilter() : table -> true);
+    final List<Table> limitedTables =
+        sortedCopy(catalog.getTables().stream().filter(limitTableFilter).toList());
+
+    final Set<Table> greppedTables =
+        limitedTables.stream()
+            .filter(NamedObjectFilters.tableGrep(grepOptions))
+            .collect(Collectors.toSet());
+
+    final NamedObjectFilter<Table> relatedTableFilter =
+        new RelatedTableFilter(
+            limitedTables,
+            greppedTables,
+            filterOptions.parentTableFilterDepth(),
             filterOptions.childTableFilterDepth());
-
-    final Set<Table> selectedTables = new LinkedHashSet<>(seedTables);
-    selectedTables.addAll(parentTables);
-    selectedTables.addAll(childTables);
-    return sortedCopy(selectedTables);
+    return sortedCopy(limitedTables.stream().filter(relatedTableFilter).toList());
   }
 }

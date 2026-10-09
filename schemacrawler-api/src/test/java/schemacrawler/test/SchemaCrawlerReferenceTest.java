@@ -218,8 +218,6 @@ public class SchemaCrawlerReferenceTest {
   }
 
   private Catalog projectCatalog(final Catalog baseline, final SchemaCrawlerOptions options) {
-    return CatalogProjectionBuilder.builder(baseline)
-        .withOptions(options.projectionOptions())
-        .build();
+    return CatalogProjectionBuilder.builder(baseline).withOptions(options).build();
   }
 }

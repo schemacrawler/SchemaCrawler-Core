@@ -178,9 +178,7 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
   }
 
   private Catalog selectCatalog(final Catalog catalog) {
-    return CatalogProjectionBuilder.builder(catalog)
-        .withOptions(schemaCrawlerOptions.projectionOptions())
-        .build();
+    return CatalogProjectionBuilder.builder(catalog).withOptions(schemaCrawlerOptions).build();
   }
 
   private SchemaCrawlerCommand<?> loadCommand() {

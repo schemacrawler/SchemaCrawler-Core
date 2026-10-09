@@ -12,13 +12,12 @@ package schemacrawler.schemacrawler;
 public final class SchemaCrawlerOptionsBuilder {
 
   public static SchemaCrawlerOptions newSchemaCrawlerOptions() {
-    final CrawlOptions crawlOptions =
-        new CrawlOptions(
-            "", LoadOptionsBuilder.newLoadOptions(), LimitOptionsBuilder.newLimitOptions());
-    final ProjectionOptions projectionOptions =
-        new ProjectionOptions(
-            FilterOptionsBuilder.newFilterOptions(), GrepOptionsBuilder.newGrepOptions());
-    return new SchemaCrawlerOptions(crawlOptions, projectionOptions);
+    return new SchemaCrawlerOptions(
+        "",
+        LimitOptionsBuilder.newLimitOptions(),
+        FilterOptionsBuilder.newFilterOptions(),
+        GrepOptionsBuilder.newGrepOptions(),
+        LoadOptionsBuilder.newLoadOptions());
   }
 
   private SchemaCrawlerOptionsBuilder() {

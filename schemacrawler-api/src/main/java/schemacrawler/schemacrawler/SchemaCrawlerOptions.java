@@ -9,77 +9,70 @@
 package schemacrawler.schemacrawler;
 
 import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
 import org.jspecify.annotations.NonNull;
 import us.fatehi.utility.Options;
 
 /** SchemaCrawler options. */
 public record SchemaCrawlerOptions(
-    @NonNull CrawlOptions crawlOptions, @NonNull ProjectionOptions projectionOptions)
+    @NonNull String title,
+    @NonNull LimitOptions limitOptions,
+    @NonNull FilterOptions filterOptions,
+    @NonNull GrepOptions grepOptions,
+    @NonNull LoadOptions loadOptions)
     implements Options {
 
   public SchemaCrawlerOptions {
-    requireNonNull(crawlOptions, "No crawl options provided");
-    requireNonNull(projectionOptions, "No projection options provided");
+    title = trimToEmpty(title);
+    requireNonNull(limitOptions, "No limit options provided");
+    requireNonNull(filterOptions, "No filter options provided");
+    requireNonNull(grepOptions, "No grep options provided");
+    requireNonNull(loadOptions, "No load options provided");
   }
 
-  public String title() {
-    return crawlOptions.title();
+  public SchemaCrawlerOptions(
+      @NonNull LimitOptions limitOptions,
+      @NonNull FilterOptions filterOptions,
+      @NonNull GrepOptions grepOptions,
+      @NonNull LoadOptions loadOptions) {
+    this("", limitOptions, filterOptions, grepOptions, loadOptions);
   }
 
-  public LoadOptions loadOptions() {
-    return crawlOptions.loadOptions();
-  }
-
-  public LimitOptions limitOptions() {
-    return crawlOptions.limitOptions();
-  }
-
-  public FilterOptions filterOptions() {
-    return projectionOptions.filterOptions();
-  }
-
-  public GrepOptions grepOptions() {
-    return projectionOptions.grepOptions();
+  /** Groups options that determine loaded metadata and crawl membership. */
+  public CrawlOptions crawlOptions() {
+    return new CrawlOptions(title, loadOptions, limitOptions);
   }
 
   public SchemaCrawlerOptions withFilterOptions(final FilterOptions filterOptions) {
     if (filterOptions == null) {
       return this;
     }
-    return new SchemaCrawlerOptions(
-        crawlOptions, new ProjectionOptions(filterOptions, projectionOptions.grepOptions()));
+    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
   }
 
   public SchemaCrawlerOptions withGrepOptions(final GrepOptions grepOptions) {
     if (grepOptions == null) {
       return this;
     }
-    return new SchemaCrawlerOptions(
-        crawlOptions, new ProjectionOptions(projectionOptions.filterOptions(), grepOptions));
+    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
   }
 
   public SchemaCrawlerOptions withLimitOptions(final LimitOptions limitOptions) {
     if (limitOptions == null) {
       return this;
     }
-    return new SchemaCrawlerOptions(
-        new CrawlOptions(crawlOptions.title(), crawlOptions.loadOptions(), limitOptions),
-        projectionOptions);
+    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
   }
 
   public SchemaCrawlerOptions withLoadOptions(final LoadOptions loadOptions) {
     if (loadOptions == null) {
       return this;
     }
-    return new SchemaCrawlerOptions(
-        new CrawlOptions(crawlOptions.title(), loadOptions, crawlOptions.limitOptions()),
-        projectionOptions);
+    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
   }
 
   public SchemaCrawlerOptions withTitle(final String title) {
-    return new SchemaCrawlerOptions(
-        new CrawlOptions(title, crawlOptions.loadOptions(), crawlOptions.limitOptions()),
-        projectionOptions);
+    return new SchemaCrawlerOptions(title, limitOptions, filterOptions, grepOptions, loadOptions);
   }
 }

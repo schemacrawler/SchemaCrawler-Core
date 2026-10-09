@@ -69,9 +69,7 @@ public class SchemaCrawlerGrepTest {
           is(true));
 
       final Catalog catalog =
-          CatalogProjectionBuilder.builder(baseline)
-              .withOptions(schemaCrawlerOptions.projectionOptions())
-              .build();
+          CatalogProjectionBuilder.builder(baseline).withOptions(schemaCrawlerOptions).build();
       final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
       assertThat("Schema count does not match", schemas, arrayWithSize(6));
       for (final Schema schema : schemas) {
@@ -228,8 +226,6 @@ public class SchemaCrawlerGrepTest {
 
   private Catalog projectCatalog(final Connection connection, final SchemaCrawlerOptions options) {
     final Catalog baseline = getCatalog(connection, options);
-    return CatalogProjectionBuilder.builder(baseline)
-        .withOptions(options.projectionOptions())
-        .build();
+    return CatalogProjectionBuilder.builder(baseline).withOptions(options).build();
   }
 }

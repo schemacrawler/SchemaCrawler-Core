@@ -137,6 +137,27 @@ final class CatalogProjection implements Catalog {
     this.databaseUsers = indexByKey(databaseUsers);
   }
 
+  CatalogProjection(
+      final String name,
+      final CrawlInfo crawlInfo,
+      final DatabaseInfo databaseInfo,
+      final JdbcDriverInfo jdbcDriverInfo,
+      final Map<String, Object> attributesMap) {
+    this(
+        name,
+        crawlInfo,
+        databaseInfo,
+        jdbcDriverInfo,
+        attributesMap,
+        List.of(),
+        List.of(),
+        List.of(),
+        List.of(),
+        List.of(),
+        List.of(),
+        List.of());
+  }
+
   @Override
   public int compareTo(final NamedObject other) {
     return compare(this, other, alphabetical);
