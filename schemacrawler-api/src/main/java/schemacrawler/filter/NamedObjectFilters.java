@@ -93,6 +93,16 @@ public final class NamedObjectFilters {
   }
 
   /**
+   * Creates a filter that excludes tables whose known row count is zero. Tables with a positive or
+   * unknown row count are accepted. This filter does not load or query row counts.
+   *
+   * @return a filter that rejects known-empty tables
+   */
+  public static NamedObjectFilter<Table> omitEmptyTables() {
+    return new OmitEmptyTablesFilter();
+  }
+
+  /**
    * Creates a "grep" style filter over routines, using {@link GrepOptions} to match a routine's
    * definition (source text), parameters, or remarks, in addition to any name-based inclusion
    * rules. Use this when routine selection needs to search inside the routine, not just its name;

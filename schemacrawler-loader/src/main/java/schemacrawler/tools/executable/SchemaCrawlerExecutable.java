@@ -14,6 +14,7 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.ermodel.model.ERModel;
+import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
@@ -97,12 +98,14 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
       if (!hasCatalog()) {
         loadCatalog();
       }
+      final Catalog selectedCatalog = selectCatalog(getCatalog());
       if (!hasERModel()) {
-        buildERModel();
+        buildERModel(selectedCatalog);
       }
 
       // Prepare to execute
       transferState(scCommand);
+      scCommand.setCatalog(selectedCatalog);
 
       // Execute
       LOGGER.log(Level.INFO, new StringFormat("Executing SchemaCrawler command <%s>", command));
@@ -159,8 +162,8 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
     return command;
   }
 
-  private void buildERModel() {
-    final ERModel erModel = SchemaCrawlerUtility.buildERModel(getCatalog(), additionalConfig);
+  private void buildERModel(final Catalog catalog) {
+    final ERModel erModel = SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
     requireNonNull(erModel, "ER model could not be built");
     setERModel(erModel);
   }
@@ -171,6 +174,10 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
             getConnectionSource(), schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
     requireNonNull(catalog, "Catalog could not be retrieved");
     setCatalog(catalog);
+  }
+
+  private Catalog selectCatalog(final Catalog catalog) {
+    return CatalogProjectionBuilder.builder(catalog).withOptions(schemaCrawlerOptions).build();
   }
 
   private SchemaCrawlerCommand<?> loadCommand() {

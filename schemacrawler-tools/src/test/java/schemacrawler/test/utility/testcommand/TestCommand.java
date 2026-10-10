@@ -34,6 +34,7 @@ public final class TestCommand extends AbstractSchemaCrawlerCommand<TestOptions>
     try (final PrintWriter writer = outputOptions.openNewOutputWriter()) {
       writer.println("Output generated from " + this.getClass().getName());
       writer.println(commandOptions);
+      writer.println("Tables: " + getCatalog().getTables().size());
       writer.flush();
     }
   }

@@ -106,8 +106,9 @@ public final class TableTypes implements Iterable<TableType> {
     if (tableTypesCollection == null) {
       tableTypes = null;
     } else {
-      tableTypes = new ArrayList<>(tableTypesCollection);
-      Collections.sort(tableTypes);
+      final List<TableType> tableTypesList = new ArrayList<>(tableTypesCollection);
+      Collections.sort(tableTypesList);
+      tableTypes = List.copyOf(tableTypesList);
     }
   }
 
@@ -160,7 +161,7 @@ public final class TableTypes implements Iterable<TableType> {
       return this;
     }
     if (tableTypesKeepList.isIncludeNone()) {
-      return new TableTypes(null);
+      return new TableTypes(List.of());
     }
 
     final List<TableType> filteredTableTypes = new ArrayList<>();

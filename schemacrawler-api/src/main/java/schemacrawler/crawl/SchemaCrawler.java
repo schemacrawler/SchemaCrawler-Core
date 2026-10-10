@@ -9,7 +9,6 @@
 package schemacrawler.crawl;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.filter.ReducerFactory.getCatalogReducer;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForColumnInclusion;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForRoutineInclusion;
 import static schemacrawler.schemacrawler.DatabaseObjectRuleForInclusion.ruleForRoutineParameterInclusion;
@@ -239,15 +238,6 @@ public final class SchemaCrawler {
             })
         .submit();
 
-    taskRunner
-        .add(
-            "filterAndSortRoutines",
-            () -> {
-              // Filter the list of routines based on grep criteria
-              getCatalogReducer(options).reduce(catalog);
-            })
-        .submit();
-
     taskRunner.add(retrieveRoutineInformation, retrieverExtra::retrieveRoutineInformation).submit();
     taskRunner.add(retrieveRoutineReferences, retrieverExtra::retrieveRoutineReferences).submit();
   }
@@ -260,10 +250,6 @@ public final class SchemaCrawler {
         .add(
             "retrieveSchemas",
             () -> retriever.retrieveSchemas(options.limitOptions().get(ruleForSchemaInclusion)))
-        .submit();
-
-    taskRunner
-        .add("filterAndSortSchemas", () -> getCatalogReducer(options).reduce(catalog))
         .submit();
 
     final NamedObjectList<SchemaReference> schemas = retriever.getAllSchemas();
@@ -292,10 +278,6 @@ public final class SchemaCrawler {
                 retrieverExtra.retrieveSequenceInformation(
                     limitOptions.get(ruleForSequenceInclusion)))
         .submit();
-
-    taskRunner
-        .add("filterAndSortSequences", () -> getCatalogReducer(options).reduce(catalog))
-        .submit();
   }
 
   private void crawlSynonyms() throws Exception {
@@ -316,10 +298,6 @@ public final class SchemaCrawler {
             () ->
                 retrieverExtra.retrieveSynonymInformation(
                     limitOptions.get(ruleForSynonymInclusion)))
-        .submit();
-
-    taskRunner
-        .add("filterAndSortSynonms", () -> getCatalogReducer(options).reduce(catalog))
         .submit();
   }
 
@@ -405,16 +383,11 @@ public final class SchemaCrawler {
         .add(retrieveTriggerInformation, triggerRetriever::retrieveTriggerInformation)
         .submit();
 
-    // Should be run independently, since filter and sort modifies the tables collection
+    // Sort indexes are computed independently of table retrieval.
     taskRunner
         .add(
-            "filterAndSortTables",
+            "sortTables",
             () -> {
-              // Filter the list of tables based on grep criteria, and
-              // parent-child relationships
-              getCatalogReducer(options).reduce(catalog);
-
-              // Sort the remaining tables
               final TablesGraph tablesGraph = new TablesGraph(allTables);
               tablesGraph.setTablesSortIndexes();
             })

@@ -39,6 +39,11 @@ public record SchemaCrawlerOptions(
     this("", limitOptions, filterOptions, grepOptions, loadOptions);
   }
 
+  /** Groups options that determine loaded metadata and crawl membership. */
+  public CrawlOptions crawlOptions() {
+    return new CrawlOptions(title, loadOptions, limitOptions);
+  }
+
   public SchemaCrawlerOptions withFilterOptions(final FilterOptions filterOptions) {
     if (filterOptions == null) {
       return this;

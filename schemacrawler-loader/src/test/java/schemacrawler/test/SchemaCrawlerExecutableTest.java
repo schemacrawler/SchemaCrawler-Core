@@ -11,6 +11,7 @@ package schemacrawler.test;
 import static java.lang.System.lineSeparator;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.readString;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -24,8 +25,13 @@ import static schemacrawler.test.utility.crawl.LightCatalogUtility.lightCatalog;
 import static us.fatehi.utility.IOUtility.createTempFilePath;
 
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
+import schemacrawler.filter.CatalogProjectionBuilder;
+import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schemacrawler.GrepOptionsBuilder;
+import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
@@ -37,6 +43,7 @@ import schemacrawler.tools.options.Config;
 import schemacrawler.tools.options.ConfigUtility;
 import schemacrawler.tools.options.OutputOptions;
 import schemacrawler.tools.options.OutputOptionsBuilder;
+import schemacrawler.tools.utility.SchemaCrawlerUtility;
 import us.fatehi.test.utility.extensions.WithSystemProperty;
 import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
@@ -65,6 +72,8 @@ public class SchemaCrawlerExecutableTest {
         "Output generated from schemacrawler.test.utility.testcommand.TestCommand"
             + lineSeparator()
             + "TestOptions [testCommandParameter=]"
+            + lineSeparator()
+            + "Tables: 20"
             + lineSeparator(),
         equalTo(readString(testOutputFile, UTF_8)));
     assertThat(executable.toString(), is("test-command"));
@@ -98,6 +107,97 @@ public class SchemaCrawlerExecutableTest {
     final ExecutionRuntimeException ex2 =
         assertThrows(ExecutionRuntimeException.class, () -> executable2.execute());
     assertThat(ex2.getMessage(), is("Cannot configure command <" + command2 + ">"));
+  }
+
+  @Test
+  public void executableBuildsModelFromSelectedCatalog(
+      final DatabaseConnectionSource connectionSource) throws Exception {
+    final Path testOutputFile = createTempFilePath("sc", "data");
+    final SchemaCrawlerOptions options =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withGrepOptions(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedColumns(new RegularExpressionInclusionRule(".*BOOKAUTHORS.*"))
+                    .toOptions());
+    final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
+    executable.setSchemaCrawlerOptions(options);
+    executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
+    executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
+
+    executable.setConnectionSource(connectionSource);
+    executable.execute();
+
+    assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 1" + lineSeparator()));
+    assertThat(executable.getERModel().getTables(), hasSize(1));
+    assertThat(executable.getERModel().getTables().iterator().next().getName(), is("BOOKAUTHORS"));
+    assertThat(executable.getCatalog().getTables(), hasSize(20));
+  }
+
+  @Test
+  public void executableDoesNotSelectAlreadySelectedCatalogAgain(
+      final DatabaseConnectionSource connectionSource) throws Exception {
+    final Path testOutputFile = createTempFilePath("sc", "data");
+    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
+    final Catalog baseline =
+        SchemaCrawlerUtility.getCatalog(
+            connectionSource, schemaRetrievalOptionsDefault, options, ConfigUtility.newConfig());
+    final Catalog selectedCatalog =
+        CatalogProjectionBuilder.builder(baseline)
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeTables(Pattern.compile(".*BOOKAUTHORS$"))
+                            .toOptions()))
+            .build();
+    final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
+    executable.setSchemaCrawlerOptions(options);
+    executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
+    executable.setCatalog(selectedCatalog);
+    executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
+
+    executable.setConnectionSource(connectionSource);
+    executable.execute();
+
+    assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 1" + lineSeparator()));
+    assertThat(executable.getCatalog(), is(selectedCatalog));
+  }
+
+  @Test
+  public void executableCanExplicitlyNarrowAlreadySelectedCatalog(
+      final DatabaseConnectionSource connectionSource) throws Exception {
+    final Path testOutputFile = createTempFilePath("sc", "data");
+    final Catalog baseline =
+        SchemaCrawlerUtility.getCatalog(
+            connectionSource,
+            schemaRetrievalOptionsDefault,
+            SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions(),
+            ConfigUtility.newConfig());
+    final Catalog selectedCatalog =
+        CatalogProjectionBuilder.builder(baseline)
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeTables(Pattern.compile(".*BOOKAUTHORS$"))
+                            .toOptions()))
+            .build();
+    final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
+    executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
+    executable.setCatalog(selectedCatalog);
+    executable.setSchemaCrawlerOptions(
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withGrepOptions(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedColumns(new RegularExpressionInclusionRule(".*NEVER_MATCH.*"))
+                    .toOptions()));
+    executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
+
+    executable.setConnectionSource(connectionSource);
+    executable.execute();
+
+    assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 0" + lineSeparator()));
+    assertThat(executable.getCatalog(), is(selectedCatalog));
   }
 
   @Test
@@ -178,6 +278,8 @@ public class SchemaCrawlerExecutableTest {
         "Output generated from schemacrawler.test.utility.testcommand.TestCommand"
             + lineSeparator()
             + "TestOptions [testCommandParameter=]"
+            + lineSeparator()
+            + "Tables: 0"
             + lineSeparator(),
         equalTo(readString(testOutputFile, UTF_8)));
     assertThat(executable.toString(), is("test-command"));

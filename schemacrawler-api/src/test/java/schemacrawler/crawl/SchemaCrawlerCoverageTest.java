@@ -15,10 +15,9 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import static schemacrawler.test.utility.DatabaseTestUtility.schemaRetrievalOptionsDefault;
 import static us.fatehi.test.utility.ObjectPropertyTestUtility.checkBooleanProperties;
@@ -27,6 +26,9 @@ import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,12 +38,13 @@ import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
+import schemacrawler.schema.ColumnReference;
+import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexColumnSortSequence;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.PrimaryKey;
-import schemacrawler.schema.Reducer;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Table;
@@ -70,14 +73,33 @@ public class SchemaCrawlerCoverageTest {
   private Catalog catalog;
 
   @Test
-  public void catalogReduce() throws Exception {
-    final Reducer reducer = spy(Reducer.class);
+  public void catalogDoesNotExposeReductionMethods() {
+    final boolean catalogExposesReduction =
+        Arrays.stream(Catalog.class.getMethods())
+            .anyMatch(
+                method -> method.getName().equals("reduce") || method.getName().equals("undo"));
+    assertThat(catalogExposesReduction, is(false));
+  }
 
-    catalog.reduce(Catalog.class, (Reducer<Catalog>) reducer);
-    verifyNoMoreInteractions(reducer);
+  @Test
+  public void tableSortIndexesRespectForeignKeyOrder() {
+    final Map<Table, Integer> positions = new HashMap<>();
+    int position = 0;
+    for (final Table table : catalog.getTables()) {
+      positions.put(table, position++);
+    }
 
-    assertThrows(NullPointerException.class, () -> catalog.reduce(null, reducer));
-    assertThrows(NullPointerException.class, () -> catalog.reduce(Table.class, null));
+    for (final Table table : catalog.getTables()) {
+      for (final ForeignKey foreignKey : table.getForeignKeys()) {
+        for (final ColumnReference columnReference : foreignKey) {
+          final Table primaryKeyTable = columnReference.getPrimaryKeyColumn().getParent();
+          final Table foreignKeyTable = columnReference.getForeignKeyColumn().getParent();
+          if (!primaryKeyTable.equals(foreignKeyTable)) {
+            assertThat(positions.get(primaryKeyTable), lessThan(positions.get(foreignKeyTable)));
+          }
+        }
+      }
+    }
   }
 
   @Test

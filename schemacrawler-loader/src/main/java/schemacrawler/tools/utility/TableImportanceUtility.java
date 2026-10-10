@@ -8,11 +8,10 @@
 
 package schemacrawler.tools.utility;
 
-import static schemacrawler.loader.utility.TableRowCountsUtility.getRowCount;
-import static schemacrawler.loader.utility.TableRowCountsUtility.hasRowCount;
+import static schemacrawler.utility.TableRowCountsUtility.getRowCount;
+import static schemacrawler.utility.TableRowCountsUtility.hasRowCount;
 
 import java.util.List;
-import schemacrawler.loader.utility.TableRowCountsUtility;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.UtilityMarker;
@@ -25,8 +24,7 @@ public class TableImportanceUtility {
       return null;
     }
 
-    final Long rowCount =
-        TableRowCountsUtility.hasRowCount(table) ? TableRowCountsUtility.getRowCount(table) : null;
+    final Long rowCount = hasRowCount(table) ? getRowCount(table) : null;
     final List<Column> columns = table.getColumns();
     final TableCounts tableCounts =
         new TableCounts(

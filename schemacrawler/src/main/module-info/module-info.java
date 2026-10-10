@@ -63,7 +63,6 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.loader.catalog.model;
   exports schemacrawler.loader.catalog.summary;
   exports schemacrawler.loader.ermodel.summary;
-  exports schemacrawler.loader.utility;
 
   // ServiceLoader providers
   uses java.sql.Driver;

@@ -31,8 +31,14 @@ import java.sql.SQLException;
 import java.util.zip.GZIPOutputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import schemacrawler.filter.CatalogProjectionBuilder;
+import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
+import schemacrawler.loader.catalog.CatalogLoader;
+import schemacrawler.loader.catalog.offline.OfflineCatalogLoaderProvider;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.GrepOptions;
+import schemacrawler.schemacrawler.GrepOptionsBuilder;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.LoadOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -40,8 +46,6 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.loader.catalog.CatalogLoader;
-import schemacrawler.loader.catalog.offline.OfflineCatalogLoaderProvider;
 import schemacrawler.tools.offline.jdbc.OfflineConnection;
 import schemacrawler.tools.offline.jdbc.OfflineConnectionUtility;
 import schemacrawler.tools.options.ConfigUtility;
@@ -90,6 +94,62 @@ public class OfflineCatalogLoaderTest {
     validateCatalog(catalog);
   }
 
+  @Test
+  public void getOfflineCatalogIgnoresCurrentLimits() throws Exception {
+    final OfflineConnection offlineConnection =
+        OfflineConnectionUtility.newOfflineConnection(serializedCatalogFile);
+    final DatabaseConnectionSource connectionSource =
+        DatabaseConnectionSources.fromConnection(offlineConnection);
+    final SchemaCrawlerOptions schemaCrawlerOptions =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withLimitOptions(
+                LimitOptionsBuilder.builder()
+                    .includeTables(new RegularExpressionInclusionRule(".*NEVER_MATCH.*"))
+                    .toOptions());
+
+    final Catalog catalog =
+        getCatalog(
+            connectionSource,
+            SchemaRetrievalOptionsBuilder.newSchemaRetrievalOptions(),
+            schemaCrawlerOptions,
+            ConfigUtility.newConfig());
+    validateCatalog(catalog);
+    assertThat(catalog.getTables(), hasSize(20));
+  }
+
+  @Test
+  public void getOfflineCatalogDefersGrepUntilProjection() throws Exception {
+    final OfflineConnection offlineConnection =
+        OfflineConnectionUtility.newOfflineConnection(serializedCatalogFile);
+    final DatabaseConnectionSource connectionSource =
+        DatabaseConnectionSources.fromConnection(offlineConnection);
+    final GrepOptions noMatchGrepOptions =
+        GrepOptionsBuilder.builder()
+            .includeGreppedColumns(new RegularExpressionInclusionRule(".*NEVER_MATCH.*"))
+            .toOptions();
+    final GrepOptions matchingGrepOptions =
+        GrepOptionsBuilder.builder()
+            .includeGreppedColumns(new RegularExpressionInclusionRule(".*BOOKID"))
+            .toOptions();
+    final SchemaCrawlerOptions options =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions().withGrepOptions(noMatchGrepOptions);
+
+    final Catalog baseline =
+        getCatalog(
+            connectionSource,
+            SchemaRetrievalOptionsBuilder.newSchemaRetrievalOptions(),
+            options,
+            ConfigUtility.newConfig());
+    validateCatalog(baseline);
+
+    final Catalog noMatchProjection = projectCatalog(baseline, noMatchGrepOptions);
+    final Catalog matchingProjection = projectCatalog(baseline, matchingGrepOptions);
+
+    assertThat(noMatchProjection.getTables(), is(empty()));
+    assertThat(matchingProjection.getTables(), is(not(empty())));
+    assertThat(baseline.getTables(), hasSize(20));
+  }
+
   @BeforeEach
   public void serializeCatalog(final DatabaseConnectionSource connectionSource) {
     try {
@@ -128,5 +188,12 @@ public class OfflineCatalogLoaderTest {
     final Schema schema = catalog.lookupSchema("PUBLIC.BOOKS").orElse(null);
     assertThat("Could not obtain schema", schema, notNullValue());
     assertThat("Unexpected number of tables in the schema", catalog.getTables(schema), hasSize(11));
+  }
+
+  private Catalog projectCatalog(final Catalog baseline, final GrepOptions grepOptions) {
+    return CatalogProjectionBuilder.builder(baseline)
+        .withOptions(
+            SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions().withGrepOptions(grepOptions))
+        .build();
   }
 }

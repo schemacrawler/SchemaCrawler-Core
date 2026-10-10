@@ -30,7 +30,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
-import schemacrawler.filter.ReducerFactory;
 import schemacrawler.inclusionrule.ExcludeAll;
 import schemacrawler.inclusionrule.IncludeAll;
 import schemacrawler.inclusionrule.InclusionRule;
@@ -38,7 +37,6 @@ import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
 import schemacrawler.inclusionrule.ListExclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.CatalogReducer;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DependantObject;
 import schemacrawler.schema.Function;
@@ -56,9 +54,7 @@ import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.TypedObject;
-import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
-import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.WithTestDatabase;
 import schemacrawler.test.utility.crawl.LightProcedure;
@@ -177,32 +173,6 @@ public class MetadataUtilityTest {
     } catch (final Exception e) {
       fail("Catalog not loaded", e);
     }
-  }
-
-  @Test
-  public void reduceCatalog() throws Exception {
-
-    final LimitOptionsBuilder limitOptionsBuilder = LimitOptionsBuilder.builder();
-    limitOptionsBuilder.includeTables(tableName -> !tableName.matches(".*\\.BOOKS"));
-
-    final SchemaCrawlerOptions schemaCrawlerOptions =
-        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
-            .withLimitOptions(limitOptionsBuilder.toOptions());
-
-    // Reduce catalog
-    final CatalogReducer reducer = ReducerFactory.getCatalogReducer(schemaCrawlerOptions);
-    reducer.reduce(catalog);
-
-    final Schema schema = catalog.lookupSchema("PUBLIC.BOOKS").get();
-    assertThat("BOOKS Schema not found", schema, notNullValue());
-
-    assertThat("BOOKS Table not found", catalog.lookupTable(schema, "BOOKS").isEmpty());
-
-    // Reset catalog
-    reducer.undo(catalog);
-
-    final Table table = catalog.lookupTable(schema, "BOOKS").get();
-    assertThat("BOOKS Table not found", table, notNullValue());
   }
 
   @Test

@@ -9,9 +9,9 @@
 package schemacrawler.loader.catalog.counts;
 
 import static java.util.Objects.requireNonNull;
-import static schemacrawler.loader.utility.TableRowCountsUtility.TABLE_ROW_COUNT_KEY;
 import static schemacrawler.schema.IdentifierQuotingStrategy.quote_all;
 import static schemacrawler.schemacrawler.QueryUtility.executeForLong;
+import static schemacrawler.utility.TableRowCountsUtility.TABLE_ROW_COUNT_KEY;
 
 import java.sql.Connection;
 import java.sql.SQLException;

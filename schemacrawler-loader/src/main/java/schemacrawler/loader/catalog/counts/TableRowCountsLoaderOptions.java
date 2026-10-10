@@ -10,5 +10,4 @@ package schemacrawler.loader.catalog.counts;
 
 import schemacrawler.tools.command.CommandOptions;
 
-public record TableRowCountsLoaderOptions(boolean loadRowCounts, boolean noEmptyTables)
-    implements CommandOptions {}
+public record TableRowCountsLoaderOptions(boolean loadRowCounts) implements CommandOptions {}

@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 /** Database and connection information. */
-public interface Catalog extends NamedObject, AttributedObject, DescribedObject, Reducible {
+public interface Catalog extends NamedObject, AttributedObject, DescribedObject {
 
   /**
    * Gets the column data types

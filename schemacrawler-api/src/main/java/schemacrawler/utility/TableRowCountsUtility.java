@@ -6,9 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.loader.utility;
-
-import static java.util.Objects.requireNonNull;
+package schemacrawler.utility;
 
 import schemacrawler.schema.Table;
 import us.fatehi.utility.UtilityMarker;
@@ -25,25 +23,6 @@ public final class TableRowCountsUtility {
     }
 
     return table.getAttribute(TABLE_ROW_COUNT_KEY, UNKNOWN_TABLE_ROW_COUNT);
-  }
-
-  /**
-   * Message format for the counts.
-   *
-   * @param number Number value in the message
-   * @return Message format for the counts
-   */
-  public static String getRowCountMessage(final Number number) {
-    requireNonNull(number, "No number provided");
-    final long longValue = number.longValue();
-    if (longValue <= 0) {
-      return "empty";
-    }
-    return "%,d rows".formatted(longValue);
-  }
-
-  public static String getRowCountMessage(final Table table) {
-    return getRowCountMessage(getRowCount(table));
   }
 
   public static boolean hasRowCount(final Table table) {
