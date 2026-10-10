@@ -110,7 +110,7 @@ public class SchemaCrawlerExecutableTest {
   }
 
   @Test
-  public void executableSelectsAfterBuildingTheBaselineModel(
+  public void executableBuildsModelFromSelectedCatalog(
       final DatabaseConnectionSource connectionSource) throws Exception {
     final Path testOutputFile = createTempFilePath("sc", "data");
     final SchemaCrawlerOptions options =
@@ -128,6 +128,8 @@ public class SchemaCrawlerExecutableTest {
     executable.execute();
 
     assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 1" + lineSeparator()));
+    assertThat(executable.getERModel().getTables(), hasSize(1));
+    assertThat(executable.getERModel().getTables().iterator().next().getName(), is("BOOKAUTHORS"));
     assertThat(executable.getCatalog().getTables(), hasSize(20));
   }
 

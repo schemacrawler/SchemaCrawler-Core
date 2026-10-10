@@ -98,11 +98,10 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
       if (!hasCatalog()) {
         loadCatalog();
       }
-      if (!hasERModel()) {
-        buildERModel();
-      }
-
       final Catalog selectedCatalog = selectCatalog(getCatalog());
+      if (!hasERModel()) {
+        buildERModel(selectedCatalog);
+      }
 
       // Prepare to execute
       transferState(scCommand);
@@ -163,8 +162,8 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
     return command;
   }
 
-  private void buildERModel() {
-    final ERModel erModel = SchemaCrawlerUtility.buildERModel(getCatalog(), additionalConfig);
+  private void buildERModel(final Catalog catalog) {
+    final ERModel erModel = SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
     requireNonNull(erModel, "ER model could not be built");
     setERModel(erModel);
   }
