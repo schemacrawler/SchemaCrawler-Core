@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import tools.jackson.databind.ObjectMapper;
 
@@ -286,6 +287,9 @@ public class TestObjectUtility {
     }
     if (Map.class.isAssignableFrom(returnType)) {
       return Map.of();
+    }
+    if (Set.class.isAssignableFrom(returnType)) {
+      return Set.of();
     }
     if (Collection.class.isAssignableFrom(returnType)) {
       return List.of();
