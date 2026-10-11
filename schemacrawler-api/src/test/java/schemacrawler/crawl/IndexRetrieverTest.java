@@ -103,7 +103,8 @@ public class IndexRetrieverTest {
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
-    final IndexRetriever indexRetriever = new IndexRetriever(retrieverConnection, catalog, options);
+    final IndexRetriever indexRetriever =
+        new IndexRetriever(retrieverConnection, catalog, options.crawlOptions());
     indexRetriever.retrieveIndexes(catalog.getAllTables());
 
     // Now test retrieveIndexInformation with a SQL that returns non-existent tables and indexes
@@ -133,7 +134,7 @@ public class IndexRetrieverTest {
         new RetrieverConnection(connectionSource, edgeCaseOptions);
 
     final IndexRetriever edgeCaseRetriever =
-        new IndexRetriever(edgeCaseConnection, catalog, options);
+        new IndexRetriever(edgeCaseConnection, catalog, options.crawlOptions());
 
     // The method should handle non-existent tables and indexes gracefully
     assertDoesNotThrow(() -> edgeCaseRetriever.retrieveIndexInformation());
@@ -170,7 +171,8 @@ public class IndexRetrieverTest {
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
-    final IndexRetriever indexRetriever = new IndexRetriever(retrieverConnection, catalog, options);
+    final IndexRetriever indexRetriever =
+        new IndexRetriever(retrieverConnection, catalog, options.crawlOptions());
 
     // The method should handle exceptions gracefully and not throw
     assertDoesNotThrow(() -> indexRetriever.retrieveIndexInformation());
@@ -197,7 +199,8 @@ public class IndexRetrieverTest {
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
-    final IndexRetriever indexRetriever = new IndexRetriever(retrieverConnection, catalog, options);
+    final IndexRetriever indexRetriever =
+        new IndexRetriever(retrieverConnection, catalog, options.crawlOptions());
     indexRetriever.retrieveIndexes(catalog.getAllTables());
 
     verifyRetrieveIndexes(catalog);
@@ -217,7 +220,8 @@ public class IndexRetrieverTest {
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
-    final IndexRetriever indexRetriever = new IndexRetriever(retrieverConnection, catalog, options);
+    final IndexRetriever indexRetriever =
+        new IndexRetriever(retrieverConnection, catalog, options.crawlOptions());
     indexRetriever.retrieveIndexes(catalog.getAllTables());
 
     // Verify that indexes were retrieved
@@ -267,7 +271,8 @@ public class IndexRetrieverTest {
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
-    final IndexRetriever indexRetriever = new IndexRetriever(retrieverConnection, catalog, options);
+    final IndexRetriever indexRetriever =
+        new IndexRetriever(retrieverConnection, catalog, options.crawlOptions());
     indexRetriever.retrieveIndexInformation();
 
     final Collection<Table> tables = catalog.getTables();
@@ -320,7 +325,8 @@ public class IndexRetrieverTest {
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
-    final IndexRetriever indexRetriever = new IndexRetriever(retrieverConnection, catalog, options);
+    final IndexRetriever indexRetriever =
+        new IndexRetriever(retrieverConnection, catalog, options.crawlOptions());
 
     // The method should handle exceptions gracefully and not throw
     assertDoesNotThrow(() -> indexRetriever.retrieveIndexInformation());

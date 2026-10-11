@@ -21,9 +21,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.CheckOptionType;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import us.fatehi.utility.string.StringFormat;
 
 /** A retriever uses database metadata to get the extended details about the database tables. */
@@ -34,7 +34,7 @@ final class ViewExtRetriever extends AbstractRetriever {
   ViewExtRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options)
+      final CrawlOptions options)
       throws SQLException {
     super(retrieverConnection, catalog, options);
   }

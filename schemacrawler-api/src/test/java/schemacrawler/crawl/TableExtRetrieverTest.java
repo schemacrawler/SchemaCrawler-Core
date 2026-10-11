@@ -96,7 +96,7 @@ public class TableExtRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TableExtRetriever tableExtRetriever =
-        new TableExtRetriever(retrieverConnection, catalog, options);
+        new TableExtRetriever(retrieverConnection, catalog, options.crawlOptions());
     tableExtRetriever.retrieveAdditionalColumnMetadata();
 
     final Schema schema = new SchemaReference("PUBLIC", "BOOKS");
@@ -197,7 +197,7 @@ public class TableExtRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TableConstraintRetriever tableExtRetriever =
-        new TableConstraintRetriever(retrieverConnection, catalog, options);
+        new TableConstraintRetriever(retrieverConnection, catalog, options.crawlOptions());
     tableExtRetriever.retrieveTableConstraintInformation();
 
     final Collection<Table> tables = catalog.getTables();
@@ -248,7 +248,7 @@ public class TableExtRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TableExtRetriever tableExtRetriever =
-        new TableExtRetriever(retrieverConnection, catalog, options);
+        new TableExtRetriever(retrieverConnection, catalog, options.crawlOptions());
     tableExtRetriever.retrieveTableDefinitions();
 
     final Collection<Table> tables = catalog.getTables();
@@ -300,7 +300,7 @@ public class TableExtRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final ViewExtRetriever viewExtRetriever =
-        new ViewExtRetriever(retrieverConnection, catalog, options);
+        new ViewExtRetriever(retrieverConnection, catalog, options.crawlOptions());
     viewExtRetriever.retrieveViewTableUsage();
 
     viewCount = 0;

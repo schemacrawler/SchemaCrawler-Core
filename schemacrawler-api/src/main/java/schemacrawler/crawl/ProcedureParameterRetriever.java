@@ -29,9 +29,9 @@ import schemacrawler.schema.ParameterModeType;
 import schemacrawler.schema.ProcedureParameter;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.WrappedSQLException;
 import us.fatehi.utility.string.StringFormat;
@@ -47,7 +47,7 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
   ProcedureParameterRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options) {
+      final CrawlOptions options) {
     super(retrieverConnection, catalog, options);
   }
 

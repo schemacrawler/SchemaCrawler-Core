@@ -75,7 +75,7 @@ public class DatabaseInfoRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final DatabaseInfoRetriever databaseInfoRetriever =
-        new DatabaseInfoRetriever(retrieverConnection, catalog, options);
+        new DatabaseInfoRetriever(retrieverConnection, catalog, options.crawlOptions());
     databaseInfoRetriever.retrieveAdditionalDatabaseInfo();
 
     // Verify that database properties were retrieved
@@ -123,7 +123,7 @@ public class DatabaseInfoRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final DatabaseInfoRetriever databaseInfoRetriever =
-        new DatabaseInfoRetriever(retrieverConnection, catalog, options);
+        new DatabaseInfoRetriever(retrieverConnection, catalog, options.crawlOptions());
     databaseInfoRetriever.retrieveAdditionalJdbcDriverInfo();
 
     // Verify that JDBC driver properties were retrieved
@@ -186,7 +186,7 @@ public class DatabaseInfoRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final DatabaseInfoRetriever databaseInfoRetriever =
-        new DatabaseInfoRetriever(retrieverConnection, catalog, options);
+        new DatabaseInfoRetriever(retrieverConnection, catalog, options.crawlOptions());
     databaseInfoRetriever.retrieveDatabaseUsers();
 
     final List<DatabaseUser> databaseUsers = new ArrayList<>(catalog.getDatabaseUsers());
@@ -228,7 +228,7 @@ public class DatabaseInfoRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final DatabaseInfoRetriever databaseInfoRetriever =
-        new DatabaseInfoRetriever(retrieverConnection, catalog, options);
+        new DatabaseInfoRetriever(retrieverConnection, catalog, options.crawlOptions());
 
     // The method should handle exceptions gracefully and not throw
     assertDoesNotThrow(() -> databaseInfoRetriever.retrieveAdditionalDatabaseInfo());
@@ -264,7 +264,7 @@ public class DatabaseInfoRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final DatabaseInfoRetriever databaseInfoRetriever =
-        new DatabaseInfoRetriever(retrieverConnection, catalog, options);
+        new DatabaseInfoRetriever(retrieverConnection, catalog, options.crawlOptions());
     databaseInfoRetriever.retrieveAdditionalDatabaseInfo();
 
     // Verify that result set type properties were retrieved
@@ -331,7 +331,7 @@ public class DatabaseInfoRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final DatabaseInfoRetriever databaseInfoRetriever =
-        new DatabaseInfoRetriever(retrieverConnection, catalog, options);
+        new DatabaseInfoRetriever(retrieverConnection, catalog, options.crawlOptions());
     databaseInfoRetriever.retrieveServerInfo();
 
     final List<Property> serverInfo = new ArrayList<>(catalog.getDatabaseInfo().getServerInfo());

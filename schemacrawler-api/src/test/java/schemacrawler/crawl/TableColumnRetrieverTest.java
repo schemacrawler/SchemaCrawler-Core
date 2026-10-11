@@ -161,7 +161,7 @@ public class TableColumnRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TableColumnRetriever tableColumnRetriever =
-        new TableColumnRetriever(retrieverConnection, catalog, options);
+        new TableColumnRetriever(retrieverConnection, catalog, options.crawlOptions());
     tableColumnRetriever.retrieveTableColumns(catalog.getAllTables(), new IncludeAll());
 
     // Verify that no columns were added to the tables in the test catalog
@@ -190,7 +190,7 @@ public class TableColumnRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TableColumnRetriever tableColumnRetriever =
-        new TableColumnRetriever(retrieverConnection, catalog, options);
+        new TableColumnRetriever(retrieverConnection, catalog, options.crawlOptions());
 
     // Verify that the exception is properly handled
     final SQLException exception =
@@ -238,7 +238,7 @@ public class TableColumnRetrieverTest {
             .withLimitOptions(limitOptionsBuilder.toOptions());
 
     final TableColumnRetriever tableColumnRetriever =
-        new TableColumnRetriever(retrieverConnection, catalog, options);
+        new TableColumnRetriever(retrieverConnection, catalog, options.crawlOptions());
     tableColumnRetriever.retrieveTableColumns(catalog.getAllTables(), new IncludeAll());
 
     assertThat(couponsTable.getColumns().size(), is(3));
@@ -339,7 +339,7 @@ public class TableColumnRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TableColumnRetriever tableColumnRetriever =
-        new TableColumnRetriever(retrieverConnection, catalog, options);
+        new TableColumnRetriever(retrieverConnection, catalog, options.crawlOptions());
     tableColumnRetriever.retrieveTableColumns(catalog.getAllTables(), new IncludeAll());
 
     // Assert column was added
@@ -413,7 +413,7 @@ public class TableColumnRetrieverTest {
 
     try {
       final TableColumnRetriever tableColumnRetriever =
-          new TableColumnRetriever(retrieverConnection, catalog, options);
+          new TableColumnRetriever(retrieverConnection, catalog, options.crawlOptions());
       tableColumnRetriever.retrieveTableColumns(catalog.getAllTables(), new IncludeAll());
 
       // Check that no new columns have been added, and no exception is thrown
@@ -486,7 +486,7 @@ public class TableColumnRetrieverTest {
 
     try {
       final TableColumnRetriever tableColumnRetriever =
-          new TableColumnRetriever(retrieverConnection, catalog, options);
+          new TableColumnRetriever(retrieverConnection, catalog, options.crawlOptions());
       tableColumnRetriever.retrieveTableColumns(catalog.getAllTables(), new IncludeAll());
 
       // Assert column was added
@@ -525,17 +525,18 @@ public class TableColumnRetrieverTest {
     final NamedObjectList<MutableTable> allTables = catalog.getAllTables();
 
     final TableColumnRetriever tableColumnRetriever =
-        new TableColumnRetriever(retrieverConnection, catalog, options);
+        new TableColumnRetriever(retrieverConnection, catalog, options.crawlOptions());
     tableColumnRetriever.retrieveTableColumns(allTables, new IncludeAll());
 
     // Fix foreign-keys in the original catalog
     final ForeignKeyRetriever foreignKeyRetriever =
-        new ForeignKeyRetriever(retrieverConnection, catalog, options);
+        new ForeignKeyRetriever(retrieverConnection, catalog, options.crawlOptions());
     foreignKeyRetriever.retrieveForeignKeys(allTables);
     final PrimaryKeyRetriever primaryKeyRetriever =
-        new PrimaryKeyRetriever(retrieverConnection, catalog, options);
+        new PrimaryKeyRetriever(retrieverConnection, catalog, options.crawlOptions());
     primaryKeyRetriever.retrievePrimaryKeys(allTables);
-    final IndexRetriever indexRetriever = new IndexRetriever(retrieverConnection, catalog, options);
+    final IndexRetriever indexRetriever =
+        new IndexRetriever(retrieverConnection, catalog, options.crawlOptions());
     indexRetriever.retrieveIndexes(allTables);
 
     verifyRetrieveTableColumns(catalog);

@@ -31,9 +31,9 @@ import schemacrawler.schema.ForeignKeyUpdateRule;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.WrappedSQLException;
 import us.fatehi.utility.logging.UtilityLogger;
 import us.fatehi.utility.string.StringFormat;
@@ -46,7 +46,7 @@ final class ForeignKeyRetriever extends AbstractRetriever {
   ForeignKeyRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options) {
+      final CrawlOptions options) {
     super(retrieverConnection, catalog, options);
   }
 

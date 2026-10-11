@@ -30,9 +30,9 @@ import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import schemacrawler.schemacrawler.exceptions.SchemaCrawlerException;
 import schemacrawler.schemacrawler.exceptions.WrappedSQLException;
@@ -49,7 +49,7 @@ final class TableColumnRetriever extends AbstractRetriever {
   TableColumnRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options)
+      final CrawlOptions options)
       throws SQLException {
     super(retrieverConnection, catalog, options);
   }

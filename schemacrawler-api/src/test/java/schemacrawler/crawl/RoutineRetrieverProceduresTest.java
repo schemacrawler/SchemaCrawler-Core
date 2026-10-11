@@ -98,7 +98,7 @@ public class RoutineRetrieverProceduresTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final RoutineRetriever procedureRetriever =
-        new RoutineRetriever(retrieverConnection, catalog, options);
+        new RoutineRetriever(retrieverConnection, catalog, options.crawlOptions());
     procedureRetriever.retrieveRoutines(List.of(RoutineType.procedure), new IncludeAll());
 
     final TestWriter testout = new TestWriter();

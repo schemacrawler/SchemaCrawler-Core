@@ -50,7 +50,7 @@ public class TableRetrieverTest extends AbstractRetrieverTest {
             data_dictionary_all);
 
     final TableRetriever tableRetriever =
-        new TableRetriever(retrieverConnection, catalog, createOptions());
+        new TableRetriever(retrieverConnection, catalog, createOptions().crawlOptions());
     tableRetriever.retrieveTables("", TableTypes.from("TABLE", "VIEW"), new IncludeAll());
 
     // Verify that no new tables were added to the catalog
@@ -70,7 +70,7 @@ public class TableRetrieverTest extends AbstractRetrieverTest {
             data_dictionary_all);
 
     final TableRetriever tableRetriever =
-        new TableRetriever(retrieverConnection, catalog, createOptions());
+        new TableRetriever(retrieverConnection, catalog, createOptions().crawlOptions());
 
     // Verify that the retriever handles SQL exceptions gracefully
     final SQLException sqlException =
@@ -103,7 +103,7 @@ public class TableRetrieverTest extends AbstractRetrieverTest {
             data_dictionary_all);
 
     final TableRetriever tableRetriever =
-        new TableRetriever(retrieverConnection, catalog, createOptions());
+        new TableRetriever(retrieverConnection, catalog, createOptions().crawlOptions());
     // Should handle empty table name gracefully
     tableRetriever.retrieveTables("", TableTypes.from("TABLE", "VIEW"), new IncludeAll());
 
@@ -131,7 +131,7 @@ public class TableRetrieverTest extends AbstractRetrieverTest {
             data_dictionary_all);
 
     final TableRetriever tableRetriever =
-        new TableRetriever(retrieverConnection, catalog, createOptions());
+        new TableRetriever(retrieverConnection, catalog, createOptions().crawlOptions());
     tableRetriever.retrieveTables("", TableTypes.from("TABLE", "VIEW"), new IncludeAll());
 
     final TestWriter testout = new TestWriter();

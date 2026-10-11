@@ -73,7 +73,7 @@ public class TablePrivilegeRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TablePrivilegeRetriever tablePrivilegeRetriever =
-        new TablePrivilegeRetriever(retrieverConnection, catalog, options);
+        new TablePrivilegeRetriever(retrieverConnection, catalog, options.crawlOptions());
     tablePrivilegeRetriever.retrieveTableColumnPrivileges();
 
     final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
@@ -98,7 +98,7 @@ public class TablePrivilegeRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TablePrivilegeRetriever tablePrivilegeRetriever =
-        new TablePrivilegeRetriever(retrieverConnection, catalog, options);
+        new TablePrivilegeRetriever(retrieverConnection, catalog, options.crawlOptions());
     assertThrows(
         ExecutionRuntimeException.class,
         () -> tablePrivilegeRetriever.retrieveTableColumnPrivileges());
@@ -117,7 +117,7 @@ public class TablePrivilegeRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TablePrivilegeRetriever tablePrivilegeRetriever =
-        new TablePrivilegeRetriever(retrieverConnection, catalog, options);
+        new TablePrivilegeRetriever(retrieverConnection, catalog, options.crawlOptions());
     tablePrivilegeRetriever.retrieveTableColumnPrivileges();
 
     final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
@@ -175,7 +175,7 @@ public class TablePrivilegeRetrieverTest {
     assertThat(table.getPrivileges(), is(empty()));
 
     final TablePrivilegeRetriever tablePrivilegeRetriever =
-        new TablePrivilegeRetriever(retrieverConnection, catalog, options);
+        new TablePrivilegeRetriever(retrieverConnection, catalog, options.crawlOptions());
     tablePrivilegeRetriever.retrieveTablePrivileges();
 
     assertThat(table.getPrivileges(), is(empty()));
@@ -219,7 +219,7 @@ public class TablePrivilegeRetrieverTest {
     assertThat(table.getPrivileges(), is(empty()));
 
     final TablePrivilegeRetriever tablePrivilegeRetriever =
-        new TablePrivilegeRetriever(retrieverConnection, catalog, options);
+        new TablePrivilegeRetriever(retrieverConnection, catalog, options.crawlOptions());
     tablePrivilegeRetriever.retrieveTablePrivileges();
 
     assertThat(table.getPrivileges(), hasSize(6));
@@ -240,7 +240,7 @@ public class TablePrivilegeRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final TablePrivilegeRetriever tablePrivilegeRetriever =
-        new TablePrivilegeRetriever(retrieverConnection, catalog, options);
+        new TablePrivilegeRetriever(retrieverConnection, catalog, options.crawlOptions());
     assertThrows(
         ExecutionRuntimeException.class, () -> tablePrivilegeRetriever.retrieveTablePrivileges());
   }

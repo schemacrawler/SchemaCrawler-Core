@@ -212,7 +212,7 @@ public class DataTypeRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final DataTypeRetriever dataTypeRetriever =
-        new DataTypeRetriever(retrieverConnection, catalog, options);
+        new DataTypeRetriever(retrieverConnection, catalog, options.crawlOptions());
     dataTypeRetriever.retrieveSystemColumnDataTypes();
 
     verifyRetrieveColumnDataTypes(catalog, testContext.testMethodFullName());
@@ -230,7 +230,7 @@ public class DataTypeRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final DataTypeRetriever dataTypeRetriever =
-        new DataTypeRetriever(retrieverConnection, catalog, options);
+        new DataTypeRetriever(retrieverConnection, catalog, options.crawlOptions());
     dataTypeRetriever.retrieveSystemColumnDataTypes();
 
     final Collection<ColumnDataType> systemColumnDataTypes = catalog.getSystemColumnDataTypes();

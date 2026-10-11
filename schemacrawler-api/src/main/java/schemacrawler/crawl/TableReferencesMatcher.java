@@ -15,7 +15,7 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.schemacrawler.CrawlOptions;
 import us.fatehi.utility.Multimap;
 
 /** A retriever uses database metadata to get the references to database tables. */
@@ -24,7 +24,7 @@ final class TableReferencesMatcher extends AbstractRetriever {
   TableReferencesMatcher(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options)
+      final CrawlOptions options)
       throws SQLException {
     super(retrieverConnection, catalog, options);
   }

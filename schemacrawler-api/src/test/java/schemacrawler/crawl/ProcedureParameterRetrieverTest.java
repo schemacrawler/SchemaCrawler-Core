@@ -154,7 +154,8 @@ public class ProcedureParameterRetrieverTest extends AbstractParameterRetrieverT
 
   @Override
   protected void createRetriever(final SchemaCrawlerOptions options) {
-    retriever = new ProcedureParameterRetriever(retrieverConnection, catalog, options);
+    retriever =
+        new ProcedureParameterRetriever(retrieverConnection, catalog, options.crawlOptions());
   }
 
   @Override

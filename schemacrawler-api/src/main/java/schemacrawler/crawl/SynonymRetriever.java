@@ -22,9 +22,9 @@ import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Synonym;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 import us.fatehi.utility.string.StringFormat;
 
@@ -49,7 +49,7 @@ final class SynonymRetriever extends AbstractRetriever {
   SynonymRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options)
+      final CrawlOptions options)
       throws SQLException {
     super(retrieverConnection, catalog, options);
   }

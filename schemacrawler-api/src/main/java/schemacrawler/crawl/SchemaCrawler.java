@@ -56,6 +56,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.RoutineType;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.LimitOptions;
 import schemacrawler.schemacrawler.LoadOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -75,7 +76,7 @@ public final class SchemaCrawler {
 
   private static final Logger LOGGER = Logger.getLogger(SchemaCrawler.class.getName());
 
-  private final SchemaCrawlerOptions options;
+  private final CrawlOptions options;
   private final RetrieverConnection retrieverConnection;
   private final SchemaInfoLevel infoLevel;
   private RetrievalTaskRunner taskRunner;
@@ -94,9 +95,9 @@ public final class SchemaCrawler {
       final SchemaCrawlerOptions options) {
     try {
       retrieverConnection = new RetrieverConnection(connectionSource, schemaRetrievalOptions);
-      this.options = requireNonNull(options, "No SchemaCrawler options provided");
+      this.options = requireNonNull(options, "No SchemaCrawler options provided").crawlOptions();
 
-      final LoadOptions loadOptions = options.loadOptions();
+      final LoadOptions loadOptions = this.options.loadOptions();
       infoLevel = loadOptions.schemaInfoLevel();
 
     } catch (final SQLException e) {

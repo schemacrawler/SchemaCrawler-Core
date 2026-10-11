@@ -52,6 +52,9 @@ import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableConstraintType;
 import schemacrawler.schema.View;
+import schemacrawler.schemacrawler.FilterOptionsBuilder;
+import schemacrawler.schemacrawler.GrepOptionsBuilder;
+import schemacrawler.schemacrawler.InfoLevel;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.LoadOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -71,6 +74,69 @@ import us.fatehi.utility.datasource.DatabaseConnectionSources;
 public class SchemaCrawlerCoverageTest {
 
   private Catalog catalog;
+
+  @Test
+  public void crawlIgnoresSelectionOptions(final Connection connection) {
+    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
+    final SchemaCrawlerOptions selectedOptions =
+        options
+            .withFilterOptions(
+                FilterOptionsBuilder.builder()
+                    .parentTableFilterDepth(2)
+                    .childTableFilterDepth(1)
+                    .omitEmptyTables(true)
+                    .toOptions())
+            .withGrepOptions(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedTables(Pattern.compile("NO_MATCHING_TABLE"))
+                    .includeGreppedRoutines(Pattern.compile("NO_MATCHING_ROUTINE"))
+                    .toOptions());
+    final Catalog baseline = getCatalog(connection, options);
+    final Catalog withSelectionOptions = getCatalog(connection, selectedOptions);
+
+    assertThat(
+        withSelectionOptions.getTables().stream().map(Table::key).toList(),
+        is(baseline.getTables().stream().map(Table::key).toList()));
+    assertThat(
+        withSelectionOptions.getRoutines().stream().map(Routine::key).toList(),
+        is(baseline.getRoutines().stream().map(Routine::key).toList()));
+    assertThat(withSelectionOptions.getTables().isEmpty(), is(false));
+  }
+
+  @Test
+  public void crawlPreservesTitleLoadAndLimits(final Connection connection) {
+    final SchemaCrawlerOptions options =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withTitle("Crawl-only options")
+            .withLimitOptions(
+                LimitOptionsBuilder.builder()
+                    .includeSchemas(Pattern.compile("PUBLIC\\.BOOKS"))
+                    .includeTables(Pattern.compile(".*\\.AUTHORS"))
+                    .toOptions())
+            .withLoadOptions(
+                LoadOptionsBuilder.builder()
+                    .withSchemaInfoLevel(
+                        SchemaInfoLevelBuilder.builder()
+                            .withInfoLevel(InfoLevel.minimum)
+                            .setRetrieveTableColumns(false)
+                            .toOptions())
+                    .toOptions());
+    final Catalog limited = getCatalog(connection, options);
+
+    assertThat(limited.getCrawlInfo().getTitle(), is("Crawl-only options"));
+    assertThat(
+        limited.getTables().stream().map(Table::getName).toList(), is(Arrays.asList("AUTHORS")));
+    assertThat(limited.getTables().iterator().next().getColumns().isEmpty(), is(true));
+  }
+
+  @Test
+  public void crawlRejectsNullOptions(final DatabaseConnectionSource connectionSource) {
+    final NullPointerException exception =
+        assertThrows(
+            NullPointerException.class,
+            () -> new SchemaCrawler(connectionSource, schemaRetrievalOptionsDefault, null));
+    assertThat(exception.getMessage(), is("No SchemaCrawler options provided"));
+  }
 
   @Test
   public void catalogDoesNotExposeReductionMethods() {

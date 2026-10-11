@@ -24,9 +24,9 @@ import java.util.logging.Logger;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.SearchableType;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.Multimap;
@@ -42,7 +42,7 @@ final class DataTypeRetriever extends AbstractRetriever {
   DataTypeRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options)
+      final CrawlOptions options)
       throws SQLException {
     super(retrieverConnection, catalog, options);
     baseColumnTypes = new Multimap<>();

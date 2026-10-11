@@ -87,7 +87,7 @@ public class RoutineRetrieverFunctionsTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final RoutineRetriever functionRetriever =
-        new RoutineRetriever(retrieverConnection, catalog, options);
+        new RoutineRetriever(retrieverConnection, catalog, options.crawlOptions());
     functionRetriever.retrieveRoutines(List.of(RoutineType.function), new IncludeAll());
 
     final TestWriter testout = new TestWriter();

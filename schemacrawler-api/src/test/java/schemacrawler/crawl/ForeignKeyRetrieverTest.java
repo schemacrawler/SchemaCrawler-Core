@@ -135,7 +135,7 @@ public class ForeignKeyRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final ForeignKeyRetriever foreignKeyRetriever =
-        new ForeignKeyRetriever(retrieverConnection, catalog, options);
+        new ForeignKeyRetriever(retrieverConnection, catalog, options.crawlOptions());
     foreignKeyRetriever.retrieveForeignKeys(catalog.getAllTables());
 
     verifyRetrieveForeignKeys(catalog);

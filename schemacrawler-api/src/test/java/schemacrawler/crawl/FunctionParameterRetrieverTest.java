@@ -152,7 +152,8 @@ public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTe
 
   @Override
   protected void createRetriever(final SchemaCrawlerOptions options) {
-    retriever = new FunctionParameterRetriever(retrieverConnection, catalog, options);
+    retriever =
+        new FunctionParameterRetriever(retrieverConnection, catalog, options.crawlOptions());
   }
 
   @Override

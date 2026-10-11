@@ -18,7 +18,7 @@ import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintType;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
+import schemacrawler.schemacrawler.CrawlOptions;
 
 /** A retriever uses database metadata to get the constraints on the database tables. */
 final class TableConstraintMatcher extends AbstractRetriever {
@@ -26,7 +26,7 @@ final class TableConstraintMatcher extends AbstractRetriever {
   TableConstraintMatcher(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options)
+      final CrawlOptions options)
       throws SQLException {
     super(retrieverConnection, catalog, options);
   }

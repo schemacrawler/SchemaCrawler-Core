@@ -78,7 +78,7 @@ public class SchemaRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final SchemaRetriever schemaRetriever =
-        new SchemaRetriever(retrieverConnection, catalog, options);
+        new SchemaRetriever(retrieverConnection, catalog, options.crawlOptions());
     schemaRetriever.retrieveSchemas(new IncludeAll());
 
     verify(databaseMetaData, times(0)).getSchemas();

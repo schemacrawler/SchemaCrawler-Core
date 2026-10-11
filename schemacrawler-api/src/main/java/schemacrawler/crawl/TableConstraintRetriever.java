@@ -33,9 +33,9 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintType;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import us.fatehi.utility.string.StringFormat;
 
 /** A retriever uses database metadata to get the constraints on the database tables. */
@@ -86,7 +86,7 @@ final class TableConstraintRetriever extends AbstractRetriever {
   TableConstraintRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options)
+      final CrawlOptions options)
       throws SQLException {
     super(retrieverConnection, catalog, options);
     tableConstraintsMap = new HashMap<>();

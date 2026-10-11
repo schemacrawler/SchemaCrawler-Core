@@ -20,9 +20,9 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.WrappedSQLException;
 import us.fatehi.utility.logging.UtilityLogger;
 import us.fatehi.utility.string.StringFormat;
@@ -35,7 +35,7 @@ final class PrimaryKeyRetriever extends AbstractRetriever {
   PrimaryKeyRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options)
+      final CrawlOptions options)
       throws SQLException {
     super(retrieverConnection, catalog, options);
   }

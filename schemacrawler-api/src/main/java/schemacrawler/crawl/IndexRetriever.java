@@ -25,9 +25,9 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.IndexColumnSortSequence;
 import schemacrawler.schema.IndexType;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.WrappedSQLException;
 import us.fatehi.utility.logging.UtilityLogger;
 import us.fatehi.utility.string.StringFormat;
@@ -40,7 +40,7 @@ final class IndexRetriever extends AbstractRetriever {
   IndexRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options) {
+      final CrawlOptions options) {
     super(retrieverConnection, catalog, options);
   }
 

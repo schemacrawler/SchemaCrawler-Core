@@ -115,12 +115,12 @@ public class RoutineExtRetrieverTest {
 
     // Retrieve routines first
     final RoutineRetriever routineRetriever =
-        new RoutineRetriever(retrieverConnection, catalog, options);
+        new RoutineRetriever(retrieverConnection, catalog, options.crawlOptions());
     routineRetriever.retrieveRoutines(
         List.of(RoutineType.procedure, RoutineType.function), new IncludeAll());
 
     final RoutineExtRetriever procedureExtRetriever =
-        new RoutineExtRetriever(retrieverConnection, catalog, options);
+        new RoutineExtRetriever(retrieverConnection, catalog, options.crawlOptions());
     procedureExtRetriever.retrieveRoutineReferences();
 
     final TestWriter testout = new TestWriter();

@@ -30,9 +30,9 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.ParameterModeType;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.logging.UtilityLogger;
 import us.fatehi.utility.string.StringFormat;
@@ -45,7 +45,7 @@ final class FunctionParameterRetriever extends AbstractRetriever {
   FunctionParameterRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options) {
+      final CrawlOptions options) {
     super(retrieverConnection, catalog, options);
   }
 

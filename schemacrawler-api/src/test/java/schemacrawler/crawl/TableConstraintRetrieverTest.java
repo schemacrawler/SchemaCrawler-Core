@@ -109,7 +109,7 @@ public class TableConstraintRetrieverTest {
 
     // Create the constraint retriever
     final TableConstraintRetriever constraintRetriever =
-        new TableConstraintRetriever(retrieverConnection, catalog, options);
+        new TableConstraintRetriever(retrieverConnection, catalog, options.crawlOptions());
 
     // Act - retrieve table constraint definitions
     constraintRetriever.retrieveCheckConstraints();
@@ -169,7 +169,7 @@ public class TableConstraintRetrieverTest {
 
     // Create the constraint retriever
     final TableConstraintRetriever constraintRetriever =
-        new TableConstraintRetriever(retrieverConnection, catalog, options);
+        new TableConstraintRetriever(retrieverConnection, catalog, options.crawlOptions());
 
     // Act - retrieve table constraint information
     constraintRetriever.retrieveTableConstraintInformation();
@@ -204,9 +204,9 @@ public class TableConstraintRetrieverTest {
 
     // Create the constraint retriever
     final TableConstraintRetriever constraintRetriever =
-        new TableConstraintRetriever(retrieverConnection, catalog, options);
+        new TableConstraintRetriever(retrieverConnection, catalog, options.crawlOptions());
     final TableConstraintMatcher constraintMatcher =
-        new TableConstraintMatcher(retrieverConnection, catalog, options);
+        new TableConstraintMatcher(retrieverConnection, catalog, options.crawlOptions());
 
     // Act - retrieve table constraints
     constraintRetriever.retrieveTableConstraints();
@@ -260,9 +260,9 @@ public class TableConstraintRetrieverTest {
 
     // Create the constraint retriever
     final TableConstraintRetriever constraintRetriever =
-        new TableConstraintRetriever(retrieverConnection, catalog, options);
+        new TableConstraintRetriever(retrieverConnection, catalog, options.crawlOptions());
     final TableConstraintMatcher constraintMatcher =
-        new TableConstraintMatcher(retrieverConnection, catalog, options);
+        new TableConstraintMatcher(retrieverConnection, catalog, options.crawlOptions());
 
     // Act - retrieve table constraints with invalid SQL
     // This should not throw an exception

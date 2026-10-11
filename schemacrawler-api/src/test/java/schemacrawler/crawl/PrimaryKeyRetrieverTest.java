@@ -124,7 +124,7 @@ public class PrimaryKeyRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     final PrimaryKeyRetriever primaryKeyRetriever =
-        new PrimaryKeyRetriever(retrieverConnection, catalog, options);
+        new PrimaryKeyRetriever(retrieverConnection, catalog, options.crawlOptions());
     primaryKeyRetriever.retrievePrimaryKeys(catalog.getAllTables());
 
     final Collection<Table> tables = catalog.getTables();

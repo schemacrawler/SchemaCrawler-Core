@@ -22,8 +22,8 @@ import java.util.Optional;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.Retriever;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 
 /** Base class for retriever that uses database metadata to get the details about the schema. */
@@ -31,14 +31,14 @@ import schemacrawler.schemacrawler.SchemaReference;
 abstract class AbstractRetriever {
 
   final MutableCatalog catalog;
-  private final SchemaCrawlerOptions options;
+  private final CrawlOptions options;
   private final RetrieverConnection retrieverConnection;
   private final DataTypeLookup dataTypeLookup;
 
   AbstractRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options) {
+      final CrawlOptions options) {
     this.retrieverConnection =
         requireNonNull(retrieverConnection, "No retriever connection provided");
     this.catalog = catalog;

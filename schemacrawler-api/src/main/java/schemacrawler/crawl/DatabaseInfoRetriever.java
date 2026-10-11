@@ -28,9 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.jdbc.driver.JdbcConnectionUtility;
 import us.fatehi.utility.jdbc.driver.JdbcDriverMetadata;
@@ -106,7 +106,7 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
   DatabaseInfoRetriever(
       final RetrieverConnection retrieverConnection,
       final MutableCatalog catalog,
-      final SchemaCrawlerOptions options)
+      final CrawlOptions options)
       throws SQLException {
     super(retrieverConnection, catalog, options);
   }
