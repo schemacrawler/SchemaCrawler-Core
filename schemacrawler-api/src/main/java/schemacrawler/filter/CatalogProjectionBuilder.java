@@ -41,7 +41,11 @@ import schemacrawler.schemacrawler.LimitOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 
-/** Builds immutable catalog projections from an already loaded catalog. */
+/**
+ * Builds {@link Catalog} selections with immutable membership from a loaded catalog.
+ *
+ * <p>Selection does not retrieve metadata or broaden the source catalog's membership.
+ */
 public final class CatalogProjectionBuilder {
 
   static final class SchemaFilter<D extends DatabaseObject> implements NamedObjectFilter<D> {
@@ -144,7 +148,11 @@ public final class CatalogProjectionBuilder {
         databaseUsers);
   }
 
-  /** Sets composed filter and grep options for the projection. */
+  /**
+   * Sets the limit, filter, and grep options used to select source objects.
+   *
+   * <p>Load options do not trigger metadata retrieval during selection.
+   */
   public CatalogProjectionBuilder withOptions(final SchemaCrawlerOptions schemaCrawlerOptions) {
     if (schemaCrawlerOptions != null) {
       this.schemaCrawlerOptions = schemaCrawlerOptions;

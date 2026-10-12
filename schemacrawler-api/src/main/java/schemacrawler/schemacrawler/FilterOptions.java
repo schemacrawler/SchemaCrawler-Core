@@ -10,7 +10,12 @@ package schemacrawler.schemacrawler;
 
 import us.fatehi.utility.Options;
 
-/** Options controlling post-load catalog filters and related-table expansion. */
+/**
+ * Options controlling post-load catalog filters and related-table expansion.
+ *
+ * <p>Empty-table exclusion omits tables only when their row count is known to be zero; tables with
+ * an unknown row count remain eligible.
+ */
 public record FilterOptions(
     int childTableFilterDepth, int parentTableFilterDepth, boolean omitEmptyTables)
     implements Options {
@@ -20,7 +25,8 @@ public record FilterOptions(
    *
    * @param childTableFilterDepth depth for child tables; must be >= 0
    * @param parentTableFilterDepth depth for parent tables; must be >= 0
-   * @param omitEmptyTables Whether to exclude tables with a known row count of zero
+   * @param omitEmptyTables Whether to exclude tables with a known row count of zero; unknown row
+   *     counts remain eligible
    */
   public FilterOptions {
     if (childTableFilterDepth < 0) {
