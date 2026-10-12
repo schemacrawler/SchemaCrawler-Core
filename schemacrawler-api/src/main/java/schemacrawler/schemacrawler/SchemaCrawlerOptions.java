@@ -14,7 +14,13 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 import org.jspecify.annotations.NonNull;
 import us.fatehi.utility.Options;
 
-/** SchemaCrawler options. */
+/**
+ * Immutable options for loading a catalog and selecting objects from a catalog.
+ *
+ * <p>Catalog selection applies limit, filter, and grep options to existing
+ * membership. Load options control metadata retrieval and do not trigger it
+ * during selection.
+ */
 public record SchemaCrawlerOptions(
     @NonNull String title,
     @NonNull LimitOptions limitOptions,

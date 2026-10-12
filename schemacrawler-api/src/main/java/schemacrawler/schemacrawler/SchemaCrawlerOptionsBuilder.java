@@ -8,7 +8,7 @@
 
 package schemacrawler.schemacrawler;
 
-/** SchemaCrawler options builder, to build the immutable options to crawl a schema. */
+/** Builds immutable options for loading and selecting a schema catalog. */
 public final class SchemaCrawlerOptionsBuilder {
 
   public static SchemaCrawlerOptions newSchemaCrawlerOptions() {
