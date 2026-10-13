@@ -212,7 +212,8 @@ public class DatabaseInfoRetrieverTest {
   public void errorHandlingInRetrieveAdditionalDatabaseInfo(final TestContext testContext)
       throws Exception {
 
-    // Create a retriever connection with a mocked connection source to simulate errors
+    // Create a retriever connection with a mocked connection source to simulate
+    // errors
     final Connection mockConnection = mockConnection();
     final DatabaseMetaData mockMetaData = mockConnection.getMetaData();
     when(mockMetaData.isReadOnly()).thenThrow(SQLException.class);

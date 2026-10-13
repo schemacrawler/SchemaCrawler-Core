@@ -14,11 +14,11 @@ import static java.util.Objects.requireNonNull;
 import java.io.Serial;
 import java.util.Objects;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.TypedObject;
-import schemacrawler.schema.Identifiers;
 
 /** Represents a database object. */
 abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
@@ -55,12 +55,12 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
       return -1;
     }
 
-    if (obj instanceof DatabaseObject object2) {
+    if (obj instanceof final DatabaseObject object2) {
       final int schemaCompareTo = getSchema().compareTo(object2.getSchema());
       if (schemaCompareTo != 0) {
         return schemaCompareTo;
       }
-      if (this instanceof TypedObject object && obj instanceof TypedObject object1) {
+      if (this instanceof final TypedObject object && obj instanceof final TypedObject object1) {
         try {
           final int typeCompareTo = object.getType().compareTo(object1.getType());
           if (typeCompareTo != 0) {

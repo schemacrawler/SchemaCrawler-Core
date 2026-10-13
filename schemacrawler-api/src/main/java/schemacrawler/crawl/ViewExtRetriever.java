@@ -62,21 +62,25 @@ final class ViewExtRetriever extends AbstractRetriever {
     final Query viewInformationSql = informationSchemaViews.getQuery(VIEWS);
 
     switch (getRetrieverConnection().get(viewInformationRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving additional view information, using fast data dictionary retrieval"
                 + " over schemas");
         retrieveViewInformationOverSchemas(viewInformationSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving additional view information, using fast data dictionary retrieval");
         retrieveViewInformationFromDataDictionary(viewInformationSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(
+            Level.INFO,
+            "Retrieving additional view information, using fast data dictionary retrieval");
+        retrieveViewInformationFromDataDictionary(viewInformationSql);
+      }
     }
   }
 
@@ -105,18 +109,20 @@ final class ViewExtRetriever extends AbstractRetriever {
     LOGGER.log(Level.INFO, "Retrieving view table usage");
 
     switch (getRetrieverConnection().get(viewTableUsageRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving view table usage, using fast data dictionary retrieval" + " over schemas");
         retrieveViewTableUsageOverSchemas(viewTableUsageSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(Level.INFO, "Retrieving view table usage, using fast data dictionary retrieval");
         retrieveViewTableUsageFromDataDictionary(viewTableUsageSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(Level.INFO, "Retrieving view table usage, using fast data dictionary retrieval");
+        retrieveViewTableUsageFromDataDictionary(viewTableUsageSql);
+      }
     }
   }
 
@@ -206,7 +212,7 @@ final class ViewExtRetriever extends AbstractRetriever {
             new MetadataResultSet(viewInformationSql, statement, getLimitMap()); ) {
       while (results.next()) {
         retrievalCounts.count();
-        boolean addedViewInformation = addViewInformation(results);
+        final boolean addedViewInformation = addViewInformation(results);
         retrievalCounts.countIfIncluded(addedViewInformation);
       }
     } catch (final Exception e) {
@@ -235,7 +241,7 @@ final class ViewExtRetriever extends AbstractRetriever {
               new MetadataResultSet(viewInformationSql, statement, getLimitMap(schema)); ) {
         while (results.next()) {
           retrievalCounts.count(schema.key());
-          boolean addedViewInformation = addViewInformation(results);
+          final boolean addedViewInformation = addViewInformation(results);
           retrievalCounts.countIfIncluded(schema.key(), addedViewInformation);
         }
       } catch (final Exception e) {
@@ -265,7 +271,7 @@ final class ViewExtRetriever extends AbstractRetriever {
             new MetadataResultSet(viewTableUsageSql, statement, getLimitMap()); ) {
       while (results.next()) {
         retrievalCounts.count();
-        boolean addedTableUsage = addViewTableUsage(results);
+        final boolean addedTableUsage = addViewTableUsage(results);
         retrievalCounts.countIfIncluded(addedTableUsage);
       }
     } catch (final Exception e) {
@@ -294,7 +300,7 @@ final class ViewExtRetriever extends AbstractRetriever {
               new MetadataResultSet(viewTableUsageSql, statement, getLimitMap(schema)); ) {
         while (results.next()) {
           retrievalCounts.count(schema.key());
-          boolean addedTableUsage = addViewTableUsage(results);
+          final boolean addedTableUsage = addViewTableUsage(results);
           retrievalCounts.countIfIncluded(schema.key(), addedTableUsage);
         }
       } catch (final Exception e) {

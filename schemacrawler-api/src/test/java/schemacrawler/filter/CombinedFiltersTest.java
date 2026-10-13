@@ -22,15 +22,12 @@ import schemacrawler.test.utility.crawl.LightTable;
 
 class CombinedFiltersTest {
 
-  @Test
-  void testNegatedFilter() {
-    final LightTable sales = new LightTable("sales");
-    final LightTable inventory = new LightTable("inventory");
-    final Predicate<schemacrawler.schema.NamedObject> notSales =
-        NamedObjectFilters.nameRegex("sales").negate();
-
-    assertThat(notSales.test(sales), is(false));
-    assertThat(notSales.test(inventory), is(true));
+  private static Table viewTypeTable(final String name) {
+    final Table table = mock(Table.class);
+    when(table.getName()).thenReturn(name);
+    when(table.getFullName()).thenReturn(name);
+    when(table.getTableType()).thenReturn(new TableType("view"));
+    return table;
   }
 
   @Test
@@ -48,11 +45,14 @@ class CombinedFiltersTest {
     assertThat(salesViewsOnly.test(inventoryView), is(false));
   }
 
-  private static Table viewTypeTable(final String name) {
-    final Table table = mock(Table.class);
-    when(table.getName()).thenReturn(name);
-    when(table.getFullName()).thenReturn(name);
-    when(table.getTableType()).thenReturn(new TableType("view"));
-    return table;
+  @Test
+  void testNegatedFilter() {
+    final LightTable sales = new LightTable("sales");
+    final LightTable inventory = new LightTable("inventory");
+    final Predicate<schemacrawler.schema.NamedObject> notSales =
+        NamedObjectFilters.nameRegex("sales").negate();
+
+    assertThat(notSales.test(sales), is(false));
+    assertThat(notSales.test(inventory), is(true));
   }
 }

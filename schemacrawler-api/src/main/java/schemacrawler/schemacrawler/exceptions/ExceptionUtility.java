@@ -23,12 +23,15 @@ class ExceptionUtility {
       causeMessage = cause.getMessage();
     }
 
-    // If the override message is blank, use the cause message, even if the cause message is null
+    // If the override message is blank, use the cause message, even if the cause
+    // message is null
     if (isBlank(message)) {
       return causeMessage;
     }
-    // If the cause message is blank, use the override message, even if the it is null
-    // Do not use a combined message for known exceptions, since they may already be mapped
+    // If the cause message is blank, use the override message, even if the it is
+    // null
+    // Do not use a combined message for known exceptions, since they may already be
+    // mapped
     if (isBlank(causeMessage)
         || cause instanceof SchemaCrawlerException
         || cause instanceof WrappedSQLException) {

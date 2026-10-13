@@ -62,6 +62,26 @@ public class SchemaCrawlerUtilityTest {
   }
 
   @Test
+  public void getCatalogClosedConnection(final Connection connection) throws Exception {
+    final DatabaseConnectionSource connectionSource =
+        DatabaseConnectionSources.fromConnection(connection);
+    connection.close();
+    assertThrows(
+        SQLRuntimeException.class,
+        () -> SchemaCrawlerUtility.getCatalog(connectionSource, newSchemaCrawlerOptions()));
+  }
+
+  @Test
+  public void getCatalogMissingPlugin(final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    final InternalRuntimeException exception =
+        assertThrows(
+            InternalRuntimeException.class,
+            () -> SchemaCrawlerUtility.getCatalog(connectionSource, newSchemaCrawlerOptions()));
+    assertThat(exception.getMessage(), containsString("hsqldb"));
+  }
+
+  @Test
   @WithSystemProperty(key = "SC_WITHOUT_DATABASE_PLUGIN", value = "hsqldb")
   public void getCatalogReturnsLimitedBaselineBeforeGrep(
       final DatabaseConnectionSource connectionSource) throws Exception {
@@ -92,26 +112,6 @@ public class SchemaCrawlerUtilityTest {
             .withOptions(newSchemaCrawlerOptions().withGrepOptions(grepOptions))
             .build();
     assertThat(projection.getTables(schema), is(empty()));
-  }
-
-  @Test
-  public void getCatalogClosedConnection(final Connection connection) throws Exception {
-    final DatabaseConnectionSource connectionSource =
-        DatabaseConnectionSources.fromConnection(connection);
-    connection.close();
-    assertThrows(
-        SQLRuntimeException.class,
-        () -> SchemaCrawlerUtility.getCatalog(connectionSource, newSchemaCrawlerOptions()));
-  }
-
-  @Test
-  public void getCatalogMissingPlugin(final DatabaseConnectionSource connectionSource)
-      throws Exception {
-    final InternalRuntimeException exception =
-        assertThrows(
-            InternalRuntimeException.class,
-            () -> SchemaCrawlerUtility.getCatalog(connectionSource, newSchemaCrawlerOptions()));
-    assertThat(exception.getMessage(), containsString("hsqldb"));
   }
 
   @Test

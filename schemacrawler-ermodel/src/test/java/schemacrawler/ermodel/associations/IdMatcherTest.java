@@ -81,7 +81,7 @@ public class IdMatcherTest {
 
   private Column mockColumn(
       final String tableName, final String columnName, final boolean partOfPrimaryKey) {
-    LightColumn lightColumn = new LightTable(tableName).addColumn(columnName);
+    final LightColumn lightColumn = new LightTable(tableName).addColumn(columnName);
     final Column column = spy(lightColumn);
     when(column.isPartOfPrimaryKey()).thenReturn(partOfPrimaryKey);
     return column;

@@ -186,89 +186,6 @@ public class TableEntityModelInferrerTest {
   }
 
   @Test
-  public void testInferEntityTypeNonEntity() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final Table table = spy(new LightTable(schema, "NO_PK"));
-    final TableType tableType = mock(TableType.class);
-    when(tableType.isView()).thenReturn(false);
-    when(tableType.getSimpleTableType()).thenReturn(SimpleTableType.table);
-    when(table.getTableType()).thenReturn(tableType);
-
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
-    assertThat(model.inferEntityType(), is(EntityType.non_entity));
-  }
-
-  @Test
-  public void testInferEntityTypeStrongEntity() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-    final LightTable table = new LightTable(schema, "STRONG");
-    final LightColumn id = table.addColumn("ID");
-    final LightPrimaryKey pk = new LightPrimaryKey(id);
-    table.setPrimaryKey(pk);
-
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
-    assertThat(model.inferEntityType(), is(EntityType.strong_entity));
-  }
-
-  @Test
-  public void testInferEntityTypeSubtype() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-
-    final MutableTable parent = new MutableTable(schema, "PARENT");
-    final MutableColumn parentId = new MutableColumn(parent, "ID");
-    parent.addColumn(parentId);
-    final MutablePrimaryKey parentPk = MutablePrimaryKey.newPrimaryKey(parent, "PK_PARENT");
-    parentPk.addColumn(new MutableTableConstraintColumn(parentPk, parentId));
-    parent.setPrimaryKey(parentPk);
-
-    final MutableTable child = new MutableTable(schema, "CHILD");
-    final MutableColumn childId = new MutableColumn(child, "ID");
-    child.addColumn(childId);
-    final MutablePrimaryKey childPk = MutablePrimaryKey.newPrimaryKey(child, "PK_CHILD");
-    childPk.addColumn(new MutableTableConstraintColumn(childPk, childId));
-    child.setPrimaryKey(childPk);
-
-    final MutableForeignKey fk =
-        new MutableForeignKey(
-            "FK_CHILD_PARENT", new ImmutableColumnReference(1, childId, parentId));
-    child.addForeignKey(fk);
-
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(child);
-    assertThat(model.inferEntityType(), is(EntityType.subtype));
-    assertThat(model.inferSuperType().orElse(null), is(parent));
-  }
-
-  @Test
-  public void testInferEntityTypeWeakEntity() {
-    final SchemaReference schema = new SchemaReference("catalog", "schema");
-
-    final MutableTable parent = new MutableTable(schema, "PARENT");
-    final MutableColumn parentId = new MutableColumn(parent, "ID");
-    parent.addColumn(parentId);
-    final MutablePrimaryKey parentPk = MutablePrimaryKey.newPrimaryKey(parent, "PK_PARENT");
-    parentPk.addColumn(new MutableTableConstraintColumn(parentPk, parentId));
-    parent.setPrimaryKey(parentPk);
-
-    final MutableTable weak = new MutableTable(schema, "WEAK");
-    final MutableColumn weakParentId = new MutableColumn(weak, "PARENT_ID");
-    weak.addColumn(weakParentId);
-    final MutableColumn discriminator = new MutableColumn(weak, "SEQ");
-    weak.addColumn(discriminator);
-    final MutablePrimaryKey weakPk = MutablePrimaryKey.newPrimaryKey(weak, "PK_WEAK");
-    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, weakParentId));
-    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, discriminator));
-    weak.setPrimaryKey(weakPk);
-
-    final MutableForeignKey fk =
-        new MutableForeignKey(
-            "FK_WEAK_PARENT", new ImmutableColumnReference(1, weakParentId, parentId));
-    weak.addForeignKey(fk);
-
-    final TableEntityModelInferrer model = new TableEntityModelInferrer(weak);
-    assertThat(model.inferEntityType(), is(EntityType.weak_entity));
-  }
-
-  @Test
   public void testInferBridgeTable() {
     final SchemaReference schema = new SchemaReference("catalog", "schema");
 
@@ -354,5 +271,88 @@ public class TableEntityModelInferrerTest {
 
     model = new TableEntityModelInferrer(bridgeTable2);
     assertThat(model.inferBridgeTable(), is(true));
+  }
+
+  @Test
+  public void testInferEntityTypeNonEntity() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+    final Table table = spy(new LightTable(schema, "NO_PK"));
+    final TableType tableType = mock(TableType.class);
+    when(tableType.isView()).thenReturn(false);
+    when(tableType.getSimpleTableType()).thenReturn(SimpleTableType.table);
+    when(table.getTableType()).thenReturn(tableType);
+
+    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
+    assertThat(model.inferEntityType(), is(EntityType.non_entity));
+  }
+
+  @Test
+  public void testInferEntityTypeStrongEntity() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+    final LightTable table = new LightTable(schema, "STRONG");
+    final LightColumn id = table.addColumn("ID");
+    final LightPrimaryKey pk = new LightPrimaryKey(id);
+    table.setPrimaryKey(pk);
+
+    final TableEntityModelInferrer model = new TableEntityModelInferrer(table);
+    assertThat(model.inferEntityType(), is(EntityType.strong_entity));
+  }
+
+  @Test
+  public void testInferEntityTypeSubtype() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+
+    final MutableTable parent = new MutableTable(schema, "PARENT");
+    final MutableColumn parentId = new MutableColumn(parent, "ID");
+    parent.addColumn(parentId);
+    final MutablePrimaryKey parentPk = MutablePrimaryKey.newPrimaryKey(parent, "PK_PARENT");
+    parentPk.addColumn(new MutableTableConstraintColumn(parentPk, parentId));
+    parent.setPrimaryKey(parentPk);
+
+    final MutableTable child = new MutableTable(schema, "CHILD");
+    final MutableColumn childId = new MutableColumn(child, "ID");
+    child.addColumn(childId);
+    final MutablePrimaryKey childPk = MutablePrimaryKey.newPrimaryKey(child, "PK_CHILD");
+    childPk.addColumn(new MutableTableConstraintColumn(childPk, childId));
+    child.setPrimaryKey(childPk);
+
+    final MutableForeignKey fk =
+        new MutableForeignKey(
+            "FK_CHILD_PARENT", new ImmutableColumnReference(1, childId, parentId));
+    child.addForeignKey(fk);
+
+    final TableEntityModelInferrer model = new TableEntityModelInferrer(child);
+    assertThat(model.inferEntityType(), is(EntityType.subtype));
+    assertThat(model.inferSuperType().orElse(null), is(parent));
+  }
+
+  @Test
+  public void testInferEntityTypeWeakEntity() {
+    final SchemaReference schema = new SchemaReference("catalog", "schema");
+
+    final MutableTable parent = new MutableTable(schema, "PARENT");
+    final MutableColumn parentId = new MutableColumn(parent, "ID");
+    parent.addColumn(parentId);
+    final MutablePrimaryKey parentPk = MutablePrimaryKey.newPrimaryKey(parent, "PK_PARENT");
+    parentPk.addColumn(new MutableTableConstraintColumn(parentPk, parentId));
+    parent.setPrimaryKey(parentPk);
+
+    final MutableTable weak = new MutableTable(schema, "WEAK");
+    final MutableColumn weakParentId = new MutableColumn(weak, "PARENT_ID");
+    weak.addColumn(weakParentId);
+    final MutableColumn discriminator = new MutableColumn(weak, "SEQ");
+    weak.addColumn(discriminator);
+    final MutablePrimaryKey weakPk = MutablePrimaryKey.newPrimaryKey(weak, "PK_WEAK");
+    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, weakParentId));
+    weakPk.addColumn(new MutableTableConstraintColumn(weakPk, discriminator));
+    weak.setPrimaryKey(weakPk);
+
+    final MutableForeignKey fk =
+        new MutableForeignKey(
+            "FK_WEAK_PARENT", new ImmutableColumnReference(1, weakParentId, parentId));
+    weak.addForeignKey(fk);
+
+    final TableEntityModelInferrer model = new TableEntityModelInferrer(weak);
+    assertThat(model.inferEntityType(), is(EntityType.weak_entity));
   }
 }

@@ -30,6 +30,17 @@ import us.fatehi.utility.property.PropertyName;
 public class CommandRegistryTest {
 
   @Test
+  public void commandLineCommands() {
+
+    final TestCommandProvider testCommandProvider = new TestCommandProvider();
+
+    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
+    final Collection<PluginCommand> commandLineCommands = commandRegistry.getCommandLineCommands();
+    assertThat(commandLineCommands, hasSize(1));
+    assertThat(commandLineCommands, hasItem(testCommandProvider.getCommandLineCommand()));
+  }
+
+  @Test
   public void configureNewCommand() {
 
     final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
@@ -49,17 +60,6 @@ public class CommandRegistryTest {
   }
 
   @Test
-  public void commandLineCommands() {
-
-    final TestCommandProvider testCommandProvider = new TestCommandProvider();
-
-    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
-    final Collection<PluginCommand> commandLineCommands = commandRegistry.getCommandLineCommands();
-    assertThat(commandLineCommands, hasSize(1));
-    assertThat(commandLineCommands, hasItem(testCommandProvider.getCommandLineCommand()));
-  }
-
-  @Test
   public void helpCommands() {
 
     final TestCommandProvider testCommandProvider = new TestCommandProvider();
@@ -68,23 +68,6 @@ public class CommandRegistryTest {
     final Collection<PluginCommand> commandLineCommands = commandRegistry.getHelpCommands();
     assertThat(commandLineCommands, hasSize(1));
     assertThat(commandLineCommands, hasItem(testCommandProvider.getHelpCommand()));
-  }
-
-  @Test
-  public void registeredPlugins() {
-
-    final TestCommandProvider testCommandProvider = new TestCommandProvider();
-
-    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
-    final Collection<PropertyName> commandLineCommands = commandRegistry.getRegisteredPlugins();
-    assertThat(commandLineCommands, hasSize(1));
-    assertThat(commandLineCommands, is(testCommandProvider.getSupportedCommands()));
-  }
-
-  @Test
-  public void name() {
-    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
-    assertThat(commandRegistry.getName(), is("SchemaCrawler Commands"));
   }
 
   @Test
@@ -98,5 +81,22 @@ public class CommandRegistryTest {
         });
     // Reset
     reload(CommandRegistry.class);
+  }
+
+  @Test
+  public void name() {
+    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
+    assertThat(commandRegistry.getName(), is("SchemaCrawler Commands"));
+  }
+
+  @Test
+  public void registeredPlugins() {
+
+    final TestCommandProvider testCommandProvider = new TestCommandProvider();
+
+    final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
+    final Collection<PropertyName> commandLineCommands = commandRegistry.getRegisteredPlugins();
+    assertThat(commandLineCommands, hasSize(1));
+    assertThat(commandLineCommands, is(testCommandProvider.getSupportedCommands()));
   }
 }

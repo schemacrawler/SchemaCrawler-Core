@@ -79,41 +79,6 @@ public class CatalogStatsUtilityTest {
   }
 
   @Test
-  public void schemaStatsFromThrowsOnNullCatalog() {
-    assertThrows(NullPointerException.class, () -> CatalogStatsUtility.schemaStatsFrom(null));
-  }
-
-  @Test
-  public void schemaTableSumsMatchCatalogCounts(final DatabaseConnectionSource connectionSource) {
-    final Catalog catalog =
-        getCatalog(connectionSource.get(), schemaCrawlerOptionsWithMaximumSchemaInfoLevel);
-    final CatalogStats catalogStats = CatalogStatsUtility.from(catalog);
-
-    final int sumOfColumns =
-        catalogStats.schemas().stream()
-            .map(SchemaStats::counts)
-            .map(stats -> stats.tables().columns())
-            .mapToInt(Integer::intValue)
-            .sum();
-    final int sumOfForeignKeys =
-        catalogStats.schemas().stream()
-            .map(SchemaStats::counts)
-            .map(stats -> stats.tables().foreignKeys())
-            .mapToInt(Integer::intValue)
-            .sum();
-    final int sumOfViews =
-        catalogStats.schemas().stream()
-            .map(SchemaStats::counts)
-            .map(stats -> stats.tables().views())
-            .mapToInt(Integer::intValue)
-            .sum();
-
-    assertThat(catalogStats.counts().columns(), is(sumOfColumns));
-    assertThat(catalogStats.counts().foreignKeys(), is(sumOfForeignKeys));
-    assertThat(catalogStats.counts().views(), is(sumOfViews));
-  }
-
-  @Test
   public void schemaStatsFromMatchesCatalogSchemas(
       final DatabaseConnectionSource connectionSource) {
     final Catalog catalog =
@@ -152,5 +117,40 @@ public class CatalogStatsUtilityTest {
     assertThat(catalogStats.counts().views(), is(greaterThan(0)));
     assertThat(catalogStats.counts().foreignKeys(), is(greaterThan(0)));
     assertThat(catalogStats.counts().columns(), is(greaterThan(0)));
+  }
+
+  @Test
+  public void schemaStatsFromThrowsOnNullCatalog() {
+    assertThrows(NullPointerException.class, () -> CatalogStatsUtility.schemaStatsFrom(null));
+  }
+
+  @Test
+  public void schemaTableSumsMatchCatalogCounts(final DatabaseConnectionSource connectionSource) {
+    final Catalog catalog =
+        getCatalog(connectionSource.get(), schemaCrawlerOptionsWithMaximumSchemaInfoLevel);
+    final CatalogStats catalogStats = CatalogStatsUtility.from(catalog);
+
+    final int sumOfColumns =
+        catalogStats.schemas().stream()
+            .map(SchemaStats::counts)
+            .map(stats -> stats.tables().columns())
+            .mapToInt(Integer::intValue)
+            .sum();
+    final int sumOfForeignKeys =
+        catalogStats.schemas().stream()
+            .map(SchemaStats::counts)
+            .map(stats -> stats.tables().foreignKeys())
+            .mapToInt(Integer::intValue)
+            .sum();
+    final int sumOfViews =
+        catalogStats.schemas().stream()
+            .map(SchemaStats::counts)
+            .map(stats -> stats.tables().views())
+            .mapToInt(Integer::intValue)
+            .sum();
+
+    assertThat(catalogStats.counts().columns(), is(sumOfColumns));
+    assertThat(catalogStats.counts().foreignKeys(), is(sumOfForeignKeys));
+    assertThat(catalogStats.counts().views(), is(sumOfViews));
   }
 }

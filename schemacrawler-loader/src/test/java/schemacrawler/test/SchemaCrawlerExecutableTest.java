@@ -110,97 +110,6 @@ public class SchemaCrawlerExecutableTest {
   }
 
   @Test
-  public void executableBuildsModelFromSelectedCatalog(
-      final DatabaseConnectionSource connectionSource) throws Exception {
-    final Path testOutputFile = createTempFilePath("sc", "data");
-    final SchemaCrawlerOptions options =
-        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
-            .withGrepOptions(
-                GrepOptionsBuilder.builder()
-                    .includeGreppedColumns(new RegularExpressionInclusionRule(".*BOOKAUTHORS.*"))
-                    .toOptions());
-    final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
-    executable.setSchemaCrawlerOptions(options);
-    executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
-    executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
-
-    executable.setConnectionSource(connectionSource);
-    executable.execute();
-
-    assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 1" + lineSeparator()));
-    assertThat(executable.getERModel().getTables(), hasSize(1));
-    assertThat(executable.getERModel().getTables().iterator().next().getName(), is("BOOKAUTHORS"));
-    assertThat(executable.getCatalog().getTables(), hasSize(20));
-  }
-
-  @Test
-  public void executableDoesNotSelectAlreadySelectedCatalogAgain(
-      final DatabaseConnectionSource connectionSource) throws Exception {
-    final Path testOutputFile = createTempFilePath("sc", "data");
-    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
-    final Catalog baseline =
-        SchemaCrawlerUtility.getCatalog(
-            connectionSource, schemaRetrievalOptionsDefault, options, ConfigUtility.newConfig());
-    final Catalog selectedCatalog =
-        CatalogProjectionBuilder.builder(baseline)
-            .withOptions(
-                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
-                    .withLimitOptions(
-                        LimitOptionsBuilder.builder()
-                            .includeTables(Pattern.compile(".*BOOKAUTHORS$"))
-                            .toOptions()))
-            .build();
-    final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
-    executable.setSchemaCrawlerOptions(options);
-    executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
-    executable.setCatalog(selectedCatalog);
-    executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
-
-    executable.setConnectionSource(connectionSource);
-    executable.execute();
-
-    assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 1" + lineSeparator()));
-    assertThat(executable.getCatalog(), is(selectedCatalog));
-  }
-
-  @Test
-  public void executableCanExplicitlyNarrowAlreadySelectedCatalog(
-      final DatabaseConnectionSource connectionSource) throws Exception {
-    final Path testOutputFile = createTempFilePath("sc", "data");
-    final Catalog baseline =
-        SchemaCrawlerUtility.getCatalog(
-            connectionSource,
-            schemaRetrievalOptionsDefault,
-            SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions(),
-            ConfigUtility.newConfig());
-    final Catalog selectedCatalog =
-        CatalogProjectionBuilder.builder(baseline)
-            .withOptions(
-                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
-                    .withLimitOptions(
-                        LimitOptionsBuilder.builder()
-                            .includeTables(Pattern.compile(".*BOOKAUTHORS$"))
-                            .toOptions()))
-            .build();
-    final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
-    executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
-    executable.setCatalog(selectedCatalog);
-    executable.setSchemaCrawlerOptions(
-        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
-            .withGrepOptions(
-                GrepOptionsBuilder.builder()
-                    .includeGreppedColumns(new RegularExpressionInclusionRule(".*NEVER_MATCH.*"))
-                    .toOptions()));
-    executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
-
-    executable.setConnectionSource(connectionSource);
-    executable.execute();
-
-    assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 0" + lineSeparator()));
-    assertThat(executable.getCatalog(), is(selectedCatalog));
-  }
-
-  @Test
   public void executable_options() throws Exception {
 
     final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
@@ -287,5 +196,96 @@ public class SchemaCrawlerExecutableTest {
     assertThat(executable.getCatalog(), is(sameInstance(mockCatalog)));
     assertThat(
         executable.getSchemaRetrievalOptions(), is(sameInstance(mockSchemaRetrievalOptions)));
+  }
+
+  @Test
+  public void executableBuildsModelFromSelectedCatalog(
+      final DatabaseConnectionSource connectionSource) throws Exception {
+    final Path testOutputFile = createTempFilePath("sc", "data");
+    final SchemaCrawlerOptions options =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withGrepOptions(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedColumns(new RegularExpressionInclusionRule(".*BOOKAUTHORS.*"))
+                    .toOptions());
+    final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
+    executable.setSchemaCrawlerOptions(options);
+    executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
+    executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
+
+    executable.setConnectionSource(connectionSource);
+    executable.execute();
+
+    assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 1" + lineSeparator()));
+    assertThat(executable.getERModel().getTables(), hasSize(1));
+    assertThat(executable.getERModel().getTables().iterator().next().getName(), is("BOOKAUTHORS"));
+    assertThat(executable.getCatalog().getTables(), hasSize(20));
+  }
+
+  @Test
+  public void executableCanExplicitlyNarrowAlreadySelectedCatalog(
+      final DatabaseConnectionSource connectionSource) throws Exception {
+    final Path testOutputFile = createTempFilePath("sc", "data");
+    final Catalog baseline =
+        SchemaCrawlerUtility.getCatalog(
+            connectionSource,
+            schemaRetrievalOptionsDefault,
+            SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions(),
+            ConfigUtility.newConfig());
+    final Catalog selectedCatalog =
+        CatalogProjectionBuilder.builder(baseline)
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeTables(Pattern.compile(".*BOOKAUTHORS$"))
+                            .toOptions()))
+            .build();
+    final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
+    executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
+    executable.setCatalog(selectedCatalog);
+    executable.setSchemaCrawlerOptions(
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withGrepOptions(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedColumns(new RegularExpressionInclusionRule(".*NEVER_MATCH.*"))
+                    .toOptions()));
+    executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
+
+    executable.setConnectionSource(connectionSource);
+    executable.execute();
+
+    assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 0" + lineSeparator()));
+    assertThat(executable.getCatalog(), is(selectedCatalog));
+  }
+
+  @Test
+  public void executableDoesNotSelectAlreadySelectedCatalogAgain(
+      final DatabaseConnectionSource connectionSource) throws Exception {
+    final Path testOutputFile = createTempFilePath("sc", "data");
+    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
+    final Catalog baseline =
+        SchemaCrawlerUtility.getCatalog(
+            connectionSource, schemaRetrievalOptionsDefault, options, ConfigUtility.newConfig());
+    final Catalog selectedCatalog =
+        CatalogProjectionBuilder.builder(baseline)
+            .withOptions(
+                SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+                    .withLimitOptions(
+                        LimitOptionsBuilder.builder()
+                            .includeTables(Pattern.compile(".*BOOKAUTHORS$"))
+                            .toOptions()))
+            .build();
+    final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
+    executable.setSchemaCrawlerOptions(options);
+    executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
+    executable.setCatalog(selectedCatalog);
+    executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
+
+    executable.setConnectionSource(connectionSource);
+    executable.execute();
+
+    assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 1" + lineSeparator()));
+    assertThat(executable.getCatalog(), is(selectedCatalog));
   }
 }

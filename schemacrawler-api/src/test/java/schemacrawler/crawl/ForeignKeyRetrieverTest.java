@@ -107,7 +107,8 @@ public class ForeignKeyRetrieverTest {
         }
       }
     }
-    // IMPORTANT: The data dictionary test should return the same information as the metadata test
+    // IMPORTANT: The data dictionary test should return the same information as the
+    // metadata test
     assertThat(outputOf(testout), hasSameContentAs(classpathResource(referenceFile)));
   }
 

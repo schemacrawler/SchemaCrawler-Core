@@ -20,14 +20,6 @@ import schemacrawler.tools.databaseconnector.DatabaseUrlConnectionOptions;
 public class DatabaseConnectionOptionsTest {
 
   @Test
-  public void url() {
-    final DatabaseUrlConnectionOptions connectionOptions =
-        new DatabaseUrlConnectionOptions("jdbc:test-db:test");
-
-    assertThat(connectionOptions.connectionUrl(), is("jdbc:test-db:test"));
-  }
-
-  @Test
   public void serverHost() {
 
     final Map<String, String> map = new HashMap<>();
@@ -40,5 +32,13 @@ public class DatabaseConnectionOptionsTest {
     assertThat(connectionOptions.port(), is(2222));
     assertThat(connectionOptions.database(), is("database"));
     assertThat(connectionOptions.urlx(), is(map));
+  }
+
+  @Test
+  public void url() {
+    final DatabaseUrlConnectionOptions connectionOptions =
+        new DatabaseUrlConnectionOptions("jdbc:test-db:test");
+
+    assertThat(connectionOptions.connectionUrl(), is("jdbc:test-db:test"));
   }
 }

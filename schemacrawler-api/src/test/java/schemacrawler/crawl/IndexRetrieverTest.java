@@ -79,7 +79,8 @@ public class IndexRetrieverTest {
         }
       }
     }
-    // IMPORTANT: The data dictionary should return the same information as the metadata test
+    // IMPORTANT: The data dictionary should return the same information as the
+    // metadata test
     assertThat(outputOf(testout), hasSameContentAs(classpathResource("SchemaCrawlerTest.indexes")));
   }
 
@@ -107,7 +108,8 @@ public class IndexRetrieverTest {
         new IndexRetriever(retrieverConnection, catalog, options.crawlOptions());
     indexRetriever.retrieveIndexes(catalog.getAllTables());
 
-    // Now test retrieveIndexInformation with a SQL that returns non-existent tables and indexes
+    // Now test retrieveIndexInformation with a SQL that returns non-existent tables
+    // and indexes
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()
             .withSql(
@@ -140,15 +142,6 @@ public class IndexRetrieverTest {
     assertDoesNotThrow(() -> edgeCaseRetriever.retrieveIndexInformation());
 
     assertThat("Should have indexes after edge case test", countAllIndexes(), is(24));
-  }
-
-  private int countAllIndexes() {
-    // Verify that the original indexes are still intact
-    int count = 0;
-    for (final Table table : catalog.getTables()) {
-      count = count + table.getIndexes().size();
-    }
-    return count;
   }
 
   @Test
@@ -330,5 +323,14 @@ public class IndexRetrieverTest {
 
     // The method should handle exceptions gracefully and not throw
     assertDoesNotThrow(() -> indexRetriever.retrieveIndexInformation());
+  }
+
+  private int countAllIndexes() {
+    // Verify that the original indexes are still intact
+    int count = 0;
+    for (final Table table : catalog.getTables()) {
+      count = count + table.getIndexes().size();
+    }
+    return count;
   }
 }

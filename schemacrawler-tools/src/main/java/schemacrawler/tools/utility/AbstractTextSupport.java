@@ -14,6 +14,7 @@ import static schemacrawler.ermodel.model.RelationshipCardinality.one_many;
 import static schemacrawler.ermodel.model.RelationshipCardinality.zero_many;
 import static schemacrawler.utility.MetaDataUtility.getSimpleTypeName;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
+import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,9 +24,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static us.fatehi.utility.Utility.trimToEmpty;
-
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
 import schemacrawler.ermodel.model.Relationship;

@@ -23,10 +23,9 @@ public class IdentifiersTest {
 
   @Test
   public void blank() {
-    final String[] words =
-        new String[] {
-          "  ", "\t",
-        };
+    final String[] words = {
+      "  ", "\t",
+    };
     for (final String word : words) {
       assertThat(word, identifiers.isReservedWord(word), is(false));
       assertThat(word, identifiers.isToBeQuoted(word), is(true));
@@ -35,50 +34,12 @@ public class IdentifiersTest {
 
   @Test
   public void empty() {
-    final String[] words =
-        new String[] {
-          "", null,
-        };
+    final String[] words = {
+      "", null,
+    };
     for (final String word : words) {
       assertThat(word, identifiers.isReservedWord(word), is(false));
       assertThat(word, identifiers.isToBeQuoted(word), is(false));
-    }
-  }
-
-  @Test
-  public void quotedIdentifiers() {
-    final String[] words =
-        new String[] {
-          "1234", "w@w", "e.e", "१२३४५६७८९०", "Celebrity Updates", "Trail ", " leaD", "q2W", "W_w"
-        };
-    for (final String word : words) {
-      assertThat(word, identifiers.isReservedWord(word), is(false));
-      assertThat(word, identifiers.isToBeQuoted(word), is(true));
-    }
-  }
-
-  @Test
-  public void quotedNames() {
-    final String[] names =
-        new String[] {"one name", "\"UPDATE\"", "1234", "goodname", "\"goodname\""};
-    final String[] quotedNames =
-        new String[] {"\"one name\"", "\"UPDATE\"", "\"1234\"", "goodname", "\"goodname\""};
-    for (int i = 0; i < names.length; i++) {
-      final String name = names[i];
-      final String quotedName = quotedNames[i];
-      assertThat(quotedName, equalTo(identifiers.quoteName(name)));
-    }
-  }
-
-  @Test
-  public void sqlReservedWords() {
-    final String[] words =
-        new String[] {
-          "update", "UPDATE",
-        };
-    for (final String word : words) {
-      assertThat(word, identifiers.isReservedWord(word), is(true));
-      assertThat(word, identifiers.isToBeQuoted(word), is(true));
     }
   }
 
@@ -96,15 +57,27 @@ public class IdentifiersTest {
   }
 
   @Test
-  public void quoteNoneStrategy() {
-    final Identifiers quoteNone =
-        IdentifiersBuilder.builder()
-            .withIdentifierQuotingStrategy(IdentifierQuotingStrategy.quote_none)
-            .toOptions();
-    assertThat(quoteNone.isToBeQuoted("goodname"), is(false));
-    assertThat(quoteNone.isToBeQuoted("update"), is(false));
-    assertThat(quoteNone.isToBeQuoted("w@w"), is(false));
-    assertThat(quoteNone.isToBeQuoted("q2W"), is(false));
+  public void quotedIdentifiers() {
+    final String[] words = {
+      "1234", "w@w", "e.e", "१२३४५६७८९०", "Celebrity Updates", "Trail ", " leaD", "q2W", "W_w"
+    };
+    for (final String word : words) {
+      assertThat(word, identifiers.isReservedWord(word), is(false));
+      assertThat(word, identifiers.isToBeQuoted(word), is(true));
+    }
+  }
+
+  @Test
+  public void quotedNames() {
+    final String[] names = {"one name", "\"UPDATE\"", "1234", "goodname", "\"goodname\""};
+    final String[] quotedNames = {
+      "\"one name\"", "\"UPDATE\"", "\"1234\"", "goodname", "\"goodname\""
+    };
+    for (int i = 0; i < names.length; i++) {
+      final String name = names[i];
+      final String quotedName = quotedNames[i];
+      assertThat(quotedName, equalTo(identifiers.quoteName(name)));
+    }
   }
 
   @Test
@@ -127,12 +100,34 @@ public class IdentifiersTest {
   }
 
   @Test
+  public void quoteNoneStrategy() {
+    final Identifiers quoteNone =
+        IdentifiersBuilder.builder()
+            .withIdentifierQuotingStrategy(IdentifierQuotingStrategy.quote_none)
+            .toOptions();
+    assertThat(quoteNone.isToBeQuoted("goodname"), is(false));
+    assertThat(quoteNone.isToBeQuoted("update"), is(false));
+    assertThat(quoteNone.isToBeQuoted("w@w"), is(false));
+    assertThat(quoteNone.isToBeQuoted("q2W"), is(false));
+  }
+
+  @Test
+  public void sqlReservedWords() {
+    final String[] words = {
+      "update", "UPDATE",
+    };
+    for (final String word : words) {
+      assertThat(word, identifiers.isReservedWord(word), is(true));
+      assertThat(word, identifiers.isToBeQuoted(word), is(true));
+    }
+  }
+
+  @Test
   public void unquotedIdentifiers() {
-    final String[] words =
-        new String[] {
-          "qwer", "QWER", "Q2W", "q2w", "w_w", "W_W", "_W", "W_", "हम", "ह७म", "७म", "ह७", "हिंदी",
-          "दी८दी"
-        };
+    final String[] words = {
+      "qwer", "QWER", "Q2W", "q2w", "w_w", "W_W", "_W", "W_", "हम", "ह७म", "७म", "ह७", "हिंदी",
+      "दी८दी"
+    };
     for (final String word : words) {
       assertThat(word, identifiers.isReservedWord(word), is(false));
       assertThat(word, identifiers.isToBeQuoted(word), is(false));

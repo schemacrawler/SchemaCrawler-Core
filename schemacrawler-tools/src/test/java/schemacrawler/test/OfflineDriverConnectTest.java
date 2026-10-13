@@ -83,7 +83,8 @@ public class OfflineDriverConnectTest {
 
   @Test
   public void throwsForBlankPath() {
-    // Windows rejects a whitespace-only path with an InvalidPathException, while POSIX
+    // Windows rejects a whitespace-only path with an InvalidPathException, while
+    // POSIX
     // file systems accept it as a file name and fail the readability check instead
     assertThrows(
         RuntimeException.class, () -> offlineDriver.connect("jdbc:offline:   ", new Properties()));

@@ -52,7 +52,7 @@ public final class SchemaReference implements Schema {
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || !(obj instanceof SchemaReference)) {
+    if (obj == null || !(obj instanceof SchemaReference)) {
       return false;
     }
     final Schema other = (Schema) obj;

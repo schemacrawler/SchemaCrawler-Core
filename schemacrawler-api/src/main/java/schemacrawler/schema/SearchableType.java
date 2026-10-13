@@ -42,8 +42,7 @@ public enum SearchableType implements IdentifiedEnum {
   public String toString() {
     if (this == unknown) {
       return "not searchable";
-    } else {
-      return text;
     }
+    return text;
   }
 }

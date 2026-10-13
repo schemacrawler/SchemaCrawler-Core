@@ -23,38 +23,6 @@ import schemacrawler.schema.TableRelationshipType;
 /** Selects tables related to the original seeds within a bounded table collection. */
 final class RelatedTableFilter implements NamedObjectFilter<Table> {
 
-  private final Set<NamedObjectKey> seedTableKeys;
-  private final Set<NamedObjectKey> parentTableKeys;
-  private final Set<NamedObjectKey> childTableKeys;
-
-  RelatedTableFilter(
-      final Collection<Table> eligibleTables,
-      final Collection<Table> seedTables,
-      final int parentDepth,
-      final int childDepth) {
-    requireNonNull(eligibleTables, "No eligible tables provided");
-    requireNonNull(seedTables, "No seed tables provided");
-
-    final Set<NamedObjectKey> eligibleTableKeys = keys(eligibleTables);
-    seedTableKeys = Set.copyOf(keys(seedTables));
-    parentTableKeys =
-        Set.copyOf(
-            keys(
-                includeRelatedTables(
-                    seedTables, eligibleTableKeys, TableRelationshipType.parent, parentDepth)));
-    childTableKeys =
-        Set.copyOf(
-            keys(
-                includeRelatedTables(
-                    seedTables, eligibleTableKeys, TableRelationshipType.child, childDepth)));
-  }
-
-  private static HashSet<NamedObjectKey> keys(final Collection<Table> tables) {
-    final HashSet<NamedObjectKey> tableKeys = new HashSet<>();
-    tables.stream().map(NamedObject::key).forEach(tableKeys::add);
-    return tableKeys;
-  }
-
   private static Set<Table> includeRelatedTables(
       final Collection<Table> seedTables,
       final Set<NamedObjectKey> eligibleTableKeys,
@@ -82,6 +50,40 @@ final class RelatedTableFilter implements NamedObjectFilter<Table> {
       frontier = nextFrontier;
     }
     return relatedTables;
+  }
+
+  private static HashSet<NamedObjectKey> keys(final Collection<Table> tables) {
+    final HashSet<NamedObjectKey> tableKeys = new HashSet<>();
+    tables.stream().map(NamedObject::key).forEach(tableKeys::add);
+    return tableKeys;
+  }
+
+  private final Set<NamedObjectKey> seedTableKeys;
+
+  private final Set<NamedObjectKey> parentTableKeys;
+
+  private final Set<NamedObjectKey> childTableKeys;
+
+  RelatedTableFilter(
+      final Collection<Table> eligibleTables,
+      final Collection<Table> seedTables,
+      final int parentDepth,
+      final int childDepth) {
+    requireNonNull(eligibleTables, "No eligible tables provided");
+    requireNonNull(seedTables, "No seed tables provided");
+
+    final Set<NamedObjectKey> eligibleTableKeys = keys(eligibleTables);
+    seedTableKeys = Set.copyOf(keys(seedTables));
+    parentTableKeys =
+        Set.copyOf(
+            keys(
+                includeRelatedTables(
+                    seedTables, eligibleTableKeys, TableRelationshipType.parent, parentDepth)));
+    childTableKeys =
+        Set.copyOf(
+            keys(
+                includeRelatedTables(
+                    seedTables, eligibleTableKeys, TableRelationshipType.child, childDepth)));
   }
 
   @Override

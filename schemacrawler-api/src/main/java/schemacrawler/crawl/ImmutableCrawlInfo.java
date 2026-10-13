@@ -92,14 +92,6 @@ final class ImmutableCrawlInfo implements CrawlInfo {
   }
 
   @Override
-  public DatabaseServerFingerprint getDatabaseServerFingerprint() {
-    if (databaseServerFingerprint != null) {
-      return databaseServerFingerprint;
-    }
-    return new DatabaseServerFingerprint();
-  }
-
-  @Override
   public String getCrawlTimestamp() {
     final ZonedDateTime dateTime = getCrawlTimestampUTC();
     return DATE_TIME_FORMATTER.format(dateTime);
@@ -108,6 +100,14 @@ final class ImmutableCrawlInfo implements CrawlInfo {
   @Override
   public Instant getCrawlTimestampInstant() {
     return crawlTimestamp;
+  }
+
+  @Override
+  public DatabaseServerFingerprint getDatabaseServerFingerprint() {
+    if (databaseServerFingerprint != null) {
+      return databaseServerFingerprint;
+    }
+    return new DatabaseServerFingerprint();
   }
 
   /** {@inheritDoc} */

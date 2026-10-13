@@ -48,7 +48,8 @@ public class SchemaRetrieverTest {
   @Test
   @DisplayName("Verify that schemas can be obtained from INFORMATION_SCHEMA")
   public void schemataView(final Connection connection) throws SQLException {
-    // Mock database metadata, so we can check if it is being used over the INFORMATION_SCHEMA
+    // Mock database metadata, so we can check if it is being used over the
+    // INFORMATION_SCHEMA
     final Connection spyConnection = connection;
     // final Connection spyConnection = spy(connection.unwrap(Connection.class));
     final DatabaseMetaData databaseMetaData = mockDatabaseMetaData();

@@ -40,17 +40,6 @@ public class OutputFormatStateTest {
   }
 
   @Test
-  public void testOutputFormatStateWithNulls() {
-    final OutputFormatState state =
-        new OutputFormatState("json", "JSON output format", (String[]) null);
-
-    assertAll(
-        () -> assertThat(state.getFormat(), is("json")),
-        () -> assertThat(state.getFormats(), contains("json")),
-        () -> assertTrue(state.isSupportedFormat("json")));
-  }
-
-  @Test
   public void testOutputFormatStateInvalid() {
     assertAll(
         () ->
@@ -59,5 +48,16 @@ public class OutputFormatStateTest {
         () ->
             assertThrows(IllegalArgumentException.class, () -> new OutputFormatState("fmt", null)),
         () -> assertThrows(IllegalArgumentException.class, () -> new OutputFormatState("fmt", "")));
+  }
+
+  @Test
+  public void testOutputFormatStateWithNulls() {
+    final OutputFormatState state =
+        new OutputFormatState("json", "JSON output format", (String[]) null);
+
+    assertAll(
+        () -> assertThat(state.getFormat(), is("json")),
+        () -> assertThat(state.getFormats(), contains("json")),
+        () -> assertTrue(state.isSupportedFormat("json")));
   }
 }

@@ -72,7 +72,7 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
     } else {
       // Match schema retrieval options, and update data source before any connections
       // are used
-      DatabaseConnectionSource connectionSource = getConnectionSource();
+      final DatabaseConnectionSource connectionSource = getConnectionSource();
       if (schemaRetrievalOptions == null) {
         schemaRetrievalOptions =
             DatabaseConnectorUtility.matchSchemaRetrievalOptions(connectionSource);
@@ -176,10 +176,6 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
     setCatalog(catalog);
   }
 
-  private Catalog selectCatalog(final Catalog catalog) {
-    return CatalogProjectionBuilder.builder(catalog).withOptions(schemaCrawlerOptions).build();
-  }
-
   private SchemaCrawlerCommand<?> loadCommand() {
     final CommandRegistry commandRegistry = CommandRegistry.getRegistry();
     final SchemaCrawlerCommand<?> scCommand =
@@ -187,5 +183,9 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
             command, schemaCrawlerOptions, additionalConfig, outputOptions);
 
     return requireNonNull(scCommand, "No SchemaCrawler command instantiated");
+  }
+
+  private Catalog selectCatalog(final Catalog catalog) {
+    return CatalogProjectionBuilder.builder(catalog).withOptions(schemaCrawlerOptions).build();
   }
 }

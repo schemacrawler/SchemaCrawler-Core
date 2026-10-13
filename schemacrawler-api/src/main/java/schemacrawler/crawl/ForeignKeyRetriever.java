@@ -54,26 +54,21 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     requireNonNull(allTables, "No tables provided");
 
     switch (getRetrieverConnection().get(foreignKeysRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(Level.INFO, "Retrieving foreign keys, using fast data dictionary retrieval");
         retrieveForeignKeysFromDataDictionary();
-        break;
-
-      case data_dictionary_over_schemas:
+      }
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving foreign keys, using fast data dictionary retrieval over schemas");
         retrieveForeignKeysOverSchemas();
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving foreign keys");
         retrieveForeignKeysFromMetadata(allTables);
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving foreign keys");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving foreign keys");
     }
   }
 
@@ -83,7 +78,7 @@ final class ForeignKeyRetriever extends AbstractRetriever {
       final Column pkColumn,
       final Table fkTable,
       final boolean isFkColumnPartial) {
-    if (fkColumn instanceof MutableColumn column) {
+    if (fkColumn instanceof final MutableColumn column) {
       column.setReferencedColumn(pkColumn);
       ((MutableTable) fkTable).addForeignKey(foreignKey);
     } else if (isFkColumnPartial) {
@@ -218,7 +213,7 @@ final class ForeignKeyRetriever extends AbstractRetriever {
 
   private void markSelfReferencingRelationship(
       final Table fkTable, final Table pkTable, final Column fkColumn) {
-    if (fkTable instanceof MutableTable mutableFkTable && fkTable.equals(pkTable)) {
+    if (fkTable instanceof final MutableTable mutableFkTable && fkTable.equals(pkTable)) {
       mutableFkTable.markAsSelfReferencing();
       if (fkColumn instanceof final MutableColumn mutableFkColumn) {
         mutableFkColumn.markAsPartOfSelfReferencingRelationship();

@@ -71,6 +71,22 @@ final class RetrievalCounts extends InclusionCounts {
     count();
   }
 
+  public void log(final NamedObjectKey key) {
+    if (key == null) {
+      return;
+    }
+
+    final Level level = Level.INFO;
+    if (LOGGER.isLoggable(level)) {
+      final int count = keyCount.get(key);
+      final int includedCount = includedKeyCount.get(key);
+      LOGGER.log(
+          level,
+          "Processed %d/%d %s %s"
+              .formatted(includedCount, count, getName(), key == null ? "" : " for " + key));
+    }
+  }
+
   void countIfIncluded(final NamedObjectKey key, final boolean included) {
     if (key == null) {
       return;
@@ -89,21 +105,5 @@ final class RetrievalCounts extends InclusionCounts {
 
     includedKeyCount.count(key);
     countIncluded();
-  }
-
-  public void log(final NamedObjectKey key) {
-    if (key == null) {
-      return;
-    }
-
-    final Level level = Level.INFO;
-    if (LOGGER.isLoggable(level)) {
-      final int count = keyCount.get(key);
-      final int includedCount = includedKeyCount.get(key);
-      LOGGER.log(
-          level,
-          "Processed %d/%d %s %s"
-              .formatted(includedCount, count, getName(), key == null ? "" : " for " + key));
-    }
   }
 }

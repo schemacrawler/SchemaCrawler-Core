@@ -82,13 +82,13 @@ public enum JavaSqlTypeGroup {
     register(xml, SQLXML);
   }
 
+  public static JavaSqlTypeGroup valueOf(final int type) {
+    return TYPE_MAP.getOrDefault(type, unknown);
+  }
+
   private static void register(final JavaSqlTypeGroup group, final int... types) {
     for (final int type : types) {
       TYPE_MAP.put(type, group);
     }
-  }
-
-  public static JavaSqlTypeGroup valueOf(final int type) {
-    return TYPE_MAP.getOrDefault(type, unknown);
   }
 }

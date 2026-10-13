@@ -58,21 +58,25 @@ final class RoutineExtRetriever extends AbstractRetriever {
     final Query routineDefinitionsSql = informationSchemaViews.getQuery(ROUTINES);
 
     switch (getRetrieverConnection().get(routinesRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving additional routine information, using fast data dictionary retrieval"
                 + " over schemas");
         retrieveRoutineInformationOverSchemas(routineDefinitionsSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving additional routine information, using fast data dictionary retrieval");
         retrieveRoutineInformationFromDataDictionary(routineDefinitionsSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(
+            Level.INFO,
+            "Retrieving additional routine information, using fast data dictionary retrieval");
+        retrieveRoutineInformationFromDataDictionary(routineDefinitionsSql);
+      }
     }
   }
 
@@ -92,20 +96,23 @@ final class RoutineExtRetriever extends AbstractRetriever {
     final Query routineReferencesSql = informationSchemaViews.getQuery(ROUTINE_REFERENCES);
 
     switch (getRetrieverConnection().get(routineReferencesRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving routine references, using fast data dictionary retrieval"
                 + " over schemas");
         retrieveRoutineReferencesOverSchemas(routineReferencesSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO, "Retrieving routine references, using fast data dictionary retrieval");
         retrieveRoutineReferencesFromDataDictionary(routineReferencesSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(
+            Level.INFO, "Retrieving routine references, using fast data dictionary retrieval");
+        retrieveRoutineReferencesFromDataDictionary(routineReferencesSql);
+      }
     }
   }
 

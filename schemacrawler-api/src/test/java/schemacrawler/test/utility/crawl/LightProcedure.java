@@ -84,11 +84,6 @@ public final class LightProcedure extends AbstractLightDatabaseObject implements
   }
 
   @Override
-  public NamedObjectKey key() {
-    return super.key().with(specificName);
-  }
-
-  @Override
   public RoutineType getType() {
     return RoutineType.procedure;
   }
@@ -96,6 +91,11 @@ public final class LightProcedure extends AbstractLightDatabaseObject implements
   @Override
   public boolean hasDefinition() {
     return definition != null && !definition.isEmpty();
+  }
+
+  @Override
+  public NamedObjectKey key() {
+    return super.key().with(specificName);
   }
 
   @Override

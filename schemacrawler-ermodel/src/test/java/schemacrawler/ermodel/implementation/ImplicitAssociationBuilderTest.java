@@ -35,7 +35,7 @@ public class ImplicitAssociationBuilderTest {
     final LightTable fkTable = new LightTable("FK_TABLE");
     final LightColumn fkColumn = fkTable.addColumn("PK_TABLE_ID");
 
-    Catalog catalog = LightCatalogUtility.lightCatalog();
+    final Catalog catalog = LightCatalogUtility.lightCatalog();
 
     final MutableERModel mutableERModel = new MutableERModel();
     final MutableEntity pkEntity = new MutableEntity(pkTable, strong_entity);
@@ -62,7 +62,7 @@ public class ImplicitAssociationBuilderTest {
     final LightTable fkTable = new LightTable("FK_TABLE");
     final LightColumn fkColumn = fkTable.addColumn("PK_TABLE_ID");
 
-    Catalog catalog = LightCatalogUtility.lightCatalog(pkTable, fkTable);
+    final Catalog catalog = LightCatalogUtility.lightCatalog(pkTable, fkTable);
 
     final MutableERModel mutableERModel = new MutableERModel();
     // No entities added
@@ -78,7 +78,7 @@ public class ImplicitAssociationBuilderTest {
 
   @Test
   public void builderRejectsNonMutableERModel() {
-    Catalog catalog = LightCatalogUtility.lightCatalog();
+    final Catalog catalog = LightCatalogUtility.lightCatalog();
     final ERModel nonMutableERModel = mock(ERModel.class);
     assertThrows(
         IllegalArgumentException.class,
@@ -87,14 +87,14 @@ public class ImplicitAssociationBuilderTest {
 
   @Test
   public void builderRejectsNullERModel() {
-    Catalog catalog = LightCatalogUtility.lightCatalog();
+    final Catalog catalog = LightCatalogUtility.lightCatalog();
     assertThrows(
         NullPointerException.class, () -> ImplicitRelationshipBuilder.builder(catalog, null));
   }
 
   @Test
   public void builderReturnsNonNullForMutableERModel() {
-    Catalog catalog = LightCatalogUtility.lightCatalog();
+    final Catalog catalog = LightCatalogUtility.lightCatalog();
     final MutableERModel mutableERModel = new MutableERModel();
     final ImplicitRelationshipBuilder builder =
         ImplicitRelationshipBuilder.builder(catalog, mutableERModel);

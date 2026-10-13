@@ -89,7 +89,7 @@ final class MutableJdbcDriverInfo extends BaseProductVersion implements JdbcDriv
     return jdbcDriverInformation.toString();
   }
 
-  void addJdbcDriverProperties(Collection<JdbcDriverProperty> properties) {
+  void addJdbcDriverProperties(final Collection<JdbcDriverProperty> properties) {
     if (properties != null) {
       jdbcDriverProperties.addAll(properties);
     }

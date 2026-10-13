@@ -41,6 +41,16 @@ public final class SerializedCatalogUtility {
           Pattern.compile("java\\.(sql|math|time|net)\\..*"),
           Pattern.compile("\\[[BC]"));
 
+  public static Catalog deserializeCatalog(final Path offlineDatabasePath) throws IOException {
+    final Catalog catalog;
+    try (final InputStream inputFileStream =
+        new GZIPInputStream(newInputStream(offlineDatabasePath)); ) {
+      catalog = readCatalog(inputFileStream);
+      LOGGER.log(Level.INFO, () -> "Deserialized catalog from <%s>".formatted(offlineDatabasePath));
+    }
+    return catalog;
+  }
+
   public static Catalog readCatalog(final InputStream in) {
     requireNonNull(in, "No input stream provided");
     return SerializedObjectInputStream.read(in, CATALOG_CLASS_PATTERNS);
@@ -54,15 +64,5 @@ public final class SerializedCatalogUtility {
 
   private SerializedCatalogUtility() {
     // Prevent instantiation
-  }
-
-  public static Catalog deserializeCatalog(final Path offlineDatabasePath) throws IOException {
-    final Catalog catalog;
-    try (final InputStream inputFileStream =
-        new GZIPInputStream(newInputStream(offlineDatabasePath)); ) {
-      catalog = readCatalog(inputFileStream);
-      LOGGER.log(Level.INFO, () -> "Deserialized catalog from <%s>".formatted(offlineDatabasePath));
-    }
-    return catalog;
   }
 }

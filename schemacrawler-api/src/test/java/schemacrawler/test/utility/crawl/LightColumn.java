@@ -40,8 +40,8 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
         parent,
         name,
         columnDataType(columnDataTypeName), /* isHidden */
-        false,
-        /* isGenerated */ false);
+        false, /* isGenerated */
+        false);
   }
 
   protected static LightColumn newEnumeratedColumn(final Table parent, final String name) {

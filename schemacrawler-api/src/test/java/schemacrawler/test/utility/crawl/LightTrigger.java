@@ -32,7 +32,7 @@ public class LightTrigger extends AbstractLightDatabaseObject implements Trigger
   }
 
   @Override
-  public int compareTo(NamedObject o) {
+  public int compareTo(final NamedObject o) {
     return 0;
   }
 
@@ -86,10 +86,10 @@ public class LightTrigger extends AbstractLightDatabaseObject implements Trigger
     return null;
   }
 
-  public void setActionStatement(String actionStatement) {
+  public void setActionStatement(final String actionStatement) {
     this.actionStatement = actionStatement;
   }
 
   @Override
-  public void withQuoting(Identifiers identifiers) {}
+  public void withQuoting(final Identifiers identifiers) {}
 }

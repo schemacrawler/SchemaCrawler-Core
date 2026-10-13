@@ -40,10 +40,9 @@ public class PluginCommandOption {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof PluginCommandOption)) {
+    if (!(o instanceof final PluginCommandOption that)) {
       return false;
     }
-    final PluginCommandOption that = (PluginCommandOption) o;
     return Objects.equals(getName(), that.getName());
   }
 

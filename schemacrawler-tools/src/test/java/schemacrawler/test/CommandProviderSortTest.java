@@ -27,7 +27,7 @@ import us.fatehi.utility.property.PropertyName;
 
 public class CommandProviderSortTest {
 
-  private final class OperationCommandProvider extends AbstractSchemaCrawlerCommandProvider {
+  private static final class OperationCommandProvider extends AbstractSchemaCrawlerCommandProvider {
     private OperationCommandProvider() {
       super(List.of(new PropertyName("OperationCommandProvider", "OperationCommandProvider")));
     }

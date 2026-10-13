@@ -47,44 +47,6 @@ class RoutineGrepFilterTest {
   }
 
   @Test
-  void testRoutineGrepFilterWithJustInvertMatch() {
-    final GrepOptions grepOptions = GrepOptionsBuilder.builder().invertGrepMatch(true).toOptions();
-    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
-
-    assertThat(filter.test(routine), is(true));
-  }
-
-  @Test
-  void testRoutineGrepFilterWithParameterInclusionRule() {
-    final InclusionRule rule = new RegularExpressionInclusionRule("test_routine\\.test_param");
-    final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder().includeGreppedRoutineParameters(rule).toOptions();
-    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
-
-    assertThat(filter.test(routine), is(true));
-  }
-
-  @Test
-  void testRoutineGrepFilterWithNonMatchingParameterInclusionRule() {
-    final InclusionRule rule = new RegularExpressionInclusionRule("test_routine\\.other_param");
-    final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder().includeGreppedRoutineParameters(rule).toOptions();
-    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
-
-    assertThat(filter.test(routine), is(false));
-  }
-
-  @Test
-  void testRoutineGrepFilterWithDefinitionInclusionRuleOnRemarks() {
-    final InclusionRule rule = new RegularExpressionInclusionRule("test_remarks");
-    final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder().includeGreppedDefinitions(rule).toOptions();
-    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
-
-    assertThat(filter.test(routine), is(true));
-  }
-
-  @Test
   void testRoutineGrepFilterWithDefinitionInclusionRuleOnDefinition() {
     final InclusionRule rule = new RegularExpressionInclusionRule("test_definition");
     final GrepOptions grepOptions =
@@ -105,13 +67,13 @@ class RoutineGrepFilterTest {
   }
 
   @Test
-  void testRoutineGrepFilterWithNonMatchingDefinitionInclusionRule() {
-    final InclusionRule rule = new RegularExpressionInclusionRule("non_matching");
+  void testRoutineGrepFilterWithDefinitionInclusionRuleOnRemarks() {
+    final InclusionRule rule = new RegularExpressionInclusionRule("test_remarks");
     final GrepOptions grepOptions =
         GrepOptionsBuilder.builder().includeGreppedDefinitions(rule).toOptions();
     final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
 
-    assertThat(filter.test(routine), is(false));
+    assertThat(filter.test(routine), is(true));
   }
 
   @Test
@@ -141,23 +103,13 @@ class RoutineGrepFilterTest {
   }
 
   @Test
-  void testRoutineGrepFilterWithRoutineInclusionRule() {
-    final InclusionRule rule = new RegularExpressionInclusionRule(".*test_routine");
+  void testRoutineGrepFilterWithInvertMatchForNonMatchingRoutineInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule(".*other_routine");
     final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).toOptions();
+        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).invertGrepMatch(true).toOptions();
     final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
 
     assertThat(filter.test(routine), is(true));
-  }
-
-  @Test
-  void testRoutineGrepFilterWithNonMatchingRoutineInclusionRule() {
-    final InclusionRule rule = new RegularExpressionInclusionRule(".*other_routine");
-    final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).toOptions();
-    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
-
-    assertThat(filter.test(routine), is(false));
   }
 
   @Test
@@ -171,30 +123,52 @@ class RoutineGrepFilterTest {
   }
 
   @Test
-  void testRoutineGrepFilterWithInvertMatchForNonMatchingRoutineInclusionRule() {
-    final InclusionRule rule = new RegularExpressionInclusionRule(".*other_routine");
-    final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).invertGrepMatch(true).toOptions();
+  void testRoutineGrepFilterWithJustInvertMatch() {
+    final GrepOptions grepOptions = GrepOptionsBuilder.builder().invertGrepMatch(true).toOptions();
     final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
 
     assertThat(filter.test(routine), is(true));
   }
 
   @Test
-  void testRoutineGrepFilterWithRoutineInclusionRuleCombinedWithParameterInclusionRule() {
-    // Routine name pattern does not match, but parameter pattern does - the routine should
-    // still be included, since matching any one of the active grep criteria is sufficient.
-    final InclusionRule routineRule = new RegularExpressionInclusionRule(".*other_routine");
-    final InclusionRule parameterRule =
-        new RegularExpressionInclusionRule("test_routine\\.test_param");
+  void testRoutineGrepFilterWithNonMatchingDefinitionInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule("non_matching");
     final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder()
-            .includeGreppedRoutines(routineRule)
-            .includeGreppedRoutineParameters(parameterRule)
-            .toOptions();
+        GrepOptionsBuilder.builder().includeGreppedDefinitions(rule).toOptions();
     final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
 
-    assertThat(filter.test(routine), is(true));
+    assertThat(filter.test(routine), is(false));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithNonMatchingParameterInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule("test_routine\\.other_param");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder().includeGreppedRoutineParameters(rule).toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(routine), is(false));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithNonMatchingRoutineInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule(".*other_routine");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(routine), is(false));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithNoParametersDoesNotMatchParameterGrep() {
+    final LightProcedure noParamRoutine = new LightProcedure("no_param_routine");
+    final InclusionRule rule = new RegularExpressionInclusionRule("non_matching_parameter");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder().includeGreppedRoutineParameters(rule).toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(noParamRoutine), is(false));
   }
 
   @Test
@@ -209,13 +183,41 @@ class RoutineGrepFilterTest {
   }
 
   @Test
-  void testRoutineGrepFilterWithNoParametersDoesNotMatchParameterGrep() {
-    final LightProcedure noParamRoutine = new LightProcedure("no_param_routine");
-    final InclusionRule rule = new RegularExpressionInclusionRule("non_matching_parameter");
+  void testRoutineGrepFilterWithParameterInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule("test_routine\\.test_param");
     final GrepOptions grepOptions =
         GrepOptionsBuilder.builder().includeGreppedRoutineParameters(rule).toOptions();
     final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
 
-    assertThat(filter.test(noParamRoutine), is(false));
+    assertThat(filter.test(routine), is(true));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithRoutineInclusionRule() {
+    final InclusionRule rule = new RegularExpressionInclusionRule(".*test_routine");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder().includeGreppedRoutines(rule).toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(routine), is(true));
+  }
+
+  @Test
+  void testRoutineGrepFilterWithRoutineInclusionRuleCombinedWithParameterInclusionRule() {
+    // Routine name pattern does not match, but parameter pattern does - the routine
+    // should
+    // still be included, since matching any one of the active grep criteria is
+    // sufficient.
+    final InclusionRule routineRule = new RegularExpressionInclusionRule(".*other_routine");
+    final InclusionRule parameterRule =
+        new RegularExpressionInclusionRule("test_routine\\.test_param");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder()
+            .includeGreppedRoutines(routineRule)
+            .includeGreppedRoutineParameters(parameterRule)
+            .toOptions();
+    final RoutineGrepFilter filter = new RoutineGrepFilter(grepOptions);
+
+    assertThat(filter.test(routine), is(true));
   }
 }

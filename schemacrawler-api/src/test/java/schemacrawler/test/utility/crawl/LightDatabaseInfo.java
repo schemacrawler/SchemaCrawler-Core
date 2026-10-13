@@ -20,7 +20,7 @@ public class LightDatabaseInfo implements DatabaseInfo {
 
   @Serial private static final long serialVersionUID = -7659631401272737847L;
 
-  private DatabaseInformation databaseInformation;
+  private final DatabaseInformation databaseInformation;
 
   public LightDatabaseInfo() {
     databaseInformation = new DatabaseInformation("Mocked Database", "0.0.1", "");

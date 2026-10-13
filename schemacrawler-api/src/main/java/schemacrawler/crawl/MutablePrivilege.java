@@ -70,7 +70,7 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
       if (this == obj) {
         return true;
       }
-      if ((obj == null) || (getClass() != obj.getClass())) {
+      if (obj == null || getClass() != obj.getClass()) {
         return false;
       }
       final PrivilegeGrant other = (PrivilegeGrant) obj;

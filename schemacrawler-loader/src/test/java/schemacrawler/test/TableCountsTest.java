@@ -35,61 +35,6 @@ public class TableCountsTest {
   }
 
   @Test
-  public void negativeIntegerCountsAreCoercedToNull() {
-    final TableCounts counts = new TableCounts(-1, -3, -5, -99, -1, null);
-
-    assertThat(counts.columnCount(), is(nullValue()));
-    assertThat(counts.attributeColumnCount(), is(nullValue()));
-    assertThat(counts.foreignKeyCount(), is(nullValue()));
-    assertThat(counts.indexCount(), is(nullValue()));
-    assertThat(counts.triggerCount(), is(nullValue()));
-  }
-
-  @Test
-  public void zeroCountsAreRetained() {
-    final TableCounts counts = new TableCounts(0, 0, 0, 0, 0, null);
-
-    assertThat(counts.attributeColumnCount(), is(0));
-    assertThat(counts.columnCount(), is(0));
-    assertThat(counts.foreignKeyCount(), is(0));
-    assertThat(counts.indexCount(), is(0));
-    assertThat(counts.triggerCount(), is(0));
-  }
-
-  @Test
-  public void zeroRowCountIsCoercedToNull() {
-    final TableCounts counts = new TableCounts(null, null, null, null, null, 0L);
-
-    assertThat(counts.rowCount(), is(nullValue()));
-  }
-
-  @Test
-  public void negativeRowCountIsCoercedToNull() {
-    final TableCounts counts = new TableCounts(null, null, null, null, null, -1L);
-
-    assertThat(counts.attributeColumnCount(), is(nullValue()));
-    assertThat(counts.columnCount(), is(nullValue()));
-    assertThat(counts.foreignKeyCount(), is(nullValue()));
-    assertThat(counts.indexCount(), is(nullValue()));
-    assertThat(counts.triggerCount(), is(nullValue()));
-    assertThat(counts.rowCount(), is(nullValue()));
-  }
-
-  @Test
-  public void positiveValuesArePassedThrough() {
-    final TableCounts counts = new TableCounts(2, 3, 1, 2, 1, 42L);
-
-    assertThat(counts.attributeColumnCount(), is(2));
-    assertThat(counts.columnCount(), is(3));
-    assertThat(counts.foreignKeyCount(), is(1));
-    assertThat(counts.indexCount(), is(2));
-    assertThat(counts.triggerCount(), is(1));
-    assertThat(counts.rowCount(), is(42L));
-  }
-
-  // ---- from(Table) -----------------------------------------------------------
-
-  @Test
   public void fromNullTableReturnsNull() {
     assertThat(TableImportanceUtility.tableCountsfrom(null), is(nullValue()));
   }
@@ -126,6 +71,61 @@ public class TableCountsTest {
     table.setAttribute(TABLE_ROW_COUNT_KEY, 0L);
 
     final TableCounts counts = TableImportanceUtility.tableCountsfrom(table);
+
+    assertThat(counts.rowCount(), is(nullValue()));
+  }
+
+  @Test
+  public void negativeIntegerCountsAreCoercedToNull() {
+    final TableCounts counts = new TableCounts(-1, -3, -5, -99, -1, null);
+
+    assertThat(counts.columnCount(), is(nullValue()));
+    assertThat(counts.attributeColumnCount(), is(nullValue()));
+    assertThat(counts.foreignKeyCount(), is(nullValue()));
+    assertThat(counts.indexCount(), is(nullValue()));
+    assertThat(counts.triggerCount(), is(nullValue()));
+  }
+
+  // ---- from(Table) -----------------------------------------------------------
+
+  @Test
+  public void negativeRowCountIsCoercedToNull() {
+    final TableCounts counts = new TableCounts(null, null, null, null, null, -1L);
+
+    assertThat(counts.attributeColumnCount(), is(nullValue()));
+    assertThat(counts.columnCount(), is(nullValue()));
+    assertThat(counts.foreignKeyCount(), is(nullValue()));
+    assertThat(counts.indexCount(), is(nullValue()));
+    assertThat(counts.triggerCount(), is(nullValue()));
+    assertThat(counts.rowCount(), is(nullValue()));
+  }
+
+  @Test
+  public void positiveValuesArePassedThrough() {
+    final TableCounts counts = new TableCounts(2, 3, 1, 2, 1, 42L);
+
+    assertThat(counts.attributeColumnCount(), is(2));
+    assertThat(counts.columnCount(), is(3));
+    assertThat(counts.foreignKeyCount(), is(1));
+    assertThat(counts.indexCount(), is(2));
+    assertThat(counts.triggerCount(), is(1));
+    assertThat(counts.rowCount(), is(42L));
+  }
+
+  @Test
+  public void zeroCountsAreRetained() {
+    final TableCounts counts = new TableCounts(0, 0, 0, 0, 0, null);
+
+    assertThat(counts.attributeColumnCount(), is(0));
+    assertThat(counts.columnCount(), is(0));
+    assertThat(counts.foreignKeyCount(), is(0));
+    assertThat(counts.indexCount(), is(0));
+    assertThat(counts.triggerCount(), is(0));
+  }
+
+  @Test
+  public void zeroRowCountIsCoercedToNull() {
+    final TableCounts counts = new TableCounts(null, null, null, null, null, 0L);
 
     assertThat(counts.rowCount(), is(nullValue()));
   }

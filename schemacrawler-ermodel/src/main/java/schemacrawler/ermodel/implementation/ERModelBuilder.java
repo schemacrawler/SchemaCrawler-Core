@@ -32,13 +32,13 @@ public final class ERModelBuilder implements Builder<ERModel> {
 
   private static final Logger LOGGER = Logger.getLogger(ERModelBuilder.class.getName());
 
-  public static ERModelBuilder builder(final Catalog catalog) {
-    return new ERModelBuilder(catalog);
-  }
-
   /** Creates a new empty ER model with no entities or relationships. */
   public static ERModel buildEmptyERModel() {
     return new MutableERModel();
+  }
+
+  public static ERModelBuilder builder(final Catalog catalog) {
+    return new ERModelBuilder(catalog);
   }
 
   private final Catalog catalog;

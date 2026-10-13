@@ -44,10 +44,9 @@ public final class SchemaInfoLevel implements Options {
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || !(obj instanceof SchemaInfoLevel)) {
+    if (obj == null || !(obj instanceof final SchemaInfoLevel other)) {
       return false;
     }
-    final SchemaInfoLevel other = (SchemaInfoLevel) obj;
     return Arrays.equals(schemaInfoRetrievals, other.schemaInfoRetrievals)
         && Objects.equals(tag, other.tag);
   }

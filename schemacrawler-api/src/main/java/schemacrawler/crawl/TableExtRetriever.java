@@ -58,21 +58,25 @@ final class TableExtRetriever extends AbstractRetriever {
     final Query columnAttributesSql = informationSchemaViews.getQuery(ADDITIONAL_COLUMN_ATTRIBUTES);
 
     switch (getRetrieverConnection().get(tableColumnAdditionalAttributesRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving additional column attributes, using fast data dictionary retrieval"
                 + " over schemas");
         retrieveAdditionalColumnAttributesOverSchemas(columnAttributesSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving additional column attributes, using fast data dictionary retrieval");
         retrieveAdditionalColumnAttributesFromDataDictionary(columnAttributesSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(
+            Level.INFO,
+            "Retrieving additional column attributes, using fast data dictionary retrieval");
+        retrieveAdditionalColumnAttributesFromDataDictionary(columnAttributesSql);
+      }
     }
   }
 
@@ -139,21 +143,25 @@ final class TableExtRetriever extends AbstractRetriever {
     final Query tableAttributesSql = informationSchemaViews.getQuery(ADDITIONAL_TABLE_ATTRIBUTES);
 
     switch (getRetrieverConnection().get(tableAdditionalAttributesRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving additional table attributes, using fast data dictionary retrieval"
                 + " over schemas");
         retrieveAdditionalTableAttributesOverSchemas(tableAttributesSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving additional table attributes, using fast data dictionary retrieval");
         retrieveAdditionalTableAttributesFromDataDictionary(tableAttributesSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(
+            Level.INFO,
+            "Retrieving additional table attributes, using fast data dictionary retrieval");
+        retrieveAdditionalTableAttributesFromDataDictionary(tableAttributesSql);
+      }
     }
   }
 

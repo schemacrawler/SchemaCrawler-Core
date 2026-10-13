@@ -48,7 +48,7 @@ abstract class AbstractNamedObject implements NamedObject {
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || !(obj instanceof NamedObject)) {
+    if (obj == null || !(obj instanceof NamedObject)) {
       return false;
     }
     return Objects.equals(name, ((NamedObject) obj).getName());

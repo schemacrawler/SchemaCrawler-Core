@@ -94,13 +94,14 @@ public final class EnvironmentalDatabaseConnectionSourceBuilder {
 
     final DatabaseConnectionSourceBuilder dbConnectionSourceBuilder;
 
-    // This JDBC URL is not expected to have any substitutable parameters, so subsequent
+    // This JDBC URL is not expected to have any substitutable parameters, so
+    // subsequent
     // settings should not have any effect
     dbConnectionSourceBuilder = DatabaseConnectionSourceBuilder.builder(connectionUrl);
 
     final DatabaseConnectorRegistry databaseConnectorRegistry =
         DatabaseConnectorRegistry.getRegistry();
-    DatabaseConnector databaseConnector =
+    final DatabaseConnector databaseConnector =
         databaseConnectorRegistry.getDatabaseConnector(databaseSystemIdentifier);
     dbConnectionSourceBuilder.withConnectionInitializer(
         databaseConnector.databaseConnectionSourceBuilder().getConnectionInitializer());

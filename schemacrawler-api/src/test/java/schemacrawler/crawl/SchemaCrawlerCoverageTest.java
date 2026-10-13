@@ -76,6 +76,70 @@ public class SchemaCrawlerCoverageTest {
   private Catalog catalog;
 
   @Test
+  public void catalogDoesNotExposeReductionMethods() {
+    final boolean catalogExposesReduction =
+        Arrays.stream(Catalog.class.getMethods())
+            .anyMatch(
+                method -> "reduce".equals(method.getName()) || "undo".equals(method.getName()));
+    assertThat(catalogExposesReduction, is(false));
+  }
+
+  @Test
+  public void columnDataTypeProperties() throws Exception {
+    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
+    final Table table = catalog.lookupTable(schema, "AUTHORS").get();
+    final Column column = table.lookupColumn("FIRSTNAME").get();
+    final ColumnDataType columnDataType = column.getColumnDataType();
+
+    checkBooleanProperties(
+        columnDataType,
+        "autoIncrementable",
+        "caseSensitive",
+        "fixedPrecisionScale",
+        "nullable",
+        "unsigned");
+  }
+
+  @Test
+  public void columnProperties() throws Exception {
+    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
+    final Table table = catalog.lookupTable(schema, "AUTHORS").get();
+    final Column column = table.lookupColumn("FIRSTNAME").get();
+
+    checkBooleanProperties(column, "autoIncremented", "generated", "hidden");
+  }
+
+  @Test
+  public void coverIndexColumn() {
+    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
+    final Table table = catalog.lookupTable(schema, "AUTHORS").get();
+    final Index index = table.lookupIndex("IDX_B_AUTHORS").get();
+    final IndexColumn indexColumn = index.getColumns().get(0);
+    final Column column = table.lookupColumn(indexColumn.getName()).get();
+
+    compareColumnFields(indexColumn, column);
+
+    assertThat(indexColumn.getIndex(), is(index));
+    assertThat(indexColumn.getIndexOrdinalPosition(), is(1));
+    assertThat(indexColumn.getSortSequence(), is(IndexColumnSortSequence.ascending));
+  }
+
+  @Test
+  public void coverTableConstraintColumn() {
+    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
+    final Table table = catalog.lookupTable(schema, "AUTHORS").get();
+    final TableConstraint tableConstraint = new ArrayList<>(table.getTableConstraints()).get(0);
+    final TableConstraintColumn tableConstraintColumn =
+        tableConstraint.getConstrainedColumns().get(0);
+    final Column column = table.lookupColumn(tableConstraintColumn.getName()).get();
+
+    compareColumnFields(tableConstraintColumn, column);
+
+    assertThat(tableConstraintColumn.getTableConstraint(), is(tableConstraint));
+    assertThat(tableConstraintColumn.getTableConstraintOrdinalPosition(), is(1));
+  }
+
+  @Test
   public void crawlIgnoresSelectionOptions(final Connection connection) {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
     final SchemaCrawlerOptions selectedOptions =
@@ -136,91 +200,6 @@ public class SchemaCrawlerCoverageTest {
             NullPointerException.class,
             () -> new SchemaCrawler(connectionSource, schemaRetrievalOptionsDefault, null));
     assertThat(exception.getMessage(), is("No SchemaCrawler options provided"));
-  }
-
-  @Test
-  public void catalogDoesNotExposeReductionMethods() {
-    final boolean catalogExposesReduction =
-        Arrays.stream(Catalog.class.getMethods())
-            .anyMatch(
-                method -> method.getName().equals("reduce") || method.getName().equals("undo"));
-    assertThat(catalogExposesReduction, is(false));
-  }
-
-  @Test
-  public void tableSortIndexesRespectForeignKeyOrder() {
-    final Map<Table, Integer> positions = new HashMap<>();
-    int position = 0;
-    for (final Table table : catalog.getTables()) {
-      positions.put(table, position++);
-    }
-
-    for (final Table table : catalog.getTables()) {
-      for (final ForeignKey foreignKey : table.getForeignKeys()) {
-        for (final ColumnReference columnReference : foreignKey) {
-          final Table primaryKeyTable = columnReference.getPrimaryKeyColumn().getParent();
-          final Table foreignKeyTable = columnReference.getForeignKeyColumn().getParent();
-          if (!primaryKeyTable.equals(foreignKeyTable)) {
-            assertThat(positions.get(primaryKeyTable), lessThan(positions.get(foreignKeyTable)));
-          }
-        }
-      }
-    }
-  }
-
-  @Test
-  public void columnDataTypeProperties() throws Exception {
-    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
-    final Table table = catalog.lookupTable(schema, "AUTHORS").get();
-    final Column column = table.lookupColumn("FIRSTNAME").get();
-    final ColumnDataType columnDataType = column.getColumnDataType();
-
-    checkBooleanProperties(
-        columnDataType,
-        "autoIncrementable",
-        "caseSensitive",
-        "fixedPrecisionScale",
-        "nullable",
-        "unsigned");
-  }
-
-  @Test
-  public void columnProperties() throws Exception {
-    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
-    final Table table = catalog.lookupTable(schema, "AUTHORS").get();
-    final Column column = table.lookupColumn("FIRSTNAME").get();
-
-    checkBooleanProperties(column, "autoIncremented", "generated", "hidden");
-  }
-
-  @Test
-  public void coverIndexColumn() {
-    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
-    final Table table = catalog.lookupTable(schema, "AUTHORS").get();
-    final Index index = table.lookupIndex("IDX_B_AUTHORS").get();
-    final IndexColumn indexColumn = index.getColumns().get(0);
-    final Column column = table.lookupColumn(indexColumn.getName()).get();
-
-    compareColumnFields(indexColumn, column);
-
-    assertThat(indexColumn.getIndex(), is(index));
-    assertThat(indexColumn.getIndexOrdinalPosition(), is(1));
-    assertThat(indexColumn.getSortSequence(), is(IndexColumnSortSequence.ascending));
-  }
-
-  @Test
-  public void coverTableConstraintColumn() {
-    final SchemaReference schema = new SchemaReference("PUBLIC", "BOOKS");
-    final Table table = catalog.lookupTable(schema, "AUTHORS").get();
-    final TableConstraint tableConstraint = new ArrayList<>(table.getTableConstraints()).get(0);
-    final TableConstraintColumn tableConstraintColumn =
-        tableConstraint.getConstrainedColumns().get(0);
-    final Column column = table.lookupColumn(tableConstraintColumn.getName()).get();
-
-    compareColumnFields(tableConstraintColumn, column);
-
-    assertThat(tableConstraintColumn.getTableConstraint(), is(tableConstraint));
-    assertThat(tableConstraintColumn.getTableConstraintOrdinalPosition(), is(1));
   }
 
   @Test
@@ -350,6 +329,28 @@ public class SchemaCrawlerCoverageTest {
     assertThat(table.hasAttribute("new_one"), is(true));
     table.removeAttribute("new_one");
     assertThat(table.hasAttribute("new_one"), is(false));
+  }
+
+  @Test
+  public void tableSortIndexesRespectForeignKeyOrder() {
+    final Map<Table, Integer> positions = new HashMap<>();
+    int position = 0;
+    for (final Table table : catalog.getTables()) {
+      positions.put(table, position);
+      position++;
+    }
+
+    for (final Table table : catalog.getTables()) {
+      for (final ForeignKey foreignKey : table.getForeignKeys()) {
+        for (final ColumnReference columnReference : foreignKey) {
+          final Table primaryKeyTable = columnReference.getPrimaryKeyColumn().getParent();
+          final Table foreignKeyTable = columnReference.getForeignKeyColumn().getParent();
+          if (!primaryKeyTable.equals(foreignKeyTable)) {
+            assertThat(positions.get(primaryKeyTable), lessThan(positions.get(foreignKeyTable)));
+          }
+        }
+      }
+    }
   }
 
   @Test

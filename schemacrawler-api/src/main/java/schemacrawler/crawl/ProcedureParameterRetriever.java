@@ -64,27 +64,22 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
     }
 
     switch (getRetrieverConnection().get(procedureParametersRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO, "Retrieving procedure parameters, using fast data dictionary retrieval");
         retrieveProcedureParametersFromDataDictionary(allRoutines, parameterFilter);
-        break;
-
-      case data_dictionary_over_schemas:
+      }
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving procedure parameters, using fast data dictionary retrieval over schemas");
         retrieveProcedureParametersOverSchemas(allRoutines, parameterFilter);
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving procedure parameters");
         retrieveProcedureParametersFromMetadata(allRoutines, parameterFilter);
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving procedure parameters");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving procedure parameters");
     }
   }
 
@@ -157,20 +152,14 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
   }
 
   private ParameterModeType getProcedureParameterMode(final int columnType) {
-    switch (columnType) {
-      case DatabaseMetaData.procedureColumnIn:
-        return ParameterModeType.in;
-      case DatabaseMetaData.procedureColumnInOut:
-        return ParameterModeType.inOut;
-      case DatabaseMetaData.procedureColumnOut:
-        return ParameterModeType.out;
-      case DatabaseMetaData.procedureColumnResult:
-        return ParameterModeType.result;
-      case DatabaseMetaData.procedureColumnReturn:
-        return ParameterModeType.returnValue;
-      default:
-        return ParameterModeType.unknown;
-    }
+    return switch (columnType) {
+      case DatabaseMetaData.procedureColumnIn -> ParameterModeType.in;
+      case DatabaseMetaData.procedureColumnInOut -> ParameterModeType.inOut;
+      case DatabaseMetaData.procedureColumnOut -> ParameterModeType.out;
+      case DatabaseMetaData.procedureColumnResult -> ParameterModeType.result;
+      case DatabaseMetaData.procedureColumnReturn -> ParameterModeType.returnValue;
+      default -> ParameterModeType.unknown;
+    };
   }
 
   private MutableProcedureParameter lookupOrCreateProcedureParameter(

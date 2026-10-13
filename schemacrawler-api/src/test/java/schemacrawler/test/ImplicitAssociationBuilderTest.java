@@ -67,28 +67,6 @@ public class ImplicitAssociationBuilderTest {
 
   private Catalog catalog;
 
-  @BeforeAll
-  public void loadCatalog(final Connection connection) throws Exception {
-
-    final SchemaRetrievalOptions schemaRetrievalOptions =
-        DatabaseTestUtility.newSchemaRetrievalOptions();
-
-    final LimitOptionsBuilder limitOptionsBuilder =
-        LimitOptionsBuilder.builder()
-            .includeSchemas(new RegularExpressionExclusionRule(".*\\.FOR_LINT"))
-            .includeAllSynonyms()
-            .includeAllSequences()
-            .includeAllRoutines();
-    final LoadOptionsBuilder loadOptionsBuilder =
-        LoadOptionsBuilder.builder().withSchemaInfoLevel(SchemaInfoLevelBuilder.maximum());
-    final SchemaCrawlerOptions schemaCrawlerOptions =
-        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
-            .withLimitOptions(limitOptionsBuilder.toOptions())
-            .withLoadOptions(loadOptionsBuilder.toOptions());
-
-    catalog = getCatalog(connection, schemaRetrievalOptions, schemaCrawlerOptions);
-  }
-
   /**
    * Keep in sync with {@link ImplicitAssociationsAttributesTest#implicitAssociations() LabelName}
    */
@@ -230,7 +208,7 @@ public class ImplicitAssociationBuilderTest {
             newImplicitAssociationColumn(
                 new SchemaReference("PUBLIC", "BOOKS"), "BOOKAUTHORS", "AUTHORID"),
             newImplicitAssociationColumn(pkColumn));
-    TableReference fk = builder.build();
+    final TableReference fk = builder.build();
     assertThat(fk, is(not(nullValue())));
     assertThat(fk, instanceOf(ForeignKey.class));
     assertThat(fk.getName(), is("Z_FK_AUTHOR"));
@@ -260,5 +238,27 @@ public class ImplicitAssociationBuilderTest {
     }
     assertThat(
         outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+  }
+
+  @BeforeAll
+  public void loadCatalog(final Connection connection) throws Exception {
+
+    final SchemaRetrievalOptions schemaRetrievalOptions =
+        DatabaseTestUtility.newSchemaRetrievalOptions();
+
+    final LimitOptionsBuilder limitOptionsBuilder =
+        LimitOptionsBuilder.builder()
+            .includeSchemas(new RegularExpressionExclusionRule(".*\\.FOR_LINT"))
+            .includeAllSynonyms()
+            .includeAllSequences()
+            .includeAllRoutines();
+    final LoadOptionsBuilder loadOptionsBuilder =
+        LoadOptionsBuilder.builder().withSchemaInfoLevel(SchemaInfoLevelBuilder.maximum());
+    final SchemaCrawlerOptions schemaCrawlerOptions =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withLimitOptions(limitOptionsBuilder.toOptions())
+            .withLoadOptions(loadOptionsBuilder.toOptions());
+
+    catalog = getCatalog(connection, schemaRetrievalOptions, schemaCrawlerOptions);
   }
 }

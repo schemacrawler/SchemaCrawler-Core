@@ -11,7 +11,8 @@ package schemacrawler.schemacrawler;
 public enum MetadataRetrievalStrategy {
   // Do not load metadata
   none,
-  // use JDBC metadata calls to retrieve information one database object at a time;
+  // use JDBC metadata calls to retrieve information one database object at a
+  // time;
   // and the JDBC driver decides how to honor these requests
   metadata,
   // use JDBC metadata calls to retrieve information one schema at a time;

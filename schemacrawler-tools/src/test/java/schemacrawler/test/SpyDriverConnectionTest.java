@@ -53,14 +53,13 @@ import us.fatehi.utility.datasource.MultiUseUserCredentials;
 @ExtendWith(MockitoExtension.class)
 public class SpyDriverConnectionTest {
 
-  private static final String SPY_URL = "jdbc:p6spy:test-db:test";
-
   /** Minimal spy driver implementation that delegates connection creation to the inner driver. */
   private static final class p6spyDriver implements Driver {
 
     private static Connection newSpyConnection(final String url, final Properties info)
         throws SQLException {
-      // Delegate the actual connection to the registered inner driver via DriverManager
+      // Delegate the actual connection to the registered inner driver via
+      // DriverManager
       final Driver innerDriver = DriverManager.getDriver("jdbc:test-db:test");
       final Connection innerConnection = innerDriver.connect("jdbc:test-db:test", info);
 
@@ -118,17 +117,19 @@ public class SpyDriverConnectionTest {
     }
   }
 
+  private static final String SPY_URL = "jdbc:p6spy:test-db:test";
+
   private p6spyDriver p6spyDriver;
+
+  @AfterEach
+  public void deregisterp6spyDriver() throws SQLException {
+    DriverManager.deregisterDriver(p6spyDriver);
+  }
 
   @BeforeEach
   public void registerp6spyDriver() throws SQLException {
     p6spyDriver = new p6spyDriver();
     DriverManager.registerDriver(p6spyDriver);
-  }
-
-  @AfterEach
-  public void deregisterp6spyDriver() throws SQLException {
-    DriverManager.deregisterDriver(p6spyDriver);
   }
 
   @Test

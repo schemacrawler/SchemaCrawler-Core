@@ -42,7 +42,8 @@ public class OfflineConnectionTest {
 
   @Test
   public void testMetaData() throws SQLException {
-    // This is an important test to make sure that we do not over-engineer the offline connection
+    // This is an important test to make sure that we do not over-engineer the
+    // offline connection
     assertThrows(SQLFeatureNotSupportedException.class, () -> connection.getMetaData());
   }
 

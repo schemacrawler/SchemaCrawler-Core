@@ -67,12 +67,12 @@ final class RetrieverConnection {
     return connectionSource.get();
   }
 
-  EnumDataTypeHelper getEnumDataTypeHelper() {
-    return schemaRetrievalOptions.getEnumDataTypeHelper();
-  }
-
   DatabaseServerType getDatabaseServerType() {
     return schemaRetrievalOptions.getDatabaseServerType();
+  }
+
+  EnumDataTypeHelper getEnumDataTypeHelper() {
+    return schemaRetrievalOptions.getEnumDataTypeHelper();
   }
 
   Identifiers getIdentifiers() {

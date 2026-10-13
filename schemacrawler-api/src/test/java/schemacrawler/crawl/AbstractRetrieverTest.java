@@ -72,13 +72,24 @@ public abstract class AbstractRetrieverTest {
   }
 
   /**
-   * Customize the SchemaInfoLevelBuilder for specific retriever tests. Subclasses should override
-   * this method to disable specific object retrieval.
+   * Creates default SchemaCrawlerOptions.
    *
-   * @param schemaInfoLevelBuilder SchemaInfoLevelBuilder to customize
+   * @return SchemaCrawlerOptions
    */
-  protected void customizeSchemaInfoLevel(final SchemaInfoLevelBuilder schemaInfoLevelBuilder) {
-    // Default implementation does nothing
+  protected SchemaCrawlerOptions createOptions() {
+    return SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
+  }
+
+  /**
+   * Creates a RetrieverConnection with default schema retrieval options.
+   *
+   * @param connectionSource Database connection source
+   * @return RetrieverConnection
+   * @throws SQLException If a database access error occurs
+   */
+  protected RetrieverConnection createRetrieverConnection(
+      final DatabaseConnectionSource connectionSource) throws SQLException {
+    return new RetrieverConnection(connectionSource, schemaRetrievalOptionsDefault);
   }
 
   /**
@@ -118,24 +129,13 @@ public abstract class AbstractRetrieverTest {
   }
 
   /**
-   * Creates a RetrieverConnection with default schema retrieval options.
+   * Customize the SchemaInfoLevelBuilder for specific retriever tests. Subclasses should override
+   * this method to disable specific object retrieval.
    *
-   * @param connectionSource Database connection source
-   * @return RetrieverConnection
-   * @throws SQLException If a database access error occurs
+   * @param schemaInfoLevelBuilder SchemaInfoLevelBuilder to customize
    */
-  protected RetrieverConnection createRetrieverConnection(
-      final DatabaseConnectionSource connectionSource) throws SQLException {
-    return new RetrieverConnection(connectionSource, schemaRetrievalOptionsDefault);
-  }
-
-  /**
-   * Creates default SchemaCrawlerOptions.
-   *
-   * @return SchemaCrawlerOptions
-   */
-  protected SchemaCrawlerOptions createOptions() {
-    return SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
+  protected void customizeSchemaInfoLevel(final SchemaInfoLevelBuilder schemaInfoLevelBuilder) {
+    // Default implementation does nothing
   }
 
   /**

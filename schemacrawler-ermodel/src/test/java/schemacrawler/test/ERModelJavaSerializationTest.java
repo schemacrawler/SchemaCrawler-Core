@@ -83,17 +83,6 @@ public class ERModelJavaSerializationTest {
     validateERModel(erModel);
   }
 
-  private void validateERModel(final ERModel erModel) {
-    assertThat(erModel, is(not(nullValue())));
-    assertThat(erModel.getEntities(), hasSize(12));
-    assertThat(erModel.getRelationships(), hasSize(15));
-    // Calculate total implicit relationships
-    final int numImplicitRelationships =
-        erModel.getEntities().stream()
-            .collect(Collectors.summingInt(entity -> entity.getImplicitRelationships().size()));
-    assertThat(numImplicitRelationships, is(3));
-  }
-
   private void validateDeserializedERModel(final ERModel erModel) {
     final Entity books = erModel.lookupEntity("PUBLIC.BOOKS.BOOKS").orElseThrow();
     assertThat(books.getType(), is(EntityType.strong_entity));
@@ -124,5 +113,16 @@ public class ERModelJavaSerializationTest {
         assertThat(entityAttribute.getParent().getTable(), is(entity.getTable()));
       }
     }
+  }
+
+  private void validateERModel(final ERModel erModel) {
+    assertThat(erModel, is(not(nullValue())));
+    assertThat(erModel.getEntities(), hasSize(12));
+    assertThat(erModel.getRelationships(), hasSize(15));
+    // Calculate total implicit relationships
+    final int numImplicitRelationships =
+        erModel.getEntities().stream()
+            .collect(Collectors.summingInt(entity -> entity.getImplicitRelationships().size()));
+    assertThat(numImplicitRelationships, is(3));
   }
 }

@@ -63,8 +63,10 @@ public final class TableEntityModelInferrer {
       final Map<NamedObjectKey, Set<Column>> importedColumnsMapBuilder,
       final Map<NamedObjectKey, Set<Column>> pkColumnsMapBuilder,
       final Map<NamedObjectKey, Set<Column>> parentPkColumnsMapBuilder) {
-    // Precompute child columns for all imported foreign keys, including self-references.
-    // Cardinality inference depends on this map even when self-referencing FKs are excluded
+    // Precompute child columns for all imported foreign keys, including
+    // self-references.
+    // Cardinality inference depends on this map even when self-referencing FKs are
+    // excluded
     // from entity-type classification.
     for (final ForeignKey fk : table.getImportedForeignKeys()) {
       final Set<Column> importedKeysForFk =

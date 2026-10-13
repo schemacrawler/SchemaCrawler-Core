@@ -35,6 +35,16 @@ import us.fatehi.utility.property.PropertyName;
 public class DatabaseConnectorRegistryTest {
 
   @Test
+  public void commandLineCommands() throws Exception {
+
+    final DatabaseConnectorRegistry databaseConnectorRegistry =
+        DatabaseConnectorRegistry.getRegistry();
+    final Collection<PluginCommand> commandLineCommands =
+        databaseConnectorRegistry.getCommandLineCommands();
+    assertThat(commandLineCommands, is(empty()));
+  }
+
+  @Test
   public void databaseConnectorRegistry() {
     final DatabaseConnectorRegistry databaseConnectorRegistry =
         DatabaseConnectorRegistry.getRegistry();
@@ -89,16 +99,6 @@ public class DatabaseConnectorRegistryTest {
   }
 
   @Test
-  public void commandLineCommands() throws Exception {
-
-    final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getRegistry();
-    final Collection<PluginCommand> commandLineCommands =
-        databaseConnectorRegistry.getCommandLineCommands();
-    assertThat(commandLineCommands, is(empty()));
-  }
-
-  @Test
   public void helpCommands() throws Exception {
 
     final TestDatabaseConnector testDatabaseConnector = new TestDatabaseConnector();
@@ -127,32 +127,6 @@ public class DatabaseConnectorRegistryTest {
   }
 
   @Test
-  public void registeredPlugins() throws Exception {
-
-    final TestDatabaseConnector testDatabaseConnector = new TestDatabaseConnector();
-    DatabaseServerType databaseServerType = testDatabaseConnector.getDatabaseServerType();
-    final PropertyName serverDescription =
-        new PropertyName(
-            databaseServerType.getDatabaseSystemIdentifier(),
-            databaseServerType.getDatabaseSystemName());
-
-    final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getRegistry();
-    final Collection<PropertyName> commandLineCommands =
-        databaseConnectorRegistry.getRegisteredPlugins();
-    assertThat(commandLineCommands, hasSize(2));
-    assertThat(commandLineCommands, hasItem(serverDescription));
-  }
-
-  @Test
-  public void name() throws Exception {
-
-    final DatabaseConnectorRegistry databaseConnectorRegistry =
-        DatabaseConnectorRegistry.getRegistry();
-    assertThat(databaseConnectorRegistry.getName(), is("SchemaCrawler Database Server Plugins"));
-  }
-
-  @Test
   public void loadError() throws Exception {
     restoreSystemProperties(
         () -> {
@@ -164,5 +138,31 @@ public class DatabaseConnectorRegistryTest {
         });
     // Reset
     reload(DatabaseConnectorRegistry.class);
+  }
+
+  @Test
+  public void name() throws Exception {
+
+    final DatabaseConnectorRegistry databaseConnectorRegistry =
+        DatabaseConnectorRegistry.getRegistry();
+    assertThat(databaseConnectorRegistry.getName(), is("SchemaCrawler Database Server Plugins"));
+  }
+
+  @Test
+  public void registeredPlugins() throws Exception {
+
+    final TestDatabaseConnector testDatabaseConnector = new TestDatabaseConnector();
+    final DatabaseServerType databaseServerType = testDatabaseConnector.getDatabaseServerType();
+    final PropertyName serverDescription =
+        new PropertyName(
+            databaseServerType.getDatabaseSystemIdentifier(),
+            databaseServerType.getDatabaseSystemName());
+
+    final DatabaseConnectorRegistry databaseConnectorRegistry =
+        DatabaseConnectorRegistry.getRegistry();
+    final Collection<PropertyName> commandLineCommands =
+        databaseConnectorRegistry.getRegisteredPlugins();
+    assertThat(commandLineCommands, hasSize(2));
+    assertThat(commandLineCommands, hasItem(serverDescription));
   }
 }

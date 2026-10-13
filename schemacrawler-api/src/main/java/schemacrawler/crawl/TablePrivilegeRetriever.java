@@ -41,38 +41,30 @@ final class TablePrivilegeRetriever extends AbstractRetriever {
 
   void retrieveTableColumnPrivileges() throws SQLException {
     switch (getRetrieverConnection().get(tableColumnPrivilegesRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO, "Retrieving column privileges, using fast data dictionary retrieval");
         retrieveTableColumnPrivilegesFromDataDictionary();
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving column privileges from metadata");
         retrieveTableColumnPrivilegesFromMetadata();
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving tables");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving tables");
     }
   }
 
   void retrieveTablePrivileges() throws SQLException {
     switch (getRetrieverConnection().get(tablePrivilegesRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(Level.INFO, "Retrieving table privileges, using fast data dictionary retrieval");
         retrieveTablePrivilegesFromDataDictionary();
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving table privileges from metadata");
         retrieveTablePrivilegesFromMetadata();
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving tables");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving tables");
     }
   }
 

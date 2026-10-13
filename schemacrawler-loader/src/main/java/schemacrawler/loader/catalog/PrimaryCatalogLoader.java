@@ -11,9 +11,9 @@ package schemacrawler.loader.catalog;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.crawl.SchemaCrawler;
+import schemacrawler.loader.catalog.PrimaryCatalogLoader.PrimaryCatalogLoaderOptions;
 import schemacrawler.schema.Catalog;
 import schemacrawler.tools.command.CommandOptions;
-import schemacrawler.loader.catalog.PrimaryCatalogLoader.PrimaryCatalogLoaderOptions;
 import us.fatehi.utility.property.PropertyName;
 
 class PrimaryCatalogLoader extends AbstractCatalogLoader<PrimaryCatalogLoaderOptions> {

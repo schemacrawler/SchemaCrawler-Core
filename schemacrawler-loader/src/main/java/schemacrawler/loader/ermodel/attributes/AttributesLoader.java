@@ -87,35 +87,6 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
     }
   }
 
-  private void loadRemarks(final Catalog catalog, final CatalogAttributes catalogAttributes) {
-    for (final TableAttributes tableAttributes : catalogAttributes.getTables()) {
-      final Optional<Table> lookupTable =
-          catalog.lookupTable(tableAttributes.getSchema(), tableAttributes.getName());
-      final Table table;
-      if (lookupTable.isEmpty()) {
-        LOGGER.log(Level.CONFIG, new StringFormat("Table %s not found", tableAttributes));
-        continue;
-      }
-      table = lookupTable.get();
-
-      if (tableAttributes.hasRemarks()) {
-        table.setRemarks(tableAttributes.getRemarks());
-      }
-
-      for (final ColumnAttributes columnAttributes : tableAttributes) {
-        if (columnAttributes.hasRemarks()) {
-          final Optional<Column> lookupColumn = table.lookupColumn(columnAttributes.getName());
-          if (lookupColumn.isPresent()) {
-            final Column column = lookupColumn.get();
-            column.setRemarks(columnAttributes.getRemarks());
-          } else {
-            LOGGER.log(Level.CONFIG, new StringFormat("Column %s not found", columnAttributes));
-          }
-        }
-      }
-    }
-  }
-
   private void loadImplicitAssociations(
       final Catalog catalog, final ERModel erModel, final CatalogAttributes catalogAttributes) {
     final ImplicitRelationshipBuilder relationshipBuilder =
@@ -150,6 +121,35 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
         for (final Entry<String, String> attribute :
             implicitAssociationAttributes.getAttributes().entrySet()) {
           implicitRelationship.setAttribute(attribute.getKey(), attribute.getValue());
+        }
+      }
+    }
+  }
+
+  private void loadRemarks(final Catalog catalog, final CatalogAttributes catalogAttributes) {
+    for (final TableAttributes tableAttributes : catalogAttributes.getTables()) {
+      final Optional<Table> lookupTable =
+          catalog.lookupTable(tableAttributes.getSchema(), tableAttributes.getName());
+      final Table table;
+      if (lookupTable.isEmpty()) {
+        LOGGER.log(Level.CONFIG, new StringFormat("Table %s not found", tableAttributes));
+        continue;
+      }
+      table = lookupTable.get();
+
+      if (tableAttributes.hasRemarks()) {
+        table.setRemarks(tableAttributes.getRemarks());
+      }
+
+      for (final ColumnAttributes columnAttributes : tableAttributes) {
+        if (columnAttributes.hasRemarks()) {
+          final Optional<Column> lookupColumn = table.lookupColumn(columnAttributes.getName());
+          if (lookupColumn.isPresent()) {
+            final Column column = lookupColumn.get();
+            column.setRemarks(columnAttributes.getRemarks());
+          } else {
+            LOGGER.log(Level.CONFIG, new StringFormat("Column %s not found", columnAttributes));
+          }
         }
       }
     }

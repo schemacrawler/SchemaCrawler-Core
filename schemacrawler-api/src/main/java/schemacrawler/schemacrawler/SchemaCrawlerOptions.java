@@ -17,9 +17,8 @@ import us.fatehi.utility.Options;
 /**
  * Immutable options for loading a catalog and selecting objects from a catalog.
  *
- * <p>Catalog selection applies limit, filter, and grep options to existing
- * membership. Load options control metadata retrieval and do not trigger it
- * during selection.
+ * <p>Catalog selection applies limit, filter, and grep options to existing membership. Load options
+ * control metadata retrieval and do not trigger it during selection.
  */
 public record SchemaCrawlerOptions(
     @NonNull String title,
@@ -38,10 +37,10 @@ public record SchemaCrawlerOptions(
   }
 
   public SchemaCrawlerOptions(
-      @NonNull LimitOptions limitOptions,
-      @NonNull FilterOptions filterOptions,
-      @NonNull GrepOptions grepOptions,
-      @NonNull LoadOptions loadOptions) {
+      @NonNull final LimitOptions limitOptions,
+      @NonNull final FilterOptions filterOptions,
+      @NonNull final GrepOptions grepOptions,
+      @NonNull final LoadOptions loadOptions) {
     this("", limitOptions, filterOptions, grepOptions, loadOptions);
   }
 

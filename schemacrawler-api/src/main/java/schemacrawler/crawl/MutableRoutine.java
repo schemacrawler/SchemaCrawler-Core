@@ -66,7 +66,7 @@ abstract sealed class MutableRoutine extends AbstractDatabaseObject implements R
   public int compareTo(final NamedObject obj) {
     int comparison = super.compareTo(obj);
 
-    if (obj instanceof Routine other) {
+    if (obj instanceof final Routine other) {
       if (comparison == 0) {
         final List<RoutineParameter<? extends Routine>> thisParameters = getParameters();
         final List<RoutineParameter<? extends Routine>> otherParameters = other.getParameters();

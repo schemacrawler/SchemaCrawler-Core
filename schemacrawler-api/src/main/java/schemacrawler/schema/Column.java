@@ -50,7 +50,7 @@ public interface Column extends BaseColumn<Table> {
    * @return If the column is an entity attribute
    */
   default boolean isAttribute() {
-    return (!isPartOfPrimaryKey() && !isPartOfForeignKey());
+    return !isPartOfPrimaryKey() && !isPartOfForeignKey();
   }
 
   /**
@@ -115,7 +115,7 @@ public interface Column extends BaseColumn<Table> {
    * @return If the column is significant because it is part of a key or index
    */
   default boolean isSignificant() {
-    return (isPartOfPrimaryKey() || isPartOfForeignKey() || isPartOfIndex());
+    return isPartOfPrimaryKey() || isPartOfForeignKey() || isPartOfIndex();
   }
 
   /**
