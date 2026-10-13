@@ -199,7 +199,7 @@ public class SchemaCrawlerExecutableTest {
   }
 
   @Test
-  public void executableBuildsModelFromSelectedCatalog(
+  public void executableBuildsModelFromProjectedCatalog(
       final DatabaseConnectionSource connectionSource) throws Exception {
     final Path testOutputFile = createTempFilePath("sc", "data");
     final SchemaCrawlerOptions options =
@@ -223,7 +223,7 @@ public class SchemaCrawlerExecutableTest {
   }
 
   @Test
-  public void executableCanExplicitlyNarrowAlreadySelectedCatalog(
+  public void executableCanExplicitlyNarrowAlreadyProjectedCatalog(
       final DatabaseConnectionSource connectionSource) throws Exception {
     final Path testOutputFile = createTempFilePath("sc", "data");
     final Catalog baseline =
@@ -232,7 +232,7 @@ public class SchemaCrawlerExecutableTest {
             schemaRetrievalOptionsDefault,
             SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions(),
             ConfigUtility.newConfig());
-    final Catalog selectedCatalog =
+    final Catalog projectedCatalog =
         CatalogProjectionBuilder.builder(baseline)
             .withOptions(
                 SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
@@ -243,7 +243,7 @@ public class SchemaCrawlerExecutableTest {
             .build();
     final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
     executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
-    executable.setCatalog(selectedCatalog);
+    executable.setCatalog(projectedCatalog);
     executable.setSchemaCrawlerOptions(
         SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
             .withGrepOptions(
@@ -256,18 +256,18 @@ public class SchemaCrawlerExecutableTest {
     executable.execute();
 
     assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 0" + lineSeparator()));
-    assertThat(executable.getCatalog(), is(selectedCatalog));
+    assertThat(executable.getCatalog(), is(projectedCatalog));
   }
 
   @Test
-  public void executableDoesNotSelectAlreadySelectedCatalogAgain(
+  public void executableDoesNotProjectAlreadyProjectedCatalogAgain(
       final DatabaseConnectionSource connectionSource) throws Exception {
     final Path testOutputFile = createTempFilePath("sc", "data");
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
     final Catalog baseline =
         SchemaCrawlerUtility.getCatalog(
             connectionSource, schemaRetrievalOptionsDefault, options, ConfigUtility.newConfig());
-    final Catalog selectedCatalog =
+    final Catalog projectedCatalog =
         CatalogProjectionBuilder.builder(baseline)
             .withOptions(
                 SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
@@ -279,13 +279,13 @@ public class SchemaCrawlerExecutableTest {
     final SchemaCrawlerExecutable executable = new SchemaCrawlerExecutable("test-command");
     executable.setSchemaCrawlerOptions(options);
     executable.setSchemaRetrievalOptions(schemaRetrievalOptionsDefault);
-    executable.setCatalog(selectedCatalog);
+    executable.setCatalog(projectedCatalog);
     executable.setOutputOptions(ExecutableTestUtility.newOutputOptions("text", testOutputFile));
 
     executable.setConnectionSource(connectionSource);
     executable.execute();
 
     assertThat(readString(testOutputFile, UTF_8), containsString("Tables: 1" + lineSeparator()));
-    assertThat(executable.getCatalog(), is(selectedCatalog));
+    assertThat(executable.getCatalog(), is(projectedCatalog));
   }
 }

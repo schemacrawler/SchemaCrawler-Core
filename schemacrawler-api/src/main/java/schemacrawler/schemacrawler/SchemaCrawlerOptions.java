@@ -15,10 +15,10 @@ import org.jspecify.annotations.NonNull;
 import us.fatehi.utility.Options;
 
 /**
- * Immutable options for loading a catalog and selecting objects from a catalog.
+ * Immutable options for loading a catalog and filtering objects into a catalog projection.
  *
- * <p>Catalog selection applies limit, filter, and grep options to existing membership. Load options
- * control metadata retrieval and do not trigger it during selection.
+ * <p>Catalog projection applies limit, filter, and grep options to existing membership. Load
+ * options control metadata retrieval and do not trigger it during projection.
  */
 public record SchemaCrawlerOptions(
     @NonNull String title,

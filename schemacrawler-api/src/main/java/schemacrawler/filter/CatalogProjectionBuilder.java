@@ -42,9 +42,9 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 
 /**
- * Builds {@link Catalog} selections with immutable membership from a loaded catalog.
+ * Builds catalog projections with immutable membership from a loaded catalog.
  *
- * <p>Selection does not retrieve metadata or broaden the source catalog's membership.
+ * <p>Projection does not retrieve metadata or broaden the source catalog's membership.
  */
 public final class CatalogProjectionBuilder {
 
@@ -93,7 +93,7 @@ public final class CatalogProjectionBuilder {
   /** Builds an immutable projection from the source catalog. */
   public Catalog build() {
     final List<Schema> eligibleSchemas = sortedCopy(catalog.getSchemas());
-    final List<Schema> schemas = selectSchemas(eligibleSchemas);
+    final List<Schema> schemas = filterSchemas(eligibleSchemas);
     final Set<NamedObjectKey> schemaKeys = keys(schemas);
     final boolean sourceHasSchemas = !eligibleSchemas.isEmpty();
     if (sourceHasSchemas && schemas.isEmpty()) {
@@ -108,7 +108,7 @@ public final class CatalogProjectionBuilder {
     @NonNull final LimitOptions limitOptions = schemaCrawlerOptions.limitOptions();
     @NonNull final GrepOptions grepOptions = schemaCrawlerOptions.grepOptions();
 
-    final List<Table> tables = selectTables(schemaKeys);
+    final List<Table> tables = filterTables(schemaKeys);
 
     final Predicate<Routine> routineFilter =
         new SchemaFilter<Routine>(schemaKeys)
@@ -149,9 +149,9 @@ public final class CatalogProjectionBuilder {
   }
 
   /**
-   * Sets the limit, filter, and grep options used to select source objects.
+   * Sets the limit, filter, and grep options used to filter source objects for the projection.
    *
-   * <p>Load options do not trigger metadata retrieval during selection.
+   * <p>Load options do not trigger metadata retrieval during projection.
    */
   public CatalogProjectionBuilder withOptions(final SchemaCrawlerOptions schemaCrawlerOptions) {
     if (schemaCrawlerOptions != null) {
@@ -160,14 +160,14 @@ public final class CatalogProjectionBuilder {
     return this;
   }
 
-  private List<Schema> selectSchemas(final Collection<Schema> eligibleSchemas) {
+  private List<Schema> filterSchemas(final Collection<Schema> eligibleSchemas) {
     final Predicate<Schema> schemaLimitFilter =
         NamedObjectFilters.fullName(
             schemaCrawlerOptions.limitOptions().get(ruleForSchemaInclusion));
     return sortedCopy(eligibleSchemas.stream().filter(schemaLimitFilter).toList());
   }
 
-  private List<Table> selectTables(final Set<NamedObjectKey> schemaKeys) {
+  private List<Table> filterTables(final Set<NamedObjectKey> schemaKeys) {
     @NonNull final LimitOptions limitOptions = schemaCrawlerOptions.limitOptions();
     @NonNull final FilterOptions filterOptions = schemaCrawlerOptions.filterOptions();
     @NonNull final GrepOptions grepOptions = schemaCrawlerOptions.grepOptions();

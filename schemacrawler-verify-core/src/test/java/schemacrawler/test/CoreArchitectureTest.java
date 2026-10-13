@@ -46,7 +46,7 @@ public class CoreArchitectureTest extends BaseArchitectureTest {
         .resideInAPackage("schemacrawler.crawl")
         .should()
         .haveRawType(SchemaCrawlerOptions.class)
-        .because("crawl implementations must not retain selection options")
+        .because("crawl implementations must not retain full SchemaCrawlerOptions")
         .check(classes);
   }
 
