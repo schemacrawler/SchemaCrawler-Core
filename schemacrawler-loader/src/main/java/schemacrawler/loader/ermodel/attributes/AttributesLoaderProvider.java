@@ -12,8 +12,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import java.util.List;
-import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.loader.ermodel.AbstractERModelLoaderProvider;
+import schemacrawler.tools.executable.commandline.PluginCommand;
 import schemacrawler.tools.options.Config;
 import us.fatehi.utility.property.PropertyName;
 

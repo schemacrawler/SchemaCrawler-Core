@@ -20,33 +20,23 @@ import schemacrawler.schema.Table;
 
 class InclusionRuleFilterTest {
 
-  @Test
-  void testUnquotedPatternDoesNotMatchQuotedFullNameViaJoinedKey() {
-    // The full name is quoted for display, but the underlying key parts (as originally
-    // captured) are not.
-    final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
-    final InclusionRuleFilter<Table> filter =
-        new InclusionRuleFilter<>(new RegularExpressionInclusionRule(".*Celebrity Updates$"), true);
-
-    assertThat(filter.test(table), is(false));
+  private static Table table(
+      final String schemaName,
+      final String fullNameSuffix,
+      final String schemaKeyPart,
+      final String nameKeyPart) {
+    final Table table = mock(Table.class);
+    when(table.getFullName()).thenReturn(schemaName + "." + fullNameSuffix);
+    when(table.key()).thenReturn(new NamedObjectKey(schemaKeyPart, nameKeyPart));
+    return table;
   }
 
   @Test
-  void testUnquotedPatternMatchesUnquotedFullName() {
-    // Pre-existing behavior: an unquoted full name still matches directly, unchanged.
-    final Table table = table("books", "sales", "books", "sales");
+  void testNullFullNameIsExcluded() {
+    final Table table = mock(Table.class);
+    when(table.getFullName()).thenReturn(null);
     final InclusionRuleFilter<Table> filter =
-        new InclusionRuleFilter<>(new RegularExpressionInclusionRule(".*sales$"), true);
-
-    assertThat(filter.test(table), is(true));
-  }
-
-  @Test
-  void testPatternDifferingOnlyInCaseDoesNotMatch() {
-    // Quote-tolerance is added without introducing case-insensitivity.
-    final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
-    final InclusionRuleFilter<Table> filter =
-        new InclusionRuleFilter<>(new RegularExpressionInclusionRule(".*celebrity updates$"), true);
+        new InclusionRuleFilter<>(new RegularExpressionInclusionRule(".*"), true);
 
     assertThat(filter.test(table), is(false));
   }
@@ -60,23 +50,35 @@ class InclusionRuleFilterTest {
   }
 
   @Test
-  void testNullFullNameIsExcluded() {
-    final Table table = mock(Table.class);
-    when(table.getFullName()).thenReturn(null);
+  void testPatternDifferingOnlyInCaseDoesNotMatch() {
+    // Quote-tolerance is added without introducing case-insensitivity.
+    final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
     final InclusionRuleFilter<Table> filter =
-        new InclusionRuleFilter<>(new RegularExpressionInclusionRule(".*"), true);
+        new InclusionRuleFilter<>(new RegularExpressionInclusionRule(".*celebrity updates$"), true);
 
     assertThat(filter.test(table), is(false));
   }
 
-  private static Table table(
-      final String schemaName,
-      final String fullNameSuffix,
-      final String schemaKeyPart,
-      final String nameKeyPart) {
-    final Table table = mock(Table.class);
-    when(table.getFullName()).thenReturn(schemaName + "." + fullNameSuffix);
-    when(table.key()).thenReturn(new NamedObjectKey(schemaKeyPart, nameKeyPart));
-    return table;
+  @Test
+  void testUnquotedPatternDoesNotMatchQuotedFullNameViaJoinedKey() {
+    // The full name is quoted for display, but the underlying key parts (as
+    // originally
+    // captured) are not.
+    final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
+    final InclusionRuleFilter<Table> filter =
+        new InclusionRuleFilter<>(new RegularExpressionInclusionRule(".*Celebrity Updates$"), true);
+
+    assertThat(filter.test(table), is(false));
+  }
+
+  @Test
+  void testUnquotedPatternMatchesUnquotedFullName() {
+    // Pre-existing behavior: an unquoted full name still matches directly,
+    // unchanged.
+    final Table table = table("books", "sales", "books", "sales");
+    final InclusionRuleFilter<Table> filter =
+        new InclusionRuleFilter<>(new RegularExpressionInclusionRule(".*sales$"), true);
+
+    assertThat(filter.test(table), is(true));
   }
 }

@@ -25,6 +25,9 @@ import us.fatehi.utility.property.ProductVersion;
 
 public class LightCrawlInfo implements CrawlInfo {
 
+  /** */
+  private static final long serialVersionUID = -5364676721666592503L;
+
   public static final DateTimeFormatter DATE_TIME_FORMATTER =
       new DateTimeFormatterBuilder()
           .appendValue(YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
@@ -78,15 +81,15 @@ public class LightCrawlInfo implements CrawlInfo {
     return crawlTimestamp;
   }
 
+  @Override
+  public DatabaseServerFingerprint getDatabaseServerFingerprint() {
+    return new DatabaseServerFingerprint();
+  }
+
   /** {@inheritDoc} */
   @Override
   public ProductVersion getDatabaseVersion() {
     return databaseVersion;
-  }
-
-  @Override
-  public DatabaseServerFingerprint getDatabaseServerFingerprint() {
-    return new DatabaseServerFingerprint();
   }
 
   /** {@inheritDoc} */

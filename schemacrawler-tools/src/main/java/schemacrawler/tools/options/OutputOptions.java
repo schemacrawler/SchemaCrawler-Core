@@ -52,7 +52,7 @@ public final class OutputOptions implements Options {
 
   public Path getOutputFile(final String extension) {
     final Path outputFile;
-    if (outputResource instanceof FileOutputResource resource) {
+    if (outputResource instanceof final FileOutputResource resource) {
       outputFile = resource.getOutputFile();
     } else {
       outputFile =

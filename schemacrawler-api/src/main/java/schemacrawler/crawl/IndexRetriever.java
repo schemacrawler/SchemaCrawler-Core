@@ -49,25 +49,20 @@ final class IndexRetriever extends AbstractRetriever {
     requireNonNull(allTables, "No tables provided");
 
     switch (getRetrieverConnection().get(indexesRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(Level.INFO, "Retrieving indexes, using fast data dictionary retrieval");
         retrieveIndexesFromDataDictionary();
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving indexes");
         retrieveIndexesFromMetadata(allTables);
-        break;
-
-      case data_dictionary_over_schemas:
+      }
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO, "Retrieving indexes, using fast data dictionary retrieval over schemas");
         retrieveIndexesOverSchemas();
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving indexes");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving indexes");
     }
   }
 

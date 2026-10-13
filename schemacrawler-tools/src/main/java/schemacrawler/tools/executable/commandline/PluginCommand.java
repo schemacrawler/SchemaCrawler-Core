@@ -96,10 +96,9 @@ public class PluginCommand implements Iterable<PluginCommandOption> {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof PluginCommand)) {
+    if (!(o instanceof final PluginCommand that)) {
       return false;
     }
-    final PluginCommand that = (PluginCommand) o;
     return Objects.equals(name, that.name);
   }
 

@@ -159,26 +159,20 @@ final class RoutineRetriever extends AbstractRetriever {
     }
 
     switch (getRetrieverConnection().get(functionsRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(Level.INFO, "Retrieving functions, using fast data dictionary retrieval");
         retrieveFunctionsFromDataDictionary(schemas, functionFilter);
-        break;
-
-      case data_dictionary_over_schemas:
+      }
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO, "Retrieving functions, using fast data dictionary retrieval over schemas");
         retrieveFunctionsOverSchemas(schemas, functionFilter);
-        break;
-
-      case metadata:
-      case metadata_over_schemas:
+      }
+      case metadata, metadata_over_schemas -> {
         LOGGER.log(Level.INFO, "Retrieving functions");
         retrieveFunctionsFromMetadata(schemas, functionFilter);
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving functions");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving functions");
     }
   }
 

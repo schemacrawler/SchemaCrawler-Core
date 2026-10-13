@@ -115,6 +115,27 @@ final class CatalogProjection implements Catalog {
       final CrawlInfo crawlInfo,
       final DatabaseInfo databaseInfo,
       final JdbcDriverInfo jdbcDriverInfo,
+      final Map<String, Object> attributesMap) {
+    this(
+        name,
+        crawlInfo,
+        databaseInfo,
+        jdbcDriverInfo,
+        attributesMap,
+        List.of(),
+        List.of(),
+        List.of(),
+        List.of(),
+        List.of(),
+        List.of(),
+        List.of());
+  }
+
+  CatalogProjection(
+      final String name,
+      final CrawlInfo crawlInfo,
+      final DatabaseInfo databaseInfo,
+      final JdbcDriverInfo jdbcDriverInfo,
       final Map<String, Object> attributesMap,
       final Collection<Schema> schemas,
       final Collection<Table> tables,
@@ -135,27 +156,6 @@ final class CatalogProjection implements Catalog {
     this.synonyms = indexBySchemaAndName(synonyms);
     this.columnDataTypes = indexBySchemaAndName(columnDataTypes);
     this.databaseUsers = indexByKey(databaseUsers);
-  }
-
-  CatalogProjection(
-      final String name,
-      final CrawlInfo crawlInfo,
-      final DatabaseInfo databaseInfo,
-      final JdbcDriverInfo jdbcDriverInfo,
-      final Map<String, Object> attributesMap) {
-    this(
-        name,
-        crawlInfo,
-        databaseInfo,
-        jdbcDriverInfo,
-        attributesMap,
-        List.of(),
-        List.of(),
-        List.of(),
-        List.of(),
-        List.of(),
-        List.of(),
-        List.of());
   }
 
   @Override

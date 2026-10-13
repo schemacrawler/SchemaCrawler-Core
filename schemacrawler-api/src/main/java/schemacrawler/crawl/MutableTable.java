@@ -88,7 +88,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
 
     int comparison = 0;
 
-    if (comparison == 0 && obj instanceof MutableTable table) {
+    if (comparison == 0 && obj instanceof final MutableTable table) {
       comparison = sortIndex - table.sortIndex;
     }
     if (comparison == 0) {
@@ -401,7 +401,8 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
     }
 
     // Sort imported keys (constrained columns) first and then exported keys
-    // Note: This comparator assumes the all the foreign keys belong to this table - either imported
+    // Note: This comparator assumes the all the foreign keys belong to this table -
+    // either imported
     // or exported, and no explicit checks for this are done
     final Comparator<R> fkComparator =
         nullsLast(

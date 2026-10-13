@@ -58,7 +58,8 @@ final class TableConstraintMatcher extends AbstractRetriever {
         copyRemarksAndAttributes(tableConstraint, foreignKey);
         table.removeTableConstraint(tableConstraint);
       }
-      // Add or replace the table constraint with the foreign key, which has more information like
+      // Add or replace the table constraint with the foreign key, which has more
+      // information like
       // column mappings
       table.addTableConstraint(foreignKey);
     }

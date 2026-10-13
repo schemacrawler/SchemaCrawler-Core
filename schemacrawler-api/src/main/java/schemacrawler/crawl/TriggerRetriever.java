@@ -64,17 +64,19 @@ final class TriggerRetriever extends AbstractRetriever {
     final Query triggerInformationSql = informationSchemaViews.getQuery(TRIGGERS);
 
     switch (getRetrieverConnection().get(triggersRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO, "Retrieving triggers, using fast data dictionary retrieval over schemas");
         retrieveTriggerOverSchemas(triggerInformationSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(Level.INFO, "Retrieving triggers, using fast data dictionary retrieval");
         retrieveTriggerFromDataDictionary(triggerInformationSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(Level.INFO, "Retrieving triggers, using fast data dictionary retrieval");
+        retrieveTriggerFromDataDictionary(triggerInformationSql);
+      }
     }
   }
 

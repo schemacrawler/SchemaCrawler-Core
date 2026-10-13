@@ -34,12 +34,6 @@ public final class FilterOptionsBuilder
     return this;
   }
 
-  /** Excludes tables with a known row count of zero. */
-  public FilterOptionsBuilder omitEmptyTables(final boolean omitEmptyTables) {
-    this.omitEmptyTables = omitEmptyTables;
-    return this;
-  }
-
   @Override
   public FilterOptionsBuilder fromOptions(final FilterOptions options) {
     if (options == null) {
@@ -50,6 +44,12 @@ public final class FilterOptionsBuilder
     parentTableFilterDepth = options.parentTableFilterDepth();
     omitEmptyTables = options.omitEmptyTables();
 
+    return this;
+  }
+
+  /** Excludes tables with a known row count of zero. */
+  public FilterOptionsBuilder omitEmptyTables(final boolean omitEmptyTables) {
+    this.omitEmptyTables = omitEmptyTables;
     return this;
   }
 

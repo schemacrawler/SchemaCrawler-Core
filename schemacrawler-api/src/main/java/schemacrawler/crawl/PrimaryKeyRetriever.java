@@ -44,26 +44,21 @@ final class PrimaryKeyRetriever extends AbstractRetriever {
     requireNonNull(allTables, "No tables provided");
 
     switch (getRetrieverConnection().get(primaryKeysRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(Level.INFO, "Retrieving primary keys, using fast data dictionary retrieval");
         retrievePrimaryKeysFromDataDictionary();
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving primary keys");
         retrievePrimaryKeysFromMetadata(allTables);
-        break;
-
-      case data_dictionary_over_schemas:
+      }
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving primary keys, using fast data dictionary retrieval over schemas");
         retrievePrimaryKeysOverSchemas();
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving primary keys");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving primary keys");
     }
   }
 

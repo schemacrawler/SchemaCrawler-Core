@@ -121,19 +121,6 @@ public class TableTraitsTest {
   }
 
   @Test
-  public void handlesNullTable() {
-    final TableTraits attributes = TableImportanceUtility.tableTraitsfrom(null);
-
-    assertThat(attributes.noPrimaryKey(), is(nullValue()));
-    assertThat(attributes.noForeignKeys(), is(nullValue()));
-    assertThat(attributes.noIndexes(), is(nullValue()));
-    assertThat(attributes.selfReferencing(), is(nullValue()));
-    assertThat(attributes.hasTriggers(), is(nullValue()));
-    assertThat(attributes.emptyTable(), is(nullValue()));
-    assertThat(attributes.entityModelType(), is(nullValue()));
-  }
-
-  @Test
   public void derivesAttributesFromTable() {
     final LightTable table =
         new LightTable(new SchemaReference("PUBLIC", "BOOKS"), "TABLE_TRAIT_1");
@@ -160,6 +147,19 @@ public class TableTraitsTest {
     final TableTraits attributes = TableImportanceUtility.tableTraitsfrom(table);
 
     assertThat(attributes.emptyTable(), is(nullValue()));
+  }
+
+  @Test
+  public void handlesNullTable() {
+    final TableTraits attributes = TableImportanceUtility.tableTraitsfrom(null);
+
+    assertThat(attributes.noPrimaryKey(), is(nullValue()));
+    assertThat(attributes.noForeignKeys(), is(nullValue()));
+    assertThat(attributes.noIndexes(), is(nullValue()));
+    assertThat(attributes.selfReferencing(), is(nullValue()));
+    assertThat(attributes.hasTriggers(), is(nullValue()));
+    assertThat(attributes.emptyTable(), is(nullValue()));
+    assertThat(attributes.entityModelType(), is(nullValue()));
   }
 
   @Test

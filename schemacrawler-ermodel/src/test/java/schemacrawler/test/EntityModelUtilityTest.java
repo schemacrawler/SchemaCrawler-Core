@@ -72,6 +72,44 @@ public class EntityModelUtilityTest {
     assertThat(ERModelUtility.inferCardinality(null), is(RelationshipCardinality.unknown));
   }
 
+  @Test
+  public void inferEntityAttributeType() {
+    final Map<String, EntityAttributeType> attributeTypes =
+        Map.of(
+            "INTEGER",
+            EntityAttributeType.integer,
+            "decimal",
+            EntityAttributeType.decimal,
+            "OTHER",
+            EntityAttributeType.other,
+            "LONGVARBINARY",
+            EntityAttributeType.binary,
+            "BOOLEAN",
+            EntityAttributeType.bool,
+            "LONGNVARCHAR",
+            EntityAttributeType.string,
+            "DATE",
+            EntityAttributeType.date,
+            "TIME_WITH_TIMEZONE",
+            EntityAttributeType.time,
+            "TIMESTAMP",
+            EntityAttributeType.timestamp,
+            "NO_DATA_TYPE",
+            EntityAttributeType.unknown);
+    for (final Entry<String, EntityAttributeType> attributeTypeCase : attributeTypes.entrySet()) {
+      assertThat(
+          "Wrong attribute type for <%s>".formatted(attributeTypeCase.getKey()),
+          EntityAttributeType.from(
+              LightColumnDataTypeUtility.columnDataType(attributeTypeCase.getKey())),
+          is(attributeTypeCase.getValue()));
+    }
+
+    assertThat(EntityAttributeType.from(null), is(EntityAttributeType.unknown));
+
+    final ColumnDataType enumeratedDataType = enumColumnDataType();
+    assertThat(EntityAttributeType.from(enumeratedDataType), is(EntityAttributeType.enumerated));
+  }
+
   @BeforeAll
   public void loadCatalog(final Connection connection) {
     final SchemaCrawlerOptions schemaCrawlerOptions =
@@ -134,43 +172,5 @@ public class EntityModelUtilityTest {
     assertThat(ERModelUtility.inferEntityType(parentTable), is(EntityType.strong_entity));
 
     assertThat(ERModelUtility.inferEntityType(null), is(EntityType.unknown));
-  }
-
-  @Test
-  public void inferEntityAttributeType() {
-    Map<String, EntityAttributeType> attributeTypes =
-        Map.of(
-            "INTEGER",
-            EntityAttributeType.integer,
-            "decimal",
-            EntityAttributeType.decimal,
-            "OTHER",
-            EntityAttributeType.other,
-            "LONGVARBINARY",
-            EntityAttributeType.binary,
-            "BOOLEAN",
-            EntityAttributeType.bool,
-            "LONGNVARCHAR",
-            EntityAttributeType.string,
-            "DATE",
-            EntityAttributeType.date,
-            "TIME_WITH_TIMEZONE",
-            EntityAttributeType.time,
-            "TIMESTAMP",
-            EntityAttributeType.timestamp,
-            "NO_DATA_TYPE",
-            EntityAttributeType.unknown);
-    for (Entry<String, EntityAttributeType> attributeTypeCase : attributeTypes.entrySet()) {
-      assertThat(
-          "Wrong attribute type for <%s>".formatted(attributeTypeCase.getKey()),
-          EntityAttributeType.from(
-              LightColumnDataTypeUtility.columnDataType(attributeTypeCase.getKey())),
-          is(attributeTypeCase.getValue()));
-    }
-
-    assertThat(EntityAttributeType.from(null), is(EntityAttributeType.unknown));
-
-    final ColumnDataType enumeratedDataType = enumColumnDataType();
-    assertThat(EntityAttributeType.from(enumeratedDataType), is(EntityAttributeType.enumerated));
   }
 }

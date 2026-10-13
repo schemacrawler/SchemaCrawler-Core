@@ -55,21 +55,17 @@ final class DataTypeRetriever extends AbstractRetriever {
    */
   void retrieveSystemColumnDataTypes() throws SQLException {
     switch (getRetrieverConnection().get(typeInfoRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving system column data types, using fast data dictionary retrieval");
         retrieveSystemColumnDataTypesFromDataDictionary();
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving system column data types");
         retrieveSystemColumnDataTypesFromMetadata();
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving system column data types");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving system column data types");
     }
   }
 
@@ -162,7 +158,8 @@ final class DataTypeRetriever extends AbstractRetriever {
 
     columnDataType.addAttributes(results.getAttributes());
 
-    // NOTE: Column data type was already added to the catalog during lookup and create
+    // NOTE: Column data type was already added to the catalog during lookup and
+    // create
 
     // Cache as a base column data type
     baseColumnTypes.add(dataType, columnDataType);
@@ -195,7 +192,8 @@ final class DataTypeRetriever extends AbstractRetriever {
 
     columnDataType.addAttributes(results.getAttributes());
 
-    // NOTE: Column data type was already added to the catalog during lookup and create
+    // NOTE: Column data type was already added to the catalog during lookup and
+    // create
   }
 
   private void retrieveSystemColumnDataTypesFromDataDictionary() throws SQLException {
@@ -204,7 +202,7 @@ final class DataTypeRetriever extends AbstractRetriever {
     if (!informationSchemaViews.hasQuery(TYPE_INFO)) {
       throw new ExecutionRuntimeException("No system column data types SQL provided");
     }
-    String name = "system column data types";
+    final String name = "system column data types";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     final Query typeInfoSql = informationSchemaViews.getQuery(TYPE_INFO);
     try (final Connection connection = getRetrieverConnection().getConnection(name);

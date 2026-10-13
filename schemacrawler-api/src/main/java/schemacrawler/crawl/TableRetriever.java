@@ -62,19 +62,15 @@ final class TableRetriever extends AbstractRetriever {
     }
 
     switch (getRetrieverConnection().get(tablesRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(Level.INFO, "Retrieving tables, using fast data dictionary retrieval");
         retrieveTablesFromDataDictionary(schemas, tableTypes, tableFilter);
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving tables");
         retrieveTablesFromMetadata(schemas, tableNamePattern, tableTypes, tableFilter);
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving tables");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving tables");
     }
   }
 

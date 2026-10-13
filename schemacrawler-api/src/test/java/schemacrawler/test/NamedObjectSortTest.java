@@ -24,7 +24,7 @@ import schemacrawler.utility.NamedObjectSort;
 
 public class NamedObjectSortTest {
 
-  private class NewNamedObject implements NamedObject {
+  private static class NewNamedObject implements NamedObject {
 
     /** */
     private static final long serialVersionUID = 6242517200200079638L;
@@ -42,11 +42,10 @@ public class NamedObjectSortTest {
       if (o == null) {
         return -1;
       }
-      if (o instanceof NewNamedObject object) {
+      if (o instanceof final NewNamedObject object) {
         return Integer.compare(value, object.value);
-      } else {
-        return -1;
       }
+      return -1;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class NamedObjectSortTest {
     }
   }
 
-  private class NullNamedObject implements NamedObject {
+  private static class NullNamedObject implements NamedObject {
 
     /** */
     private static final long serialVersionUID = -5606558254139597791L;
@@ -111,18 +110,17 @@ public class NamedObjectSortTest {
 
   private List<NamedObject> createExpectedList(final boolean sortAlphabetically) {
 
-    final String[] names =
-        new String[] {
-          "ID",
-          "FIRSTNAME",
-          "LASTNAME",
-          "ADDRESS1",
-          "ADDRESS2",
-          "CITY",
-          "STATE",
-          "POSTALCODE",
-          "COUNTRY",
-        };
+    final String[] names = {
+      "ID",
+      "FIRSTNAME",
+      "LASTNAME",
+      "ADDRESS1",
+      "ADDRESS2",
+      "CITY",
+      "STATE",
+      "POSTALCODE",
+      "COUNTRY",
+    };
     if (sortAlphabetically) {
       Arrays.sort(names);
     }

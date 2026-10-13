@@ -99,6 +99,7 @@ public final class Config implements Options, ReadConfig {
    * @param propertyName Property name
    * @return Integer value
    */
+  @Override
   public int getIntegerValue(final String propertyName, final int defaultValue) {
     final Object value = configMap.get(propertyName);
     if (value == null) {
@@ -116,6 +117,10 @@ public final class Config implements Options, ReadConfig {
           new StringFormat("Could not parse integer value for property <%s>", propertyName));
       return defaultValue;
     }
+  }
+
+  public Map<String, Object> getMap() {
+    return getSubMap("");
   }
 
   public Optional<InclusionRule> getOptionalInclusionRule(
@@ -142,10 +147,6 @@ public final class Config implements Options, ReadConfig {
       return defaultValue;
     }
     return value.toString();
-  }
-
-  public Map<String, Object> getMap() {
-    return getSubMap("");
   }
 
   public Map<String, Object> getSubMap(final String propertyName) {

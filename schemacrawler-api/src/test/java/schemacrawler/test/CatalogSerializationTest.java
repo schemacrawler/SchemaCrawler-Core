@@ -41,18 +41,6 @@ public class CatalogSerializationTest {
 
   private Catalog catalog;
 
-  @BeforeEach
-  public void loadCatalog(final Connection connection) {
-    final SchemaCrawlerOptions schemaCrawlerOptions =
-        schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
-    try {
-      catalog = getCatalog(connection, schemaCrawlerOptions);
-    } catch (final Exception e) {
-      fail("Catalog not loaded", e);
-    }
-    validateSchema(catalog);
-  }
-
   @Test
   public void catalogSerializationWithJava(final DatabaseConnectionSource connectionSource)
       throws Exception {
@@ -75,5 +63,17 @@ public class CatalogSerializationTest {
     assertThat(afterFingerprint, is(notNullValue()));
     assertThat(afterFingerprint.fingerprint(), is(beforeFingerprint.fingerprint()));
     assertThat(afterFingerprint.confidence(), is(beforeFingerprint.confidence()));
+  }
+
+  @BeforeEach
+  public void loadCatalog(final Connection connection) {
+    final SchemaCrawlerOptions schemaCrawlerOptions =
+        schemaCrawlerOptionsWithMaximumSchemaInfoLevel;
+    try {
+      catalog = getCatalog(connection, schemaCrawlerOptions);
+    } catch (final Exception e) {
+      fail("Catalog not loaded", e);
+    }
+    validateSchema(catalog);
   }
 }

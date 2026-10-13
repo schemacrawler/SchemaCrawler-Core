@@ -55,7 +55,7 @@ public class ERModelTest {
       out.println("# Entity attributes:");
       for (final Entity entity : erModel.getEntities()) {
         out.println("- %s".formatted(entity));
-        for (EntityAttribute entityAttribute : entity.getEntityAttributes()) {
+        for (final EntityAttribute entityAttribute : entity.getEntityAttributes()) {
           out.println(
               "  - %s [%s]".formatted(entityAttribute.getName(), entityAttribute.getType()));
           out.println("    - required: %b".formatted(entityAttribute.isRequired()));
@@ -80,7 +80,7 @@ public class ERModelTest {
           out.println("  - super-type: %s".formatted(subentity.getSupertype()));
         }
         out.println("  - relationships");
-        for (Relationship relationship : entity.getRelationships()) {
+        for (final Relationship relationship : entity.getRelationships()) {
           out.println("    - relationship: %s".formatted(relationship.getName()));
         }
         if (entity instanceof final EntitySubtype subtype) {
@@ -130,7 +130,7 @@ public class ERModelTest {
 
   @Test
   public void implicitRelationshipsNegative(final TestContext testContext) {
-    Collection<Relationship> implicitRelationships = erModel.getImplicitRelationships();
+    final Collection<Relationship> implicitRelationships = erModel.getImplicitRelationships();
     assertThat(implicitRelationships, is(not(nullValue())));
     assertThat(implicitRelationships, hasSize(2));
   }

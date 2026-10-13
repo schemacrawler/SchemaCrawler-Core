@@ -28,9 +28,8 @@ public enum NamedObjectSort implements Comparator<NamedObject> {
   public static NamedObjectSort getNamedObjectSort(final boolean alphabeticalSort) {
     if (alphabeticalSort) {
       return NamedObjectSort.alphabetical;
-    } else {
-      return NamedObjectSort.natural;
     }
+    return NamedObjectSort.natural;
   }
 
   private final Comparator<NamedObject> comparator;

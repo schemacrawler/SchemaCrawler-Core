@@ -51,30 +51,27 @@ public final class RegularExpressionInclusionRule implements InclusionRuleWithRe
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof InclusionRuleWithRegularExpression)) {
+    if (!(obj instanceof final InclusionRuleWithRegularExpression other)) {
       return false;
     }
-    final InclusionRuleWithRegularExpression other = (InclusionRuleWithRegularExpression) obj;
     return getExclusionPattern().pattern().equals(other.getExclusionPattern().pattern())
         && getInclusionPattern().pattern().equals(other.getInclusionPattern().pattern());
   }
 
   @Override
   public Pattern getExclusionPattern() {
-    if (inclusionRule instanceof InclusionRuleWithRegularExpression expression) {
+    if (inclusionRule instanceof final InclusionRuleWithRegularExpression expression) {
       return expression.getExclusionPattern();
-    } else {
-      return InclusionRuleWithRegularExpression.super.getExclusionPattern();
     }
+    return InclusionRuleWithRegularExpression.super.getExclusionPattern();
   }
 
   @Override
   public Pattern getInclusionPattern() {
-    if (inclusionRule instanceof InclusionRuleWithRegularExpression expression) {
+    if (inclusionRule instanceof final InclusionRuleWithRegularExpression expression) {
       return expression.getInclusionPattern();
-    } else {
-      return InclusionRuleWithRegularExpression.super.getInclusionPattern();
     }
+    return InclusionRuleWithRegularExpression.super.getInclusionPattern();
   }
 
   @Override

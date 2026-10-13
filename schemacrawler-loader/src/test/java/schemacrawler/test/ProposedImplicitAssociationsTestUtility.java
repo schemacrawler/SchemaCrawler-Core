@@ -76,7 +76,8 @@ public class ProposedImplicitAssociationsTestUtility {
         final Collection<? extends TableReference> implicitAssociations =
             ERModelUtility.collectImplicitAssociations(table, erModel);
         for (final TableReference implicitAssociation : implicitAssociations) {
-          // out.println("  implicit association: %s".formatted(implicitAssociation.getName()));
+          // out.println(" implicit association:
+          // %s".formatted(implicitAssociation.getName()));
           out.println("  implicit association:");
           for (final ColumnReference colRef : implicitAssociation) {
             out.println("    column reference: %s".formatted(colRef));

@@ -135,7 +135,8 @@ public class PluginCommandPojoTest {
     assertThat(
         pluginCommandOption.toString(),
         is(
-            "PluginCommandOption[name='name', valueClass=schemacrawler.tools.executable.commandline.PluginCommandPojoTest]"));
+            "PluginCommandOption[name='name',"
+                + " valueClass=schemacrawler.tools.executable.commandline.PluginCommandPojoTest]"));
   }
 
   @Test
@@ -155,7 +156,8 @@ public class PluginCommandPojoTest {
     assertThat(
         pluginCommand.toString(),
         is(
-            "PluginCommand[name='name', options=[PluginCommandOption[name='option1', valueClass=java.lang.Object]]]"));
+            "PluginCommand[name='name', options=[PluginCommandOption[name='option1',"
+                + " valueClass=java.lang.Object]]]"));
     assertThat(pluginCommand.getName(), endsWith(":name"));
     assertThat(pluginCommand.getHelpHeader(), is(helpHeader));
     assertThat(pluginCommand.getHelpDescription(), is(not(nullValue())));

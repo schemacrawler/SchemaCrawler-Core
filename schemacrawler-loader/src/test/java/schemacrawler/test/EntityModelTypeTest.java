@@ -20,16 +20,16 @@ import schemacrawler.tools.utility.EntityModelType;
 public class EntityModelTypeTest {
 
   @Test
-  public void returnsUnknownForNullTable() {
-    assertThat(EntityModelType.from(null), is(EntityModelType.unknown));
-  }
-
-  @Test
   public void returnsStrongEntityForTableWithSelfSufficientPrimaryKey() {
     final LightTable table = new LightTable(new SchemaReference("PUBLIC", "BOOKS"), "AUTHORS");
     final LightColumn id = table.addColumn("ID");
     table.setPrimaryKey(new LightPrimaryKey(id));
 
     assertThat(EntityModelType.from(table), is(EntityModelType.strong_entity));
+  }
+
+  @Test
+  public void returnsUnknownForNullTable() {
+    assertThat(EntityModelType.from(null), is(EntityModelType.unknown));
   }
 }

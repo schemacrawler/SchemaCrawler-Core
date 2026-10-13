@@ -57,6 +57,30 @@ public class ImplicitAssociationsAttributesTest {
   private Catalog catalog;
   private ERModel erModel;
 
+  /** Keep in sync with {@link SchemaCrawlerTest#implicitAssociations() LabelName} */
+  @Test
+  public void implicitAssociations(final TestContext testContext) throws Exception {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
+      assertThat("Schema count does not match", schemas, arrayWithSize(5));
+      for (final Schema schema : schemas) {
+        out.println("schema: " + schema.getFullName());
+        final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
+        for (final Table table : tables) {
+          out.println("  table: " + table.getFullName());
+          final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
+          printTableReferences("foreign-key", foreignKeys, out);
+          final Collection<? extends TableReference> implicitAssociations =
+              ERModelUtility.collectImplicitAssociations(table, erModel);
+          printTableReferences("implicit-association", implicitAssociations, out);
+        }
+      }
+    }
+    assertThat(
+        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
+  }
+
   @BeforeAll
   public void loadCatalog(
       final TestContext testContext, final DatabaseConnectionSource connectionSource)
@@ -83,30 +107,6 @@ public class ImplicitAssociationsAttributesTest {
         SchemaCrawlerUtility.getCatalog(
             connectionSource, schemaRetrievalOptions, schemaCrawlerOptions, additionalConfig);
     erModel = SchemaCrawlerUtility.buildERModel(catalog, additionalConfig);
-  }
-
-  /** Keep in sync with {@link SchemaCrawlerTest#implicitAssociations() LabelName} */
-  @Test
-  public void implicitAssociations(final TestContext testContext) throws Exception {
-    final TestWriter testout = new TestWriter();
-    try (final TestWriter out = testout) {
-      final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
-      assertThat("Schema count does not match", schemas, arrayWithSize(5));
-      for (final Schema schema : schemas) {
-        out.println("schema: " + schema.getFullName());
-        final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
-        for (final Table table : tables) {
-          out.println("  table: " + table.getFullName());
-          final Collection<ForeignKey> foreignKeys = table.getForeignKeys();
-          printTableReferences("foreign-key", foreignKeys, out);
-          final Collection<? extends TableReference> implicitAssociations =
-              ERModelUtility.collectImplicitAssociations(table, erModel);
-          printTableReferences("implicit-association", implicitAssociations, out);
-        }
-      }
-    }
-    assertThat(
-        outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
   }
 
   private void printTableReferences(

@@ -133,17 +133,14 @@ public final class Identifiers implements Options, Serializable {
       return false;
     }
 
-    switch (identifierQuotingStrategy) {
-      case quote_none:
-        return false;
-      case quote_all:
-        return true;
-      case quote_if_special_characters:
-        return needsSpecialCharacterQuoting(name);
-      case quote_if_special_characters_and_reserved_words:
-      default:
-        return needsSpecialCharacterQuoting(name) || isReservedWord(name);
-    }
+    return switch (identifierQuotingStrategy) {
+      case quote_none -> false;
+      case quote_all -> true;
+      case quote_if_special_characters -> needsSpecialCharacterQuoting(name);
+      case quote_if_special_characters_and_reserved_words ->
+          needsSpecialCharacterQuoting(name) || isReservedWord(name);
+      default -> needsSpecialCharacterQuoting(name) || isReservedWord(name);
+    };
   }
 
   public String quoteFullName(final DatabaseObject databaseObject) {
@@ -230,10 +227,6 @@ public final class Identifiers implements Options, Serializable {
     return name;
   }
 
-  private boolean needsSpecialCharacterQuoting(final String name) {
-    return !isIdentifier(name) || isMixedCase(name);
-  }
-
   private boolean isMixedCase(final String name) {
 
     if (!quoteMixedCaseIdentifiers || isBlank(name)) {
@@ -258,6 +251,10 @@ public final class Identifiers implements Options, Serializable {
     }
 
     return false;
+  }
+
+  private boolean needsSpecialCharacterQuoting(final String name) {
+    return !isIdentifier(name) || isMixedCase(name);
   }
 
   private void quoteFullName(final StringBuilder buffer, final DatabaseObject databaseObject) {

@@ -24,6 +24,40 @@ import schemacrawler.test.utility.crawl.LightTable;
 
 class RelatedTableFilterTest {
 
+  private static final class PartialRelatedTable extends RelatedTable
+      implements PartialDatabaseObject {
+
+    /** */
+    private static final long serialVersionUID = -6164215244633371493L;
+
+    PartialRelatedTable(final String name) {
+      super(name);
+    }
+  }
+
+  private static class RelatedTable extends LightTable {
+
+    /** */
+    private static final long serialVersionUID = -8482199174214629802L;
+
+    private final Map<TableRelationshipType, List<Table>> relatedTables =
+        new EnumMap<>(TableRelationshipType.class);
+
+    RelatedTable(final String name) {
+      super(new SchemaReference("CATALOG", "PUBLIC"), name);
+    }
+
+    @Override
+    public Collection<Table> getRelatedTables(final TableRelationshipType relationshipType) {
+      return relatedTables.getOrDefault(relationshipType, List.of());
+    }
+
+    void setRelatedTables(
+        final TableRelationshipType relationshipType, final List<Table> relatedTables) {
+      this.relatedTables.put(relationshipType, List.copyOf(relatedTables));
+    }
+  }
+
   @Test
   void expandsIndependentlyWithinBaselineAndSkipsPartialTables() {
     final RelatedTable seed = new RelatedTable("seed");
@@ -45,33 +79,5 @@ class RelatedTableFilterTest {
     final List<Table> selected = eligibleTables.stream().filter(relatedTableFilter).toList();
 
     assertThat(selected, containsInAnyOrder(seed, parent, grandparent, child));
-  }
-
-  private static class RelatedTable extends LightTable {
-
-    private final Map<TableRelationshipType, List<Table>> relatedTables =
-        new EnumMap<>(TableRelationshipType.class);
-
-    RelatedTable(final String name) {
-      super(new SchemaReference("CATALOG", "PUBLIC"), name);
-    }
-
-    @Override
-    public Collection<Table> getRelatedTables(final TableRelationshipType relationshipType) {
-      return relatedTables.getOrDefault(relationshipType, List.of());
-    }
-
-    void setRelatedTables(
-        final TableRelationshipType relationshipType, final List<Table> relatedTables) {
-      this.relatedTables.put(relationshipType, List.copyOf(relatedTables));
-    }
-  }
-
-  private static final class PartialRelatedTable extends RelatedTable
-      implements PartialDatabaseObject {
-
-    PartialRelatedTable(final String name) {
-      super(name);
-    }
   }
 }

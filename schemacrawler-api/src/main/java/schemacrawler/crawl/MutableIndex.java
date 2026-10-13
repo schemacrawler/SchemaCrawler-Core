@@ -54,12 +54,10 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
    * the indexes by the names of the columns in the index.
    */
   @Override
-  public final int compareTo(final NamedObject obj) {
-    if (obj == null || !(obj instanceof Index)) {
+  public int compareTo(final NamedObject obj) {
+    if (obj == null || !(obj instanceof final Index that)) {
       return -1;
     }
-
-    final Index that = (Index) obj;
 
     int compareTo = 0;
 
@@ -87,52 +85,52 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
 
   /** {@inheritDoc} */
   @Override
-  public final long getCardinality() {
+  public long getCardinality() {
     return cardinality;
   }
 
   /** {@inheritDoc} */
   @Override
-  public final List<IndexColumn> getColumns() {
+  public List<IndexColumn> getColumns() {
     return List.copyOf(columns.values());
   }
 
   /** {@inheritDoc} */
   @Override
-  public final String getDefinition() {
+  public String getDefinition() {
     return definition;
   }
 
   @Override
-  public final String getFilterCondition() {
+  public String getFilterCondition() {
     return filterCondition;
   }
 
   /** {@inheritDoc} */
   @Override
-  public final IndexType getIndexType() {
+  public IndexType getIndexType() {
     return indexType;
   }
 
   /** {@inheritDoc} */
   @Override
-  public final long getPages() {
+  public long getPages() {
     return pages;
   }
 
   /** {@inheritDoc} */
   @Override
-  public final IndexType getType() {
+  public IndexType getType() {
     return getIndexType();
   }
 
   @Override
-  public final boolean hasDefinition() {
+  public boolean hasDefinition() {
     return !isBlank(definition);
   }
 
   @Override
-  public final boolean hasFilterCondition() {
+  public boolean hasFilterCondition() {
     return !isBlank(filterCondition);
   }
 
@@ -143,47 +141,47 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
   }
 
   @Override
-  public final Iterator<IndexColumn> iterator() {
+  public Iterator<IndexColumn> iterator() {
     return getColumns().iterator();
   }
 
   /** {@inheritDoc} */
   @Override
-  public final Optional<MutableIndexColumn> lookupColumn(final String name) {
+  public Optional<MutableIndexColumn> lookupColumn(final String name) {
     // NOTE: Index columns are still table columns, so they need to be
     // looked up with a table lookup key
     return columns.lookup(getParent(), name);
   }
 
-  final void addColumn(final MutableIndexColumn column) {
+  void addColumn(final MutableIndexColumn column) {
     columns.add(column);
   }
 
-  final void setCardinality(final long cardinality) {
+  void setCardinality(final long cardinality) {
     this.cardinality = cardinality;
   }
 
-  final void setDefinition(final String definition) {
+  void setDefinition(final String definition) {
     if (!hasDefinition() && !isBlank(definition)) {
       this.definition = definition;
     }
   }
 
-  final void setFilterCondition(final String filterCondition) {
+  void setFilterCondition(final String filterCondition) {
     if (!hasFilterCondition() && !isBlank(filterCondition)) {
       this.filterCondition = filterCondition;
     }
   }
 
-  final void setIndexType(final IndexType indexType) {
+  void setIndexType(final IndexType indexType) {
     this.indexType = requireNonNull(indexType, "Null index type");
   }
 
-  final void setPages(final long pages) {
+  void setPages(final long pages) {
     this.pages = pages;
   }
 
-  final void setUnique(final boolean unique) {
+  void setUnique(final boolean unique) {
     isUnique = unique;
   }
 }

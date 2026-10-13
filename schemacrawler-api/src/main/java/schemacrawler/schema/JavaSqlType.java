@@ -78,10 +78,7 @@ public final class JavaSqlType implements SQLType, Serializable, Comparable<Java
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if ((obj == null) || (getClass() != obj.getClass())) {
       return false;
     }
     final JavaSqlType other = (JavaSqlType) obj;
@@ -111,9 +108,8 @@ public final class JavaSqlType implements SQLType, Serializable, Comparable<Java
     final Integer vendorTypeNumber = sqlType.getVendorTypeNumber();
     if (vendorTypeNumber != null) {
       return vendorTypeNumber;
-    } else {
-      return Integer.MIN_VALUE;
     }
+    return Integer.MIN_VALUE;
   }
 
   @Override

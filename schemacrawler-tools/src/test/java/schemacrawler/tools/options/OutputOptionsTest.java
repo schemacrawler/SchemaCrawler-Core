@@ -25,17 +25,6 @@ import us.fatehi.utility.ioresource.ConsoleOutputResource;
 public class OutputOptionsTest {
 
   @Test
-  public void testOutputOptionsBuilderDefault() {
-    final OutputOptions options = OutputOptionsBuilder.newOutputOptions();
-
-    assertAll(
-        () -> assertThat(options.getInputCharset(), is(StandardCharsets.UTF_8)),
-        () -> assertThat(options.getOutputCharset(), is(StandardCharsets.UTF_8)),
-        () -> assertThat(options.getOutputFormatValue(), is("text")),
-        () -> assertThat(options.getOutputResource(), is(notNullValue())));
-  }
-
-  @Test
   public void testOutputOptionsBuilder() {
     final OutputOptions options =
         OutputOptionsBuilder.builder()
@@ -51,16 +40,80 @@ public class OutputOptionsTest {
   }
 
   @Test
-  public void testOutputOptionsBuilderWithStrings() {
+  public void testOutputOptionsBuilderDefault() {
+    final OutputOptions options = OutputOptionsBuilder.newOutputOptions();
+
+    assertAll(
+        () -> assertThat(options.getInputCharset(), is(StandardCharsets.UTF_8)),
+        () -> assertThat(options.getOutputCharset(), is(StandardCharsets.UTF_8)),
+        () -> assertThat(options.getOutputFormatValue(), is("text")),
+        () -> assertThat(options.getOutputResource(), is(notNullValue())));
+  }
+
+  @Test
+  public void testOutputOptionsBuilderFromOptions() {
+    final OutputOptions original =
+        OutputOptionsBuilder.builder()
+            .withOutputFormatValue("csv")
+            .withInputEncoding(StandardCharsets.UTF_16)
+            .toOptions();
+
+    final OutputOptions options = OutputOptionsBuilder.builder(original).toOptions();
+
+    assertAll(
+        () -> assertThat(options.getOutputFormatValue(), is("csv")),
+        () -> assertThat(options.getInputCharset(), is(StandardCharsets.UTF_16)));
+  }
+
+  @Test
+  public void testOutputOptionsBuilderInvalid() {
+    assertAll(
+        () ->
+            assertThrows(
+                NullPointerException.class,
+                () -> OutputOptionsBuilder.builder().withOutputFile(null)),
+        () ->
+            assertThrows(
+                NullPointerException.class,
+                () -> OutputOptionsBuilder.builder().withOutputFormat(null)),
+        () ->
+            assertThrows(
+                NullPointerException.class,
+                () -> OutputOptionsBuilder.builder().withOutputWriter(null)));
+  }
+
+  @Test
+  public void testOutputOptionsBuilderNewOutputOptions() {
+    final OutputFormat format = new OutputFormatState("xml", "XML");
+    final Path path = Path.of("output.xml");
+    final OutputOptions options = OutputOptionsBuilder.newOutputOptions(format, path);
+
+    assertAll(
+        () -> assertThat(options.getOutputFormatValue(), is("xml")),
+        () -> assertThat(options.getOutputFile("xml").getFileName(), is(path.getFileName())));
+  }
+
+  @Test
+  public void testOutputOptionsBuilderNulls() {
     final OutputOptions options =
         OutputOptionsBuilder.builder()
-            .withInputEncoding("UTF-8")
-            .withOutputEncoding("UTF-16")
+            .withInputEncoding((String) null)
+            .withOutputEncoding((String) null)
             .toOptions();
 
     assertAll(
         () -> assertThat(options.getInputCharset(), is(StandardCharsets.UTF_8)),
         () -> assertThat(options.getOutputCharset(), is(StandardCharsets.UTF_8)));
+  }
+
+  @Test
+  public void testOutputOptionsBuilderWithConsoleOutput() {
+    final OutputOptions options = OutputOptionsBuilder.builder().withConsoleOutput().toOptions();
+    assertThat(options.getOutputResource() instanceof ConsoleOutputResource, is(true));
+
+    final Path outputFile = options.getOutputFile("txt");
+    assertThat(outputFile.getFileName().toString(), containsString("schemacrawler-"));
+    assertThat(outputFile.getFileName().toString(), containsString(".txt"));
   }
 
   @Test
@@ -96,21 +149,6 @@ public class OutputOptionsTest {
   }
 
   @Test
-  public void testOutputOptionsBuilderFromOptions() {
-    final OutputOptions original =
-        OutputOptionsBuilder.builder()
-            .withOutputFormatValue("csv")
-            .withInputEncoding(StandardCharsets.UTF_16)
-            .toOptions();
-
-    final OutputOptions options = OutputOptionsBuilder.builder(original).toOptions();
-
-    assertAll(
-        () -> assertThat(options.getOutputFormatValue(), is("csv")),
-        () -> assertThat(options.getInputCharset(), is(StandardCharsets.UTF_16)));
-  }
-
-  @Test
   public void testOutputOptionsBuilderWithOutputWriter() {
     final StringWriter stringWriter = new StringWriter();
     final OutputOptions options =
@@ -123,53 +161,15 @@ public class OutputOptionsTest {
   }
 
   @Test
-  public void testOutputOptionsBuilderNulls() {
+  public void testOutputOptionsBuilderWithStrings() {
     final OutputOptions options =
         OutputOptionsBuilder.builder()
-            .withInputEncoding((String) null)
-            .withOutputEncoding((String) null)
+            .withInputEncoding("UTF-8")
+            .withOutputEncoding("UTF-16")
             .toOptions();
 
     assertAll(
         () -> assertThat(options.getInputCharset(), is(StandardCharsets.UTF_8)),
         () -> assertThat(options.getOutputCharset(), is(StandardCharsets.UTF_8)));
-  }
-
-  @Test
-  public void testOutputOptionsBuilderWithConsoleOutput() {
-    final OutputOptions options = OutputOptionsBuilder.builder().withConsoleOutput().toOptions();
-    assertThat(options.getOutputResource() instanceof ConsoleOutputResource, is(true));
-
-    final Path outputFile = options.getOutputFile("txt");
-    assertThat(outputFile.getFileName().toString(), containsString("schemacrawler-"));
-    assertThat(outputFile.getFileName().toString(), containsString(".txt"));
-  }
-
-  @Test
-  public void testOutputOptionsBuilderNewOutputOptions() {
-    final OutputFormat format = new OutputFormatState("xml", "XML");
-    final Path path = Path.of("output.xml");
-    final OutputOptions options = OutputOptionsBuilder.newOutputOptions(format, path);
-
-    assertAll(
-        () -> assertThat(options.getOutputFormatValue(), is("xml")),
-        () -> assertThat(options.getOutputFile("xml").getFileName(), is(path.getFileName())));
-  }
-
-  @Test
-  public void testOutputOptionsBuilderInvalid() {
-    assertAll(
-        () ->
-            assertThrows(
-                NullPointerException.class,
-                () -> OutputOptionsBuilder.builder().withOutputFile(null)),
-        () ->
-            assertThrows(
-                NullPointerException.class,
-                () -> OutputOptionsBuilder.builder().withOutputFormat(null)),
-        () ->
-            assertThrows(
-                NullPointerException.class,
-                () -> OutputOptionsBuilder.builder().withOutputWriter(null)));
   }
 }

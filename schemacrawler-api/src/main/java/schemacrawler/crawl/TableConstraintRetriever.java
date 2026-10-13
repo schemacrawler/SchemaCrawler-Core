@@ -112,21 +112,25 @@ final class TableConstraintRetriever extends AbstractRetriever {
     final Query checkConstraintSql = informationSchemaViews.getQuery(CHECK_CONSTRAINTS);
 
     switch (getRetrieverConnection().get(tableCheckConstraintsRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving check constraint definitions, using fast data dictionary retrieval"
                 + " over schemas");
         retrieveCheckConstraintsOverSchemas(checkConstraintSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving check constraint definitions, using fast data dictionary retrieval");
         retrieveCheckConstraintsFromDataDictionary(checkConstraintSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(
+            Level.INFO,
+            "Retrieving check constraint definitions, using fast data dictionary retrieval");
+        retrieveCheckConstraintsFromDataDictionary(checkConstraintSql);
+      }
     }
   }
 
@@ -147,21 +151,25 @@ final class TableConstraintRetriever extends AbstractRetriever {
         informationSchemaViews.getQuery(CONSTRAINT_COLUMN_USAGE);
 
     switch (getRetrieverConnection().get(tableConstraintColumnsRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving table constraint columns, using fast data dictionary retrieval"
                 + " over schemas");
         retrieveTableConstraintColumnsOverSchemas(tableConstraintsColumnsSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving table constraint columns, using fast data dictionary retrieval");
         retrieveTableConstraintColumnsFromDataDictionary(tableConstraintsColumnsSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(
+            Level.INFO,
+            "Retrieving table constraint columns, using fast data dictionary retrieval");
+        retrieveTableConstraintColumnsFromDataDictionary(tableConstraintsColumnsSql);
+      }
     }
   }
 
@@ -273,19 +281,22 @@ final class TableConstraintRetriever extends AbstractRetriever {
     final Query tableConstraintsSql = informationSchemaViews.getQuery(TABLE_CONSTRAINTS);
 
     switch (getRetrieverConnection().get(tableConstraintsRetrievalStrategy)) {
-      case data_dictionary_over_schemas:
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving table constraints, using fast data dictionary retrieval" + " over schemas");
         retrieveTableConstraintsOverSchemas(tableConstraintsSql);
-        break;
-
-      case data_dictionary_all:
-      default:
+      }
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO, "Retrieving table constraints, using fast data dictionary retrieval");
         retrieveTableConstraintsFromDataDictionary(tableConstraintsSql);
-        break;
+      }
+      default -> {
+        LOGGER.log(
+            Level.INFO, "Retrieving table constraints, using fast data dictionary retrieval");
+        retrieveTableConstraintsFromDataDictionary(tableConstraintsSql);
+      }
     }
   }
 

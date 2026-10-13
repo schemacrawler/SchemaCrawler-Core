@@ -76,7 +76,7 @@ abstract class AbstractLightDatabaseObject implements DatabaseObject, Serializab
 
   @Override
   public String getFullName() {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append(schema.getFullName());
     if (!buffer.isEmpty()) {
       buffer.append(".");

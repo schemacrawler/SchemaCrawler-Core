@@ -82,7 +82,7 @@ public final class OutputOptionsBuilder
     // Otherwise, assume text output
     if (isBlank(outputFormatValue)) {
       final String fileExtension;
-      if (outputResource instanceof FileOutputResource resource) {
+      if (outputResource instanceof final FileOutputResource resource) {
         fileExtension = getFileExtension(resource.getOutputFile());
       } else {
         fileExtension = null;

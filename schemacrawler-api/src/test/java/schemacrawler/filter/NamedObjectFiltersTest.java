@@ -31,46 +31,12 @@ import schemacrawler.test.utility.crawl.LightTable;
 
 class NamedObjectFiltersTest {
 
-  @Test
-  void testNameRegex() {
-    final LightTable table = new LightTable("sales");
-
-    assertThat(NamedObjectFilters.nameRegex(".*sales").test(table), is(true));
-    assertThat(NamedObjectFilters.nameRegex(".*inventory").test(table), is(false));
-  }
-
-  @Test
-  void testNullNamedObjectIsExcluded() {
-    assertThat(NamedObjectFilters.nameRegex(".*").test(null), is(false));
-    assertThat(NamedObjectFilters.fullNameRegex(".*").test(null), is(false));
-  }
-
-  @Test
-  void testNullRegexThrowsIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () -> NamedObjectFilters.nameRegex(null));
-    assertThrows(IllegalArgumentException.class, () -> NamedObjectFilters.fullNameRegex(null));
-  }
-
-  @Test
-  void testNameRegexMatchesRawNameOnly() {
-    final LightTable table = new LightTable("\"Sales.Table\"");
-
-    // There is no dequoting or lower-casing transform, so a regex must match the raw name,
-    // quote characters and all, to succeed. Matching is still case-insensitive via the
-    // pattern's own compilation flags.
-    assertThat(NamedObjectFilters.nameRegex("\"Sales\\.Table\"").test(table), is(true));
-    assertThat(NamedObjectFilters.nameRegex("\"sales\\.table\"").test(table), is(true));
-    // A regex written for the unquoted, dequoted value no longer matches, since the name is
-    // never dequoted before matching.
-    assertThat(NamedObjectFilters.nameRegex("Sales\\.Table").test(table), is(false));
-  }
-
-  @Test
-  void testFullNameRegexMatchesRawFullNameAndJoinedKey() {
-    final LightTable table = new LightTable("sales");
-
-    assertThat(NamedObjectFilters.fullNameRegex(".*sales").test(table), is(true));
-    assertThat(NamedObjectFilters.fullNameRegex(".*inventory").test(table), is(false));
+  private static Table viewTypeTable(final String name) {
+    final Table table = mock(Table.class);
+    when(table.getName()).thenReturn(name);
+    when(table.getFullName()).thenReturn(name);
+    when(table.getTableType()).thenReturn(new TableType("view"));
+    return table;
   }
 
   @Test
@@ -100,17 +66,52 @@ class NamedObjectFiltersTest {
   void testFullNameRegexAlsoAcceptsQuotedRawRegexIntent() {
     final LightTable table = new LightTable("\"Sales.Table\"");
 
-    // Matched against the raw, still-quoted full name and the joined key parts, both of which
+    // Matched against the raw, still-quoted full name and the joined key parts,
+    // both of which
     // retain the literal quote characters, since no dequoting transform is applied.
     assertThat(NamedObjectFilters.fullNameRegex(".*\"Sales\\.Table\"").test(table), is(true));
     assertThat(NamedObjectFilters.fullNameRegex(".*\".*\\.Table\"").test(table), is(true));
   }
 
   @Test
+  void testFullNameRegexForRoutineExcludesSpecificNameFromJoinedKey() {
+    // A routine's identifier key carries a trailing specific-name-disambiguating
+    // component that
+    // its full name never has. fullNameRegex must derive the joined-key candidate
+    // from the
+    // qualified name (without that trailing component), not the raw key.
+    final Routine procedure = mock(Routine.class);
+    when(procedure.getFullName()).thenReturn("sales_schema.list_sales");
+    when(procedure.key())
+        .thenReturn(new NamedObjectKey("sales_schema", "list_sales", "list_sales_17"));
+
+    assertThat(
+        NamedObjectFilters.fullNameRegex(".*sales_schema\\.list_sales").test(procedure), is(true));
+    // The specific name is never part of the routine's full name, so a regex
+    // requiring it as a
+    // trailing joined-key segment must not match.
+    assertThat(
+        NamedObjectFilters.fullNameRegex(".*sales_schema\\.list_sales\\.list_sales_17")
+            .test(procedure),
+        is(false));
+  }
+
+  @Test
+  void testFullNameRegexMatchesRawFullNameAndJoinedKey() {
+    final LightTable table = new LightTable("sales");
+
+    assertThat(NamedObjectFilters.fullNameRegex(".*sales").test(table), is(true));
+    assertThat(NamedObjectFilters.fullNameRegex(".*inventory").test(table), is(false));
+  }
+
+  @Test
   void testFullNameRegexPreservesLiteralDotsInsideQuotedParts() {
-    // Each part of the schema-qualified name is quoted, and itself contains a literal dot.
-    // The key is built from separately-captured parts (never by concatenating then splitting a
-    // single string), so joining them keeps the literal dots intact as content, and only the
+    // Each part of the schema-qualified name is quoted, and itself contains a
+    // literal dot.
+    // The key is built from separately-captured parts (never by concatenating then
+    // splitting a
+    // single string), so joining them keeps the literal dots intact as content, and
+    // only the
     // join adds a genuine separator.
     final Schema schema = new SchemaReference(null, "\"My.Schema\"");
     final LightTable table = new LightTable(schema, "\"My.Table\"");
@@ -118,6 +119,14 @@ class NamedObjectFiltersTest {
     assertThat(
         NamedObjectFilters.fullNameRegex(".*\"My\\.Schema\"\\.\"My\\.Table\"").test(table),
         is(true));
+  }
+
+  @Test
+  void testNameRegex() {
+    final LightTable table = new LightTable("sales");
+
+    assertThat(NamedObjectFilters.nameRegex(".*sales").test(table), is(true));
+    assertThat(NamedObjectFilters.nameRegex(".*inventory").test(table), is(false));
   }
 
   @Test
@@ -132,56 +141,32 @@ class NamedObjectFiltersTest {
   }
 
   @Test
-  void testFullNameRegexForRoutineExcludesSpecificNameFromJoinedKey() {
-    // A routine's identifier key carries a trailing specific-name-disambiguating component that
-    // its full name never has. fullNameRegex must derive the joined-key candidate from the
-    // qualified name (without that trailing component), not the raw key.
-    final Routine procedure = mock(Routine.class);
-    when(procedure.getFullName()).thenReturn("sales_schema.list_sales");
-    when(procedure.key())
-        .thenReturn(new NamedObjectKey("sales_schema", "list_sales", "list_sales_17"));
+  void testNameRegexMatchesRawNameOnly() {
+    final LightTable table = new LightTable("\"Sales.Table\"");
 
-    assertThat(
-        NamedObjectFilters.fullNameRegex(".*sales_schema\\.list_sales").test(procedure), is(true));
-    // The specific name is never part of the routine's full name, so a regex requiring it as a
-    // trailing joined-key segment must not match.
-    assertThat(
-        NamedObjectFilters.fullNameRegex(".*sales_schema\\.list_sales\\.list_sales_17")
-            .test(procedure),
-        is(false));
+    // There is no dequoting or lower-casing transform, so a regex must match the
+    // raw name,
+    // quote characters and all, to succeed. Matching is still case-insensitive via
+    // the
+    // pattern's own compilation flags.
+    assertThat(NamedObjectFilters.nameRegex("\"Sales\\.Table\"").test(table), is(true));
+    assertThat(NamedObjectFilters.nameRegex("\"sales\\.table\"").test(table), is(true));
+    // A regex written for the unquoted, dequoted value no longer matches, since the
+    // name is
+    // never dequoted before matching.
+    assertThat(NamedObjectFilters.nameRegex("Sales\\.Table").test(table), is(false));
   }
 
   @Test
-  void testTableGrepWithNullOptionsThrowsNullPointerException() {
-    assertThrows(NullPointerException.class, () -> NamedObjectFilters.tableGrep(null));
+  void testNullNamedObjectIsExcluded() {
+    assertThat(NamedObjectFilters.nameRegex(".*").test(null), is(false));
+    assertThat(NamedObjectFilters.fullNameRegex(".*").test(null), is(false));
   }
 
   @Test
-  void testTableGrepIncludesMatchingTableAndExcludesOthers() {
-    final LightTable sales = new LightTable("sales");
-    final LightTable inventory = new LightTable("inventory");
-    final NamedObjectFilter<schemacrawler.schema.Table> filter =
-        NamedObjectFilters.tableGrep(
-            GrepOptionsBuilder.builder()
-                .includeGreppedTables(new RegularExpressionInclusionRule(".*sales.*"))
-                .toOptions());
-
-    assertThat(filter.test(sales), is(true));
-    assertThat(filter.test(inventory), is(false));
-  }
-
-  @Test
-  void testTableGrepWithNoInclusionRulesIncludesEverything() {
-    final LightTable table = new LightTable("sales");
-    final NamedObjectFilter<schemacrawler.schema.Table> filter =
-        NamedObjectFilters.tableGrep(GrepOptionsBuilder.builder().toOptions());
-
-    assertThat(filter.test(table), is(true));
-  }
-
-  @Test
-  void testRoutineGrepWithNullOptionsThrowsNullPointerException() {
-    assertThrows(NullPointerException.class, () -> NamedObjectFilters.routineGrep(null));
+  void testNullRegexThrowsIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () -> NamedObjectFilters.nameRegex(null));
+    assertThrows(IllegalArgumentException.class, () -> NamedObjectFilters.fullNameRegex(null));
   }
 
   @Test
@@ -210,11 +195,8 @@ class NamedObjectFiltersTest {
   }
 
   @Test
-  void testTableTypesFilterByName() {
-    final Table table = viewTypeTable("sales");
-
-    assertThat(NamedObjectFilters.tableTypes(SimpleTableType.view).test(table), is(true));
-    assertThat(NamedObjectFilters.tableTypes(SimpleTableType.table).test(table), is(false));
+  void testRoutineGrepWithNullOptionsThrowsNullPointerException() {
+    assertThrows(NullPointerException.class, () -> NamedObjectFilters.routineGrep(null));
   }
 
   @Test
@@ -234,11 +216,39 @@ class NamedObjectFiltersTest {
     assertThrows(NullPointerException.class, () -> NamedObjectFilters.routineTypes(null));
   }
 
-  private static Table viewTypeTable(final String name) {
-    final Table table = mock(Table.class);
-    when(table.getName()).thenReturn(name);
-    when(table.getFullName()).thenReturn(name);
-    when(table.getTableType()).thenReturn(new TableType("view"));
-    return table;
+  @Test
+  void testTableGrepIncludesMatchingTableAndExcludesOthers() {
+    final LightTable sales = new LightTable("sales");
+    final LightTable inventory = new LightTable("inventory");
+    final NamedObjectFilter<schemacrawler.schema.Table> filter =
+        NamedObjectFilters.tableGrep(
+            GrepOptionsBuilder.builder()
+                .includeGreppedTables(new RegularExpressionInclusionRule(".*sales.*"))
+                .toOptions());
+
+    assertThat(filter.test(sales), is(true));
+    assertThat(filter.test(inventory), is(false));
+  }
+
+  @Test
+  void testTableGrepWithNoInclusionRulesIncludesEverything() {
+    final LightTable table = new LightTable("sales");
+    final NamedObjectFilter<schemacrawler.schema.Table> filter =
+        NamedObjectFilters.tableGrep(GrepOptionsBuilder.builder().toOptions());
+
+    assertThat(filter.test(table), is(true));
+  }
+
+  @Test
+  void testTableGrepWithNullOptionsThrowsNullPointerException() {
+    assertThrows(NullPointerException.class, () -> NamedObjectFilters.tableGrep(null));
+  }
+
+  @Test
+  void testTableTypesFilterByName() {
+    final Table table = viewTypeTable("sales");
+
+    assertThat(NamedObjectFilters.tableTypes(SimpleTableType.view).test(table), is(true));
+    assertThat(NamedObjectFilters.tableTypes(SimpleTableType.table).test(table), is(false));
   }
 }

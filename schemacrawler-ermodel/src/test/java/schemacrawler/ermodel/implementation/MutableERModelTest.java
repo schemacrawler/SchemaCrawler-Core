@@ -114,27 +114,6 @@ public class MutableERModelTest {
   }
 
   @Test
-  public void testTableReferenceLookups() {
-    final MutableERModel model = new MutableERModel();
-
-    final LightTable pkTable = new LightTable("PK_TABLE");
-    final LightTable fkTable = new LightTable("FK_TABLE");
-    final LightForeignKey tableRef = new LightForeignKey("FK_PK", fkTable, pkTable);
-    final MutableTableReferenceRelationship rel = new MutableTableReferenceRelationship(tableRef);
-
-    model.addRelationship(rel);
-
-    assertThat(model.lookupRelationship(tableRef).isPresent(), is(true));
-    assertThat(model.lookupRelationship(tableRef).get(), is(rel));
-    assertThat(model.lookupRelationship("FK_PK").isPresent(), is(true));
-    assertThat(model.lookupRelationship("FK_PK").get(), is(rel));
-
-    assertThat(model.lookupRelationship((String) null).isPresent(), is(false));
-    assertThat(model.lookupRelationship((TableReference) null).isPresent(), is(false));
-    assertThat(model.lookupRelationship("NONEXISTENT").isPresent(), is(false));
-  }
-
-  @Test
   public void testMutableTableReferenceRelationship() {
     final LightTable pkTable = new LightTable("PK_TABLE");
     pkTable.addColumn("ID");
@@ -158,6 +137,27 @@ public class MutableERModelTest {
     final LightTable otherTable = new LightTable("OTHER");
     final MutableEntity otherEntity = new MutableEntity(otherTable, weak_entity);
     assertThrows(ExecutionRuntimeException.class, () -> rel.setEntities(otherEntity, otherEntity));
+  }
+
+  @Test
+  public void testTableReferenceLookups() {
+    final MutableERModel model = new MutableERModel();
+
+    final LightTable pkTable = new LightTable("PK_TABLE");
+    final LightTable fkTable = new LightTable("FK_TABLE");
+    final LightForeignKey tableRef = new LightForeignKey("FK_PK", fkTable, pkTable);
+    final MutableTableReferenceRelationship rel = new MutableTableReferenceRelationship(tableRef);
+
+    model.addRelationship(rel);
+
+    assertThat(model.lookupRelationship(tableRef).isPresent(), is(true));
+    assertThat(model.lookupRelationship(tableRef).get(), is(rel));
+    assertThat(model.lookupRelationship("FK_PK").isPresent(), is(true));
+    assertThat(model.lookupRelationship("FK_PK").get(), is(rel));
+
+    assertThat(model.lookupRelationship((String) null).isPresent(), is(false));
+    assertThat(model.lookupRelationship((TableReference) null).isPresent(), is(false));
+    assertThat(model.lookupRelationship("NONEXISTENT").isPresent(), is(false));
   }
 
   @Test

@@ -75,6 +75,19 @@ class TableGrepFilterTest {
   }
 
   @Test
+  void testTableGrepFilterWithColumnRemarksInclusionRule() {
+    final InclusionRule grepDefinitionInclusionRule =
+        new RegularExpressionInclusionRule("test_column_remarks");
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder()
+            .includeGreppedDefinitions(grepDefinitionInclusionRule)
+            .toOptions();
+    final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
+
+    assertThat(tableGrepFilter.test(table), is(true));
+  }
+
+  @Test
   void testTableGrepFilterWithDefinitionInclusionRule() {
     final InclusionRule grepDefinitionInclusionRule =
         new RegularExpressionInclusionRule("test_definition");
@@ -88,20 +101,6 @@ class TableGrepFilterTest {
   }
 
   @Test
-  void testTableGrepFilterWithMultilineDefinitionInclusionRule() {
-    final LightTable multilineTable = new LightTable("test_table");
-    multilineTable.setDefinition("first line\nsecond line");
-
-    final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder()
-            .includeGreppedDefinitions(new RegularExpressionInclusionRule(".*first.*second.*"))
-            .toOptions();
-    final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
-
-    assertThat(tableGrepFilter.test(multilineTable), is(true));
-  }
-
-  @Test
   void testTableGrepFilterWithInclusionRule() {
     final InclusionRule grepTableInclusionRule = new RegularExpressionInclusionRule("test_table");
     final GrepOptions grepOptions =
@@ -109,39 +108,6 @@ class TableGrepFilterTest {
     final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
 
     assertThat(tableGrepFilter.test(table), is(true));
-  }
-
-  @Test
-  void testTableGrepFilterWithQuotedAndUnquotedFullNamePatterns() {
-    final NamedObjectKey key = new NamedObjectKey("books", "Celebrity Updates");
-    final Table table = mock(Table.class);
-    when(table.getFullName()).thenReturn("books.\"Celebrity Updates\"");
-    when(table.key()).thenReturn(key);
-
-    assertThat(
-        new TableGrepFilter(
-                GrepOptionsBuilder.builder()
-                    .includeGreppedTables(
-                        new RegularExpressionInclusionRule(".*\\\"Celebrity Updates\\\"$"))
-                    .toOptions())
-            .test(table),
-        is(true));
-    assertThat(
-        new TableGrepFilter(
-                GrepOptionsBuilder.builder()
-                    .includeGreppedTables(
-                        new RegularExpressionInclusionRule(".*Celebrity Updates$"))
-                    .toOptions())
-            .test(table),
-        is(true));
-    assertThat(
-        new TableGrepFilter(
-                GrepOptionsBuilder.builder()
-                    .includeGreppedTables(
-                        new RegularExpressionInclusionRule(".*celebrity updates$"))
-                    .toOptions())
-            .test(table),
-        is(false));
   }
 
   @Test
@@ -176,6 +142,20 @@ class TableGrepFilterTest {
     final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
 
     assertThat(tableGrepFilter.test(table), is(true));
+  }
+
+  @Test
+  void testTableGrepFilterWithMultilineDefinitionInclusionRule() {
+    final LightTable multilineTable = new LightTable("test_table");
+    multilineTable.setDefinition("first line\nsecond line");
+
+    final GrepOptions grepOptions =
+        GrepOptionsBuilder.builder()
+            .includeGreppedDefinitions(new RegularExpressionInclusionRule(".*first.*second.*"))
+            .toOptions();
+    final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
+
+    assertThat(tableGrepFilter.test(multilineTable), is(true));
   }
 
   @Test
@@ -225,22 +205,42 @@ class TableGrepFilterTest {
   }
 
   @Test
-  void testTableGrepFilterWithRemarksInclusionRule() {
-    final InclusionRule grepDefinitionInclusionRule =
-        new RegularExpressionInclusionRule("test_remarks");
-    final GrepOptions grepOptions =
-        GrepOptionsBuilder.builder()
-            .includeGreppedDefinitions(grepDefinitionInclusionRule)
-            .toOptions();
-    final TableGrepFilter tableGrepFilter = new TableGrepFilter(grepOptions);
+  void testTableGrepFilterWithQuotedAndUnquotedFullNamePatterns() {
+    final NamedObjectKey key = new NamedObjectKey("books", "Celebrity Updates");
+    final Table table = mock(Table.class);
+    when(table.getFullName()).thenReturn("books.\"Celebrity Updates\"");
+    when(table.key()).thenReturn(key);
 
-    assertThat(tableGrepFilter.test(table), is(true));
+    assertThat(
+        new TableGrepFilter(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedTables(
+                        new RegularExpressionInclusionRule(".*\\\"Celebrity Updates\\\"$"))
+                    .toOptions())
+            .test(table),
+        is(true));
+    assertThat(
+        new TableGrepFilter(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedTables(
+                        new RegularExpressionInclusionRule(".*Celebrity Updates$"))
+                    .toOptions())
+            .test(table),
+        is(true));
+    assertThat(
+        new TableGrepFilter(
+                GrepOptionsBuilder.builder()
+                    .includeGreppedTables(
+                        new RegularExpressionInclusionRule(".*celebrity updates$"))
+                    .toOptions())
+            .test(table),
+        is(false));
   }
 
   @Test
-  void testTableGrepFilterWithColumnRemarksInclusionRule() {
+  void testTableGrepFilterWithRemarksInclusionRule() {
     final InclusionRule grepDefinitionInclusionRule =
-        new RegularExpressionInclusionRule("test_column_remarks");
+        new RegularExpressionInclusionRule("test_remarks");
     final GrepOptions grepOptions =
         GrepOptionsBuilder.builder()
             .includeGreppedDefinitions(grepDefinitionInclusionRule)

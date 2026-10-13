@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import schemacrawler.ermodel.model.EntityAttribute;
 import schemacrawler.ermodel.model.TableBacked;
+import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 
 abstract class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
@@ -34,7 +35,7 @@ abstract class AbstractTableBacked extends AbstractDatabaseObjectBacked<Table>
       entityAttributes =
           table.getColumns().stream()
               .filter(column -> !isPartial(column))
-              .filter(column -> column.isAttribute())
+              .filter(Column::isAttribute)
               .map(column -> new MutableEntityAttribute(this, column))
               .collect(Collectors.toList());
     }

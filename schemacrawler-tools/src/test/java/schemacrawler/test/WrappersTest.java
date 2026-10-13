@@ -28,15 +28,6 @@ public class WrappersTest {
 
   private Connection connection;
 
-  @BeforeEach
-  public void createTempFile() throws IOException {
-    final Path offlineDatabasePath =
-        Files.createTempFile(WrappersTest.class.getCanonicalName() + ".", ".ser");
-    Files.write(offlineDatabasePath, "some offline database metadata ...".getBytes());
-
-    connection = OfflineConnectionUtility.newOfflineConnection(offlineDatabasePath);
-  }
-
   @Test
   public void createStatement() {
 
@@ -52,6 +43,15 @@ public class WrappersTest {
         InvocationTargetException.class,
         () -> invokeMethod(connection, "createStatement", 0, 0, 0),
         "Testing connection method, createStatement");
+  }
+
+  @BeforeEach
+  public void createTempFile() throws IOException {
+    final Path offlineDatabasePath =
+        Files.createTempFile(WrappersTest.class.getCanonicalName() + ".", ".ser");
+    Files.write(offlineDatabasePath, "some offline database metadata ...".getBytes());
+
+    connection = OfflineConnectionUtility.newOfflineConnection(offlineDatabasePath);
   }
 
   @Test

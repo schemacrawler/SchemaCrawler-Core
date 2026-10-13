@@ -22,6 +22,8 @@ import schemacrawler.schema.Table;
 
 public class AbstractExecutionStateTest {
 
+  private static final class TestExecutionState extends AbstractExecutionState {}
+
   @Test
   public void tableVisibilityPredicateTracksCatalogReplacement() {
     final TestExecutionState state = new TestExecutionState();
@@ -53,6 +55,4 @@ public class AbstractExecutionStateTest {
     when(table.key()).thenReturn(new NamedObjectKey(name));
     return table;
   }
-
-  private static final class TestExecutionState extends AbstractExecutionState {}
 }

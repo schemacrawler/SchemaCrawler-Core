@@ -49,7 +49,7 @@ abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> i
 
     int comparison = 0;
 
-    if (obj instanceof AbstractKeyColumn other) {
+    if (obj instanceof final AbstractKeyColumn other) {
       comparison = keyOrdinalPosition - other.keyOrdinalPosition;
     }
 
@@ -189,7 +189,7 @@ abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> i
   }
 
   void setGenerated(final boolean isGenerated) {
-    if (column instanceof MutableColumn mutableColumn) {
+    if (column instanceof final MutableColumn mutableColumn) {
       mutableColumn.setGenerated(isGenerated);
     }
   }

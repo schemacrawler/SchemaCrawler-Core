@@ -62,29 +62,32 @@ public class TableExtRetrieverTest {
     final EnumDataTypeHelper enumDataTypeHelper =
         (column, columnDataType, databaseConnection) -> {
           final String columnDataTypeName = columnDataType.getName();
-          switch (columnDataTypeName) {
-            case "NAME_TYPE":
+          return switch (columnDataTypeName) {
+            case "NAME_TYPE" -> {
               final EnumDataTypeInfo enumDataTypeType =
                   new EnumDataTypeInfo(
                       EnumDataTypeTypes.enumerated_data_type, List.of("Moe", "Larry", "Curly"));
               assertThat(
                   enumDataTypeType.toString(),
                   is("EnumDataTypeInfo [enumerated_data_type, [Moe, Larry, Curly]]"));
-              return enumDataTypeType;
-            case "AGE_TYPE":
+              yield enumDataTypeType;
+            }
+            case "AGE_TYPE" -> {
               final EnumDataTypeInfo enumColumnType =
                   new EnumDataTypeInfo(
                       EnumDataTypeTypes.enumerated_column, List.of("1", "16", "29"));
               assertThat(
                   enumColumnType.toString(),
                   is("EnumDataTypeInfo [enumerated_column, [1, 16, 29]]"));
-              return enumColumnType;
-            default:
+              yield enumColumnType;
+            }
+            default -> {
               assertThat(
                   EnumDataTypeInfo.EMPTY_ENUM_DATA_TYPE_INFO.toString(),
                   is("EnumDataTypeInfo [not_enumerated, []]"));
-              return EnumDataTypeInfo.EMPTY_ENUM_DATA_TYPE_INFO;
-          }
+              yield EnumDataTypeInfo.EMPTY_ENUM_DATA_TYPE_INFO;
+            }
+          };
         };
     final SchemaRetrievalOptionsBuilder schemaRetrievalOptionsBuilder =
         SchemaRetrievalOptionsBuilder.builder();

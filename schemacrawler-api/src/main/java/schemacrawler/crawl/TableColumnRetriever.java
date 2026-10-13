@@ -69,26 +69,21 @@ final class TableColumnRetriever extends AbstractRetriever {
     final Set<NamedObjectKey> hiddenTableColumnsLookupKeys = retrieveHiddenTableColumnsLookupKeys();
 
     switch (getRetrieverConnection().get(tableColumnsRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(Level.INFO, "Retrieving table columns, using fast data dictionary retrieval");
         retrieveTableColumnsFromDataDictionary(
             allTables, columnFilter, hiddenTableColumnsLookupKeys);
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving table columns");
         retrieveTableColumnsFromMetadata(allTables, columnFilter, hiddenTableColumnsLookupKeys);
-        break;
-
-      case metadata_over_schemas:
+      }
+      case metadata_over_schemas -> {
         LOGGER.log(Level.INFO, "Retrieving table columns over schemas");
         retrieveTableColumnsFromMetadataOverSchemas(
             allTables, columnFilter, hiddenTableColumnsLookupKeys);
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving table columns");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving table columns");
     }
   }
 

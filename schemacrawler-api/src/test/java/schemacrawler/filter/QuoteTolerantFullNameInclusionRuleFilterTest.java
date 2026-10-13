@@ -21,24 +21,15 @@ import schemacrawler.schema.Table;
 
 class QuoteTolerantFullNameInclusionRuleFilterTest {
 
-  @Test
-  void testUnquotedPatternMatchesQuotedFullNameViaJoinedKey() {
-    final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
-    final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
-        new QuoteTolerantFullNameInclusionRuleFilter<>(
-            new RegularExpressionRule(".*Celebrity Updates$", null));
-
-    assertThat(filter.test(table), is(true));
-  }
-
-  @Test
-  void testPatternDifferingOnlyInCaseDoesNotMatch() {
-    final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
-    final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
-        new QuoteTolerantFullNameInclusionRuleFilter<>(
-            new RegularExpressionRule(".*celebrity updates$", null));
-
-    assertThat(filter.test(table), is(false));
+  private static Table table(
+      final String schemaName,
+      final String fullNameSuffix,
+      final String schemaKeyPart,
+      final String nameKeyPart) {
+    final Table table = mock(Table.class);
+    when(table.getFullName()).thenReturn(schemaName + "." + fullNameSuffix);
+    when(table.key()).thenReturn(new NamedObjectKey(schemaKeyPart, nameKeyPart));
+    return table;
   }
 
   @Test
@@ -52,11 +43,22 @@ class QuoteTolerantFullNameInclusionRuleFilterTest {
   }
 
   @Test
-  void testUnquotedExclusionAlsoWins() {
+  void testNullNamedObjectAndFullNameAreExcluded() {
+    final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
+        new QuoteTolerantFullNameInclusionRuleFilter<>(new RegularExpressionRule(".*", null));
+    final Table table = mock(Table.class);
+    when(table.getFullName()).thenReturn(null);
+
+    assertThat(filter.test(null), is(false));
+    assertThat(filter.test(table), is(false));
+  }
+
+  @Test
+  void testPatternDifferingOnlyInCaseDoesNotMatch() {
     final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
     final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
         new QuoteTolerantFullNameInclusionRuleFilter<>(
-            new RegularExpressionRule(".*Celebrity Updates$", ".*Celebrity Updates$"));
+            new RegularExpressionRule(".*celebrity updates$", null));
 
     assertThat(filter.test(table), is(false));
   }
@@ -75,24 +77,22 @@ class QuoteTolerantFullNameInclusionRuleFilterTest {
   }
 
   @Test
-  void testNullNamedObjectAndFullNameAreExcluded() {
+  void testUnquotedExclusionAlsoWins() {
+    final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
     final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
-        new QuoteTolerantFullNameInclusionRuleFilter<>(new RegularExpressionRule(".*", null));
-    final Table table = mock(Table.class);
-    when(table.getFullName()).thenReturn(null);
+        new QuoteTolerantFullNameInclusionRuleFilter<>(
+            new RegularExpressionRule(".*Celebrity Updates$", ".*Celebrity Updates$"));
 
-    assertThat(filter.test(null), is(false));
     assertThat(filter.test(table), is(false));
   }
 
-  private static Table table(
-      final String schemaName,
-      final String fullNameSuffix,
-      final String schemaKeyPart,
-      final String nameKeyPart) {
-    final Table table = mock(Table.class);
-    when(table.getFullName()).thenReturn(schemaName + "." + fullNameSuffix);
-    when(table.key()).thenReturn(new NamedObjectKey(schemaKeyPart, nameKeyPart));
-    return table;
+  @Test
+  void testUnquotedPatternMatchesQuotedFullNameViaJoinedKey() {
+    final Table table = table("books", "\"Celebrity Updates\"", "books", "Celebrity Updates");
+    final QuoteTolerantFullNameInclusionRuleFilter<Table> filter =
+        new QuoteTolerantFullNameInclusionRuleFilter<>(
+            new RegularExpressionRule(".*Celebrity Updates$", null));
+
+    assertThat(filter.test(table), is(true));
   }
 }

@@ -109,8 +109,10 @@ public class PartialsTest {
     assertThat(functionPartial.getRoutineType(), is(RoutineType.function));
     assertThat(functionPartial.getRoutineType(), is(functionPartial.getType()));
 
-    // The partial's key has the same 4-part shape as a real routine's key (catalog, schema,
-    // name, specific-name-or-null), even though it never has a real specific name; joining still
+    // The partial's key has the same 4-part shape as a real routine's key (catalog,
+    // schema,
+    // name, specific-name-or-null), even though it never has a real specific name;
+    // joining still
     // produces the plain 3-part qualified name.
     assertThat(functionPartial.key().join(), is("catalog.schema.function"));
     assertThat(functionPartial.key().toString(), is("{\"key\": \"catalog/schema/function/null\"}"));

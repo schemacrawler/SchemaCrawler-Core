@@ -21,7 +21,7 @@ public class NamedObjectKeyTest {
 
     assertTrue(key1 instanceof Comparable, "NamedObjectKey should implement Comparable");
 
-    List<NamedObjectKey> keys = new ArrayList<>();
+    final List<NamedObjectKey> keys = new ArrayList<>();
     keys.add(key3);
     keys.add(key2);
     keys.add(key4);

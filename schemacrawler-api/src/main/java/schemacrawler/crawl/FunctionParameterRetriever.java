@@ -62,27 +62,22 @@ final class FunctionParameterRetriever extends AbstractRetriever {
     }
 
     switch (getRetrieverConnection().get(functionParametersRetrievalStrategy)) {
-      case data_dictionary_all:
+      case data_dictionary_all -> {
         LOGGER.log(
             Level.INFO, "Retrieving function parameters, using fast data dictionary retrieval");
         retrieveFunctionParametersFromDataDictionary(allRoutines, parameterFilter);
-        break;
-
-      case data_dictionary_over_schemas:
+      }
+      case data_dictionary_over_schemas -> {
         LOGGER.log(
             Level.INFO,
             "Retrieving function parameters, using fast data dictionary retrieval over schemas");
         retrieveFunctionParametersOverSchemas(allRoutines, parameterFilter);
-        break;
-
-      case metadata:
+      }
+      case metadata -> {
         LOGGER.log(Level.INFO, "Retrieving function parameters");
         retrieveFunctionParametersFromMetadata(allRoutines, parameterFilter);
-        break;
-
-      default:
-        LOGGER.log(Level.INFO, "Not retrieving function parameters");
-        break;
+      }
+      default -> LOGGER.log(Level.INFO, "Not retrieving function parameters");
     }
   }
 
@@ -156,20 +151,14 @@ final class FunctionParameterRetriever extends AbstractRetriever {
   }
 
   private ParameterModeType getFunctionParameterMode(final int columnType) {
-    switch (columnType) {
-      case DatabaseMetaData.functionColumnIn:
-        return ParameterModeType.in;
-      case DatabaseMetaData.functionColumnInOut:
-        return ParameterModeType.inOut;
-      case DatabaseMetaData.functionColumnOut:
-        return ParameterModeType.out;
-      case DatabaseMetaData.functionColumnResult:
-        return ParameterModeType.result;
-      case DatabaseMetaData.functionReturn:
-        return ParameterModeType.returnValue;
-      default:
-        return ParameterModeType.unknown;
-    }
+    return switch (columnType) {
+      case DatabaseMetaData.functionColumnIn -> ParameterModeType.in;
+      case DatabaseMetaData.functionColumnInOut -> ParameterModeType.inOut;
+      case DatabaseMetaData.functionColumnOut -> ParameterModeType.out;
+      case DatabaseMetaData.functionColumnResult -> ParameterModeType.result;
+      case DatabaseMetaData.functionReturn -> ParameterModeType.returnValue;
+      default -> ParameterModeType.unknown;
+    };
   }
 
   private MutableFunctionParameter lookupOrCreateFunctionParameter(

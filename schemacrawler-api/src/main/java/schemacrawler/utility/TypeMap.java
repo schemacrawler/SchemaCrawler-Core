@@ -105,7 +105,8 @@ public final class TypeMap implements Map<String, Class<?>> {
         LOGGER.log(Level.CONFIG, "No type map available from database connection");
       }
     } catch (final Exception e) {
-      // Catch all exceptions, since even though most JDBC drivers would throw SQLException, but
+      // Catch all exceptions, since even though most JDBC drivers would throw
+      // SQLException, but
       // the Sybase Adaptive Server driver throws UnimplementedOperationException
       LOGGER.log(Level.WARNING, "Could not obtain data type map from connection", e);
     }

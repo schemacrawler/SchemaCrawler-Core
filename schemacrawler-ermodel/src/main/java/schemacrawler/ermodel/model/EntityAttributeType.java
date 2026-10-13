@@ -91,12 +91,6 @@ public enum EntityAttributeType {
     register(timestamp, TIMESTAMP, TIMESTAMP_WITH_TIMEZONE);
   }
 
-  private static void register(final EntityAttributeType type, final int... sqlTypes) {
-    for (final int sqlType : sqlTypes) {
-      TYPE_MAP.put(sqlType, type);
-    }
-  }
-
   public static EntityAttributeType from(final ColumnDataType columnDataType) {
     if (columnDataType == null) {
       return unknown;
@@ -105,5 +99,11 @@ public enum EntityAttributeType {
       return enumerated;
     }
     return TYPE_MAP.getOrDefault(columnDataType.getJavaSqlType().getVendorTypeNumber(), unknown);
+  }
+
+  private static void register(final EntityAttributeType type, final int... sqlTypes) {
+    for (final int sqlType : sqlTypes) {
+      TYPE_MAP.put(sqlType, type);
+    }
   }
 }

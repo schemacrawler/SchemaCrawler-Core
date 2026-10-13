@@ -22,9 +22,16 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 
 public abstract class AbstractExecutionState implements ExecutionState {
 
+  private static Predicate<Table> buildTableVisibilityPredicate(final Catalog catalog) {
+    final Set<NamedObjectKey> visibleTableKeys =
+        catalog.getTables().stream().map(Table::key).collect(toUnmodifiableSet());
+    return table -> table != null && visibleTableKeys.contains(table.key());
+  }
+
   private Catalog catalog;
   private ERModel erModel;
   private DatabaseConnectionSource connectionSource;
+
   private Predicate<Table> tableVisibilityPredicate = table -> false;
 
   @Override
@@ -40,10 +47,6 @@ public abstract class AbstractExecutionState implements ExecutionState {
   @Override
   public final ERModel getERModel() {
     return erModel;
-  }
-
-  protected final Predicate<Table> getTableVisibilityPredicate() {
-    return tableVisibilityPredicate;
   }
 
   @Override
@@ -110,9 +113,7 @@ public abstract class AbstractExecutionState implements ExecutionState {
     connectionSource = null;
   }
 
-  private static Predicate<Table> buildTableVisibilityPredicate(final Catalog catalog) {
-    final Set<NamedObjectKey> visibleTableKeys =
-        catalog.getTables().stream().map(Table::key).collect(toUnmodifiableSet());
-    return table -> table != null && visibleTableKeys.contains(table.key());
+  protected final Predicate<Table> getTableVisibilityPredicate() {
+    return tableVisibilityPredicate;
   }
 }

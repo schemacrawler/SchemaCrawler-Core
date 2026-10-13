@@ -50,10 +50,6 @@ public abstract class AbstractSchemaCrawlerCommandProvider implements SchemaCraw
     return supportsCommand(command);
   }
 
-  protected final boolean supportsCommand(final String command) {
-    return lookupSupportedCommand(command) != null;
-  }
-
   protected final PropertyName lookupSupportedCommand(final String command) {
     if (isBlank(command)) {
       return null;
@@ -64,6 +60,10 @@ public abstract class AbstractSchemaCrawlerCommandProvider implements SchemaCraw
       }
     }
     return null;
+  }
+
+  protected final boolean supportsCommand(final String command) {
+    return lookupSupportedCommand(command) != null;
   }
 
   protected boolean supportsOutputFormat(

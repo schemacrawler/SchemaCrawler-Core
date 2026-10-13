@@ -40,11 +40,11 @@ public final class CatalogAttributes extends ObjectAttributes {
     }
   }
 
-  public List<TableAttributes> getTables() {
-    return tables;
-  }
-
   public List<ImplicitAssociationAttributes> getImplicitAssociations() {
     return implicitAssociations;
+  }
+
+  public List<TableAttributes> getTables() {
+    return tables;
   }
 }

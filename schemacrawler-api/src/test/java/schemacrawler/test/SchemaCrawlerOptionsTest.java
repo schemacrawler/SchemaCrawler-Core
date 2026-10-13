@@ -28,13 +28,6 @@ import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 public class SchemaCrawlerOptionsTest {
 
   @Test
-  public void defaultTitleIsEmpty() {
-    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
-    assertThat(options.title(), is(""));
-    assertThat(options.crawlOptions().title(), is(""));
-  }
-
-  @Test
   public void defaultsExposeDirectOptionsAndDerivedCrawlOptions() {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
@@ -53,10 +46,10 @@ public class SchemaCrawlerOptionsTest {
   }
 
   @Test
-  public void withTitleTrimsValue() {
-    final SchemaCrawlerOptions options =
-        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions().withTitle("  My Title  ");
-    assertThat(options.title(), is("My Title"));
+  public void defaultTitleIsEmpty() {
+    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
+    assertThat(options.title(), is(""));
+    assertThat(options.crawlOptions().title(), is(""));
   }
 
   @Test
@@ -86,5 +79,12 @@ public class SchemaCrawlerOptionsTest {
     assertThat(options.crawlOptions().loadOptions(), is(loadOptions));
     assertThat(options.crawlOptions().limitOptions(), is(limitOptions));
     assertThat(defaults.grepOptions().isGrepInvertMatch(), is(false));
+  }
+
+  @Test
+  public void withTitleTrimsValue() {
+    final SchemaCrawlerOptions options =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions().withTitle("  My Title  ");
+    assertThat(options.title(), is("My Title"));
   }
 }

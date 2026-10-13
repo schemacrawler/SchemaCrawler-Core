@@ -8,22 +8,17 @@
 
 package schemacrawler.schemacrawler;
 
-import static schemacrawler.schemacrawler.SchemaInfoLevelBuilder.detailed;
-import static schemacrawler.schemacrawler.SchemaInfoLevelBuilder.maximum;
-import static schemacrawler.schemacrawler.SchemaInfoLevelBuilder.minimum;
-import static schemacrawler.schemacrawler.SchemaInfoLevelBuilder.standard;
-
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.fatehi.utility.string.StringFormat;
 
 public enum InfoLevel {
-  unknown(() -> standard()),
-  minimum(() -> minimum()),
-  standard(() -> standard()),
-  detailed(() -> detailed()),
-  maximum(() -> maximum());
+  unknown(SchemaInfoLevelBuilder::standard),
+  minimum(SchemaInfoLevelBuilder::minimum),
+  standard(SchemaInfoLevelBuilder::standard),
+  detailed(SchemaInfoLevelBuilder::detailed),
+  maximum(SchemaInfoLevelBuilder::maximum);
 
   private static final Logger LOGGER = Logger.getLogger(InfoLevel.class.getName());
 

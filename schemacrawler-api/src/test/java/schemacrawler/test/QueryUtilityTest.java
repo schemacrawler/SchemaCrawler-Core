@@ -55,8 +55,7 @@ public class QueryUtilityTest {
             "SQL with column data type",
             "SELECT * FROM SOME_TABLE WHERE SOME_COLUMN_HAS = '${column-data-type}')");
 
-    final ResultSet results =
-        QueryUtility.executeAgainstColumnDataType(query, mockStatement, testColumnDataType);
+    QueryUtility.executeAgainstColumnDataType(query, mockStatement, testColumnDataType);
 
     final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
     verify(mockStatement).execute(captor.capture());
@@ -86,9 +85,11 @@ public class QueryUtilityTest {
         new Query(
             "Tables for schema",
             tablesWhere(
-                "REGEXP_MATCHES(TABLE_SCHEMA, '${schema-inclusion-rule}') AND"
-                    + " REGEXP_MATCHES(TABLE_SCHEMA || '.' || TABLE_NAME,"
-                    + " '${table-inclusion-rule}')"));
+                """
+                REGEXP_MATCHES(TABLE_SCHEMA, '${schema-inclusion-rule}') AND\
+                 REGEXP_MATCHES(TABLE_SCHEMA || '.' || TABLE_NAME,\
+                 '${table-inclusion-rule}')\
+                """));
     final InclusionRule schemaInclusionRule = new RegularExpressionInclusionRule("BOOKS");
     final InclusionRule tableInclusionRule = new RegularExpressionInclusionRule(".*\\.AUTHORS");
 
@@ -103,9 +104,11 @@ public class QueryUtilityTest {
         new Query(
             "Tables for schema",
             tablesWhere(
-                "REGEXP_MATCHES(TABLE_SCHEMA, '${schema-inclusion-rule}') AND"
-                    + " REGEXP_MATCHES(TABLE_SCHEMA || '.' || TABLE_NAME,"
-                    + " '${table-inclusion-rule}')"));
+                """
+                REGEXP_MATCHES(TABLE_SCHEMA, '${schema-inclusion-rule}') AND\
+                 REGEXP_MATCHES(TABLE_SCHEMA || '.' || TABLE_NAME,\
+                 '${table-inclusion-rule}')\
+                """));
     final InclusionRule schemaInclusionRule = new RegularExpressionInclusionRule("(?!.*INF).*");
     final InclusionRule tableInclusionRule =
         new RegularExpressionInclusionRule(".*\\.(?!.*AUTH).*");

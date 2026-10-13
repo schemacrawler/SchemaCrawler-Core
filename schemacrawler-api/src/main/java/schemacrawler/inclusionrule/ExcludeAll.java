@@ -22,10 +22,9 @@ public final class ExcludeAll implements InclusionRuleWithRegularExpression {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof InclusionRuleWithRegularExpression)) {
+    if (!(obj instanceof final InclusionRuleWithRegularExpression other)) {
       return false;
     }
-    final InclusionRuleWithRegularExpression other = (InclusionRuleWithRegularExpression) obj;
     return getExclusionPattern().pattern().equals(other.getExclusionPattern().pattern())
         && getInclusionPattern().pattern().equals(other.getInclusionPattern().pattern());
   }

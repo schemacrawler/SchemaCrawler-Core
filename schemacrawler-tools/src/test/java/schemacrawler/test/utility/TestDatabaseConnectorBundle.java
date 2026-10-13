@@ -20,15 +20,11 @@ import us.fatehi.utility.datasource.DatabaseServerType;
 public final class TestDatabaseConnectorBundle extends DatabaseConnector
     implements DatabaseConnectorBundle {
 
-  private static DatabaseConnectorOptionsBuilder databaseConnectorOptionsBuilder(
-      final DatabaseServerType dbServerType) {
-    final PluginCommand pluginCommand = PluginCommand.newDatabasePluginCommand(dbServerType);
-    return DatabaseConnectorOptionsBuilder.builder(dbServerType)
-        .withHelpCommand(pluginCommand)
-        .withDatabaseConnectionSourceBuilder(
-            () ->
-                DatabaseConnectionSourceBuilder.builder(
-                    "jdbc:%s:${database}".formatted(dbServerType.getDatabaseSystemIdentifier())));
+  private static final class BundleChildDatabaseConnector extends DatabaseConnector {
+
+    private BundleChildDatabaseConnector() {
+      super(childConnectorOptionsBuilder().build());
+    }
   }
 
   private static DatabaseConnectorOptionsBuilder bundleConnectorOptionsBuilder() {
@@ -40,15 +36,19 @@ public final class TestDatabaseConnectorBundle extends DatabaseConnector
         new DatabaseServerType("test-bundle-db", "Test Bundle Database"));
   }
 
-  private static DatabaseConnector newBundleChildConnector() {
-    return new BundleChildDatabaseConnector();
+  private static DatabaseConnectorOptionsBuilder databaseConnectorOptionsBuilder(
+      final DatabaseServerType dbServerType) {
+    final PluginCommand pluginCommand = PluginCommand.newDatabasePluginCommand(dbServerType);
+    return DatabaseConnectorOptionsBuilder.builder(dbServerType)
+        .withHelpCommand(pluginCommand)
+        .withDatabaseConnectionSourceBuilder(
+            () ->
+                DatabaseConnectionSourceBuilder.builder(
+                    "jdbc:%s:${database}".formatted(dbServerType.getDatabaseSystemIdentifier())));
   }
 
-  private static final class BundleChildDatabaseConnector extends DatabaseConnector {
-
-    private BundleChildDatabaseConnector() {
-      super(childConnectorOptionsBuilder().build());
-    }
+  private static DatabaseConnector newBundleChildConnector() {
+    return new BundleChildDatabaseConnector();
   }
 
   public TestDatabaseConnectorBundle() {

@@ -23,7 +23,7 @@ public class NamedObjectTest {
 
   @Test
   public void tableNames() {
-    final String[] schemaNames = new String[] {"DBO", "PUBLIC"};
+    final String[] schemaNames = {"DBO", "PUBLIC"};
     final String[] tableNames = {
       "CUSTOMER", "CUSTOMERLIST", "INVOICE", "ITEM", "PRODUCT", "SUPPLIER"
     };

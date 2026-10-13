@@ -77,7 +77,8 @@ public class PrimaryKeyRetrieverTest {
         }
       }
     }
-    // IMPORTANT: The data dictionary should return the same information as the metadata test
+    // IMPORTANT: The data dictionary should return the same information as the
+    // metadata test
     assertThat(
         outputOf(testout), hasSameContentAs(classpathResource("SchemaCrawlerTest.primaryKeys")));
   }
