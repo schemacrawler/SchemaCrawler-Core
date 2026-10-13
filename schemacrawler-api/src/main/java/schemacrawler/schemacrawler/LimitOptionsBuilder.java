@@ -212,7 +212,7 @@ public final class LimitOptionsBuilder
       final String[] routineTypeStrings = splitList(routineTypesString);
       for (final String routineTypeString : routineTypeStrings) {
         final RoutineType routineType =
-            enumValue(routineTypeString.toLowerCase(Locale.ENGLISH), unknown);
+            enumValue(routineTypeString.toLowerCase(Locale.ROOT), unknown);
         if (routineType != unknown) {
           routineTypesCollection.add(routineType);
         }

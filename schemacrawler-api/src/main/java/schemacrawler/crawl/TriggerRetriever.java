@@ -147,7 +147,7 @@ final class TriggerRetriever extends AbstractRetriever {
     if (isBlank(eventManipulationString)) {
       return null;
     }
-    eventManipulationString = eventManipulationString.toLowerCase(Locale.ENGLISH);
+    eventManipulationString = eventManipulationString.toLowerCase(Locale.ROOT);
 
     // Find what to split multiple values by
     final String splitBy;

@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -86,7 +87,7 @@ public final class TestUtility {
       final ByteBuffer bb = ByteBuffer.allocate(2);
       fc.read(bb);
       final String hexValue = new BigInteger(1, bb.array()).toString(16);
-      return hexValue.toUpperCase();
+      return hexValue.toUpperCase(Locale.ROOT);
     }
   }
 

@@ -13,6 +13,7 @@ import static schemacrawler.ermodel.associations.ImplicitAssociationsUtility.ID_
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.util.List;
+import java.util.Locale;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Table;
 import us.fatehi.utility.Multimap;
@@ -59,7 +60,7 @@ final class ColumnMatchKeys {
 
   private void mapColumnNameMatches(final Table table) {
     for (final Column column : table.getColumns()) {
-      final String columnName = column.getName().toLowerCase();
+      final String columnName = column.getName().toLowerCase(Locale.ROOT);
       final String matchColumnName = ID_PATTERN.matcher(columnName).replaceAll("");
       if (!isBlank(matchColumnName)) {
         columnsForMatchKey.add(matchColumnName, column);

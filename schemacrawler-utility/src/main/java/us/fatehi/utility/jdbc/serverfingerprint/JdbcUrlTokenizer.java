@@ -14,6 +14,7 @@ import static us.fatehi.utility.Utility.isBlank;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -248,7 +249,7 @@ final class JdbcUrlTokenizer {
     if (isBlank(host)) {
       return HostClassification.UNKNOWN;
     }
-    final String normalizedHost = host.strip().toLowerCase();
+    final String normalizedHost = host.strip().toLowerCase(Locale.ROOT);
     if ("localhost".equals(normalizedHost)
         || normalizedHost.endsWith(".local")
         || normalizedHost.endsWith(".lan")) {
@@ -321,7 +322,7 @@ final class JdbcUrlTokenizer {
     if (isBlank(subprotocol)) {
       return false;
     }
-    return SPY_PREFIXES.contains(subprotocol.toLowerCase());
+    return SPY_PREFIXES.contains(subprotocol.toLowerCase(Locale.ROOT));
   }
 
   private static boolean looksLikeIpLiteral(final String host) {
@@ -339,7 +340,7 @@ final class JdbcUrlTokenizer {
    * defaulting to {@code PUBLIC}.
    */
   private static HostClassification modeClassification(final String token) {
-    final String normalized = token.toLowerCase();
+    final String normalized = token.toLowerCase(Locale.ROOT);
     if (LOCALHOST_MODE_TOKENS.contains(normalized)) {
       return HostClassification.LOCALHOST;
     }

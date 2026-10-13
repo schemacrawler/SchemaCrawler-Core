@@ -11,6 +11,7 @@ package us.fatehi.utility.jdbc.serverfingerprint;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import us.fatehi.utility.Builder;
 import us.fatehi.utility.Nullable;
@@ -70,7 +71,7 @@ public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseS
     final Map<String, String> canonical = new LinkedHashMap<>();
     canonical.put("type", jdbcUrl.databaseSystemIdentifier());
     canonical.put("host", canonicalHost(jdbcUrl));
-    canonical.put("database", jdbcUrl.databaseName().toLowerCase());
+    canonical.put("database", jdbcUrl.databaseName().toLowerCase(Locale.ROOT));
     // The product version is included in the hash on purpose, so that the
     // fingerprint value changes when a server is upgraded or patched,
     // even though the server's identity (and hence  its confidence level)
@@ -102,10 +103,10 @@ public final class DatabaseServerFingerprintBuilder implements Builder<DatabaseS
     final String host = jdbcUrl.host();
     switch (classification) {
       case PUBLIC:
-        return host.strip().toLowerCase();
+        return host.strip().toLowerCase(Locale.ROOT);
       case LOCALHOST:
       case INTERNAL:
-        return String.format("<%s>", classification).toLowerCase();
+        return String.format("<%s>", classification).toLowerCase(Locale.ROOT);
       case UNKNOWN:
       default:
         return "";

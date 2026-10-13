@@ -11,6 +11,8 @@ package us.fatehi.utility.jdbc.serverfingerprint;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
+import java.util.Locale;
+
 /**
  * The structured result of tokenizing a JDBC connection URL, as produced by {@link
  * JdbcUrlTokenizer#tokenize(String)}.
@@ -95,6 +97,6 @@ record JdbcUrlTokens(
    * database data.
    */
   private static String normalizeIdentifier(final String value) {
-    return trimToEmpty(value).toLowerCase();
+    return trimToEmpty(value).toLowerCase(Locale.ROOT);
   }
 }

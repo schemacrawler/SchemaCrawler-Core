@@ -14,6 +14,7 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static us.fatehi.test.utility.TestUtility.NOT_BLANK;
 
+import java.util.Locale;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -282,7 +283,7 @@ public class JdbcUrlParserTest {
     assertThat(
         "For spy sub-procol <%s>".formatted(spySubProtcol),
         jdbcUrl.databaseSystemIdentifier(),
-        is(spySubProtcol.toLowerCase()));
+        is(spySubProtcol.toLowerCase(Locale.ROOT)));
   }
 
   @Test

@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -186,7 +187,9 @@ final class IndexRetriever extends AbstractRetriever {
 
     if (isBlank(indexName)) {
       indexName =
-          "SC_%s".formatted(Integer.toHexString(column.getFullName().hashCode()).toUpperCase());
+          "SC_%s"
+              .formatted(
+                  Integer.toHexString(column.getFullName().hashCode()).toUpperCase(Locale.ROOT));
     }
 
     final Optional<MutableIndex> indexOptional = table.lookupIndex(indexName);

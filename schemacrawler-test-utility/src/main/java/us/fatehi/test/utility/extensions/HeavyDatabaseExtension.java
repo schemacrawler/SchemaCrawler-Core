@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
 import static org.junit.platform.commons.support.AnnotationSupport.findAnnotation;
 
+import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
@@ -67,8 +68,8 @@ public final class HeavyDatabaseExtension implements ExecutionCondition {
     final boolean isNotSetHeavyDB =
         heavydb == null
             // this is not the same as the Boolean check
-            || "false".equals(heavydb.toLowerCase())
-            || "no".equals(heavydb.toLowerCase());
+            || "false".equals(heavydb.toLowerCase(Locale.ROOT))
+            || "no".equals(heavydb.toLowerCase(Locale.ROOT));
     return !isNotSetHeavyDB;
   }
 

@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -70,7 +71,7 @@ class ImmutableDatabaseProperty extends AbstractProperty {
 
     // Prevent word-splitting of acronyms
     for (final Entry<Pattern, String> acronym : acronyms) {
-      final String lowerCaseAcronymAsWord = " " + acronym.getValue().toLowerCase();
+      final String lowerCaseAcronymAsWord = " " + acronym.getValue().toLowerCase(Locale.ROOT);
       description = acronym.getKey().matcher(description).replaceAll(lowerCaseAcronymAsWord);
     }
 

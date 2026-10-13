@@ -14,6 +14,7 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 import us.fatehi.utility.Options;
@@ -117,7 +118,7 @@ public final class Identifiers implements Options, Serializable {
    * @return Whether the given word is reserved
    */
   public boolean isReservedWord(final String word) {
-    return !isBlank(word) && reservedWords.contains(word.strip().toUpperCase());
+    return !isBlank(word) && reservedWords.contains(word.strip().toUpperCase(Locale.ROOT));
   }
 
   /**

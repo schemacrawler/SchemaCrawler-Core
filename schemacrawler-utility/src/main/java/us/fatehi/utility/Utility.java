@@ -14,6 +14,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HexFormat;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringJoiner;
@@ -34,7 +35,7 @@ public final class Utility {
     if (index < 1) {
       return "";
     }
-    return string1.substring(0, index).toLowerCase();
+    return string1.substring(0, index).toLowerCase(Locale.ROOT);
   }
 
   /**
@@ -169,7 +170,7 @@ public final class Utility {
     }
 
     // Normalize all separators to a single delimiter
-    final String normalized = identifier.replace('-', '_').toLowerCase();
+    final String normalized = identifier.replace('-', '_').toLowerCase(Locale.ROOT);
 
     final String[] parts = normalized.split("_");
     if (parts.length == 0) {
@@ -202,7 +203,7 @@ public final class Utility {
     normalizedIdentifier = acronymBoundaryPattern.matcher(normalizedIdentifier).replaceAll("$1_$2");
     normalizedIdentifier =
         camelCaseBoundaryPattern.matcher(normalizedIdentifier).replaceAll("$1_$2");
-    normalizedIdentifier = normalizedIdentifier.toLowerCase();
+    normalizedIdentifier = normalizedIdentifier.toLowerCase(Locale.ROOT);
     normalizedIdentifier = repeatedUnderscorePattern.matcher(normalizedIdentifier).replaceAll("_");
     return normalizedIdentifier.replaceAll("^_+|_+$", "");
   }
