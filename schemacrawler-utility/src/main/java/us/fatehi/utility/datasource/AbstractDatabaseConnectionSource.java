@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -64,7 +65,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
         for (final Map.Entry<String, String> connectionProperty : connectionProperties.entrySet()) {
           final String property = connectionProperty.getKey();
           final String value = connectionProperty.getValue();
-          if (jdbcDriverProperties.contains(property.toLowerCase()) && value != null) {
+          if (jdbcDriverProperties.contains(property.toLowerCase(Locale.ROOT)) && value != null) {
             jdbcConnectionProperties.setProperty(property, value);
           } else {
             // No security issues, since user and password have been removed from connection
@@ -129,7 +130,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     final Set<String> jdbcDriverProperties = new HashSet<>();
     for (final JdbcDriverProperty driverPropertyInfo : metadata.properties()) {
       final String jdbcPropertyName = driverPropertyInfo.name();
-      final String normalizedPropertyName = jdbcPropertyName.toLowerCase();
+      final String normalizedPropertyName = jdbcPropertyName.toLowerCase(Locale.ROOT);
       if (skipProperties != null && skipProperties.contains(normalizedPropertyName)) {
         continue;
       }
@@ -138,7 +139,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
     if (additionalDriverProperties != null) {
       additionalDriverProperties.stream()
           .filter(property -> !isBlank(property))
-          .map(String::toLowerCase)
+          .map(property -> property.toLowerCase(Locale.ROOT))
           .forEach(jdbcDriverProperties::add);
     }
     return jdbcDriverProperties;

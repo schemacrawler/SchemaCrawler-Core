@@ -14,6 +14,7 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Locale;
 
 /**
  * Represents a type of table in the database. Examples could be a base table, a view, a global
@@ -110,7 +111,7 @@ public final class TableType implements Serializable, Comparable<TableType> {
   public int hashCode() {
     final int prime = 31;
     final int result = 1;
-    return prime * result + (tableType == null ? 0 : tableType.toLowerCase().hashCode());
+    return prime * result + (tableType == null ? 0 : tableType.toLowerCase(Locale.ROOT).hashCode());
   }
 
   /**
@@ -128,13 +129,13 @@ public final class TableType implements Serializable, Comparable<TableType> {
   /** Checks if the table type is a view of any kind. */
   public boolean isView() {
     return tableType != null
-        && (tableType.toUpperCase().contains("VIEW")
+        && (tableType.toUpperCase(Locale.ROOT).contains("VIEW")
             || tableType.toUpperCase().contains("MATERIALIZED"));
   }
 
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return tableType.toLowerCase();
+    return tableType.toLowerCase(Locale.ROOT);
   }
 }

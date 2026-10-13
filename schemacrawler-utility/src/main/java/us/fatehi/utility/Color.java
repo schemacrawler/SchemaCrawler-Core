@@ -12,6 +12,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -127,7 +128,7 @@ public final class Color {
   public String toString() {
     final int rgb = (r & 0xFF) << 16 | (g & 0xFF) << 8 | b & 0xFF;
 
-    final String htmlColor = "#" + "%06x".formatted(rgb).toUpperCase();
+    final String htmlColor = "#" + "%06x".formatted(rgb).toUpperCase(Locale.ROOT);
     return htmlColor;
   }
 }

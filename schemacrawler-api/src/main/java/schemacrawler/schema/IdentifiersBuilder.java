@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -82,7 +83,7 @@ public class IdentifiersBuilder implements OptionsBuilder<IdentifiersBuilder, Id
     if (words != null) {
       for (final String word : words) {
         if (!isBlank(word)) {
-          upperCaseWords.add(trimToEmpty(word.toUpperCase()));
+          upperCaseWords.add(trimToEmpty(word.toUpperCase(Locale.ROOT)));
         }
       }
     }

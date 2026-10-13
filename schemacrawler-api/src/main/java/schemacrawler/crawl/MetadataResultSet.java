@@ -77,7 +77,7 @@ final class MetadataResultSet extends AbstractDataResultSet {
     for (final ResultsColumn resultsColumn : resultsColumns) {
       if (!readColumns.contains(resultsColumn)) {
         try {
-          final String key = resultsColumn.getLabel().toUpperCase();
+          final String key = resultsColumn.getLabel().toUpperCase(Locale.ROOT);
           final Object value = getColumnData(resultsColumn);
           attributes.put(key, value);
         } catch (final SQLException | ArrayIndexOutOfBoundsException e) {
@@ -160,7 +160,7 @@ final class MetadataResultSet extends AbstractDataResultSet {
     if (isBlank(value)) {
       return defaultValue;
     }
-    return enumValue(value.toLowerCase(Locale.ENGLISH), defaultValue);
+    return enumValue(value.toLowerCase(Locale.ROOT), defaultValue);
   }
 
   /**

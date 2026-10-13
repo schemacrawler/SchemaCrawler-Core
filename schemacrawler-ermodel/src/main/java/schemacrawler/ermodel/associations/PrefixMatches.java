@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -154,7 +155,7 @@ final class PrefixMatches {
   private void mapPrefixes(final List<String> keys, final Collection<String> prefixes) {
     for (final String key : keys) {
       for (final String prefix : prefixes) {
-        String matchKeyName = key.toLowerCase();
+        String matchKeyName = key.toLowerCase(Locale.ROOT);
         if (matchKeyName.startsWith(prefix)) {
           matchKeyName = matchKeyName.substring(prefix.length());
           matchKeyName = Inflection.singularize(matchKeyName);
