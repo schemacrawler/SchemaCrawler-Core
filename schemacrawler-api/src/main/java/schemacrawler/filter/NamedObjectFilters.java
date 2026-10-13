@@ -26,7 +26,7 @@ import us.fatehi.utility.UtilityMarker;
 /**
  * Factory methods for filters over named database objects (tables, routines, and so on).
  *
- * <p>Use {@link #nameRegex(String)} or {@link #fullNameRegex(String)} to select objects by name;
+ * <p>Use {@link #nameRegex(String)} or {@link #fullNameRegex(String)} to filter objects by name;
  * use {@link #tableGrep(GrepOptions)} or {@link #routineGrep(GrepOptions)} to also search inside an
  * object's columns, parameters, remarks, or definition; and use {@link
  * #tableTypes(SimpleTableType)} or {@link #routineTypes(RoutineType)} to restrict output to
@@ -105,9 +105,8 @@ public final class NamedObjectFilters {
   /**
    * Creates a "grep" style filter over routines, using {@link GrepOptions} to match a routine's
    * definition (source text), parameters, or remarks, in addition to any name-based inclusion
-   * rules. Use this when routine selection needs to search inside the routine, not just its name;
-   * for name-only matching, use {@link #nameRegex(String)} or {@link #fullNameRegex(String)}
-   * instead.
+   * rules. Use this to match routine contents, not just its name; for name-only matching, use
+   * {@link #nameRegex(String)} or {@link #fullNameRegex(String)} instead.
    *
    * @param grepOptions options describing what content of a routine to search, and with what
    *     patterns
@@ -136,8 +135,8 @@ public final class NamedObjectFilters {
   /**
    * Creates a "grep" style filter over tables, using {@link GrepOptions} to match a table's
    * columns, remarks, or definition, in addition to any name-based inclusion rules. Use this when
-   * table selection needs to search inside the table, not just its name; for name-only matching,
-   * use {@link #nameRegex(String)} or {@link #fullNameRegex(String)} instead.
+   * table matching needs to search inside the table, not just its name; for name-only matching, use
+   * {@link #nameRegex(String)} or {@link #fullNameRegex(String)} instead.
    *
    * @param grepOptions options describing what content of a table to search, and with what patterns
    * @return a compound table grep filter

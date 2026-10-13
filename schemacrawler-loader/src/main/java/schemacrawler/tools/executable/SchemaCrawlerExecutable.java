@@ -98,14 +98,14 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
       if (!hasCatalog()) {
         loadCatalog();
       }
-      final Catalog selectedCatalog = selectCatalog(getCatalog());
+      final Catalog projectedCatalog = projectCatalog(getCatalog());
       if (!hasERModel()) {
-        buildERModel(selectedCatalog);
+        buildERModel(projectedCatalog);
       }
 
       // Prepare to execute
       transferState(scCommand);
-      scCommand.setCatalog(selectedCatalog);
+      scCommand.setCatalog(projectedCatalog);
 
       // Execute
       LOGGER.log(Level.INFO, new StringFormat("Executing SchemaCrawler command <%s>", command));
@@ -185,7 +185,7 @@ public final class SchemaCrawlerExecutable extends AbstractExecutionState {
     return requireNonNull(scCommand, "No SchemaCrawler command instantiated");
   }
 
-  private Catalog selectCatalog(final Catalog catalog) {
+  private Catalog projectCatalog(final Catalog catalog) {
     return CatalogProjectionBuilder.builder(catalog).withOptions(schemaCrawlerOptions).build();
   }
 }

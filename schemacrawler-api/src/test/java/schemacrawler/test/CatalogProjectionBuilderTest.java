@@ -168,11 +168,11 @@ public class CatalogProjectionBuilderTest {
 
     final Catalog firstProjection =
         CatalogProjectionBuilder.builder(source)
-            .withOptions(tableSelectionOptions(".*first$"))
+            .withOptions(tableProjectionOptions(".*first$"))
             .build();
     final Catalog secondProjection =
         CatalogProjectionBuilder.builder(source)
-            .withOptions(tableSelectionOptions(".*second$"))
+            .withOptions(tableProjectionOptions(".*second$"))
             .build();
 
     assertThat(firstProjection.getTables(), contains(firstTable));
@@ -261,30 +261,31 @@ public class CatalogProjectionBuilderTest {
   }
 
   @Test
-  public void lookupsFollowSelectedCollections() {
-    final LightTable selectedTable = new LightTable("selected");
-    selectedTable.addColumn("id");
+  public void lookupsFollowProjectionMembership() {
+    final LightTable projectedTable = new LightTable("selected");
+    projectedTable.addColumn("id");
     final Table hiddenTable = new LightTable("hidden");
-    final Catalog source = mockCatalogWithTables(selectedTable, hiddenTable);
+    final Catalog source = mockCatalogWithTables(projectedTable, hiddenTable);
     final Catalog projection =
         CatalogProjectionBuilder.builder(source)
-            .withOptions(tableSelectionOptions(".*selected$"))
+            .withOptions(tableProjectionOptions(".*selected$"))
             .build();
 
     assertThat(
-        projection.lookupTable(selectedTable.getSchema(), "selected").orElseThrow(),
-        is(selectedTable));
+        projection.lookupTable(projectedTable.getSchema(), "selected").orElseThrow(),
+        is(projectedTable));
     assertThat(projection.lookupTable(hiddenTable.getSchema(), "hidden").isEmpty(), is(true));
     assertThat(
         source.lookupTable(hiddenTable.getSchema(), "hidden").orElseThrow(), is(hiddenTable));
     assertThat(
-        projection.lookupColumn(selectedTable.getSchema(), "selected", "id").isPresent(), is(true));
+        projection.lookupColumn(projectedTable.getSchema(), "selected", "id").isPresent(),
+        is(true));
     assertThat(
         projection.lookupColumn(hiddenTable.getSchema(), "hidden", "id").isEmpty(), is(true));
   }
 
   @Test
-  public void lookupsFollowSelectedCollectionsForEachObjectType() {
+  public void lookupsFollowProjectionMembershipForEachObjectType() {
     final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
     final SchemaReference systemSchema = new SchemaReference();
     final Table table = new LightTable(schema, "table");
@@ -331,7 +332,7 @@ public class CatalogProjectionBuilderTest {
     final Catalog baseline = mockCatalogWithTables(firstTable, secondTable);
     final Catalog firstProjection =
         CatalogProjectionBuilder.builder(baseline)
-            .withOptions(tableSelectionOptions(".*first$"))
+            .withOptions(tableProjectionOptions(".*first$"))
             .build();
 
     final Catalog nestedProjection = CatalogProjectionBuilder.builder(firstProjection).build();
@@ -418,7 +419,7 @@ public class CatalogProjectionBuilderTest {
   }
 
   @Test
-  public void publicColumnGrepSelectsMatchingTables() {
+  public void publicColumnGrepFiltersMatchingTables() {
     final LightTable matchingTable = new LightTable("matching");
     matchingTable.addColumn("wanted_column");
     final LightTable nonMatchingTable = new LightTable("non_matching");
@@ -468,7 +469,7 @@ public class CatalogProjectionBuilderTest {
   }
 
   @Test
-  public void publicTableNameGrepAndInversionSelectMatchingTables() {
+  public void publicTableNameGrepAndInversionFilterMatchingTables() {
     final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
     final Table matchingTable = new LightTable(schema, "matching");
     final Table nonMatchingTable = new LightTable(schema, "non_matching");
@@ -639,7 +640,7 @@ public class CatalogProjectionBuilderTest {
                         .invertGrepMatch(true)
                         .toOptions()))
             .build();
-    final Catalog selectedProjection =
+    final Catalog projectedCatalog =
         CatalogProjectionBuilder.builder(source)
             .withOptions(projectionOptions(null, includeBeforeUpdate))
             .build();
@@ -647,7 +648,7 @@ public class CatalogProjectionBuilderTest {
     table.setRemarks("after update");
 
     assertThat(emptyProjection.getTables(), is(List.of()));
-    assertThat(selectedProjection.getTables().iterator().next().getRemarks(), is("after update"));
+    assertThat(projectedCatalog.getTables().iterator().next().getRemarks(), is("after update"));
     assertThat(
         CatalogProjectionBuilder.builder(source)
             .withOptions(projectionOptions(null, includeBeforeUpdate))
@@ -736,7 +737,7 @@ public class CatalogProjectionBuilderTest {
         .withGrepOptions(grepOptions);
   }
 
-  private SchemaCrawlerOptions tableSelectionOptions(final String tableNamePattern) {
+  private SchemaCrawlerOptions tableProjectionOptions(final String tableNamePattern) {
     return SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
         .withLimitOptions(
             LimitOptionsBuilder.builder()

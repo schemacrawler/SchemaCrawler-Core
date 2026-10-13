@@ -140,9 +140,9 @@ public class SchemaCrawlerCoverageTest {
   }
 
   @Test
-  public void crawlIgnoresSelectionOptions(final Connection connection) {
+  public void crawlIgnoresProjectionOptions(final Connection connection) {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
-    final SchemaCrawlerOptions selectedOptions =
+    final SchemaCrawlerOptions projectionOptions =
         options
             .withFilterOptions(
                 FilterOptionsBuilder.builder()
@@ -156,15 +156,15 @@ public class SchemaCrawlerCoverageTest {
                     .includeGreppedRoutines(Pattern.compile("NO_MATCHING_ROUTINE"))
                     .toOptions());
     final Catalog baseline = getCatalog(connection, options);
-    final Catalog withSelectionOptions = getCatalog(connection, selectedOptions);
+    final Catalog catalogWithProjectionOptions = getCatalog(connection, projectionOptions);
 
     assertThat(
-        withSelectionOptions.getTables().stream().map(Table::key).toList(),
+        catalogWithProjectionOptions.getTables().stream().map(Table::key).toList(),
         is(baseline.getTables().stream().map(Table::key).toList()));
     assertThat(
-        withSelectionOptions.getRoutines().stream().map(Routine::key).toList(),
+        catalogWithProjectionOptions.getRoutines().stream().map(Routine::key).toList(),
         is(baseline.getRoutines().stream().map(Routine::key).toList()));
-    assertThat(withSelectionOptions.getTables().isEmpty(), is(false));
+    assertThat(catalogWithProjectionOptions.getTables().isEmpty(), is(false));
   }
 
   @Test
