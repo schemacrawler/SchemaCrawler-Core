@@ -60,8 +60,7 @@ public class SchemaRetrieverTest {
     final MutableJdbcDriverInfo jdbcDriverInfo =
         new MutableJdbcDriverInfo(connectionInfoBuilder.buildJdbcDriverInformation());
 
-    final MutableCatalog catalog =
-        new MutableCatalog("", "test_catalog", databaseInfo, jdbcDriverInfo);
+    final MutableCatalog catalog = new MutableCatalog("", databaseInfo, jdbcDriverInfo);
 
     final InformationSchemaViews informationSchemaViews =
         InformationSchemaViewsBuilder.builder()

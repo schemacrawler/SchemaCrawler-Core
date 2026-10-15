@@ -243,7 +243,7 @@ public class DatabaseInfoRetrieverTest {
     final MutableJdbcDriverInfo jdbcDriverInfo =
         new MutableJdbcDriverInfo(connectionInfoBuilder.buildJdbcDriverInformation());
 
-    catalog = new MutableCatalog("", "database_info_test", databaseInfo, jdbcDriverInfo);
+    catalog = new MutableCatalog("", databaseInfo, jdbcDriverInfo);
     assertThat(catalog.getColumnDataTypes(), is(empty()));
     assertThat(catalog.getSchemas(), is(empty()));
     assertThat(catalog.getDatabaseInfo().getServerInfo(), is(empty()));

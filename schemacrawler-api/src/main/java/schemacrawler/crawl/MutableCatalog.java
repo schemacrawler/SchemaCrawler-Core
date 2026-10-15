@@ -68,10 +68,9 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
   MutableCatalog(
       final String title,
-      final String name,
       final MutableDatabaseInfo databaseInfo,
       final MutableJdbcDriverInfo jdbcDriverInfo) {
-    super(name);
+    super("");
 
     this.databaseInfo = requireNonNull(databaseInfo, "No database information provided");
     this.jdbcDriverInfo = requireNonNull(jdbcDriverInfo, "No JDBC driver information provided");

@@ -126,7 +126,6 @@ public final class SchemaCrawler {
         catalog =
             new MutableCatalog(
                 options.title(),
-                "catalog",
                 new MutableDatabaseInfo(databaseInfo),
                 new MutableJdbcDriverInfo(jdbcDriverInfo));
       }
