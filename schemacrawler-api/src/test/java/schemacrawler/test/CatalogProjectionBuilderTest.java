@@ -666,6 +666,7 @@ public class CatalogProjectionBuilderTest {
     final T databaseObject = mock(objectClass);
     when(databaseObject.getSchema()).thenReturn(schema);
     when(databaseObject.getName()).thenReturn(name);
+    when(databaseObject.key()).thenReturn(schema.key().with(name));
     return databaseObject;
   }
 

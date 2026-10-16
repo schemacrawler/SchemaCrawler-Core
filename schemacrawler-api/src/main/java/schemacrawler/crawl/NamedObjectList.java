@@ -8,20 +8,18 @@
 
 package schemacrawler.crawl;
 
-import static java.util.Comparator.naturalOrder;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Schema;
+import schemacrawler.utility.ConcurrentNamedObjectIndex;
+import schemacrawler.utility.NamedObjectIndex;
 
 /**
  * Ordered list of named objects, that can be searched associatively. NamedObjectList has the
@@ -29,7 +27,8 @@ import schemacrawler.schema.NamedObjectKey;
  * String. Returns values sorted in natural sort order, and is iterable. The iterator does not allow
  * modifications to the underlying data structure.
  */
-final class NamedObjectList<N extends NamedObject> implements Serializable, Iterable<N> {
+final class NamedObjectList<N extends NamedObject>
+    implements Serializable, Iterable<N>, NamedObjectIndex<NamedObjectKey, N> {
 
   @Serial private static final long serialVersionUID = 3257847666804142128L;
 
@@ -51,41 +50,66 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Iter
     return key;
   }
 
-  private final Map<NamedObjectKey, N> objects = new ConcurrentHashMap<>();
+  private final ConcurrentNamedObjectIndex<N> objects = new ConcurrentNamedObjectIndex<>();
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean containsKey(final NamedObjectKey key) {
+    return objects.containsKey(key);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isEmpty() {
+    return objects.isEmpty();
+  }
 
   @Override
   public Iterator<N> iterator() {
-    final class UnmodifiableIterator implements Iterator<N> {
+    return objects.values().iterator();
+  }
 
-      private final Iterator<N> iterator;
+  /**
+   * Looks up a named object by lookup key.
+   *
+   * @param key Internal lookup key
+   * @return Named object
+   */
+  @Override
+  public Optional<N> lookup(final NamedObjectKey key) {
+    return internalGet(key);
+  }
 
-      UnmodifiableIterator(final Iterator<N> iterator) {
-        this.iterator = iterator;
-      }
+  /** {@inheritDoc} */
+  @Override
+  public Optional<N> lookup(final Schema schema, final String name) {
+    return objects.lookup(schema, name);
+  }
 
-      @Override
-      public boolean hasNext() {
-        return iterator.hasNext();
-      }
-
-      @Override
-      public N next() {
-        return iterator.next();
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-    }
-
-    return new UnmodifiableIterator(values().iterator());
+  /**
+   * Returns the number of elements in this list.
+   *
+   * @return Number of elements in this list.
+   */
+  @Override
+  public int size() {
+    return objects.size();
   }
 
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return values().stream().map(NamedObject::toString).collect(Collectors.joining(", "));
+    return objects.toString();
+  }
+
+  /**
+   * Gets all named objects in the list, in sorted order.
+   *
+   * @return All named objects
+   */
+  @Override
+  public List<N> values() {
+    return objects.values();
   }
 
   /**
@@ -95,59 +119,26 @@ final class NamedObjectList<N extends NamedObject> implements Serializable, Iter
    */
   boolean add(final N namedObject) {
     requireNonNull(namedObject, "Cannot add a null object to the list");
-    final NamedObjectKey key = makeLookupKey(namedObject);
-    objects.put(key, namedObject);
-    return true;
+    return objects.add(namedObject);
   }
 
   boolean contains(final NamedObject namedObject) {
     return objects.containsKey(makeLookupKey(namedObject));
   }
 
-  boolean isEmpty() {
-    return objects.isEmpty();
-  }
-
   Optional<N> lookup(final NamedObject namedObject, final String name) {
+    if (namedObject instanceof final Schema schema) {
+      return lookup(schema, name);
+    }
     final NamedObjectKey key = makeLookupKey(namedObject, name);
     return internalGet(key);
   }
 
-  /**
-   * Looks up a named object by lookup key.
-   *
-   * @param key Internal lookup key
-   * @return Named object
-   */
-  Optional<N> lookup(final NamedObjectKey key) {
-    return internalGet(key);
-  }
-
-  N remove(final N namedObject) {
+  Optional<N> remove(final N namedObject) {
     return objects.remove(makeLookupKey(namedObject));
   }
 
-  /**
-   * Returns the number of elements in this list.
-   *
-   * @return Number of elements in this list.
-   */
-  int size() {
-    return objects.size();
-  }
-
-  /**
-   * Gets all named objects in the list, in sorted order.
-   *
-   * @return All named objects
-   */
-  List<N> values() {
-    final List<N> all = new ArrayList<>(objects.values());
-    all.sort(naturalOrder());
-    return all;
-  }
-
   private Optional<N> internalGet(final NamedObjectKey key) {
-    return Optional.ofNullable(objects.get(key));
+    return objects.lookup(key);
   }
 }

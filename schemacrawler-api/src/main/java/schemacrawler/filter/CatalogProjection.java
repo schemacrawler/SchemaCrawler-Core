@@ -16,7 +16,6 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +36,7 @@ import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.utility.ImmutableNamedObjectIndex;
 
 final class CatalogProjection implements Catalog {
 
@@ -45,68 +45,40 @@ final class CatalogProjection implements Catalog {
   private static final String REMARKS_ATTRIBUTE = "REMARKS";
   private static final NamedObjectKey SYSTEM_SCHEMA_KEY = new SchemaReference().key();
 
-  private static LinkedHashMap<NamedObjectKey, DatabaseUser> indexByKey(
-      final Collection<DatabaseUser> values) {
-    final LinkedHashMap<NamedObjectKey, DatabaseUser> index = new LinkedHashMap<>();
-    values.forEach(databaseUser -> index.putIfAbsent(databaseUser.key(), databaseUser));
-    return index;
-  }
-
-  private static <N extends DatabaseObject> LinkedHashMap<NamedObjectKey, N> indexBySchemaAndName(
-      final Collection<N> values) {
-    final LinkedHashMap<NamedObjectKey, N> index = new LinkedHashMap<>();
-    values.forEach(
-        value -> {
-          final Schema schema = value.getSchema();
-          if (schema != null) {
-            index.putIfAbsent(schema.key().with(value.getName()), value);
-          }
-        });
-    return index;
-  }
-
-  private static LinkedHashMap<NamedObjectKey, Routine> indexRoutines(
-      final Collection<Routine> values) {
-    final LinkedHashMap<NamedObjectKey, Routine> index = new LinkedHashMap<>();
-    values.forEach(routine -> index.putIfAbsent(routine.key(), routine));
-    return index;
-  }
-
-  private static LinkedHashMap<String, Schema> indexSchemas(final Collection<Schema> values) {
-    final LinkedHashMap<String, Schema> index = new LinkedHashMap<>();
-    values.forEach(schema -> index.putIfAbsent(schema.getFullName(), schema));
-    return index;
-  }
-
   private static <N extends DatabaseObject> Optional<N> lookupBySchemaAndName(
-      final Map<NamedObjectKey, N> index, final Schema schema, final String name) {
+      final ImmutableNamedObjectIndex<N> index, final Schema schema, final String name) {
     if (schema == null || name == null) {
       return Optional.empty();
     }
-    return Optional.ofNullable(index.get(schema.key().with(name)));
+    return index.lookup(schema, name);
   }
 
   private static <N extends DatabaseObject> List<N> valuesForSchema(
-      final Map<NamedObjectKey, N> index, final Schema schema) {
+      final ImmutableNamedObjectIndex<N> index, final Schema schema) {
     if (schema == null) {
       return List.of();
     }
-    return index.values().stream()
+    return index.snapshot().stream()
         .filter(value -> value.getSchema() != null && schema.key().equals(value.getSchema().key()))
+        .sorted()
         .toList();
+  }
+
+  private static <N extends DatabaseObject> List<N> schemaBoundObjects(final Collection<N> values) {
+    return values.stream().filter(value -> value.getSchema() != null).toList();
   }
 
   private final CrawlInfo crawlInfo;
   private final DatabaseInfo databaseInfo;
   private final JdbcDriverInfo jdbcDriverInfo;
   private final Map<String, Object> attributesMap;
-  private final LinkedHashMap<String, Schema> schemas;
-  private final LinkedHashMap<NamedObjectKey, Table> tables;
-  private final LinkedHashMap<NamedObjectKey, Routine> routines;
-  private final LinkedHashMap<NamedObjectKey, Sequence> sequences;
-  private final LinkedHashMap<NamedObjectKey, Synonym> synonyms;
-  private final LinkedHashMap<NamedObjectKey, ColumnDataType> columnDataTypes;
-  private final LinkedHashMap<NamedObjectKey, DatabaseUser> databaseUsers;
+  private final ImmutableNamedObjectIndex<Schema> schemas;
+  private final ImmutableNamedObjectIndex<Table> tables;
+  private final ImmutableNamedObjectIndex<Routine> routines;
+  private final ImmutableNamedObjectIndex<Sequence> sequences;
+  private final ImmutableNamedObjectIndex<Synonym> synonyms;
+  private final ImmutableNamedObjectIndex<ColumnDataType> columnDataTypes;
+  private final ImmutableNamedObjectIndex<DatabaseUser> databaseUsers;
 
   CatalogProjection(
       final String name,
@@ -144,13 +116,13 @@ final class CatalogProjection implements Catalog {
     this.databaseInfo = databaseInfo;
     this.jdbcDriverInfo = jdbcDriverInfo;
     this.attributesMap = Map.copyOf(requireNonNullElse(attributesMap, Map.of()));
-    this.schemas = indexSchemas(schemas);
-    this.tables = indexBySchemaAndName(tables);
-    this.routines = indexRoutines(routines);
-    this.sequences = indexBySchemaAndName(sequences);
-    this.synonyms = indexBySchemaAndName(synonyms);
-    this.columnDataTypes = indexBySchemaAndName(columnDataTypes);
-    this.databaseUsers = indexByKey(databaseUsers);
+    this.schemas = new ImmutableNamedObjectIndex<>(schemas);
+    this.tables = new ImmutableNamedObjectIndex<>(schemaBoundObjects(tables));
+    this.routines = new ImmutableNamedObjectIndex<>(routines);
+    this.sequences = new ImmutableNamedObjectIndex<>(schemaBoundObjects(sequences));
+    this.synonyms = new ImmutableNamedObjectIndex<>(schemaBoundObjects(synonyms));
+    this.columnDataTypes = new ImmutableNamedObjectIndex<>(schemaBoundObjects(columnDataTypes));
+    this.databaseUsers = new ImmutableNamedObjectIndex<>(databaseUsers);
   }
 
   @Override
@@ -230,13 +202,14 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public Collection<Routine> getRoutines(final Schema schema, final String routineName) {
-    return routines.values().stream()
+    return routines.snapshot().stream()
         .filter(
             routine ->
                 schema != null
                     && routine.getSchema() != null
                     && schema.key().equals(routine.getSchema().key()))
         .filter(routine -> isBlank(routineName) || routineName.equals(routine.getName()))
+        .sorted()
         .toList();
   }
 
@@ -267,11 +240,12 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public Collection<ColumnDataType> getSystemColumnDataTypes() {
-    return columnDataTypes.values().stream()
+    return columnDataTypes.snapshot().stream()
         .filter(
             columnDataType ->
                 columnDataType.getSchema() != null
                     && SYSTEM_SCHEMA_KEY.equals(columnDataType.getSchema().key()))
+        .sorted()
         .toList();
   }
 
@@ -323,12 +297,27 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public <R extends Routine> Optional<R> lookupRoutine(final Schema schema, final String name) {
-    return (Optional<R>) getRoutines(schema, name).stream().findFirst();
+    if (schema == null) {
+      return Optional.empty();
+    }
+    if (isBlank(name)) {
+      return (Optional<R>)
+          routines.snapshot().stream()
+              .filter(
+                  routine ->
+                      routine.getSchema() != null && schema.key().equals(routine.getSchema().key()))
+              .findFirst();
+    }
+    return (Optional<R>) routines.lookup(schema, name);
   }
 
   @Override
   public <S extends Schema> Optional<S> lookupSchema(final String name) {
-    return (Optional<S>) Optional.ofNullable(schemas.get(name));
+    if (name == null) {
+      return Optional.empty();
+    }
+    return (Optional<S>)
+        schemas.snapshot().stream().filter(schema -> name.equals(schema.getFullName())).findFirst();
   }
 
   @Override

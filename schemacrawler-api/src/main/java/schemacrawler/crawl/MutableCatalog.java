@@ -243,6 +243,10 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Optional<MutableRoutine> lookupRoutine(final Schema schemaRef, final String name) {
+    requireNonNull(schemaRef, "No schema provided");
+    if (isBlank(name)) {
+      return Optional.empty();
+    }
     return routines.lookup(schemaRef, name);
   }
 
