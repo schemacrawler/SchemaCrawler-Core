@@ -42,12 +42,10 @@ public class CoverageTest {
 
   @Test
   public void namedObjectListNull() {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          final NamedObjectList<NamedObject> list = new NamedObjectList<>();
-          list.add(null);
-        });
+    final NamedObjectList<NamedObject> list = new NamedObjectList<>();
+    assertThat(list.add(null), is(false));
+    assertThat(list.size(), is(0));
+    assertThat(list.isEmpty(), is(true));
   }
 
   @Test

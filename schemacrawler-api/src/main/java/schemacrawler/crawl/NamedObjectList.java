@@ -8,10 +8,7 @@
 
 package schemacrawler.crawl;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -28,32 +25,12 @@ import schemacrawler.utility.NamedObjectIndex;
  * String. Returns values sorted in natural sort order, and is iterable. The iterator does not allow
  * modifications to the underlying data structure.
  */
-final class NamedObjectList<N extends NamedObject>
-    implements Serializable, Iterable<N>, NamedObjectIndex<NamedObjectKey, N> {
+final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N> {
 
   @Serial private static final long serialVersionUID = 3257847666804142128L;
 
-  private static NamedObjectKey makeLookupKey(final NamedObject namedObject) {
-    final NamedObjectKey key;
-    if (namedObject == null) {
-      key = null;
-    } else {
-      key = namedObject.key();
-    }
-    return key;
-  }
-
-  private static NamedObjectKey makeLookupKey(final NamedObject namedObject, final String name) {
-    NamedObjectKey key = makeLookupKey(namedObject);
-    if (key != null) {
-      key = key.with(name);
-    }
-    return key;
-  }
-
   private final ConcurrentNamedObjectIndex<N> objects = new ConcurrentNamedObjectIndex<>();
 
-  /** {@inheritDoc} */
   @Override
   public boolean containsKey(final NamedObjectKey key) {
     return objects.containsKey(key);
@@ -67,7 +44,7 @@ final class NamedObjectList<N extends NamedObject>
 
   @Override
   public Iterator<N> iterator() {
-    return objects.values().iterator();
+    return objects.iterator();
   }
 
   /**
@@ -78,7 +55,7 @@ final class NamedObjectList<N extends NamedObject>
    */
   @Override
   public Optional<N> lookup(final NamedObjectKey key) {
-    return internalGet(key);
+    return objects.lookup(key);
   }
 
   /** {@inheritDoc} */
@@ -124,27 +101,20 @@ final class NamedObjectList<N extends NamedObject>
    * @param namedObject Named object
    */
   boolean add(final N namedObject) {
-    requireNonNull(namedObject, "Cannot add a null object to the list");
     return objects.add(namedObject);
   }
 
-  boolean contains(final NamedObject namedObject) {
-    return objects.containsKey(makeLookupKey(namedObject));
-  }
-
   Optional<N> lookup(final NamedObject namedObject, final String name) {
+    if (namedObject == null || name == null) {
+      return Optional.empty();
+    }
     if (namedObject instanceof final Schema schema) {
       return lookup(schema, name);
     }
-    final NamedObjectKey key = makeLookupKey(namedObject, name);
-    return internalGet(key);
+    return lookup(namedObject.key().with(name));
   }
 
   Optional<N> remove(final N namedObject) {
-    return objects.remove(makeLookupKey(namedObject));
-  }
-
-  private Optional<N> internalGet(final NamedObjectKey key) {
-    return objects.lookup(key);
+    return objects.remove(namedObject);
   }
 }

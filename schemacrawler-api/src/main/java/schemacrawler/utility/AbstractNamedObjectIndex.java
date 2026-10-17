@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +26,7 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 
 abstract class AbstractNamedObjectIndex<N extends NamedObject>
-    implements NamedObjectIndex<NamedObjectKey, N>, Serializable {
+    implements NamedObjectIndex<N>, Serializable {
 
   @Serial private static final long serialVersionUID = -6220925141708190854L;
 
@@ -52,9 +53,9 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
     return objects.isEmpty();
   }
 
-  // Access to storage map for subclasses
-  Map<NamedObjectKey, N> getObjects() {
-    return objects;
+  @Override
+  public Iterator<N> iterator() {
+    return values().iterator();
   }
 
   /** {@inheritDoc} */
@@ -110,5 +111,10 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
     final List<N> sortedValues = new ArrayList<>(objects.values());
     Collections.sort(sortedValues);
     return List.copyOf(sortedValues);
+  }
+
+  // Access to storage map for subclasses
+  Map<NamedObjectKey, N> getObjects() {
+    return objects;
   }
 }

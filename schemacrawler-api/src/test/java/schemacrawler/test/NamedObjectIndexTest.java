@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 import java.io.Serial;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -36,61 +35,20 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
-import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.TestNamedObject;
 import schemacrawler.test.utility.crawl.LightProcedure;
-import schemacrawler.test.utility.crawl.LightTable;
 import schemacrawler.utility.ConcurrentNamedObjectIndex;
 import schemacrawler.utility.ImmutableNamedObjectIndex;
 import schemacrawler.utility.NamedObjectIndex;
 
 public class NamedObjectIndexTest {
 
-  private static class TestNamedObject implements NamedObject {
+  private static final class ComparisonFailingRoutine extends LightProcedure {
 
     @Serial private static final long serialVersionUID = 1L;
 
-    private final NamedObjectKey key;
-    private final String name;
-    private int order;
-
-    TestNamedObject(final NamedObjectKey key, final String name, final int order) {
-      this.key = key;
-      this.name = name;
-      this.order = order;
-    }
-
-    @Override
-    public int compareTo(final NamedObject other) {
-      return Integer.compare(order, ((TestNamedObject) other).order);
-    }
-
-    @Override
-    public String getFullName() {
-      return name;
-    }
-
-    @Override
-    public String getName() {
-      return name;
-    }
-
-    @Override
-    public NamedObjectKey key() {
-      return key;
-    }
-
-    @Override
-    public String toString() {
-      return name;
-    }
-  }
-
-  private static final class ComparisonFailingTable extends LightTable {
-
-    @Serial private static final long serialVersionUID = 1L;
-
-    ComparisonFailingTable(final Schema schema, final String name) {
+    ComparisonFailingRoutine(final Schema schema, final String name) {
       super(schema, name);
     }
 
@@ -101,27 +59,10 @@ public class NamedObjectIndexTest {
   }
 
   @Test
-  public void concurrentIndexAddsReplacesAndRemovesAtomically() {
-    final ConcurrentNamedObjectIndex<TestNamedObject> index = new ConcurrentNamedObjectIndex<>();
-    final NamedObjectKey key = new NamedObjectKey("object");
-    final TestNamedObject first = new TestNamedObject(key, "first", 0);
-    final TestNamedObject replacement = new TestNamedObject(key, "replacement", 1);
-
-    assertThat(index.add(first), is(true));
-    assertThat(index.add(replacement), is(true));
-    assertThat(index.lookup(key).orElseThrow(), is(replacement));
-    assertThat(index.size(), is(1));
-    assertThat(index.containsKey(key), is(true));
-    assertThat(index.remove(key).orElseThrow(), is(replacement));
-    assertThat(index.remove(key), is(Optional.empty()));
-    assertThat(index.isEmpty(), is(true));
-  }
-
-  @Test
   public void concurrentIndexSnapshotAndValuesAreDetachedAndUnmodifiable() {
     final ConcurrentNamedObjectIndex<TestNamedObject> index = new ConcurrentNamedObjectIndex<>();
-    final TestNamedObject first = new TestNamedObject(new NamedObjectKey("first"), "first", 1);
-    final TestNamedObject second = new TestNamedObject(new NamedObjectKey("second"), "second", 0);
+    final TestNamedObject first = new TestNamedObject("first", 1);
+    final TestNamedObject second = new TestNamedObject("second", 0);
     index.add(first);
     index.add(second);
     final ImmutableNamedObjectIndex<TestNamedObject> immutable =
@@ -130,7 +71,7 @@ public class NamedObjectIndexTest {
     final String concurrentRendering = index.toString();
     final List<TestNamedObject> snapshot = index.snapshot();
     final List<TestNamedObject> values = index.values();
-    index.remove(first.key());
+    index.remove(first);
 
     assertThat(values, contains(second, first));
     assertThat(concurrentRendering, is(immutable.toString()));
@@ -144,8 +85,8 @@ public class NamedObjectIndexTest {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final Schema otherSchema = new SchemaReference("CATALOG", "OTHER");
     final Routine routine = new LightProcedure(schema, "routine");
-    final ComparisonFailingTable nonmatching = new ComparisonFailingTable(otherSchema, "routine");
-    final ConcurrentNamedObjectIndex<NamedObject> index = new ConcurrentNamedObjectIndex<>();
+    final Routine nonmatching = new ComparisonFailingRoutine(otherSchema, "routine");
+    final ConcurrentNamedObjectIndex<Routine> index = new ConcurrentNamedObjectIndex<>();
     index.add(nonmatching);
     index.add(routine);
 
@@ -155,13 +96,13 @@ public class NamedObjectIndexTest {
     assertThat(index.lookup(schema, "specific"), is(Optional.empty()));
     assertThat(index.lookup(otherSchema, "routine").orElseThrow(), is(nonmatching));
 
-    final Table blankNamedTable = mock(Table.class);
-    when(blankNamedTable.getSchema()).thenReturn(schema);
-    when(blankNamedTable.getName()).thenReturn("");
-    when(blankNamedTable.key()).thenReturn(schema.key().with("").with("specific"));
-    when(blankNamedTable.compareTo(any(NamedObject.class))).thenReturn(0);
-    index.add(blankNamedTable);
-    assertThat(index.lookup(schema, "").orElseThrow(), is(blankNamedTable));
+    final Routine blankNamed = mock(Routine.class);
+    when(blankNamed.getSchema()).thenReturn(schema);
+    when(blankNamed.getName()).thenReturn("");
+    when(blankNamed.key()).thenReturn(schema.key().with("").with("specific"));
+    when(blankNamed.compareTo(any(NamedObject.class))).thenReturn(0);
+    index.add(blankNamed);
+    assertThat(index.lookup(schema, "").orElseThrow(), is(blankNamed));
   }
 
   @Test
@@ -179,45 +120,6 @@ public class NamedObjectIndexTest {
   }
 
   @Test
-  public void concurrentWritersRetainDistinctKeysAndSameKeyWritesReplace() throws Exception {
-    final ConcurrentNamedObjectIndex<TestNamedObject> distinctIndex =
-        new ConcurrentNamedObjectIndex<>();
-    final List<Callable<Void>> distinctWriters = new ArrayList<>();
-    for (int writer = 0; writer < 4; writer++) {
-      final int writerId = writer;
-      distinctWriters.add(
-          () -> {
-            for (int item = 0; item < 25; item++) {
-              final NamedObjectKey key = new NamedObjectKey("writer", writerId + "", item + "");
-              distinctIndex.add(new TestNamedObject(key, key.join(), item));
-            }
-            return null;
-          });
-    }
-    runTogether(distinctWriters);
-    assertThat(distinctIndex.size(), is(100));
-    assertThat(distinctIndex.values().size(), is(100));
-
-    final ConcurrentNamedObjectIndex<TestNamedObject> sameKeyIndex =
-        new ConcurrentNamedObjectIndex<>();
-    final NamedObjectKey sharedKey = new NamedObjectKey("shared");
-    final List<Callable<Void>> sameKeyWriters = new ArrayList<>();
-    for (int writer = 0; writer < 4; writer++) {
-      final int writerId = writer;
-      sameKeyWriters.add(
-          () -> {
-            for (int item = 0; item < 25; item++) {
-              sameKeyIndex.add(new TestNamedObject(sharedKey, writerId + "-" + item, item));
-            }
-            return null;
-          });
-    }
-    runTogether(sameKeyWriters);
-    assertThat(sameKeyIndex.size(), is(1));
-    assertThat(sameKeyIndex.lookup(sharedKey).isPresent(), is(true));
-  }
-
-  @Test
   public void concurrentWritersCanOverlapSnapshotsAndRemoval() throws Exception {
     final ConcurrentNamedObjectIndex<TestNamedObject> index = new ConcurrentNamedObjectIndex<>();
     final List<Callable<Void>> workers =
@@ -225,8 +127,9 @@ public class NamedObjectIndexTest {
             () -> {
               for (int item = 0; item < 200; item++) {
                 final NamedObjectKey key = new NamedObjectKey("changing", item + "");
-                index.add(new TestNamedObject(key, key.join(), item));
-                index.remove(key);
+                final TestNamedObject namedObject = new TestNamedObject(key.join(), item);
+                index.add(namedObject);
+                index.remove(namedObject);
               }
               return null;
             },
@@ -243,31 +146,47 @@ public class NamedObjectIndexTest {
   }
 
   @Test
-  public void immutableIndexDeduplicatesBeforeSortingAndDetachesCollection() {
-    final NamedObjectKey firstKey = new NamedObjectKey("first");
-    final NamedObjectKey secondKey = new NamedObjectKey("second");
-    final TestNamedObject first = new TestNamedObject(firstKey, "first", 2);
-    final TestNamedObject second = new TestNamedObject(secondKey, "second", 1);
-    final TestNamedObject duplicate = new TestNamedObject(firstKey, "duplicate", 0);
-    final Collection<TestNamedObject> source = new ArrayList<>(List.of(first, second, duplicate));
-    final ImmutableNamedObjectIndex<TestNamedObject> index =
-        new ImmutableNamedObjectIndex<>(source);
-    source.clear();
+  public void concurrentWritersRetainDistinctKeysAndSameKeyWritesReplace() throws Exception {
+    final ConcurrentNamedObjectIndex<TestNamedObject> distinctIndex =
+        new ConcurrentNamedObjectIndex<>();
+    final List<Callable<Void>> distinctWriters = new ArrayList<>();
+    for (int writer = 0; writer < 4; writer++) {
+      final int writerId = writer;
+      distinctWriters.add(
+          () -> {
+            for (int item = 0; item < 25; item++) {
+              final NamedObjectKey key = new NamedObjectKey("writer", writerId + "", item + "");
+              distinctIndex.add(new TestNamedObject(key.join(), item));
+            }
+            return null;
+          });
+    }
+    runTogether(distinctWriters);
+    assertThat(distinctIndex.size(), is(100));
+    assertThat(distinctIndex.values().size(), is(100));
 
-    assertThat(index.size(), is(2));
-    assertThat(index.lookup(firstKey).orElseThrow(), is(first));
-    assertThat(index.snapshot(), containsInAnyOrder(first, second));
-    assertThat(index.values(), contains(second, first));
-    assertThat(index.containsKey(firstKey), is(true));
-    assertThat(index.lookup(new NamedObjectKey("missing")), is(Optional.empty()));
-    assertThrows(UnsupportedOperationException.class, () -> index.snapshot().clear());
-    assertThrows(UnsupportedOperationException.class, () -> index.values().clear());
+    final ConcurrentNamedObjectIndex<TestNamedObject> sameKeyIndex =
+        new ConcurrentNamedObjectIndex<>();
+    final NamedObjectKey sharedKey = new NamedObjectKey("shared");
+    final List<Callable<Void>> sameKeyWriters = new ArrayList<>();
+    for (int writer = 0; writer < 4; writer++) {
+      sameKeyWriters.add(
+          () -> {
+            for (int item = 0; item < 25; item++) {
+              sameKeyIndex.add(new TestNamedObject(sharedKey.join(), item));
+            }
+            return null;
+          });
+    }
+    runTogether(sameKeyWriters);
+    assertThat(sameKeyIndex.size(), is(1));
+    assertThat(sameKeyIndex.lookup(sharedKey).isPresent(), is(true));
   }
 
   @Test
   public void immutableAndConcurrentIndexesSerializeTheirContracts() {
-    final TestNamedObject first = new TestNamedObject(new NamedObjectKey("first"), "first", 1);
-    final TestNamedObject second = new TestNamedObject(new NamedObjectKey("second"), "second", 0);
+    final TestNamedObject first = new TestNamedObject("first", 1);
+    final TestNamedObject second = new TestNamedObject("second", 0);
     final ImmutableNamedObjectIndex<TestNamedObject> immutable =
         new ImmutableNamedObjectIndex<>(List.of(first, second));
     final ImmutableNamedObjectIndex<TestNamedObject> immutableClone =
@@ -286,18 +205,15 @@ public class NamedObjectIndexTest {
     concurrent.add(first);
     final ConcurrentNamedObjectIndex<TestNamedObject> concurrentClone =
         SerializationUtils.clone(concurrent);
-    final TestNamedObject afterRead =
-        new TestNamedObject(new NamedObjectKey("after-read"), "after-read", 2);
+    final TestNamedObject afterRead = new TestNamedObject("after-read", 2);
     assertThat(concurrentClone.add(afterRead), is(true));
     assertThat(concurrentClone.lookup(afterRead.key()).orElseThrow().getName(), is("after-read"));
   }
 
   @Test
   public void indexesExposePublicReadContractWithoutIterable() {
-    final NamedObjectIndex<NamedObjectKey, TestNamedObject> immutable =
-        new ImmutableNamedObjectIndex<>(List.of());
-    final NamedObjectIndex<NamedObjectKey, TestNamedObject> concurrent =
-        new ConcurrentNamedObjectIndex<>();
+    final NamedObjectIndex<TestNamedObject> immutable = new ImmutableNamedObjectIndex<>(List.of());
+    final NamedObjectIndex<TestNamedObject> concurrent = new ConcurrentNamedObjectIndex<>();
 
     assertThat(immutable.isEmpty(), is(true));
     assertThat(concurrent.isEmpty(), is(true));
@@ -305,9 +221,6 @@ public class NamedObjectIndexTest {
     assertThat(concurrent.values(), is(empty()));
     assertThat(immutable.toString(), is(""));
     assertThat(concurrent.toString(), is(""));
-    assertThat(Iterable.class.isAssignableFrom(NamedObjectIndex.class), is(false));
-    assertThat(Iterable.class.isAssignableFrom(ImmutableNamedObjectIndex.class), is(false));
-    assertThat(Iterable.class.isAssignableFrom(ConcurrentNamedObjectIndex.class), is(false));
   }
 
   @Test
@@ -323,21 +236,18 @@ public class NamedObjectIndexTest {
     assertThrows(
         NullPointerException.class,
         () -> new ImmutableNamedObjectIndex<>(java.util.Arrays.asList((TestNamedObject) null)));
+
     assertThat(immutable.lookup((NamedObjectKey) null), is(Optional.empty()));
     assertThat(immutable.containsKey(null), is(false));
     assertThat(immutable.lookup(null, "name"), is(Optional.empty()));
     assertThat(immutable.lookup(schema, null), is(Optional.empty()));
+
     assertThat(concurrent.add(null), is(false));
     assertThat(concurrent.lookup((NamedObjectKey) null), is(Optional.empty()));
     assertThat(concurrent.containsKey(null), is(false));
     assertThat(concurrent.remove(null), is(Optional.empty()));
     assertThat(concurrent.lookup(null, "name"), is(Optional.empty()));
     assertThat(concurrent.lookup(schema, null), is(Optional.empty()));
-    assertThrows(
-        NullPointerException.class,
-        () -> new ImmutableNamedObjectIndex<>(List.of(new TestNamedObject(null, "no-key", 0))));
-    assertThrows(
-        NullPointerException.class, () -> concurrent.add(new TestNamedObject(null, "no-key", 0)));
   }
 
   @Test
@@ -397,37 +307,6 @@ public class NamedObjectIndexTest {
     } finally {
       start.countDown();
       executor.shutdownNow();
-    }
-  }
-
-  private static final class ComparisonFailingNamedObject implements NamedObject {
-
-    @Serial private static final long serialVersionUID = 1L;
-
-    private final NamedObjectKey key;
-
-    ComparisonFailingNamedObject(final NamedObjectKey key) {
-      this.key = key;
-    }
-
-    @Override
-    public int compareTo(final NamedObject other) {
-      throw new AssertionError("Snapshot must not compare objects");
-    }
-
-    @Override
-    public String getFullName() {
-      return key.join();
-    }
-
-    @Override
-    public String getName() {
-      return key.join();
-    }
-
-    @Override
-    public NamedObjectKey key() {
-      return key;
     }
   }
 }

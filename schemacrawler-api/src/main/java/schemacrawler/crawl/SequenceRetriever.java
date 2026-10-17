@@ -79,7 +79,7 @@ final class SequenceRetriever extends AbstractRetriever {
         final String sequenceName = results.getString("SEQUENCE_NAME");
 
         final Schema schema = new SchemaReference(catalogName, schemaName);
-        if (!schemas.contains(schema)) {
+        if (!schemas.containsKey(schema.key())) {
           continue;
         }
 

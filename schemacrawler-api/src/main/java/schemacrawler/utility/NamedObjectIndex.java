@@ -8,10 +8,12 @@
 
 package schemacrawler.utility;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.NamedObject;
+import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 
 /**
@@ -23,7 +25,7 @@ import schemacrawler.schema.Schema;
  * @param <K> Complete lookup-key type
  * @param <N> Named-object type
  */
-public interface NamedObjectIndex<K, N extends NamedObject> {
+public interface NamedObjectIndex<N extends NamedObject> extends Serializable, Iterable<N> {
 
   /**
    * Checks whether the index contains the complete key.
@@ -32,7 +34,7 @@ public interface NamedObjectIndex<K, N extends NamedObject> {
    * @return Whether the key is present
    * @throws NullPointerException if the key is null
    */
-  boolean containsKey(K key);
+  boolean containsKey(final NamedObjectKey key);
 
   /**
    * Checks whether the index contains any named objects.
@@ -48,7 +50,7 @@ public interface NamedObjectIndex<K, N extends NamedObject> {
    * @return The object, if present
    * @throws NullPointerException if the key is null
    */
-  Optional<N> lookup(K key);
+  Optional<N> lookup(NamedObjectKey key);
 
   /**
    * Looks up a database object by its schema key and exact object name.

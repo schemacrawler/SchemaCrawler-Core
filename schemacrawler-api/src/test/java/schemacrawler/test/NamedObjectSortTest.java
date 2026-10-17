@@ -19,76 +19,11 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.test.utility.TestNamedObject;
+import schemacrawler.test.utility.TestNamedObjectNullName;
 import schemacrawler.utility.NamedObjectSort;
 
 public class NamedObjectSortTest {
-
-  private static class NewNamedObject implements NamedObject {
-
-    /** */
-    private static final long serialVersionUID = 6242517200200079638L;
-
-    private final int value;
-    private final String name;
-
-    public NewNamedObject(final String name, final int value) {
-      this.name = name;
-      this.value = value;
-    }
-
-    @Override
-    public int compareTo(final NamedObject o) {
-      if (o == null) {
-        return -1;
-      }
-      if (o instanceof final NewNamedObject object) {
-        return Integer.compare(value, object.value);
-      }
-      return -1;
-    }
-
-    @Override
-    public String getFullName() {
-      return name;
-    }
-
-    @Override
-    public String getName() {
-      return name;
-    }
-
-    @Override
-    public NamedObjectKey key() {
-      return null;
-    }
-  }
-
-  private static class NullNamedObject implements NamedObject {
-
-    /** */
-    private static final long serialVersionUID = -5606558254139597791L;
-
-    @Override
-    public int compareTo(final NamedObject o) {
-      return 1;
-    }
-
-    @Override
-    public String getFullName() {
-      return null;
-    }
-
-    @Override
-    public String getName() {
-      return null;
-    }
-
-    @Override
-    public NamedObjectKey key() {
-      return null;
-    }
-  }
 
   @ParameterizedTest
   @ValueSource(booleans = {true, false, true, false, false, true})
@@ -127,10 +62,10 @@ public class NamedObjectSortTest {
 
     final int length = names.length;
 
-    final NullNamedObject nullNamedObject = new NullNamedObject();
+    final TestNamedObjectNullName nullNamedObject = new TestNamedObjectNullName();
     final List<NamedObject> expected = new ArrayList<>();
     for (int i = 0; i < length; i++) {
-      expected.add(new NewNamedObject(names[i], i));
+      expected.add(new TestNamedObject(names[i], i));
     }
     expected.add(nullNamedObject);
     expected.add(null);

@@ -106,7 +106,7 @@ final class SynonymRetriever extends AbstractRetriever {
         final Schema schema = new SchemaReference(catalogName, schemaName);
         final Schema referencedSchema =
             new SchemaReference(referencedObjectCatalogName, referencedObjectSchemaName);
-        if (!schemas.contains(schema) && !schemas.contains(referencedSchema)) {
+        if (!schemas.containsKey(schema.key()) && !schemas.containsKey(referencedSchema.key())) {
           continue;
         }
 

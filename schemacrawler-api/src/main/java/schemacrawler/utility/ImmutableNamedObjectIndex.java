@@ -34,7 +34,7 @@ public final class ImmutableNamedObjectIndex<N extends NamedObject>
 
   @Serial private static final long serialVersionUID = -4924635231319889869L;
 
-  private static <N extends NamedObject> Map<NamedObjectKey, N> makeImmutableNamedObjectIndex(
+  private static <N extends NamedObject> Map<NamedObjectKey, N> immutableNamedObjectMap(
       final Collection<? extends N> values) {
     requireNonNull(values, "Objects cannot be null");
     final Map<NamedObjectKey, N> index = new HashMap<>();
@@ -52,6 +52,6 @@ public final class ImmutableNamedObjectIndex<N extends NamedObject>
    * @throws NullPointerException if the collection, an object, or an object's key is null
    */
   public ImmutableNamedObjectIndex(final Collection<? extends N> values) {
-    super(makeImmutableNamedObjectIndex(values));
+    super(immutableNamedObjectMap(values));
   }
 }

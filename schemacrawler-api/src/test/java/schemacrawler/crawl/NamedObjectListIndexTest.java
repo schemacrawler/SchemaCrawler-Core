@@ -24,7 +24,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
@@ -39,7 +38,7 @@ public class NamedObjectListIndexTest {
     final NamedObjectList<Table> list = new NamedObjectList<>();
     final LightTable original = new LightTable("TABLE");
     final LightTable replacement = new LightTable("TABLE");
-    final NamedObjectIndex<NamedObjectKey, Table> index = list;
+    final NamedObjectIndex<Table> index = list;
 
     assertThat(list.add(original), is(true));
     assertThat(list.add(replacement), is(true));

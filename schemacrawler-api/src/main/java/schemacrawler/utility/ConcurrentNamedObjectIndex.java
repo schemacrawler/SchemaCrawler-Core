@@ -12,7 +12,6 @@ import java.io.Serial;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.NamedObjectKey;
 
 /**
  * Provides a concurrent mutable index of named objects keyed by each object's complete key.
@@ -60,10 +59,10 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
    * @return The removed object, if present
    * @throws NullPointerException if the key is null
    */
-  public Optional<N> remove(final NamedObjectKey key) {
-    if (key == null) {
+  public Optional<N> remove(final N namedObject) {
+    if (namedObject == null) {
       return Optional.empty();
     }
-    return Optional.ofNullable(getObjects().remove(key));
+    return Optional.ofNullable(getObjects().remove(namedObject.key()));
   }
 }
