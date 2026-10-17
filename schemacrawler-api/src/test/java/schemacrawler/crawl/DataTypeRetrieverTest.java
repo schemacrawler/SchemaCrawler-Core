@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static schemacrawler.schema.DataTypeType.user_defined;
 import static schemacrawler.schemacrawler.MetadataRetrievalStrategy.data_dictionary_all;
 import static schemacrawler.schemacrawler.SchemaInfoMetadataRetrievalStrategy.typeInfoRetrievalStrategy;
@@ -240,6 +239,6 @@ public class DataTypeRetrieverTest {
     assertThat(
         catalog.getColumnDataTypes(new SchemaReference("catalog", "schema")),
         is(emptyCollectionOf(ColumnDataType.class)));
-    assertThrows(NullPointerException.class, () -> catalog.getColumnDataTypes(null));
+    assertThat(catalog.getColumnDataTypes(null), is(empty()));
   }
 }

@@ -29,14 +29,6 @@ import schemacrawler.schema.Schema;
 abstract class AbstractNamedObjectIndex<N extends NamedObject>
     implements NamedObjectIndex<N>, Serializable {
 
-  @Override
-  public List<N> getObjects(Schema schema) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Serial private static final long serialVersionUID = -6220925141708190854L;
-
   private static final class FilterForSchema implements Predicate<DatabaseObject> {
 
     private final Schema schema;
@@ -51,11 +43,14 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
     }
   }
 
+  @Serial private static final long serialVersionUID = -6220925141708190854L;
+
   private final Map<NamedObjectKey, N> objects;
 
   /** Creates an index from a provided. */
   public AbstractNamedObjectIndex(final Map<NamedObjectKey, N> objects) {
-    // NOTE: Base class stores the provided storage map directly without making a defensive copy
+    // NOTE: Base class stores the provided storage map directly without making a
+    // defensive copy
     this.objects = requireNonNull(objects, "Objects cannot be null");
   }
 
@@ -66,6 +61,38 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
       return false;
     }
     return objects.containsKey(key);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public final List<N> getObjects() {
+    final List<N> sortedValues = new ArrayList<>(objects.values());
+    Collections.sort(sortedValues);
+    return List.copyOf(sortedValues);
+  }
+
+  @Override
+  public List<N> getObjects(final Schema schema) {
+    if (schema == null) {
+      return List.of();
+    }
+    final FilterForSchema schemaFilter = new FilterForSchema(schema);
+    final List<N> filteredObjects = new ArrayList<>();
+    for (final N object : snapshot()) {
+      if (object instanceof final Schema schemaObject) {
+        if (schemaObject.equals(schema)) {
+          filteredObjects.add(object);
+        }
+      } else if (object instanceof final DatabaseObject databaseObject) {
+        if (schemaFilter.test(databaseObject)) {
+          filteredObjects.add(object);
+        }
+      } else {
+        continue;
+      }
+    }
+    Collections.sort(filteredObjects);
+    return List.copyOf(filteredObjects);
   }
 
   /** {@inheritDoc} */
@@ -124,14 +151,6 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
   @Override
   public final String toString() {
     return getObjects().stream().map(NamedObject::toString).collect(joining(", "));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public final List<N> getObjects() {
-    final List<N> sortedValues = new ArrayList<>(objects.values());
-    Collections.sort(sortedValues);
-    return List.copyOf(sortedValues);
   }
 
   // Access to storage map for subclasses

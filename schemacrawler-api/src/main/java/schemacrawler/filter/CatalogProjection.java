@@ -14,12 +14,14 @@ import static schemacrawler.utility.NamedObjectSort.alphabetical;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -40,33 +42,10 @@ import schemacrawler.utility.ImmutableNamedObjectIndex;
 
 final class CatalogProjection implements Catalog {
 
-  @Serial private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = -8541112200327727237L;
 
   private static final String REMARKS_ATTRIBUTE = "REMARKS";
   private static final NamedObjectKey SYSTEM_SCHEMA_KEY = new SchemaReference().key();
-
-  private static <N extends DatabaseObject> Optional<N> lookupBySchemaAndName(
-      final ImmutableNamedObjectIndex<N> index, final Schema schema, final String name) {
-    if (schema == null || name == null) {
-      return Optional.empty();
-    }
-    return index.lookup(schema, name);
-  }
-
-  private static <N extends DatabaseObject> List<N> valuesForSchema(
-      final ImmutableNamedObjectIndex<N> index, final Schema schema) {
-    if (schema == null) {
-      return List.of();
-    }
-    return index.snapshot().stream()
-        .filter(value -> value.getSchema() != null && schema.key().equals(value.getSchema().key()))
-        .sorted()
-        .toList();
-  }
-
-  private static <N extends DatabaseObject> List<N> schemaBoundObjects(final Collection<N> values) {
-    return values.stream().filter(value -> value.getSchema() != null).toList();
-  }
 
   private final CrawlInfo crawlInfo;
   private final DatabaseInfo databaseInfo;
@@ -117,11 +96,11 @@ final class CatalogProjection implements Catalog {
     this.jdbcDriverInfo = jdbcDriverInfo;
     this.attributesMap = Map.copyOf(requireNonNullElse(attributesMap, Map.of()));
     this.schemas = new ImmutableNamedObjectIndex<>(schemas);
-    this.tables = new ImmutableNamedObjectIndex<>(schemaBoundObjects(tables));
+    this.tables = new ImmutableNamedObjectIndex<>(tables);
     this.routines = new ImmutableNamedObjectIndex<>(routines);
-    this.sequences = new ImmutableNamedObjectIndex<>(schemaBoundObjects(sequences));
-    this.synonyms = new ImmutableNamedObjectIndex<>(schemaBoundObjects(synonyms));
-    this.columnDataTypes = new ImmutableNamedObjectIndex<>(schemaBoundObjects(columnDataTypes));
+    this.sequences = new ImmutableNamedObjectIndex<>(sequences);
+    this.synonyms = new ImmutableNamedObjectIndex<>(synonyms);
+    this.columnDataTypes = new ImmutableNamedObjectIndex<>(columnDataTypes);
     this.databaseUsers = new ImmutableNamedObjectIndex<>(databaseUsers);
   }
 
@@ -145,14 +124,16 @@ final class CatalogProjection implements Catalog {
     return Collections.unmodifiableMap(new TreeMap<>(attributesMap));
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<ColumnDataType> getColumnDataTypes() {
     return List.copyOf(columnDataTypes.getObjects());
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<ColumnDataType> getColumnDataTypes(final Schema schema) {
-    return valuesForSchema(columnDataTypes, schema);
+    return List.copyOf(columnDataTypes.getObjects(schema));
   }
 
   @Override
@@ -165,6 +146,7 @@ final class CatalogProjection implements Catalog {
     return databaseInfo;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<DatabaseUser> getDatabaseUsers() {
     return List.copyOf(databaseUsers.getObjects());
@@ -175,6 +157,7 @@ final class CatalogProjection implements Catalog {
     return getName();
   }
 
+  /** {@inheritDoc} */
   @Override
   public JdbcDriverInfo getJdbcDriverInfo() {
     return jdbcDriverInfo;
@@ -190,73 +173,80 @@ final class CatalogProjection implements Catalog {
     return getAttribute(REMARKS_ATTRIBUTE, "");
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Routine> getRoutines() {
     return List.copyOf(routines.getObjects());
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Routine> getRoutines(final Schema schema) {
-    return getRoutines(schema, null);
+    return List.copyOf(routines.getObjects(schema));
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Routine> getRoutines(final Schema schema, final String routineName) {
-    return routines.snapshot().stream()
-        .filter(
-            routine ->
-                schema != null
-                    && routine.getSchema() != null
-                    && schema.key().equals(routine.getSchema().key()))
-        .filter(routine -> isBlank(routineName) || routineName.equals(routine.getName()))
-        .sorted()
-        .toList();
+    Predicate<DatabaseObject> filter = routine -> true;
+    if (!isBlank(routineName)) {
+      filter = filter.and(routine -> routine.getName().equals(routineName));
+    }
+    final Collection<Routine> routines = new ArrayList<>();
+    for (final Routine routine : getRoutines(schema)) {
+      if (filter.test(routine)) {
+        routines.add(routine);
+      }
+    }
+    return routines;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Schema> getSchemas() {
     return List.copyOf(schemas.getObjects());
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Sequence> getSequences() {
     return List.copyOf(sequences.getObjects());
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Sequence> getSequences(final Schema schema) {
-    return valuesForSchema(sequences, schema);
+    return List.copyOf(sequences.getObjects(schema));
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Synonym> getSynonyms() {
     return List.copyOf(synonyms.getObjects());
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Synonym> getSynonyms(final Schema schema) {
-    return valuesForSchema(synonyms, schema);
+    return List.copyOf(synonyms.getObjects(schema));
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<ColumnDataType> getSystemColumnDataTypes() {
-    return columnDataTypes.snapshot().stream()
-        .filter(
-            columnDataType ->
-                columnDataType.getSchema() != null
-                    && SYSTEM_SCHEMA_KEY.equals(columnDataType.getSchema().key()))
-        .sorted()
-        .toList();
+    return getColumnDataTypes(new SchemaReference());
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Table> getTables() {
     return List.copyOf(tables.getObjects());
   }
 
+  /** {@inheritDoc} */
   @Override
   public Collection<Table> getTables(final Schema schema) {
-    return valuesForSchema(tables, schema);
+    return List.copyOf(tables.getObjects(schema));
   }
 
   @Override
@@ -285,21 +275,17 @@ final class CatalogProjection implements Catalog {
   @Override
   public Optional<Column> lookupColumn(
       final Schema schema, final String tableName, final String name) {
-    return lookupBySchemaAndName(tables, schema, tableName)
-        .flatMap(table -> table.lookupColumn(name));
+    return tables.lookup(schema, tableName).flatMap(table -> table.lookupColumn(name));
   }
 
   @Override
   public <C extends ColumnDataType> Optional<C> lookupColumnDataType(
       final Schema schema, final String dataTypeName) {
-    return (Optional<C>) lookupBySchemaAndName(columnDataTypes, schema, dataTypeName);
+    return (Optional<C>) columnDataTypes.lookup(schema, dataTypeName);
   }
 
   @Override
   public <R extends Routine> Optional<R> lookupRoutine(final Schema schema, final String name) {
-    if (schema == null || name == null) {
-      return Optional.empty();
-    }
     return (Optional<R>) routines.lookup(schema, name);
   }
 
@@ -314,22 +300,22 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public <S extends Sequence> Optional<S> lookupSequence(final Schema schema, final String name) {
-    return (Optional<S>) lookupBySchemaAndName(sequences, schema, name);
+    return (Optional<S>) sequences.lookup(schema, name);
   }
 
   @Override
   public <S extends Synonym> Optional<S> lookupSynonym(final Schema schema, final String name) {
-    return (Optional<S>) lookupBySchemaAndName(synonyms, schema, name);
+    return (Optional<S>) synonyms.lookup(schema, name);
   }
 
   @Override
   public <C extends ColumnDataType> Optional<C> lookupSystemColumnDataType(final String name) {
-    return (Optional<C>) lookupBySchemaAndName(columnDataTypes, new SchemaReference(), name);
+    return (Optional<C>) columnDataTypes.lookup(new SchemaReference(), name);
   }
 
   @Override
   public <T extends Table> Optional<T> lookupTable(final Schema schema, final String name) {
-    return (Optional<T>) lookupBySchemaAndName(tables, schema, name);
+    return (Optional<T>) tables.lookup(schema, name);
   }
 
   @Override

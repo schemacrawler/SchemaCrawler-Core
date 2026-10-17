@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 
 import java.sql.Connection;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -143,9 +142,7 @@ public class NamedObjectListIndexTest {
     assertThat(catalog.lookupRoutine(schema, " "), is(Optional.empty()));
     assertThat(catalog.lookupRoutine(earlier.key()).orElseThrow(), sameInstance(earlier));
     assertThat(catalog.lookupRoutine(later.key()).orElseThrow(), sameInstance(later));
-    assertThrows(NullPointerException.class, () -> catalog.lookupRoutine(null, "run"));
-    final Collection<Table> schemaTables = catalog.getTables(schema);
-    schemaTables.clear();
+    assertThat(catalog.lookupRoutine(null, "run"), is(Optional.empty()));
     assertThat(catalog.getTables(schema), contains(table));
   }
 

@@ -39,20 +39,6 @@ import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder
  */
 final class MutableCatalog extends AbstractNamedObjectWithAttributes implements Catalog {
 
-  private static final class FilterBySchema implements Predicate<DatabaseObject> {
-
-    private final Schema schema;
-
-    public FilterBySchema(final Schema schema) {
-      this.schema = requireNonNull(schema, "No schema provided");
-    }
-
-    @Override
-    public boolean test(final DatabaseObject databaseObject) {
-      return databaseObject != null && databaseObject.getSchema().equals(schema);
-    }
-  }
-
   @Serial private static final long serialVersionUID = 4051323422934251828L;
 
   private final NamedObjectList<MutableColumnDataType> columnDataTypes = new NamedObjectList<>();
@@ -85,20 +71,13 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<ColumnDataType> getColumnDataTypes() {
-    return List.copyOf(columnDataTypes.values());
+    return List.copyOf(columnDataTypes.getObjects());
   }
 
   /** {@inheritDoc} */
   @Override
   public Collection<ColumnDataType> getColumnDataTypes(final Schema schema) {
-    final FilterBySchema filter = new FilterBySchema(schema);
-    final Collection<ColumnDataType> columnDataTypes = new ArrayList<>();
-    for (final ColumnDataType columnDataType : this.columnDataTypes) {
-      if (filter.test(columnDataType)) {
-        columnDataTypes.add(columnDataType);
-      }
-    }
-    return columnDataTypes;
+    return List.copyOf(columnDataTypes.getObjects(schema));
   }
 
   @Override
@@ -114,7 +93,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<DatabaseUser> getDatabaseUsers() {
-    return List.copyOf(databaseUsers.values());
+    return List.copyOf(databaseUsers.getObjects());
   }
 
   /** {@inheritDoc} */
@@ -126,24 +105,24 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<Routine> getRoutines() {
-    return List.copyOf(routines.values());
+    return List.copyOf(routines.getObjects());
   }
 
   /** {@inheritDoc} */
   @Override
   public Collection<Routine> getRoutines(final Schema schema) {
-    return getRoutines(schema, null);
+    return List.copyOf(routines.getObjects(schema));
   }
 
   /** {@inheritDoc} */
   @Override
   public Collection<Routine> getRoutines(final Schema schema, final String routineName) {
-    Predicate<DatabaseObject> filter = new FilterBySchema(schema);
+    Predicate<DatabaseObject> filter = routine -> true;
     if (!isBlank(routineName)) {
       filter = filter.and(routine -> routine.getName().equals(routineName));
     }
     final Collection<Routine> routines = new ArrayList<>();
-    for (final Routine routine : this.routines) {
+    for (final Routine routine : getRoutines(schema)) {
       if (filter.test(routine)) {
         routines.add(routine);
       }
@@ -154,45 +133,31 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<Schema> getSchemas() {
-    return List.copyOf(schemas.values());
+    return List.copyOf(schemas.getObjects());
   }
 
   /** {@inheritDoc} */
   @Override
   public Collection<Sequence> getSequences() {
-    return List.copyOf(sequences.values());
+    return List.copyOf(sequences.getObjects());
   }
 
   /** {@inheritDoc} */
   @Override
   public Collection<Sequence> getSequences(final Schema schema) {
-    final FilterBySchema filter = new FilterBySchema(schema);
-    final Collection<Sequence> sequences = new ArrayList<>();
-    for (final Sequence sequence : this.sequences) {
-      if (filter.test(sequence)) {
-        sequences.add(sequence);
-      }
-    }
-    return sequences;
+    return List.copyOf(sequences.getObjects(schema));
   }
 
   /** {@inheritDoc} */
   @Override
   public Collection<Synonym> getSynonyms() {
-    return List.copyOf(synonyms.values());
+    return List.copyOf(synonyms.getObjects());
   }
 
   /** {@inheritDoc} */
   @Override
   public Collection<Synonym> getSynonyms(final Schema schema) {
-    final FilterBySchema filter = new FilterBySchema(schema);
-    final Collection<Synonym> synonyms = new ArrayList<>();
-    for (final Synonym synonym : this.synonyms) {
-      if (filter.test(synonym)) {
-        synonyms.add(synonym);
-      }
-    }
-    return synonyms;
+    return List.copyOf(synonyms.getObjects(schema));
   }
 
   /** {@inheritDoc} */
@@ -204,33 +169,20 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   /** {@inheritDoc} */
   @Override
   public Collection<Table> getTables() {
-    return List.copyOf(tables.values());
+    return List.copyOf(tables.getObjects());
   }
 
   /** {@inheritDoc} */
   @Override
   public Collection<Table> getTables(final Schema schema) {
-    final FilterBySchema filter = new FilterBySchema(schema);
-    final Collection<Table> tables = new ArrayList<>();
-    for (final Table table : this.tables) {
-      if (filter.test(table)) {
-        tables.add(table);
-      }
-    }
-    return tables;
+    return List.copyOf(tables.getObjects(schema));
   }
 
   /** {@inheritDoc} */
   @Override
   public Optional<Column> lookupColumn(
-      final Schema schemaRef, final String tableName, final String name) {
-
-    final Optional<MutableTable> tableOptional = lookupTable(schemaRef, tableName);
-    if (tableOptional.isPresent()) {
-      final Table table = tableOptional.get();
-      return table.lookupColumn(name);
-    }
-    return Optional.empty();
+      final Schema schema, final String tableName, final String name) {
+    return tables.lookup(schema, tableName).flatMap(table -> table.lookupColumn(name));
   }
 
   /** {@inheritDoc} */
@@ -242,12 +194,8 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
   /** {@inheritDoc} */
   @Override
-  public Optional<MutableRoutine> lookupRoutine(final Schema schemaRef, final String name) {
-    requireNonNull(schemaRef, "No schema provided");
-    if (isBlank(name)) {
-      return Optional.empty();
-    }
-    return routines.lookup(schemaRef, name);
+  public Optional<MutableRoutine> lookupRoutine(final Schema schema, final String name) {
+    return routines.lookup(schema, name);
   }
 
   /** {@inheritDoc} */
