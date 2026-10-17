@@ -12,6 +12,7 @@ import java.io.Serial;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import schemacrawler.schema.NamedObject;
+import schemacrawler.schema.Schema;
 
 /**
  * Provides a concurrent mutable index of named objects keyed by each object's complete key.
@@ -50,6 +51,23 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
     }
     getObjects().put(namedObject.key(), namedObject);
     return true;
+  }
+
+  /**
+   * Allows lookup of dependent database objects from the parent database object.
+   *
+   * @param namedObject Parent database object (or schema)
+   * @param name Dependent object name
+   * @return Dependent object if found
+   */
+  public Optional<N> lookup(final NamedObject namedObject, final String name) {
+    if (namedObject == null || name == null) {
+      return Optional.empty();
+    }
+    if (namedObject instanceof final Schema schema) {
+      return lookup(schema, name);
+    }
+    return lookup(namedObject.key().with(name));
   }
 
   /**

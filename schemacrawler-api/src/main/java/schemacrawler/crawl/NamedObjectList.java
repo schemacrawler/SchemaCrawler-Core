@@ -105,13 +105,7 @@ final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N
   }
 
   Optional<N> lookup(final NamedObject namedObject, final String name) {
-    if (namedObject == null || name == null) {
-      return Optional.empty();
-    }
-    if (namedObject instanceof final Schema schema) {
-      return lookup(schema, name);
-    }
-    return lookup(namedObject.key().with(name));
+    return objects.lookup(namedObject, name);
   }
 
   Optional<N> remove(final N namedObject) {
