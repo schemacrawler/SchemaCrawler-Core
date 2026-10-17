@@ -147,7 +147,7 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public Collection<ColumnDataType> getColumnDataTypes() {
-    return List.copyOf(columnDataTypes.values());
+    return List.copyOf(columnDataTypes.getObjects());
   }
 
   @Override
@@ -167,7 +167,7 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public Collection<DatabaseUser> getDatabaseUsers() {
-    return List.copyOf(databaseUsers.values());
+    return List.copyOf(databaseUsers.getObjects());
   }
 
   @Override
@@ -192,7 +192,7 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public Collection<Routine> getRoutines() {
-    return List.copyOf(routines.values());
+    return List.copyOf(routines.getObjects());
   }
 
   @Override
@@ -215,12 +215,12 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public Collection<Schema> getSchemas() {
-    return List.copyOf(schemas.values());
+    return List.copyOf(schemas.getObjects());
   }
 
   @Override
   public Collection<Sequence> getSequences() {
-    return List.copyOf(sequences.values());
+    return List.copyOf(sequences.getObjects());
   }
 
   @Override
@@ -230,7 +230,7 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public Collection<Synonym> getSynonyms() {
-    return List.copyOf(synonyms.values());
+    return List.copyOf(synonyms.getObjects());
   }
 
   @Override
@@ -251,7 +251,7 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public Collection<Table> getTables() {
-    return List.copyOf(tables.values());
+    return List.copyOf(tables.getObjects());
   }
 
   @Override

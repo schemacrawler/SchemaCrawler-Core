@@ -37,6 +37,20 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
   boolean containsKey(final NamedObjectKey key);
 
   /**
+   * Gets a detached, unmodifiable list of objects in natural order.
+   *
+   * @return Naturally ordered objects
+   */
+  List<N> getObjects();
+
+  /**
+   * Gets a detached, unmodifiable list of objects for the given schema in natural order.
+   *
+   * @return Naturally ordered objects for a schema
+   */
+  List<N> getObjects(Schema schema);
+
+  /**
    * Checks whether the index contains any named objects.
    *
    * @return Whether the index contains no objects
@@ -79,11 +93,4 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
    * @return Naturally ordered objects
    */
   Collection<N> snapshot();
-
-  /**
-   * Gets a detached, unmodifiable list of objects in natural order.
-   *
-   * @return Naturally ordered objects
-   */
-  List<N> values();
 }

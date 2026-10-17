@@ -70,7 +70,7 @@ public class NamedObjectIndexTest {
 
     final String concurrentRendering = index.toString();
     final List<TestNamedObject> snapshot = index.snapshot();
-    final List<TestNamedObject> values = index.values();
+    final List<TestNamedObject> values = index.getObjects();
     index.remove(first);
 
     assertThat(values, contains(second, first));
@@ -136,7 +136,7 @@ public class NamedObjectIndexTest {
             () -> {
               for (int item = 0; item < 200; item++) {
                 index.snapshot();
-                index.values();
+                index.getObjects();
               }
               return null;
             });
@@ -163,7 +163,7 @@ public class NamedObjectIndexTest {
     }
     runTogether(distinctWriters);
     assertThat(distinctIndex.size(), is(100));
-    assertThat(distinctIndex.values().size(), is(100));
+    assertThat(distinctIndex.getObjects().size(), is(100));
 
     final ConcurrentNamedObjectIndex<TestNamedObject> sameKeyIndex =
         new ConcurrentNamedObjectIndex<>();
@@ -196,7 +196,7 @@ public class NamedObjectIndexTest {
         immutableClone.snapshot().stream().map(NamedObject::getName).toList(),
         containsInAnyOrder("first", "second"));
     assertThat(
-        immutableClone.values().stream().map(NamedObject::getName).toList(),
+        immutableClone.getObjects().stream().map(NamedObject::getName).toList(),
         contains("second", "first"));
     assertThat(immutableClone.toString(), is("second, first"));
 
@@ -217,8 +217,8 @@ public class NamedObjectIndexTest {
 
     assertThat(immutable.isEmpty(), is(true));
     assertThat(concurrent.isEmpty(), is(true));
-    assertThat(immutable.values(), is(empty()));
-    assertThat(concurrent.values(), is(empty()));
+    assertThat(immutable.getObjects(), is(empty()));
+    assertThat(concurrent.getObjects(), is(empty()));
     assertThat(immutable.toString(), is(""));
     assertThat(concurrent.toString(), is(""));
   }

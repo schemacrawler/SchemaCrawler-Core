@@ -36,6 +36,21 @@ final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N
     return objects.containsKey(key);
   }
 
+  /**
+   * Gets all named objects in the list, in sorted order.
+   *
+   * @return All named objects
+   */
+  @Override
+  public List<N> getObjects() {
+    return objects.getObjects();
+  }
+
+  @Override
+  public List<N> getObjects(Schema schema) {
+    return objects.getObjects(schema);
+  }
+
   /** {@inheritDoc} */
   @Override
   public boolean isEmpty() {
@@ -86,16 +101,6 @@ final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N
   }
 
   /**
-   * Gets all named objects in the list, in sorted order.
-   *
-   * @return All named objects
-   */
-  @Override
-  public List<N> values() {
-    return objects.values();
-  }
-
-  /**
    * Add a named object to the list.
    *
    * @param namedObject Named object
@@ -110,5 +115,9 @@ final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N
 
   Optional<N> remove(final N namedObject) {
     return objects.remove(namedObject);
+  }
+
+  List<N> values() {
+    return getObjects();
   }
 }

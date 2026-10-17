@@ -57,7 +57,7 @@ public class NamedObjectListIndexTest {
     final LightTable second = new LightTable("SECOND");
     list.add(first);
 
-    final List<Table> values = list.values();
+    final List<Table> values = list.getObjects();
     final Iterator<Table> iterator = list.iterator();
     list.add(second);
 
@@ -66,7 +66,7 @@ public class NamedObjectListIndexTest {
     assertThat(iterator.hasNext(), is(false));
     assertThrows(UnsupportedOperationException.class, () -> values.clear());
     assertThrows(UnsupportedOperationException.class, iterator::remove);
-    assertThat(list.values(), contains(first, second));
+    assertThat(list.getObjects(), contains(first, second));
     assertThat(list.toString(), is("FIRST, SECOND"));
   }
 
@@ -112,7 +112,7 @@ public class NamedObjectListIndexTest {
 
     assertThat(clonedList.lookup(table.key()).isPresent(), is(true));
     assertThat(clonedList.add(addedTable), is(true));
-    assertThat(clonedList.values(), contains(addedTable, table));
+    assertThat(clonedList.getObjects(), contains(addedTable, table));
   }
 
   @Test
@@ -153,7 +153,7 @@ public class NamedObjectListIndexTest {
   public void emptyListKeepsLegacyEmptyState() {
     final NamedObjectList<NamedObject> list = new NamedObjectList<>();
 
-    assertThat(list.values(), is(empty()));
+    assertThat(list.getObjects(), is(empty()));
     assertThat(list.toString(), is(""));
   }
 

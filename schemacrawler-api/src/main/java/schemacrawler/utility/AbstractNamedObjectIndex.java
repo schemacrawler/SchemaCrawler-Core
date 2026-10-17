@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -28,7 +29,27 @@ import schemacrawler.schema.Schema;
 abstract class AbstractNamedObjectIndex<N extends NamedObject>
     implements NamedObjectIndex<N>, Serializable {
 
+  @Override
+  public List<N> getObjects(Schema schema) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   @Serial private static final long serialVersionUID = -6220925141708190854L;
+
+  private static final class FilterForSchema implements Predicate<DatabaseObject> {
+
+    private final Schema schema;
+
+    FilterForSchema(final Schema schema) {
+      this.schema = requireNonNull(schema, "No schema provided");
+    }
+
+    @Override
+    public boolean test(final DatabaseObject databaseObject) {
+      return databaseObject != null && databaseObject.getSchema().equals(schema);
+    }
+  }
 
   private final Map<NamedObjectKey, N> objects;
 
@@ -55,7 +76,7 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
 
   @Override
   public Iterator<N> iterator() {
-    return values().iterator();
+    return getObjects().iterator();
   }
 
   /** {@inheritDoc} */
@@ -102,19 +123,19 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
   /** {@inheritDoc} */
   @Override
   public final String toString() {
-    return values().stream().map(NamedObject::toString).collect(joining(", "));
+    return getObjects().stream().map(NamedObject::toString).collect(joining(", "));
   }
 
   /** {@inheritDoc} */
   @Override
-  public final List<N> values() {
+  public final List<N> getObjects() {
     final List<N> sortedValues = new ArrayList<>(objects.values());
     Collections.sort(sortedValues);
     return List.copyOf(sortedValues);
   }
 
   // Access to storage map for subclasses
-  Map<NamedObjectKey, N> getObjects() {
+  Map<NamedObjectKey, N> internalMap() {
     return objects;
   }
 }

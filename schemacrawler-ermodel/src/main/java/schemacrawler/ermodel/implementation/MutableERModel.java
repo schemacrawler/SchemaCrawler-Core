@@ -82,7 +82,7 @@ class MutableERModel implements ERModel {
 
   @Override
   public Collection<Relationship> getRelationships() {
-    return relationshipsMap.values();
+    return relationshipsMap.getObjects();
   }
 
   @Override
@@ -112,7 +112,7 @@ class MutableERModel implements ERModel {
 
   @Override
   public Collection<Table> getTables() {
-    return tablesMap.values();
+    return tablesMap.getObjects();
   }
 
   @Override

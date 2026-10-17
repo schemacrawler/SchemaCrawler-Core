@@ -49,7 +49,7 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
     if (namedObject == null) {
       return false;
     }
-    getObjects().put(namedObject.key(), namedObject);
+    internalMap().put(namedObject.key(), namedObject);
     return true;
   }
 
@@ -81,6 +81,6 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
     if (namedObject == null) {
       return Optional.empty();
     }
-    return Optional.ofNullable(getObjects().remove(namedObject.key()));
+    return Optional.ofNullable(internalMap().remove(namedObject.key()));
   }
 }
