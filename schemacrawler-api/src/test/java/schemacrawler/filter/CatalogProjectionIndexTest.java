@@ -13,6 +13,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.Serial;
 import java.util.Collection;
@@ -22,6 +25,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.ColumnDataType;
+import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -35,23 +39,6 @@ import schemacrawler.test.utility.crawl.LightProcedure;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class CatalogProjectionIndexTest {
-
-  private static final class KeyedLightTable extends LightTable {
-
-    @Serial private static final long serialVersionUID = 1L;
-
-    private final NamedObjectKey key;
-
-    KeyedLightTable(final Schema schema, final String name, final NamedObjectKey key) {
-      super(schema, name);
-      this.key = key;
-    }
-
-    @Override
-    public NamedObjectKey key() {
-      return key;
-    }
-  }
 
   private static final class OrderedLightTable extends LightTable {
 
@@ -73,20 +60,17 @@ public class CatalogProjectionIndexTest {
   @Test
   public void completeKeysDeduplicateFirstWinsAndRetainSameNameObjects() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final NamedObjectKey firstKey = schema.key().with("shared").with("first");
-    final KeyedLightTable first = new KeyedLightTable(schema, "shared", firstKey);
-    final KeyedLightTable duplicate = new KeyedLightTable(schema, "shared", firstKey);
-    final KeyedLightTable distinct =
-        new KeyedLightTable(schema, "shared", schema.key().with("shared").with("second"));
+    final Routine first = new LightProcedure(schema, "shared");
+    final Routine duplicate = new LightProcedure(schema, "shared");
+    final Routine distinct = new LightProcedure(schema, "shared", "second");
     final CatalogProjection projection =
-        projection(List.of(schema), List.of(first, duplicate, distinct), List.of());
+        projection(List.of(schema), List.of(), List.of(first, duplicate, distinct));
 
-    final Collection<Table> tables = projection.getTables();
-    assertThat(tables.size(), is(2));
-    assertThat(tables.stream().anyMatch(table -> table == first), is(true));
-    assertThat(tables.stream().anyMatch(table -> table == duplicate), is(false));
-    assertThat(tables.stream().anyMatch(table -> table == distinct), is(true));
-    assertThat(projection.lookupTable(schema, "shared").orElseThrow(), sameInstance(first));
+    final Collection<Routine> routines = projection.getRoutines();
+    assertThat(routines.size(), is(2));
+    assertThat(routines.stream().anyMatch(routine -> routine == first), is(true));
+    assertThat(routines.stream().anyMatch(routine -> routine == duplicate), is(false));
+    assertThat(routines.stream().anyMatch(routine -> routine == distinct), is(true));
   }
 
   @Test
@@ -118,6 +102,29 @@ public class CatalogProjectionIndexTest {
     assertThat(projection.lookupSchema(secondFullName).orElseThrow(), sameInstance(second));
     assertThat(projection.lookupSchema(secondFullNameNoQuotes).isEmpty(), is(true));
     assertThat(projection.lookupSchema(null).isEmpty(), is(true));
+  }
+
+  @Test
+  public void ambiguousSchemaFullNameSelectsMinimumStructuredKey() {
+    final String fullName = "CATALOG.shared";
+    final Schema higherKey = schema(fullName, "shared", new NamedObjectKey("CATALOG", "z"));
+    final Schema lowerKey = schema(fullName, "shared", new NamedObjectKey("CATALOG", "a"));
+    final CatalogProjection projection =
+        projection(List.of(higherKey, lowerKey), List.of(), List.of());
+
+    assertThat(projection.getSchemas().size(), is(2));
+    assertThat(projection.lookupSchema(fullName).orElseThrow(), sameInstance(lowerKey));
+  }
+
+  @Test
+  public void singularRoutineLookupSelectsNaturalFirstOverload() {
+    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
+    final Routine later = new LightProcedure(schema, "run", "z");
+    final Routine earlier = new LightProcedure(schema, "run", "a");
+    final CatalogProjection projection =
+        projection(List.of(schema), List.of(), List.of(later, earlier));
+
+    assertThat(projection.lookupRoutine(schema, "run").orElseThrow(), sameInstance(earlier));
   }
 
   @Test
@@ -180,5 +187,23 @@ public class CatalogProjectionIndexTest {
         synonyms,
         columnDataTypes,
         databaseUsers);
+  }
+
+  private static <N extends DatabaseObject> N schemaLess(
+      final Class<N> objectClass, final String name) {
+    final N object = mock(objectClass);
+    when(object.getSchema()).thenReturn(null);
+    when(object.getName()).thenReturn(name);
+    when(object.key()).thenReturn(new NamedObjectKey("schema-less", name));
+    return object;
+  }
+
+  private static Schema schema(final String fullName, final String name, final NamedObjectKey key) {
+    final Schema schema = mock(Schema.class);
+    when(schema.getFullName()).thenReturn(fullName);
+    when(schema.getName()).thenReturn(name);
+    when(schema.key()).thenReturn(key);
+    when(schema.compareTo(any(NamedObject.class))).thenReturn(0);
+    return schema;
   }
 }

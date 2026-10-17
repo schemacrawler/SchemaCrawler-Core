@@ -58,6 +58,41 @@ public class NamedObjectIndexTest {
     }
   }
 
+  private static final class MutableOrderNamedObject implements NamedObject {
+
+    @Serial private static final long serialVersionUID = 1L;
+
+    private final NamedObjectKey key;
+    private final String name;
+    private int order;
+
+    MutableOrderNamedObject(final String name, final int order) {
+      key = new NamedObjectKey(name);
+      this.name = name;
+      this.order = order;
+    }
+
+    @Override
+    public int compareTo(final NamedObject other) {
+      return Integer.compare(order, ((MutableOrderNamedObject) other).order);
+    }
+
+    @Override
+    public String getFullName() {
+      return name;
+    }
+
+    @Override
+    public String getName() {
+      return name;
+    }
+
+    @Override
+    public NamedObjectKey key() {
+      return key;
+    }
+  }
+
   @Test
   public void concurrentIndexSnapshotAndValuesAreDetachedAndUnmodifiable() {
     final ConcurrentNamedObjectIndex<TestNamedObject> index = new ConcurrentNamedObjectIndex<>();
@@ -208,6 +243,44 @@ public class NamedObjectIndexTest {
     final TestNamedObject afterRead = new TestNamedObject("after-read", 2);
     assertThat(concurrentClone.add(afterRead), is(true));
     assertThat(concurrentClone.lookup(afterRead.key()).orElseThrow().getName(), is("after-read"));
+  }
+
+  @Test
+  public void immutableSnapshotDoesNotCompareAndValuesSortFreshly() {
+    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
+    final ComparisonFailingRoutine first = new ComparisonFailingRoutine(schema, "first");
+    final ComparisonFailingRoutine second = new ComparisonFailingRoutine(schema, "second");
+    final ImmutableNamedObjectIndex<Routine> comparisonFreeIndex =
+        new ImmutableNamedObjectIndex<>(List.of(first, second));
+
+    assertThat(comparisonFreeIndex.snapshot(), containsInAnyOrder(first, second));
+    assertThrows(AssertionError.class, comparisonFreeIndex::getObjects);
+
+    final MutableOrderNamedObject earlier = new MutableOrderNamedObject("earlier", 1);
+    final MutableOrderNamedObject later = new MutableOrderNamedObject("later", 2);
+    final ImmutableNamedObjectIndex<MutableOrderNamedObject> mutableOrderIndex =
+        new ImmutableNamedObjectIndex<>(List.of(earlier, later));
+    final List<MutableOrderNamedObject> previousValues = mutableOrderIndex.getObjects();
+
+    later.order = 0;
+
+    assertThat(previousValues, contains(earlier, later));
+    assertThat(mutableOrderIndex.getObjects(), contains(later, earlier));
+  }
+
+  @Test
+  public void schemaNameLookupExcludesNonDatabaseNamedObjects() {
+    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
+    final NamedObject nonDatabaseObject = mock(NamedObject.class);
+    when(nonDatabaseObject.getName()).thenReturn("target");
+    when(nonDatabaseObject.key()).thenReturn(schema.key().with("target"));
+    final ImmutableNamedObjectIndex<NamedObject> immutable =
+        new ImmutableNamedObjectIndex<>(List.of(nonDatabaseObject));
+    final ConcurrentNamedObjectIndex<NamedObject> concurrent = new ConcurrentNamedObjectIndex<>();
+    concurrent.add(nonDatabaseObject);
+
+    assertThat(immutable.lookup(schema, "target"), is(Optional.empty()));
+    assertThat(concurrent.lookup(schema, "target"), is(Optional.empty()));
   }
 
   @Test

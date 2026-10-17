@@ -42,8 +42,8 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
    * Adds or replaces an object by its complete key.
    *
    * @param namedObject Object to add
-   * @return Always true after a successful insertion
-   * @throws NullPointerException if the object or its key is null
+   * @return Whether the object was added; false if the object is null
+   * @throws NullPointerException if the object's key is null
    */
   public boolean add(final N namedObject) {
     if (namedObject == null) {
@@ -58,7 +58,7 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
    *
    * @param namedObject Parent database object (or schema)
    * @param name Dependent object name
-   * @return Dependent object if found
+   * @return Dependent object if found; empty if either argument is null or no object matches
    */
   public Optional<N> lookup(final NamedObject namedObject, final String name) {
     if (namedObject == null || name == null) {
@@ -71,11 +71,10 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
   }
 
   /**
-   * Removes and returns the object mapped to a complete key.
+   * Removes and returns the object mapped to the supplied object's complete key.
    *
-   * @param key Complete lookup key
-   * @return The removed object, if present
-   * @throws NullPointerException if the key is null
+   * @param namedObject Object whose complete key identifies the mapping to remove
+   * @return The removed object, if present; empty if the object is null or absent
    */
   public Optional<N> remove(final N namedObject) {
     if (namedObject == null) {

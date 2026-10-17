@@ -20,7 +20,8 @@ import schemacrawler.schema.Schema;
  * Provides read-only lookup and enumeration of named objects.
  *
  * <p>The interface does not specify whether membership is immutable or thread-safe. Values are
- * detached, unmodifiable lists in natural order. Implementations may provide stronger guarantees.
+ * detached, unmodifiable lists in natural order. Snapshots are detached and unmodifiable, with
+ * unspecified iteration order.
  *
  * @param <K> Complete lookup-key type
  * @param <N> Named-object type
@@ -31,8 +32,7 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
    * Checks whether the index contains the complete key.
    *
    * @param key Complete lookup key
-   * @return Whether the key is present
-   * @throws NullPointerException if the key is null
+   * @return Whether the key is present; false if the key is null
    */
   boolean containsKey(final NamedObjectKey key);
 
@@ -44,9 +44,10 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
   List<N> getObjects();
 
   /**
-   * Gets a detached, unmodifiable list of objects for the given schema in natural order.
+   * Gets a detached, unmodifiable list of objects for an equal schema in natural order.
    *
-   * @return Naturally ordered objects for a schema
+   * @param schema Schema to match using {@link Schema#equals(Object)}
+   * @return Naturally ordered objects for the schema, or an empty list if the schema is null
    */
   List<N> getObjects(Schema schema);
 
@@ -61,22 +62,21 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
    * Looks up an object by its complete key.
    *
    * @param key Complete lookup key
-   * @return The object, if present
-   * @throws NullPointerException if the key is null
+   * @return The object, if present; empty if the key is null or absent
    */
   Optional<N> lookup(NamedObjectKey key);
 
   /**
-   * Looks up a database object by its schema key and exact object name.
+   * Looks up a database object by an equal schema and exact object name.
    *
    * <p>This lookup is independent of the object's complete membership key. Blank names are matched
-   * literally. Implementations select one matching object when multiple objects qualify; this
-   * operation does not identify a unique overload.
+   * literally. Implementations select the natural-order first matching object; natural comparison
+   * ties have unspecified selection, and this operation does not identify a unique overload.
+   * Indexed database objects are expected to have non-null schemas.
    *
-   * @param schema Schema to match by key
+   * @param schema Schema to match using {@link Schema#equals(Object)}
    * @param name Exact object name
-   * @return The selected matching object, if present
-   * @throws NullPointerException if the schema or name is null
+   * @return The selected matching object, if present; empty if a query argument is null
    */
   Optional<N> lookup(Schema schema, String name);
 
@@ -90,7 +90,7 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
   /**
    * Gets a detached, unmodifiable unsorted collection of objects.
    *
-   * @return Naturally ordered objects
+   * @return Detached objects in unspecified order
    */
   Collection<N> snapshot();
 }

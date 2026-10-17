@@ -71,6 +71,7 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
     return List.copyOf(sortedValues);
   }
 
+  /** {@inheritDoc} */
   @Override
   public List<N> getObjects(final Schema schema) {
     if (schema == null) {
@@ -137,11 +138,7 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
     return objects.size();
   }
 
-  /**
-   * Gets an unmodifiable snapshot in original collection encounter order.
-   *
-   * @return Encounter-ordered objects
-   */
+  /** {@inheritDoc} */
   @Override
   public final List<N> snapshot() {
     return List.copyOf(objects.values());
@@ -153,7 +150,7 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
     return getObjects().stream().map(NamedObject::toString).collect(joining(", "));
   }
 
-  // Access to storage map for subclasses
+  /** Access to storage map for subclasses. */
   Map<NamedObjectKey, N> internalMap() {
     return objects;
   }

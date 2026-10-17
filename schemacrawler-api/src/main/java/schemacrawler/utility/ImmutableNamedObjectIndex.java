@@ -23,9 +23,10 @@ import schemacrawler.schema.NamedObjectKey;
  * <p>When keys are duplicated, the first object in collection encounter order is retained. The
  * collection is detached, but objects are shared references. Keys must remain stable. Values are
  * naturally sorted afresh on each call; objects must have stable comparison state during a sort.
- * Schema/name lookup returns the first matching retained object in encounter order. Snapshots
- * preserve encounter order without comparing objects. Returned lists are detached and unmodifiable.
- * The index is shallowly immutable and serializable when its objects are serializable.
+ * Schema/name lookup returns the natural-order first matching object, with comparison ties
+ * unspecified. Snapshots have unspecified iteration order and do not compare objects. Returned
+ * lists are detached and unmodifiable. The index is shallowly immutable and serializable when its
+ * objects are serializable.
  *
  * @param <N> Named-object type
  */

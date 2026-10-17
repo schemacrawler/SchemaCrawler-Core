@@ -8,10 +8,7 @@
 
 package schemacrawler.filter;
 
-import static java.util.Objects.compare;
-import static java.util.Objects.requireNonNullElse;
 import static schemacrawler.utility.NamedObjectSort.alphabetical;
-import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.util.ArrayList;
@@ -22,6 +19,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Predicate;
+
+import static java.util.Objects.compare;
+import static java.util.Objects.requireNonNullElse;
+
+import static us.fatehi.utility.Utility.isBlank;
+
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -45,7 +48,6 @@ final class CatalogProjection implements Catalog {
   @Serial private static final long serialVersionUID = -8541112200327727237L;
 
   private static final String REMARKS_ATTRIBUTE = "REMARKS";
-  private static final NamedObjectKey SYSTEM_SCHEMA_KEY = new SchemaReference().key();
 
   private final CrawlInfo crawlInfo;
   private final DatabaseInfo databaseInfo;
@@ -104,6 +106,16 @@ final class CatalogProjection implements Catalog {
     this.databaseUsers = new ImmutableNamedObjectIndex<>(databaseUsers);
   }
 
+  /**
+   * Looks up a routine by its schema and ordinary name.
+   *
+   * <p>Null or blank names are not treated as wildcards; use the collection lookup to enumerate
+   * routines in a schema.
+   *
+   * @param schema Schema to match
+   * @param name Ordinary routine name
+   * @return The natural-order first match, or empty if an argument is null or blank
+   */
   @Override
   public int compareTo(final NamedObject other) {
     return compare(this, other, alphabetical);
@@ -289,13 +301,26 @@ final class CatalogProjection implements Catalog {
     return (Optional<R>) routines.lookup(schema, name);
   }
 
+  /**
+   * Looks up a schema by its complete displayed name.
+   *
+   * <p>When multiple schemas have the same displayed name, the matching schema with the minimum
+   * structured key is returned.
+   *
+   * @param name Complete displayed schema name
+   * @return The matching schema, if present
+   */
   @Override
   public <S extends Schema> Optional<S> lookupSchema(final String name) {
-    if (name == null) {
+	    // Schemas need to be looked up by full name, since either the
+	    // catalog or schema may be null, depending on the database
+	    if (name == null) { // Schema names may be blank
       return Optional.empty();
     }
     return (Optional<S>)
-        schemas.snapshot().stream().filter(schema -> name.equals(schema.getFullName())).findFirst();
+        schemas.snapshot().stream()
+            .filter(schema -> name.equals(schema.getFullName()))
+            .findFirst();
   }
 
   @Override

@@ -8,15 +8,17 @@
 
 package schemacrawler.crawl;
 
-import static java.util.Objects.requireNonNull;
-import static us.fatehi.utility.Utility.isBlank;
-
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import static java.util.Objects.requireNonNull;
+
+import static us.fatehi.utility.Utility.isBlank;
+
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -203,7 +205,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   public Optional<SchemaReference> lookupSchema(final String name) {
     // Schemas need to be looked up by full name, since either the
     // catalog or schema may be null, depending on the database
-    if (name == null) {
+    if (name == null) { // Schema names may be blank
       return Optional.empty();
     }
     for (final SchemaReference schema : schemas) {
