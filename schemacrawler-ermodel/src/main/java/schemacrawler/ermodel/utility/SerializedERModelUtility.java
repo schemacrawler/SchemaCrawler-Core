@@ -33,7 +33,7 @@ public final class SerializedERModelUtility {
           Pattern.compile("schemacrawler\\.ermodel\\.model\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.ermodel\\.implementation\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.ermodel\\.associations\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.utility\\.ConcurrentNamedObjectIndex"),
+          Pattern.compile("schemacrawler\\.utility\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.[A-Z].*"),
           Pattern.compile("(\\[L)?java\\.(lang|util)\\..*"),
           Pattern.compile("java\\.(sql|math|time|net)\\..*"),

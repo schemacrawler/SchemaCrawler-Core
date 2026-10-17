@@ -8,6 +8,7 @@
 
 package schemacrawler.utility;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.schema.NamedObject;
@@ -69,6 +70,13 @@ public interface NamedObjectIndex<K, N extends NamedObject> {
    * @return Number of indexed objects
    */
   int size();
+
+  /**
+   * Gets a detached, unmodifiable unsorted collection of objects.
+   *
+   * @return Naturally ordered objects
+   */
+  Collection<N> snapshot();
 
   /**
    * Gets a detached, unmodifiable list of objects in natural order.

@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -94,6 +95,11 @@ final class NamedObjectList<N extends NamedObject>
   @Override
   public int size() {
     return objects.size();
+  }
+
+  @Override
+  public Collection<N> snapshot() {
+    return objects.snapshot();
   }
 
   /** {@inheritDoc} */

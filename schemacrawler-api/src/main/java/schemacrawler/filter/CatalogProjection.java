@@ -297,16 +297,8 @@ final class CatalogProjection implements Catalog {
 
   @Override
   public <R extends Routine> Optional<R> lookupRoutine(final Schema schema, final String name) {
-    if (schema == null) {
+    if (schema == null || name == null) {
       return Optional.empty();
-    }
-    if (isBlank(name)) {
-      return (Optional<R>)
-          routines.snapshot().stream()
-              .filter(
-                  routine ->
-                      routine.getSchema() != null && schema.key().equals(routine.getSchema().key()))
-              .findFirst();
     }
     return (Optional<R>) routines.lookup(schema, name);
   }

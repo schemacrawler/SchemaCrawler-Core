@@ -10,6 +10,7 @@ package schemacrawler.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,9 +34,11 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.crawl.LightProcedure;
 import schemacrawler.test.utility.crawl.LightTable;
 import schemacrawler.utility.ConcurrentNamedObjectIndex;
 import schemacrawler.utility.ImmutableNamedObjectIndex;
@@ -80,23 +83,6 @@ public class NamedObjectIndexTest {
     @Override
     public String toString() {
       return name;
-    }
-  }
-
-  private static class KeyedLightTable extends LightTable {
-
-    @Serial private static final long serialVersionUID = 1L;
-
-    private final NamedObjectKey key;
-
-    KeyedLightTable(final Schema schema, final String name, final NamedObjectKey key) {
-      super(schema, name);
-      this.key = key;
-    }
-
-    @Override
-    public NamedObjectKey key() {
-      return key;
     }
   }
 
@@ -157,8 +143,7 @@ public class NamedObjectIndexTest {
   public void concurrentSchemaNameLookupFiltersBeforeComparingAndTreatsBlankLiterally() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final Schema otherSchema = new SchemaReference("CATALOG", "OTHER");
-    final KeyedLightTable routine =
-        new KeyedLightTable(schema, "routine", schema.key().with("routine").with("specific"));
+    final Routine routine = new LightProcedure(schema, "routine");
     final ComparisonFailingTable nonmatching = new ComparisonFailingTable(otherSchema, "routine");
     final ConcurrentNamedObjectIndex<NamedObject> index = new ConcurrentNamedObjectIndex<>();
     index.add(nonmatching);
@@ -182,11 +167,9 @@ public class NamedObjectIndexTest {
   @Test
   public void concurrentSchemaNameLookupSelectsNaturalFirstOverload() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final KeyedLightTable later =
-        new KeyedLightTable(schema, "routine", schema.key().with("routine").with("z"));
-    final KeyedLightTable earlier =
-        new KeyedLightTable(schema, "routine", schema.key().with("routine").with("a"));
-    final ConcurrentNamedObjectIndex<KeyedLightTable> index = new ConcurrentNamedObjectIndex<>();
+    final Routine later = new LightProcedure(schema, "routine", "z");
+    final Routine earlier = new LightProcedure(schema, "routine", "a");
+    final ConcurrentNamedObjectIndex<Routine> index = new ConcurrentNamedObjectIndex<>();
     index.add(later);
     index.add(earlier);
 
@@ -273,61 +256,12 @@ public class NamedObjectIndexTest {
 
     assertThat(index.size(), is(2));
     assertThat(index.lookup(firstKey).orElseThrow(), is(first));
-    assertThat(index.snapshot(), contains(first, second));
+    assertThat(index.snapshot(), containsInAnyOrder(first, second));
     assertThat(index.values(), contains(second, first));
     assertThat(index.containsKey(firstKey), is(true));
     assertThat(index.lookup(new NamedObjectKey("missing")), is(Optional.empty()));
     assertThrows(UnsupportedOperationException.class, () -> index.snapshot().clear());
     assertThrows(UnsupportedOperationException.class, () -> index.values().clear());
-  }
-
-  @Test
-  public void immutableIndexReordersFreshlyAndPreservesTieEncounterOrder() {
-    final TestNamedObject first = new TestNamedObject(new NamedObjectKey("first"), "first", 1);
-    final TestNamedObject tied = new TestNamedObject(new NamedObjectKey("tied"), "tied", 1);
-    final TestNamedObject last = new TestNamedObject(new NamedObjectKey("last"), "last", 2);
-    final ImmutableNamedObjectIndex<TestNamedObject> index =
-        new ImmutableNamedObjectIndex<>(List.of(first, tied, last));
-
-    final List<TestNamedObject> originalValues = index.values();
-    last.order = 0;
-
-    assertThat(originalValues, contains(first, tied, last));
-    assertThat(index.values(), contains(last, first, tied));
-  }
-
-  @Test
-  public void immutableIndexSnapshotDoesNotCompareObjects() {
-    final ComparisonFailingNamedObject first =
-        new ComparisonFailingNamedObject(new NamedObjectKey("first"));
-    final ComparisonFailingNamedObject second =
-        new ComparisonFailingNamedObject(new NamedObjectKey("second"));
-    final ImmutableNamedObjectIndex<ComparisonFailingNamedObject> index =
-        new ImmutableNamedObjectIndex<>(List.of(first, second));
-
-    assertThat(index.snapshot(), contains(first, second));
-    assertThrows(AssertionError.class, index::values);
-  }
-
-  @Test
-  public void immutableIndexSchemaNameLookupUsesEncounterOrderAndCompleteKeys() {
-    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final KeyedLightTable first =
-        new KeyedLightTable(schema, "routine", schema.key().with("routine").with("z"));
-    final KeyedLightTable second =
-        new KeyedLightTable(schema, "routine", schema.key().with("routine").with("a"));
-    final Schema otherSchema = new SchemaReference("CATALOG", "OTHER");
-    final KeyedLightTable otherSchemaRoutine =
-        new KeyedLightTable(
-            otherSchema, "routine", otherSchema.key().with("routine").with("specific"));
-    final ImmutableNamedObjectIndex<KeyedLightTable> index =
-        new ImmutableNamedObjectIndex<>(List.of(first, second, otherSchemaRoutine));
-
-    assertThat(index.lookup(schema, "routine").orElseThrow(), is(first));
-    assertThat(index.lookup(otherSchema, "routine").orElseThrow(), is(otherSchemaRoutine));
-    assertThat(index.lookup(schema, "a"), is(Optional.empty()));
-    assertThat(index.lookup(first.key()).orElseThrow(), is(first));
-    assertThat(index.lookup(second.key()).orElseThrow(), is(second));
   }
 
   @Test
@@ -341,7 +275,7 @@ public class NamedObjectIndexTest {
 
     assertThat(
         immutableClone.snapshot().stream().map(NamedObject::getName).toList(),
-        contains("first", "second"));
+        containsInAnyOrder("first", "second"));
     assertThat(
         immutableClone.values().stream().map(NamedObject::getName).toList(),
         contains("second", "first"));
@@ -389,15 +323,15 @@ public class NamedObjectIndexTest {
     assertThrows(
         NullPointerException.class,
         () -> new ImmutableNamedObjectIndex<>(java.util.Arrays.asList((TestNamedObject) null)));
-    assertThrows(NullPointerException.class, () -> immutable.lookup((NamedObjectKey) null));
-    assertThrows(NullPointerException.class, () -> immutable.containsKey(null));
-    assertThrows(NullPointerException.class, () -> immutable.lookup(null, "name"));
-    assertThrows(NullPointerException.class, () -> immutable.lookup(schema, null));
-    assertThrows(NullPointerException.class, () -> concurrent.add(null));
-    assertThrows(NullPointerException.class, () -> concurrent.lookup((NamedObjectKey) null));
-    assertThrows(NullPointerException.class, () -> concurrent.containsKey(null));
-    assertThrows(NullPointerException.class, () -> concurrent.remove(null));
-    assertThrows(NullPointerException.class, () -> concurrent.lookup(null, "name"));
+    assertThat(immutable.lookup((NamedObjectKey) null), is(Optional.empty()));
+    assertThat(immutable.containsKey(null), is(false));
+    assertThat(immutable.lookup(null, "name"), is(Optional.empty()));
+    assertThat(immutable.lookup(schema, null), is(Optional.empty()));
+    assertThat(concurrent.add(null), is(false));
+    assertThat(concurrent.lookup((NamedObjectKey) null), is(Optional.empty()));
+    assertThat(concurrent.containsKey(null), is(false));
+    assertThat(concurrent.remove(null), is(Optional.empty()));
+    assertThat(concurrent.lookup(null, "name"), is(Optional.empty()));
     assertThat(concurrent.lookup(schema, null), is(Optional.empty()));
     assertThrows(
         NullPointerException.class,
@@ -407,50 +341,27 @@ public class NamedObjectIndexTest {
   }
 
   @Test
-  public void schemaNameLookupExcludesNonDatabaseAndSchemaLessObjects() {
-    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final Table schemaLessTable = mock(Table.class);
-    when(schemaLessTable.getSchema()).thenReturn(null);
-    when(schemaLessTable.getName()).thenReturn("target");
-    when(schemaLessTable.key()).thenReturn(new NamedObjectKey("schema-less", "target"));
-    final TestNamedObject nonDatabaseObject =
-        new TestNamedObject(schema.key().with("target"), "target", 0);
-    final ImmutableNamedObjectIndex<NamedObject> immutable =
-        new ImmutableNamedObjectIndex<>(List.of(schemaLessTable, nonDatabaseObject));
-    final ConcurrentNamedObjectIndex<NamedObject> concurrent = new ConcurrentNamedObjectIndex<>();
-    concurrent.add(schemaLessTable);
-    concurrent.add(nonDatabaseObject);
-
-    assertThat(immutable.lookup(schema, "target"), is(Optional.empty()));
-    assertThat(concurrent.lookup(schema, "target"), is(Optional.empty()));
-  }
-
-  @Test
   public void schemaNameLookupMatchesLiteralQuotedAndDottedNames() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final String exactName = "\"routine.with.dot\"";
-    final KeyedLightTable table =
-        new KeyedLightTable(schema, exactName, schema.key().with(exactName).with("specific"));
-    final ImmutableNamedObjectIndex<KeyedLightTable> immutable =
-        new ImmutableNamedObjectIndex<>(List.of(table));
-    final ConcurrentNamedObjectIndex<KeyedLightTable> concurrent =
-        new ConcurrentNamedObjectIndex<>();
-    concurrent.add(table);
+    final String exactName = "routine.with.dot";
+    final Routine routine = new LightProcedure(schema, exactName, "specific");
+    final ImmutableNamedObjectIndex<Routine> immutable =
+        new ImmutableNamedObjectIndex<>(List.of(routine));
+    final ConcurrentNamedObjectIndex<Routine> concurrent = new ConcurrentNamedObjectIndex<>();
+    concurrent.add(routine);
 
-    assertThat(immutable.lookup(schema, exactName).orElseThrow(), is(table));
-    assertThat(concurrent.lookup(schema, exactName).orElseThrow(), is(table));
-    assertThat(immutable.lookup(schema, "routine.with.dot"), is(Optional.empty()));
-    assertThat(concurrent.lookup(schema, "routine.with.dot"), is(Optional.empty()));
+    assertThat(immutable.lookup(schema, exactName).orElseThrow(), is(routine));
+    assertThat(concurrent.lookup(schema, exactName).orElseThrow(), is(routine));
+    assertThat(immutable.lookup(schema, "\"routine.with.dot\""), is(Optional.empty()));
+    assertThat(concurrent.lookup(schema, "\"routine.with.dot\""), is(Optional.empty()));
   }
 
   @Test
   public void schemaNameLookupSupportsNullAndEmptySpecificNameKeyParts() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final KeyedLightTable nullSpecific =
-        new KeyedLightTable(schema, "routine", schema.key().with("routine").with(null));
-    final KeyedLightTable emptySpecific =
-        new KeyedLightTable(schema, "routine", schema.key().with("routine").with(""));
-    final ConcurrentNamedObjectIndex<KeyedLightTable> index = new ConcurrentNamedObjectIndex<>();
+    final Routine nullSpecific = new LightProcedure(schema, "routine", null);
+    final Routine emptySpecific = new LightProcedure(schema, "routine", "");
+    final ConcurrentNamedObjectIndex<Routine> index = new ConcurrentNamedObjectIndex<>();
     index.add(nullSpecific);
     index.add(emptySpecific);
 

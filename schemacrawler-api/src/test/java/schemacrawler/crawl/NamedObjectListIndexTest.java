@@ -99,7 +99,7 @@ public class NamedObjectListIndexTest {
         routines.lookup(emptySpecificName.key()).orElseThrow(), sameInstance(emptySpecificName));
     assertThat(routines.lookup(schema.key().with("nullable")), is(Optional.empty()));
 
-    assertThrows(NullPointerException.class, () -> routines.lookup((Schema) null, "run"));
+    assertThat(routines.lookup((Schema) null, "run"), is(Optional.empty()));
     assertThat(routines.lookup(schema, null), is(Optional.empty()));
   }
 

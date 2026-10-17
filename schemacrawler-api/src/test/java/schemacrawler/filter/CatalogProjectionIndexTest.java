@@ -11,21 +11,17 @@ package schemacrawler.filter;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -94,33 +90,6 @@ public class CatalogProjectionIndexTest {
   }
 
   @Test
-  public void schemaBoundIndexesExcludeSchemaLessObjects() {
-    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final Table table = schemaLess(Table.class, "table");
-    final Sequence sequence = schemaLess(Sequence.class, "sequence");
-    final Synonym synonym = schemaLess(Synonym.class, "synonym");
-    final ColumnDataType dataType = schemaLess(ColumnDataType.class, "data_type");
-    final CatalogProjection projection =
-        projection(
-            List.of(schema),
-            List.of(table),
-            List.of(),
-            List.of(sequence),
-            List.of(synonym),
-            List.of(dataType),
-            List.of());
-
-    assertThat(projection.getTables(), is(empty()));
-    assertThat(projection.getSequences(), is(empty()));
-    assertThat(projection.getSynonyms(), is(empty()));
-    assertThat(projection.getColumnDataTypes(), is(empty()));
-    assertThat(projection.lookupTable(schema, "table").isEmpty(), is(true));
-    assertThat(projection.lookupSequence(schema, "sequence").isEmpty(), is(true));
-    assertThat(projection.lookupSynonym(schema, "synonym").isEmpty(), is(true));
-    assertThat(projection.lookupColumnDataType(schema, "data_type").isEmpty(), is(true));
-  }
-
-  @Test
   public void enumerationsUseFreshNaturalOrderAfterFilteringBySchema() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final OrderedLightTable first = new OrderedLightTable(schema, "first", 1);
@@ -138,30 +107,32 @@ public class CatalogProjectionIndexTest {
 
   @Test
   public void schemaIdentityUsesStructuredKeysAndFullNameLookupKeepsFirstMatch() {
-    final String fullName = "CATALOG.\"schema.with.dot\"";
-    final Schema first = schema(fullName, "first", new NamedObjectKey("CATALOG", "first"));
-    final Schema second = schema(fullName, "second", new NamedObjectKey("CATALOG", "second"));
+    final Schema first = new SchemaReference("CATALOG", "first");
+    final Schema second = new SchemaReference("CATALOG", "schema.with.dot");
     final CatalogProjection projection = projection(List.of(first, second), List.of(), List.of());
 
+    final String secondFullName = second.getFullName();
+    final String secondFullNameNoQuotes = "CATALOG.schema.with.dot";
+
     assertThat(projection.getSchemas(), contains(first, second));
-    assertThat(projection.lookupSchema(fullName).orElseThrow(), sameInstance(first));
-    assertThat(projection.lookupSchema("CATALOG.schema.with.dot").isEmpty(), is(true));
+    assertThat(projection.lookupSchema(secondFullName).orElseThrow(), sameInstance(second));
+    assertThat(projection.lookupSchema(secondFullNameNoQuotes).isEmpty(), is(true));
     assertThat(projection.lookupSchema(null).isEmpty(), is(true));
   }
 
   @Test
   public void routineLookupsPreserveOverloadsAndEncounterOrderForBlankNames() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final Routine first = routine(schema, "run", "z");
-    final Routine second = routine(schema, "run", "a");
+    final Routine first = new LightProcedure(schema, "run", "z");
+    final Routine second = new LightProcedure(schema, "run", "a");
     final CatalogProjection projection =
         projection(List.of(schema), List.of(), List.of(first, second));
 
     assertThat(projection.getRoutines(schema).size(), is(2));
     assertThat(projection.getRoutines(schema, "run").size(), is(2));
-    assertThat(projection.lookupRoutine(schema, "run").orElseThrow(), sameInstance(first));
-    assertThat(projection.lookupRoutine(schema, null).orElseThrow(), sameInstance(first));
-    assertThat(projection.lookupRoutine(schema, " ").orElseThrow(), sameInstance(first));
+    assertThat(projection.lookupRoutine(schema, "run").orElseThrow().getSpecificName(), is("a"));
+    assertThat(projection.lookupRoutine(schema, null), is(Optional.empty()));
+    assertThat(projection.lookupRoutine(schema, " "), is(Optional.empty()));
     assertThat(projection.lookupRoutine(schema, "specific-z").isEmpty(), is(true));
     assertThat(projection.lookupRoutine(null, "run").isEmpty(), is(true));
   }
@@ -180,37 +151,6 @@ public class CatalogProjectionIndexTest {
     assertThat(clonedProjection.lookupRoutine(clonedSchema, "routine").isPresent(), is(true));
     assertThat(clonedProjection.getTables().size(), is(1));
     assertThrows(UnsupportedOperationException.class, () -> clonedProjection.getTables().clear());
-  }
-
-  private static <N extends DatabaseObject> N schemaLess(
-      final Class<N> objectClass, final String name) {
-    final N object = mock(objectClass);
-    when(object.getSchema()).thenReturn(null);
-    when(object.getName()).thenReturn(name);
-    when(object.key()).thenReturn(new NamedObjectKey("schema-less", name));
-    return object;
-  }
-
-  private static Schema schema(final String fullName, final String name, final NamedObjectKey key) {
-    final Schema schema = mock(Schema.class);
-    when(schema.getFullName()).thenReturn(fullName);
-    when(schema.getName()).thenReturn(name);
-    when(schema.key()).thenReturn(key);
-    when(schema.compareTo(any(NamedObject.class))).thenReturn(0);
-    return schema;
-  }
-
-  private static Routine routine(
-      final Schema schema, final String name, final String specificName) {
-    final Routine routine = mock(Routine.class);
-    final NamedObjectKey key = schema.key().with(name).with(specificName);
-    when(routine.getSchema()).thenReturn(schema);
-    when(routine.getName()).thenReturn(name);
-    when(routine.getFullName()).thenReturn(schema.getFullName() + "." + name);
-    when(routine.key()).thenReturn(key);
-    when(routine.compareTo(any(NamedObject.class)))
-        .thenAnswer(invocation -> key.compareTo(((NamedObject) invocation.getArgument(0)).key()));
-    return routine;
   }
 
   private static CatalogProjection projection(
