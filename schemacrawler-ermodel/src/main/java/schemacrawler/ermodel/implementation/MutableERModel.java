@@ -24,7 +24,8 @@ import schemacrawler.ermodel.model.EntitySubtype;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.model.RelationshipCardinality;
-import schemacrawler.namedobject.ConcurrentNamedObjectIndex;
+import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
@@ -38,18 +39,18 @@ class MutableERModel implements ERModel {
   private static final EnumSet<EntityType> VALID_ENTITY_TYPES =
       EnumSet.of(EntityType.strong_entity, EntityType.weak_entity, EntityType.subtype);
 
-  private final ConcurrentNamedObjectIndex<Table> tablesMap;
+  private final ConcurrentDatabaseObjectIndex<Table> tablesMap;
   private final Set<TableReference> unmodeledTableReferences;
-  private final ConcurrentNamedObjectIndex<Entity> entitiesMap;
-  private final ConcurrentNamedObjectIndex<Relationship> relationshipsMap;
-  private final ConcurrentNamedObjectIndex<Relationship> implicitRelationshipsMap;
+  private final MapBackedNamedObjectIndex<Entity> entitiesMap;
+  private final MapBackedNamedObjectIndex<Relationship> relationshipsMap;
+  private final MapBackedNamedObjectIndex<Relationship> implicitRelationshipsMap;
 
   public MutableERModel() {
-    tablesMap = new ConcurrentNamedObjectIndex<>();
+    tablesMap = new ConcurrentDatabaseObjectIndex<>();
     unmodeledTableReferences = new CopyOnWriteArraySet<>();
-    entitiesMap = new ConcurrentNamedObjectIndex<>();
-    relationshipsMap = new ConcurrentNamedObjectIndex<>();
-    implicitRelationshipsMap = new ConcurrentNamedObjectIndex<>();
+    entitiesMap = new MapBackedNamedObjectIndex<>();
+    relationshipsMap = new MapBackedNamedObjectIndex<>();
+    implicitRelationshipsMap = new MapBackedNamedObjectIndex<>();
   }
 
   @Override

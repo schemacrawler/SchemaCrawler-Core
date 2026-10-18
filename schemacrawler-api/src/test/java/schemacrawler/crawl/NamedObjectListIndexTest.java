@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -148,7 +149,7 @@ public class NamedObjectListIndexTest {
 
   @Test
   public void emptyListKeepsLegacyEmptyState() {
-    final NamedObjectList<NamedObject> list = new NamedObjectList<>();
+    final NamedObjectList<DatabaseObject> list = new NamedObjectList<>();
 
     assertThat(list.getObjects(), is(empty()));
     assertThat(list.toString(), is(""));

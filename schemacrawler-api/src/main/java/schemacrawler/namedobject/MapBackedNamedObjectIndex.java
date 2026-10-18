@@ -22,7 +22,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.schema.Schema;
 
 public final class MapBackedNamedObjectIndex<N extends NamedObject>
     implements NamedObjectIndex<N>, BuildableIndex<N> {
@@ -75,12 +74,6 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
 
   /** {@inheritDoc} */
   @Override
-  public List<N> getObjects(final Schema schema) {
-    throw new UnsupportedOperationException();
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public boolean isEmpty() {
     return objects.isEmpty();
   }
@@ -97,12 +90,6 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
       return Optional.empty();
     }
     return Optional.ofNullable(objects.get(key));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<N> lookup(final Schema schema, final String name) {
-    throw new UnsupportedOperationException();
   }
 
   /** {@inheritDoc} */

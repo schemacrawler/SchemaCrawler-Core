@@ -26,8 +26,8 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 
-abstract class AbstractNamedObjectIndex<N extends NamedObject>
-    implements NamedObjectIndex<N>, Serializable {
+abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
+    implements DatabaseObjectIndex<D>, Serializable {
 
   private static final class FilterForSchema implements Predicate<DatabaseObject> {
 
@@ -45,10 +45,10 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
 
   @Serial private static final long serialVersionUID = -6220925141708190854L;
 
-  private final Map<NamedObjectKey, N> objects;
+  private final Map<NamedObjectKey, D> objects;
 
   /** Creates an index from a provided. */
-  public AbstractNamedObjectIndex(final Map<NamedObjectKey, N> objects) {
+  public AbstractDatabaseObjectIndex(final Map<NamedObjectKey, D> objects) {
     // NOTE: Base class stores the provided storage map directly without making a
     // defensive copy
     this.objects = requireNonNull(objects, "Objects cannot be null");
@@ -65,32 +65,25 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
 
   /** {@inheritDoc} */
   @Override
-  public final List<N> getObjects() {
-    final List<N> sortedValues = new ArrayList<>(objects.values());
+  public final List<D> getObjects() {
+    final List<D> sortedValues = new ArrayList<>(objects.values());
     Collections.sort(sortedValues);
     return List.copyOf(sortedValues);
   }
 
   /** {@inheritDoc} */
   @Override
-  public List<N> getObjects(final Schema schema) {
+  public List<D> getObjects(final Schema schema) {
     if (schema == null) {
       return List.of();
     }
     final FilterForSchema schemaFilter = new FilterForSchema(schema);
-    final List<N> filteredObjects = new ArrayList<>();
-    for (final N object : snapshot()) {
-      if (object instanceof final Schema schemaObject) {
-        if (schemaObject.equals(schema)) {
-          filteredObjects.add(object);
-        }
-      } else if (object instanceof final DatabaseObject databaseObject) {
-        if (schemaFilter.test(databaseObject)) {
-          filteredObjects.add(object);
-        }
-      } else {
+    final List<D> filteredObjects = new ArrayList<>();
+    for (final D object : snapshot()) {
+      if (!schemaFilter.test(object)) {
         continue;
       }
+      filteredObjects.add(object);
     }
     Collections.sort(filteredObjects);
     return List.copyOf(filteredObjects);
@@ -103,13 +96,13 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
   }
 
   @Override
-  public Iterator<N> iterator() {
+  public Iterator<D> iterator() {
     return getObjects().iterator();
   }
 
   /** {@inheritDoc} */
   @Override
-  public final Optional<N> lookup(final NamedObjectKey key) {
+  public final Optional<D> lookup(final NamedObjectKey key) {
     if (key == null) {
       return Optional.empty();
     }
@@ -118,17 +111,16 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
 
   /** {@inheritDoc} */
   @Override
-  public final Optional<N> lookup(final Schema schema, final String name) {
+  public final Optional<D> lookup(final Schema schema, final String name) {
     if (schema == null || name == null) {
       return Optional.empty();
     }
-    final Comparator<N> comparator = Comparator.naturalOrder();
+    final Comparator<D> comparator = Comparator.naturalOrder();
     return snapshot().stream()
         .filter(DatabaseObject.class::isInstance)
         .filter(
             namedObject ->
-                ((DatabaseObject) namedObject).getSchema().equals(schema)
-                    && namedObject.getName().equals(name))
+                namedObject.getSchema().equals(schema) && namedObject.getName().equals(name))
         .min(comparator);
   }
 
@@ -140,7 +132,7 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
 
   /** {@inheritDoc} */
   @Override
-  public final List<N> snapshot() {
+  public final List<D> snapshot() {
     return List.copyOf(objects.values());
   }
 
@@ -151,7 +143,7 @@ abstract class AbstractNamedObjectIndex<N extends NamedObject>
   }
 
   /** Access to storage map for subclasses. */
-  Map<NamedObjectKey, N> internalMap() {
+  Map<NamedObjectKey, D> internalMap() {
     return objects;
   }
 }

@@ -11,6 +11,7 @@ package schemacrawler.namedobject;
 import java.io.Serial;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Schema;
 
@@ -26,21 +27,21 @@ import schemacrawler.schema.Schema;
  * values are sorted. Returned lists are detached and unmodifiable. The index is serializable when
  * its objects are serializable.
  *
- * @param <N> Named-object type
+ * @param <D> Named-object type
  */
-public final class ConcurrentNamedObjectIndex<N extends NamedObject>
-    extends AbstractNamedObjectIndex<N> implements BuildableIndex<N> {
+public final class ConcurrentDatabaseObjectIndex<D extends DatabaseObject>
+    extends AbstractDatabaseObjectIndex<D> implements BuildableIndex<D> {
 
   @Serial private static final long serialVersionUID = -1089958942591485649L;
 
   /** Creates an empty concurrent index. */
-  public ConcurrentNamedObjectIndex() {
+  public ConcurrentDatabaseObjectIndex() {
     super(new ConcurrentHashMap<>());
   }
 
   /** {@inheritDoc} */
   @Override
-  public boolean add(final N namedObject) {
+  public boolean add(final D namedObject) {
     if (namedObject == null) {
       return false;
     }
@@ -55,7 +56,7 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
    * @param name Dependent object name
    * @return Dependent object if found; empty if either argument is null or no object matches
    */
-  public Optional<N> lookup(final NamedObject namedObject, final String name) {
+  public Optional<D> lookup(final NamedObject namedObject, final String name) {
     if (namedObject == null || name == null) {
       return Optional.empty();
     }
@@ -67,7 +68,7 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
 
   /** {@inheritDoc} */
   @Override
-  public Optional<N> remove(final N namedObject) {
+  public Optional<D> remove(final D namedObject) {
     if (namedObject == null) {
       return Optional.empty();
     }

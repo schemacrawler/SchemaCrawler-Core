@@ -14,6 +14,7 @@ import java.io.Serial;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 
@@ -28,10 +29,10 @@ import schemacrawler.schema.NamedObjectKey;
  * lists are detached and unmodifiable. The index is shallowly immutable and serializable when its
  * objects are serializable.
  *
- * @param <N> Named-object type
+ * @param <D> Named-object type
  */
-public final class ImmutableNamedObjectIndex<N extends NamedObject>
-    extends AbstractNamedObjectIndex<N> {
+public final class ImmutableDatabaseObjectIndex<D extends DatabaseObject>
+    extends AbstractDatabaseObjectIndex<D> {
 
   @Serial private static final long serialVersionUID = -4924635231319889869L;
 
@@ -52,7 +53,7 @@ public final class ImmutableNamedObjectIndex<N extends NamedObject>
    * @param values Objects to index
    * @throws NullPointerException if the collection, an object, or an object's key is null
    */
-  public ImmutableNamedObjectIndex(final Collection<? extends N> values) {
+  public ImmutableDatabaseObjectIndex(final Collection<? extends D> values) {
     super(immutableNamedObjectMap(values));
   }
 }

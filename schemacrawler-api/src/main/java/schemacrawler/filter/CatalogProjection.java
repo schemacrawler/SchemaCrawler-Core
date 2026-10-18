@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
-import schemacrawler.namedobject.ImmutableNamedObjectIndex;
+import schemacrawler.namedobject.ImmutableDatabaseObjectIndex;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Catalog;
@@ -46,11 +46,11 @@ final class CatalogProjection extends AbstractNamedObjectWithAttributes implemen
   private final JdbcDriverInfo jdbcDriverInfo;
   private final NamedObjectIndex<DatabaseUser> databaseUsers;
   private final NamedObjectIndex<Schema> schemas;
-  private final ImmutableNamedObjectIndex<ColumnDataType> columnDataTypes;
-  private final ImmutableNamedObjectIndex<Table> tables;
-  private final ImmutableNamedObjectIndex<Routine> routines;
-  private final ImmutableNamedObjectIndex<Sequence> sequences;
-  private final ImmutableNamedObjectIndex<Synonym> synonyms;
+  private final ImmutableDatabaseObjectIndex<ColumnDataType> columnDataTypes;
+  private final ImmutableDatabaseObjectIndex<Table> tables;
+  private final ImmutableDatabaseObjectIndex<Routine> routines;
+  private final ImmutableDatabaseObjectIndex<Sequence> sequences;
+  private final ImmutableDatabaseObjectIndex<Synonym> synonyms;
 
   CatalogProjection(
       final String name,
@@ -91,11 +91,11 @@ final class CatalogProjection extends AbstractNamedObjectWithAttributes implemen
     addAttributes(attributesMap);
     this.databaseUsers = new MapBackedNamedObjectIndex<>(databaseUsers);
     this.schemas = new MapBackedNamedObjectIndex<>(schemas);
-    this.tables = new ImmutableNamedObjectIndex<>(tables);
-    this.routines = new ImmutableNamedObjectIndex<>(routines);
-    this.sequences = new ImmutableNamedObjectIndex<>(sequences);
-    this.synonyms = new ImmutableNamedObjectIndex<>(synonyms);
-    this.columnDataTypes = new ImmutableNamedObjectIndex<>(columnDataTypes);
+    this.tables = new ImmutableDatabaseObjectIndex<>(tables);
+    this.routines = new ImmutableDatabaseObjectIndex<>(routines);
+    this.sequences = new ImmutableDatabaseObjectIndex<>(sequences);
+    this.synonyms = new ImmutableDatabaseObjectIndex<>(synonyms);
+    this.columnDataTypes = new ImmutableDatabaseObjectIndex<>(columnDataTypes);
   }
 
   @Override

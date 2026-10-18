@@ -13,8 +13,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import schemacrawler.namedobject.ConcurrentNamedObjectIndex;
-import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.DatabaseObjectIndex;
+import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
@@ -25,11 +26,11 @@ import schemacrawler.schema.Schema;
  * String. Returns values sorted in natural sort order, and is iterable. The iterator does not allow
  * modifications to the underlying data structure.
  */
-final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N> {
+final class NamedObjectList<D extends DatabaseObject> implements DatabaseObjectIndex<D> {
 
   @Serial private static final long serialVersionUID = 3257847666804142128L;
 
-  private final ConcurrentNamedObjectIndex<N> objects = new ConcurrentNamedObjectIndex<>();
+  private final ConcurrentDatabaseObjectIndex<D> objects = new ConcurrentDatabaseObjectIndex<>();
 
   @Override
   public boolean containsKey(final NamedObjectKey key) {
@@ -42,12 +43,12 @@ final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N
    * @return All named objects
    */
   @Override
-  public List<N> getObjects() {
+  public List<D> getObjects() {
     return objects.getObjects();
   }
 
   @Override
-  public List<N> getObjects(Schema schema) {
+  public List<D> getObjects(Schema schema) {
     return objects.getObjects(schema);
   }
 
@@ -58,7 +59,7 @@ final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N
   }
 
   @Override
-  public Iterator<N> iterator() {
+  public Iterator<D> iterator() {
     return objects.iterator();
   }
 
@@ -69,13 +70,13 @@ final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N
    * @return Named object
    */
   @Override
-  public Optional<N> lookup(final NamedObjectKey key) {
+  public Optional<D> lookup(final NamedObjectKey key) {
     return objects.lookup(key);
   }
 
   /** {@inheritDoc} */
   @Override
-  public Optional<N> lookup(final Schema schema, final String name) {
+  public Optional<D> lookup(final Schema schema, final String name) {
     return objects.lookup(schema, name);
   }
 
@@ -90,7 +91,7 @@ final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N
   }
 
   @Override
-  public Collection<N> snapshot() {
+  public Collection<D> snapshot() {
     return objects.snapshot();
   }
 
@@ -105,19 +106,19 @@ final class NamedObjectList<N extends NamedObject> implements NamedObjectIndex<N
    *
    * @param namedObject Named object
    */
-  boolean add(final N namedObject) {
+  boolean add(final D namedObject) {
     return objects.add(namedObject);
   }
 
-  Optional<N> lookup(final NamedObject namedObject, final String name) {
+  Optional<D> lookup(final NamedObject namedObject, final String name) {
     return objects.lookup(namedObject, name);
   }
 
-  Optional<N> remove(final N namedObject) {
+  Optional<D> remove(final D namedObject) {
     return objects.remove(namedObject);
   }
 
-  List<N> values() {
+  List<D> values() {
     return getObjects();
   }
 }
