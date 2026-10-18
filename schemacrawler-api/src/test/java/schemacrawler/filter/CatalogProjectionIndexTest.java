@@ -15,11 +15,16 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import org.apache.commons.lang3.SerializationUtils;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DatabaseUser;
@@ -99,8 +104,8 @@ public class CatalogProjectionIndexTest {
     assertThat(projection.lookupSchema(null).isEmpty(), is(true));
   }
 
-  @Test
-  public void ambiguousSchemaFullNameSelectsMinimumStructuredKey() {
+  @RepeatedTest(100)
+  public void ambiguousSchemaFullNameSelectsMinimumStructuredKey(final RepetitionInfo repetition) {
     final String schemaName = "SCHEMA";
     final Schema schema1 = new SchemaReference("", schemaName);
     final Schema schema2 = new SchemaReference(null, schemaName);
@@ -110,8 +115,9 @@ public class CatalogProjectionIndexTest {
     assertThat(schema2.getFullName(), is(schemaName));
     assertThat(schema3.getFullName(), is(schemaName));
 
-    final CatalogProjection projection =
-        projection(List.of(schema2, schema1, schema3), List.of(), List.of());
+    final List<Schema> shuffled = new ArrayList<>(List.of(schema1, schema2, schema3));
+    Collections.shuffle(shuffled, new Random(repetition.getCurrentRepetition()));
+    final CatalogProjection projection = projection(shuffled, List.of(), List.of());
 
     final Collection<Schema> schemas = projection.getSchemas();
     assertThat(schemas.size(), is(3));
