@@ -15,6 +15,7 @@ import java.io.Serial;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexType;
@@ -27,7 +28,8 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
 
   @Serial private static final long serialVersionUID = 4051326747138079028L;
 
-  private final NamedObjectList<MutableIndexColumn> columns = new NamedObjectList<>();
+  private final ConcurrentDatabaseObjectIndex<MutableIndexColumn> columns =
+      new ConcurrentDatabaseObjectIndex<>();
   private String definition;
   private long cardinality;
   private IndexType indexType;
@@ -92,7 +94,7 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
   /** {@inheritDoc} */
   @Override
   public List<IndexColumn> getColumns() {
-    return List.copyOf(columns.values());
+    return List.copyOf(columns.getObjects());
   }
 
   /** {@inheritDoc} */

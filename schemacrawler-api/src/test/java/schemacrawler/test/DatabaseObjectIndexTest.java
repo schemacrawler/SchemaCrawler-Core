@@ -136,6 +136,11 @@ public class DatabaseObjectIndexTest {
     assertThat(index.lookup((Schema) null, "name"), is(Optional.empty()));
     assertThat(index.lookup(schema, null), is(Optional.empty()));
     assertThat(index.getObjects(null), is(empty()));
+    assertThat(index.getObjects(schema, "missing"), is(empty()));
+    assertThat(index.getObjects(null, "name"), is(empty()));
+    assertThat(index.getObjects(schema, null), is(empty()));
+    assertThat(index.lookup((String) null), is(Optional.empty()));
+    assertThat(index.lookup("missing"), is(Optional.empty()));
   }
 
   @ParameterizedTest(name = "immutable={0}")
@@ -209,6 +214,10 @@ public class DatabaseObjectIndexTest {
         index(immutable, List.of(later, earlier, nullSpecific, emptySpecific));
 
     assertThat(index.lookup(schema, "run").orElseThrow(), sameInstance(earlier));
+    assertThat(index.getObjects(schema, "run"), contains(earlier, later));
+    assertThat(index.lookup(earlier.getFullName()).orElseThrow(), sameInstance(earlier));
+    assertThrows(
+        UnsupportedOperationException.class, () -> index.getObjects(schema, "run").clear());
     assertThat(index.lookup(schema, "a"), is(Optional.empty()));
     for (final Routine routine : List.of(earlier, later, nullSpecific, emptySpecific)) {
       assertThat(index.lookup(routine.key()).orElseThrow(), sameInstance(routine));
@@ -219,8 +228,7 @@ public class DatabaseObjectIndexTest {
 
   @ParameterizedTest(name = "immutable={0}")
   @ValueSource(booleans = {true, false})
-  public void ordinaryNamesMatchLiterallyIncludingBlankQuotedAndDottedNames(
-      final boolean immutable) {
+  public void ordinaryNamesMatchLiterallyIncludingQuotedAndDottedNames(final boolean immutable) {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final List<Routine> routines = new ArrayList<>();
     for (final String name : List.of("routine.with.dot", "\"quoted\"")) {
@@ -237,6 +245,28 @@ public class DatabaseObjectIndexTest {
     assertThat(index.lookup(schema, "\"routine.with.dot\""), is(Optional.empty()));
     assertThat(index.lookup(schema, "quoted"), is(Optional.empty()));
     assertThat(index.lookup(schema, "ROUTINE.WITH.DOT"), is(Optional.empty()));
+  }
+
+  @ParameterizedTest(name = "immutable={0}")
+  @ValueSource(booleans = {true, false})
+  public void schemaNameQueriesRejectBlankNamesWithoutRejectingExactKeysOrFullNames(
+      final boolean immutable) {
+    final Schema schema = new SchemaReference();
+    final Table blank = mock(Table.class);
+    when(blank.key()).thenReturn(schema.key().with(""));
+    when(blank.getSchema()).thenReturn(schema);
+    when(blank.getName()).thenReturn("");
+    when(blank.getFullName()).thenReturn("");
+    final DatabaseObjectIndex<Table> index = index(immutable, List.of(blank));
+    for (final String name : Arrays.asList(null, "", " ", "\t")) {
+      assertThat(index.lookup(schema, name), is(Optional.empty()));
+      assertThat(index.getObjects(schema, name), is(empty()));
+      if (index instanceof final ConcurrentDatabaseObjectIndex<Table> concurrent) {
+        assertThat(concurrent.lookup((NamedObject) schema, name), is(Optional.empty()));
+      }
+    }
+    assertThat(index.lookup(blank.key()).orElseThrow(), sameInstance(blank));
+    assertThat(index.lookup("").orElseThrow(), sameInstance(blank));
   }
 
   @ParameterizedTest(name = "immutable={0}")

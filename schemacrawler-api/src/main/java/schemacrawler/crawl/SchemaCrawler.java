@@ -214,7 +214,7 @@ public final class SchemaCrawler {
                 retriever.retrieveRoutines(routineTypes, limitOptions.get(ruleForRoutineInclusion)))
         .submit();
 
-    final NamedObjectList<MutableRoutine> allRoutines = catalog.getAllRoutines();
+    final NamedObjectIndex<MutableRoutine> allRoutines = catalog.getAllRoutines();
     LOGGER.log(Level.INFO, new StringFormat("Retrieved %d routines", allRoutines.size()));
     if (allRoutines.isEmpty()) {
       return;
@@ -343,7 +343,7 @@ public final class SchemaCrawler {
             })
         .submit();
 
-    final NamedObjectList<MutableTable> allTables = catalog.getAllTables();
+    final NamedObjectIndex<MutableTable> allTables = catalog.getAllTables();
     LOGGER.log(Level.INFO, new StringFormat("Retrieved %d tables", allTables.size()));
     if (allTables.isEmpty()) {
       return;

@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.Serial;
 import java.util.List;
 import java.util.Optional;
+import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.schema.Function;
 import schemacrawler.schema.FunctionParameter;
 import schemacrawler.schema.FunctionReturnType;
@@ -24,7 +25,8 @@ final class MutableFunction extends MutableRoutine implements Function {
 
   @Serial private static final long serialVersionUID = 3906925686089134130L;
 
-  private final NamedObjectList<MutableFunctionParameter> columns = new NamedObjectList<>();
+  private final ConcurrentDatabaseObjectIndex<MutableFunctionParameter> columns =
+      new ConcurrentDatabaseObjectIndex<>();
   private FunctionReturnType returnType;
 
   MutableFunction(final Schema schema, final String name, final String specificName) {
@@ -36,7 +38,7 @@ final class MutableFunction extends MutableRoutine implements Function {
   /** {@inheritDoc} */
   @Override
   public List<FunctionParameter> getParameters() {
-    return List.copyOf(columns.values());
+    return List.copyOf(columns.getObjects());
   }
 
   /** {@inheritDoc} */

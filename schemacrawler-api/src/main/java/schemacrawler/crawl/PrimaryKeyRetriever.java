@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
@@ -40,7 +41,7 @@ final class PrimaryKeyRetriever extends AbstractRetriever {
     super(retrieverConnection, catalog, options);
   }
 
-  void retrievePrimaryKeys(final NamedObjectList<MutableTable> allTables) throws SQLException {
+  void retrievePrimaryKeys(final NamedObjectIndex<MutableTable> allTables) throws SQLException {
     requireNonNull(allTables, "No tables provided");
 
     switch (getRetrieverConnection().get(primaryKeysRetrievalStrategy)) {
@@ -132,11 +133,11 @@ final class PrimaryKeyRetriever extends AbstractRetriever {
     }
   }
 
-  private void retrievePrimaryKeysFromMetadata(final NamedObjectList<MutableTable> allTables)
+  private void retrievePrimaryKeysFromMetadata(final NamedObjectIndex<MutableTable> allTables)
       throws SQLException {
     final String name = "primary keys from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final MutableTable table : allTables) {
+    for (final MutableTable table : allTables.getObjects()) {
       if (table.getTableType().isView()) {
         continue;
       }

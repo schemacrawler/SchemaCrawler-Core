@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.DatabaseObject;
@@ -50,13 +52,20 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
 
   @Serial private static final long serialVersionUID = 3257290248802284852L;
 
-  private final NamedObjectList<MutableColumn> columns = new NamedObjectList<>();
-  private final NamedObjectList<TableConstraint> constraints = new NamedObjectList<>();
-  private final NamedObjectList<MutableForeignKey> foreignKeys = new NamedObjectList<>();
-  private final NamedObjectList<MutableColumn> hiddenColumns = new NamedObjectList<>();
-  private final NamedObjectList<MutableIndex> indexes = new NamedObjectList<>();
-  private final NamedObjectList<MutablePrivilege<Table>> privileges = new NamedObjectList<>();
-  private final NamedObjectList<MutableTrigger> triggers = new NamedObjectList<>();
+  private final ConcurrentDatabaseObjectIndex<MutableColumn> columns =
+      new ConcurrentDatabaseObjectIndex<>();
+  private final ConcurrentDatabaseObjectIndex<TableConstraint> constraints =
+      new ConcurrentDatabaseObjectIndex<>();
+  private final ConcurrentDatabaseObjectIndex<MutableForeignKey> foreignKeys =
+      new ConcurrentDatabaseObjectIndex<>();
+  private final ConcurrentDatabaseObjectIndex<MutableColumn> hiddenColumns =
+      new ConcurrentDatabaseObjectIndex<>();
+  private final ConcurrentDatabaseObjectIndex<MutableIndex> indexes =
+      new ConcurrentDatabaseObjectIndex<>();
+  private final ConcurrentDatabaseObjectIndex<MutablePrivilege<Table>> privileges =
+      new ConcurrentDatabaseObjectIndex<>();
+  private final ConcurrentDatabaseObjectIndex<MutableTrigger> triggers =
+      new ConcurrentDatabaseObjectIndex<>();
   private final Set<DatabaseObject> usedByObjects = new HashSet<>();
   private MutablePrimaryKey primaryKey;
   private int sortIndex;
@@ -101,7 +110,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public List<Column> getColumns() {
-    return List.copyOf(columns.values());
+    return List.copyOf(columns.getObjects());
   }
 
   /** {@inheritDoc} */
@@ -125,7 +134,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public Collection<Column> getHiddenColumns() {
-    return Set.copyOf(hiddenColumns.values());
+    return Set.copyOf(hiddenColumns.getObjects());
   }
 
   @Override
@@ -136,7 +145,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public Collection<Index> getIndexes() {
-    return List.copyOf(indexes.values());
+    return List.copyOf(indexes.getObjects());
   }
 
   /** {@inheritDoc} */
@@ -148,7 +157,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public Collection<Privilege<Table>> getPrivileges() {
-    return List.copyOf(privileges.values());
+    return List.copyOf(privileges.getObjects());
   }
 
   /** {@inheritDoc} */
@@ -156,7 +165,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   public Collection<Table> getRelatedTables(final TableRelationshipType tableRelationshipType) {
     final Set<Table> relatedTables = new HashSet<>();
     if (tableRelationshipType != null && tableRelationshipType != TableRelationshipType.none) {
-      final List<MutableForeignKey> foreignKeysList = new ArrayList<>(foreignKeys.values());
+      final List<MutableForeignKey> foreignKeysList = new ArrayList<>(foreignKeys.getObjects());
       for (final ForeignKey foreignKey : foreignKeysList) {
         for (final ColumnReference columnReference : foreignKey) {
           final Table parentTable = columnReference.getPrimaryKeyColumn().getParent();
@@ -187,7 +196,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public Collection<TableConstraint> getTableConstraints() {
-    return List.copyOf(constraints.values());
+    return List.copyOf(constraints.getObjects());
   }
 
   /** {@inheritDoc} */
@@ -199,7 +208,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public Collection<Trigger> getTriggers() {
-    return List.copyOf(triggers.values());
+    return List.copyOf(triggers.getObjects());
   }
 
   /** {@inheritDoc} */
@@ -341,7 +350,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
     triggers.add(trigger);
   }
 
-  final NamedObjectList<MutableColumn> getAllColumns() {
+  final NamedObjectIndex<MutableColumn> getAllColumns() {
     return columns;
   }
 
@@ -378,10 +387,10 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   }
 
   private <R extends TableReference> Collection<R> getTableReferences(
-      final NamedObjectList<? extends R> tableReferences,
+      final NamedObjectIndex<? extends R> tableReferences,
       final TableAssociationType tableAssociationType) {
 
-    final List<R> foreignKeysList = new ArrayList<>(tableReferences.values());
+    final List<R> foreignKeysList = new ArrayList<>(tableReferences.getObjects());
     if (tableAssociationType != null && tableAssociationType != TableAssociationType.all) {
       for (final Iterator<R> iterator = foreignKeysList.iterator(); iterator.hasNext(); ) {
         final R foreignKey = iterator.next();

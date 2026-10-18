@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Optional;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.TableConstraint;
@@ -31,9 +32,9 @@ final class TableConstraintMatcher extends AbstractRetriever {
     super(retrieverConnection, catalog, options);
   }
 
-  void matchTableConstraints(final NamedObjectList<MutableTable> allTables) {
+  void matchTableConstraints(final NamedObjectIndex<MutableTable> allTables) {
     requireNonNull(allTables, "No tables provided");
-    for (final MutableTable mutableTable : allTables) {
+    for (final MutableTable mutableTable : allTables.getObjects()) {
       if (mutableTable == null) {
         continue;
       }

@@ -15,9 +15,9 @@ import schemacrawler.schema.NamedObject;
 /**
  * Adds parent/name lookup for dependent database objects.
  *
- * <p>Schema parents use schema/name matching, including natural-order overload selection. Other
- * parents use an exact key formed by appending the child name to the parent's key. This interface
- * does not specify mutability or thread safety.
+ * <p>Schema parents use schema/name matching, including blank-name rejection and natural-order
+ * overload selection. Other parents use an exact key formed by appending the child name to the
+ * parent's key. This interface does not specify mutability or thread safety.
  *
  * @param <D> Database-object type
  */

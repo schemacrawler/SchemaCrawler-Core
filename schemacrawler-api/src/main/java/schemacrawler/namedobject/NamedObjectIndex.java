@@ -58,10 +58,10 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
   Optional<N> lookup(NamedObjectKey key);
 
   /**
-   * Looks up an object by its full name.
+   * Looks up the natural-order first object with an exact full name, including blank names.
    *
    * @param fullName Full named object name
-   * @return The object, if present; empty if the key is null or absent
+   * @return The object, if present; empty if the full name is null or absent
    */
   Optional<N> lookup(String fullName);
 

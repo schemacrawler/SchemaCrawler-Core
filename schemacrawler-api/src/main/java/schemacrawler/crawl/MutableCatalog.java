@@ -15,7 +15,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
+import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -44,11 +46,11 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   private final MutableJdbcDriverInfo jdbcDriverInfo;
   private final MapBackedNamedObjectIndex<DatabaseUser> databaseUsers;
   private final MapBackedNamedObjectIndex<Schema> schemas;
-  private final NamedObjectList<MutableColumnDataType> columnDataTypes;
-  private final NamedObjectList<MutableTable> tables;
-  private final NamedObjectList<MutableRoutine> routines;
-  private final NamedObjectList<MutableSequence> sequences;
-  private final NamedObjectList<MutableSynonym> synonyms;
+  private final ConcurrentDatabaseObjectIndex<MutableColumnDataType> columnDataTypes;
+  private final ConcurrentDatabaseObjectIndex<MutableTable> tables;
+  private final ConcurrentDatabaseObjectIndex<MutableRoutine> routines;
+  private final ConcurrentDatabaseObjectIndex<MutableSequence> sequences;
+  private final ConcurrentDatabaseObjectIndex<MutableSynonym> synonyms;
 
   MutableCatalog(
       final String title,
@@ -67,11 +69,11 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
     databaseUsers = new MapBackedNamedObjectIndex<>();
     schemas = new MapBackedNamedObjectIndex<>();
-    columnDataTypes = new NamedObjectList<>();
-    tables = new NamedObjectList<>();
-    routines = new NamedObjectList<>();
-    sequences = new NamedObjectList<>();
-    synonyms = new NamedObjectList<>();
+    columnDataTypes = new ConcurrentDatabaseObjectIndex<>();
+    tables = new ConcurrentDatabaseObjectIndex<>();
+    routines = new ConcurrentDatabaseObjectIndex<>();
+    sequences = new ConcurrentDatabaseObjectIndex<>();
+    synonyms = new ConcurrentDatabaseObjectIndex<>();
   }
 
   @Override
@@ -263,11 +265,11 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
     tables.add(table);
   }
 
-  NamedObjectList<MutableRoutine> getAllRoutines() {
+  NamedObjectIndex<MutableRoutine> getAllRoutines() {
     return routines;
   }
 
-  NamedObjectList<MutableTable> getAllTables() {
+  NamedObjectIndex<MutableTable> getAllTables() {
     return tables;
   }
 

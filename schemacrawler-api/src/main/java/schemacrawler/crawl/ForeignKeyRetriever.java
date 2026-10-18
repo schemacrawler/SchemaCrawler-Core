@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKeyDeferrability;
@@ -50,7 +51,7 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     super(retrieverConnection, catalog, options);
   }
 
-  void retrieveForeignKeys(final NamedObjectList<MutableTable> allTables) throws SQLException {
+  void retrieveForeignKeys(final NamedObjectIndex<MutableTable> allTables) throws SQLException {
     requireNonNull(allTables, "No tables provided");
 
     switch (getRetrieverConnection().get(foreignKeysRetrievalStrategy)) {
@@ -250,14 +251,14 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     retrievalCounts.log();
   }
 
-  private void retrieveForeignKeysFromMetadata(final NamedObjectList<MutableTable> allTables)
+  private void retrieveForeignKeysFromMetadata(final NamedObjectIndex<MutableTable> allTables)
       throws SQLException {
     try (final Connection connection =
         getRetrieverConnection().getConnection("foreign keys from metadata"); ) {
       final DatabaseMetaData metaData = connection.getMetaData();
       final Map<NamedObjectKey, MutableForeignKey> foreignKeys = new ConcurrentHashMap<>();
       final RetrievalCounts retrievalCounts = new RetrievalCounts("foreign keys");
-      for (final MutableTable table : allTables) {
+      for (final MutableTable table : allTables.getObjects()) {
         if (table.getTableType().isView()) {
           continue;
         }

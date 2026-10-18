@@ -20,6 +20,7 @@ import java.sql.Statement;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.plugin.EnumDataTypeHelper;
 import schemacrawler.plugin.EnumDataTypeInfo;
 import schemacrawler.schema.Schema;
@@ -89,11 +90,11 @@ final class TableExtRetriever extends AbstractRetriever {
       final EnumDataTypeHelper enumDataTypeHelper =
           getRetrieverConnection().getEnumDataTypeHelper();
 
-      final NamedObjectList<MutableTable> tables = catalog.getAllTables();
-      for (final MutableTable table : tables) {
+      final NamedObjectIndex<MutableTable> tables = catalog.getAllTables();
+      for (final MutableTable table : tables.getObjects()) {
         retrievalCounts.count();
-        final NamedObjectList<MutableColumn> columns = table.getAllColumns();
-        for (final MutableColumn column : columns) {
+        final NamedObjectIndex<MutableColumn> columns = table.getAllColumns();
+        for (final MutableColumn column : columns.getObjects()) {
           MutableColumnDataType columnDataType = (MutableColumnDataType) column.getColumnDataType();
 
           // Check for enumerated column data-types

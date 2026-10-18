@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.filter.InclusionRuleFilter;
 import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
@@ -55,7 +56,7 @@ final class TableColumnRetriever extends AbstractRetriever {
   }
 
   void retrieveTableColumns(
-      final NamedObjectList<MutableTable> allTables, final InclusionRule columnInclusionRule)
+      final NamedObjectIndex<MutableTable> allTables, final InclusionRule columnInclusionRule)
       throws SQLException {
     requireNonNull(allTables, "No tables provided");
 
@@ -89,7 +90,7 @@ final class TableColumnRetriever extends AbstractRetriever {
 
   private boolean createTableColumn(
       final MetadataResultSet results,
-      final NamedObjectList<MutableTable> allTables,
+      final NamedObjectIndex<MutableTable> allTables,
       final InclusionRuleFilter<Column> columnFilter,
       final Set<NamedObjectKey> hiddenTableColumnsLookupKeys) {
 
@@ -214,7 +215,7 @@ final class TableColumnRetriever extends AbstractRetriever {
   }
 
   private void retrieveTableColumnsFromDataDictionary(
-      final NamedObjectList<MutableTable> allTables,
+      final NamedObjectIndex<MutableTable> allTables,
       final InclusionRuleFilter<Column> columnFilter,
       final Set<NamedObjectKey> hiddenTableColumnsLookupKeys)
       throws SQLException {
@@ -242,7 +243,7 @@ final class TableColumnRetriever extends AbstractRetriever {
   }
 
   private void retrieveTableColumnsFromMetadata(
-      final NamedObjectList<MutableTable> allTables,
+      final NamedObjectIndex<MutableTable> allTables,
       final InclusionRuleFilter<Column> columnFilter,
       final Set<NamedObjectKey> hiddenTableColumnsLookupKeys)
       throws SQLException {
@@ -250,7 +251,7 @@ final class TableColumnRetriever extends AbstractRetriever {
         TaskRunners.getTaskRunner("retrieve-table-columns-from-metadata")) {
       final String name = "table columns from metadata";
       final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-      for (final MutableTable table : allTables) {
+      for (final MutableTable table : allTables.getObjects()) {
         taskRunner.add(
             new TaskDefinition(
                 table.getFullName(),
@@ -292,7 +293,7 @@ final class TableColumnRetriever extends AbstractRetriever {
   }
 
   private void retrieveTableColumnsFromMetadataOverSchemas(
-      final NamedObjectList<MutableTable> allTables,
+      final NamedObjectIndex<MutableTable> allTables,
       final InclusionRuleFilter<Column> columnFilter,
       final Set<NamedObjectKey> hiddenTableColumnsLookupKeys)
       throws SQLException {

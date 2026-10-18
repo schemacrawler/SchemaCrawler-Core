@@ -34,19 +34,28 @@ public interface DatabaseObjectIndex<D extends DatabaseObject> extends NamedObje
    */
   List<D> getObjects(Schema schema);
 
+  /**
+   * Gets a detached, unmodifiable list matching an equal schema and exact ordinary name in natural
+   * order, including all overloads.
+   *
+   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @param name Exact object name
+   * @return Naturally ordered matches; empty if the schema is null or the name is null or blank
+   */
   List<D> getObjects(Schema schema, String name);
 
   /**
    * Looks up a database object by an equal schema and exact object name.
    *
-   * <p>This lookup is independent of the object's complete membership key. Blank names are matched
-   * literally. Implementations select the natural-order first matching object; natural comparison
+   * <p>This lookup is independent of the object's complete membership key. Blank names are
+   * rejected. Implementations select the natural-order first matching object; natural comparison
    * ties have unspecified selection, and this operation does not identify a unique overload.
    * Indexed database objects are expected to have non-null schemas.
    *
    * @param schema Schema to match using {@link Object#equals(Object)}
    * @param name Exact object name
-   * @return The selected matching object, if present; empty if a query argument is null
+   * @return The selected match, if present; empty if the schema is null or the name is null or
+   *     blank
    */
   Optional<D> lookup(Schema schema, String name);
 }

@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.IndexColumnSortSequence;
 import schemacrawler.schema.IndexType;
@@ -45,7 +46,7 @@ final class IndexRetriever extends AbstractRetriever {
     super(retrieverConnection, catalog, options);
   }
 
-  void retrieveIndexes(final NamedObjectList<MutableTable> allTables) throws SQLException {
+  void retrieveIndexes(final NamedObjectIndex<MutableTable> allTables) throws SQLException {
     requireNonNull(allTables, "No tables provided");
 
     switch (getRetrieverConnection().get(indexesRetrievalStrategy)) {
@@ -250,11 +251,11 @@ final class IndexRetriever extends AbstractRetriever {
     }
   }
 
-  private void retrieveIndexesFromMetadata(final NamedObjectList<MutableTable> allTables)
+  private void retrieveIndexesFromMetadata(final NamedObjectIndex<MutableTable> allTables)
       throws SQLException {
     final String name = "indexes from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final MutableTable table : allTables) {
+    for (final MutableTable table : allTables.getObjects()) {
       LOGGER.log(Level.INFO, new StringFormat("Retrieving %s for %s", name, table.key()));
 
       final Schema tableSchema = table.getSchema();

@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.filter.InclusionRuleFilter;
 import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.FunctionParameter;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.ParameterModeType;
@@ -50,7 +51,8 @@ final class FunctionParameterRetriever extends AbstractRetriever {
   }
 
   void retrieveFunctionParameters(
-      final NamedObjectList<MutableRoutine> allRoutines, final InclusionRule parameterInclusionRule)
+      final NamedObjectIndex<MutableRoutine> allRoutines,
+      final InclusionRule parameterInclusionRule)
       throws SQLException {
     requireNonNull(allRoutines, "No functions provided");
 
@@ -83,7 +85,7 @@ final class FunctionParameterRetriever extends AbstractRetriever {
 
   private boolean createFunctionParameter(
       final MetadataResultSet results,
-      final NamedObjectList<MutableRoutine> allRoutines,
+      final NamedObjectIndex<MutableRoutine> allRoutines,
       final InclusionRuleFilter<FunctionParameter> parameterFilter) {
     final String columnCatalogName = normalizeCatalogName(results.getString("FUNCTION_CAT"));
     final String schemaName = normalizeSchemaName(results.getString("FUNCTION_SCHEM"));
@@ -169,7 +171,7 @@ final class FunctionParameterRetriever extends AbstractRetriever {
   }
 
   private void retrieveFunctionParametersFromDataDictionary(
-      final NamedObjectList<MutableRoutine> allRoutines,
+      final NamedObjectIndex<MutableRoutine> allRoutines,
       final InclusionRuleFilter<FunctionParameter> parameterFilter)
       throws SQLException {
     final InformationSchemaViews informationSchemaViews =
@@ -194,11 +196,11 @@ final class FunctionParameterRetriever extends AbstractRetriever {
   }
 
   private void retrieveFunctionParametersFromMetadata(
-      final NamedObjectList<MutableRoutine> allRoutines,
+      final NamedObjectIndex<MutableRoutine> allRoutines,
       final InclusionRuleFilter<FunctionParameter> parameterFilter) {
     final String name = "function parameters from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final MutableRoutine routine : allRoutines) {
+    for (final MutableRoutine routine : allRoutines.getObjects()) {
       if (routine.getRoutineType() != RoutineType.function) {
         continue;
       }
@@ -235,7 +237,7 @@ final class FunctionParameterRetriever extends AbstractRetriever {
   }
 
   private void retrieveFunctionParametersOverSchemas(
-      final NamedObjectList<MutableRoutine> allRoutines,
+      final NamedObjectIndex<MutableRoutine> allRoutines,
       final InclusionRuleFilter<FunctionParameter> parameterFilter)
       throws SQLException {
 

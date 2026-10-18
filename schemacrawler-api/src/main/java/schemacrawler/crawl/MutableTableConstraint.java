@@ -12,6 +12,7 @@ import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.util.List;
+import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintColumn;
@@ -23,7 +24,8 @@ sealed class MutableTableConstraint extends AbstractDependantObject<Table>
 
   @Serial private static final long serialVersionUID = 1155277343302693656L;
 
-  private final NamedObjectList<MutableTableConstraintColumn> columns = new NamedObjectList<>();
+  private final MapBackedNamedObjectIndex<MutableTableConstraintColumn> columns =
+      new MapBackedNamedObjectIndex<>();
   private String definition;
   private boolean deferrable;
   private boolean initiallyDeferred;
@@ -38,7 +40,7 @@ sealed class MutableTableConstraint extends AbstractDependantObject<Table>
   /** {@inheritDoc} */
   @Override
   public List<TableConstraintColumn> getConstrainedColumns() {
-    return List.copyOf(columns.values());
+    return List.copyOf(columns.getObjects());
   }
 
   /** {@inheritDoc} */

@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.namedobject.AbstractNamedObject;
+import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.ResultsColumn;
 import schemacrawler.schema.ResultsColumns;
 
@@ -21,7 +22,8 @@ final class MutableResultsColumns extends AbstractNamedObject implements Results
 
   @Serial private static final long serialVersionUID = 5204766782914559188L;
 
-  private final NamedObjectList<MutableResultsColumn> columns = new NamedObjectList<>();
+  private final MapBackedNamedObjectIndex<MutableResultsColumn> columns =
+      new MapBackedNamedObjectIndex<>();
 
   MutableResultsColumns(final String name) {
     super(name);
@@ -30,7 +32,7 @@ final class MutableResultsColumns extends AbstractNamedObject implements Results
   /** {@inheritDoc} */
   @Override
   public List<ResultsColumn> getColumns() {
-    return List.copyOf(columns.values());
+    return List.copyOf(columns.getObjects());
   }
 
   /** {@inheritDoc} */
@@ -64,7 +66,7 @@ final class MutableResultsColumns extends AbstractNamedObject implements Results
     if (name == null) {
       return Optional.empty();
     }
-    for (final MutableResultsColumn column : columns) {
+    for (final MutableResultsColumn column : columns.getObjects()) {
       if (name.equalsIgnoreCase(column.getLabel())
           || name.equalsIgnoreCase(column.getFullName())
           || name.equalsIgnoreCase(column.getName())) {

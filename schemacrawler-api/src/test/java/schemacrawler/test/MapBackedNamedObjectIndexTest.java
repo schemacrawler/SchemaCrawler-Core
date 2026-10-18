@@ -174,6 +174,8 @@ public class MapBackedNamedObjectIndexTest {
       assertThat(index.containsKey(null), is(false));
       assertThat(index.containsKey(new NamedObjectKey("missing", "schema")), is(false));
       assertThat(index.lookup((NamedObjectKey) null), is(Optional.empty()));
+      assertThat(index.lookup((String) null), is(Optional.empty()));
+      assertThat(index.lookup("missing"), is(Optional.empty()));
       assertThat(index.lookup(new NamedObjectKey("missing", "schema")), is(Optional.empty()));
     }
   }
@@ -236,7 +238,20 @@ public class MapBackedNamedObjectIndexTest {
       }
       assertThat(
           index.lookup(new NamedObjectKey(null, schemaName)).orElseThrow(), sameInstance(schema2));
+      assertThat(index.lookup(schemaName).orElseThrow(), sameInstance(schema2));
       assertThat(index.toString(), is("SCHEMA, SCHEMA, SCHEMA"));
+    }
+  }
+
+  @Test
+  public void fullNameLookupMatchesBlankSchemaNamesLiterally() {
+    final Schema blank = new SchemaReference(null, null);
+    final MapBackedNamedObjectIndex<Schema> mutable = new MapBackedNamedObjectIndex<>();
+    mutable.add(blank);
+    for (final MapBackedNamedObjectIndex<Schema> index :
+        List.of(mutable, new MapBackedNamedObjectIndex<>(List.of(blank)))) {
+      assertThat(index.lookup("").orElseThrow(), sameInstance(blank));
+      assertThat(index.lookup(" "), is(Optional.empty()));
     }
   }
 

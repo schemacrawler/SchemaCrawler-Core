@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
+import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
@@ -29,7 +30,7 @@ public class NamedObjectTest {
     };
 
     MutableTable table;
-    final NamedObjectList<Table> tables = new NamedObjectList<>();
+    final MapBackedNamedObjectIndex<Table> tables = new MapBackedNamedObjectIndex<>();
 
     for (final String schemaName : schemaNames) {
       final Schema schema = new SchemaReference("CATALOG", schemaName);
