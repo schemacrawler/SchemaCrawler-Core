@@ -246,21 +246,7 @@ final class CatalogProjection extends AbstractNamedObjectWithAttributes implemen
    */
   @Override
   public Optional<Schema> lookupSchema(final String name) {
-    // Schema names may be blank, but cannot be null
-    if (name == null) {
-      return Optional.empty();
-    }
-    // Schemas need to be looked up by full name in sorted order
-    // Schema full names can be the same, since either the
-    // catalog or schema may be null, depending on the database
-    final Collection<Schema> sortedSchemas = getSchemas();
-    for (final Schema schema : sortedSchemas) {
-      if (name.equals(schema.getFullName())) {
-        // Match the first schema found, searching in sorted order
-        return Optional.of(schema);
-      }
-    }
-    return Optional.empty();
+    return schemas.lookup(name);
   }
 
   @Override

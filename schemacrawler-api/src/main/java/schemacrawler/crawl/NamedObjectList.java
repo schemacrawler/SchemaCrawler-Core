@@ -80,6 +80,11 @@ final class NamedObjectList<D extends DatabaseObject> implements DatabaseObjectI
     return objects.lookup(schema, name);
   }
 
+  @Override
+  public Optional<D> lookup(String fullName) {
+    return objects.lookup(fullName);
+  }
+
   /**
    * Returns the number of elements in this list.
    *

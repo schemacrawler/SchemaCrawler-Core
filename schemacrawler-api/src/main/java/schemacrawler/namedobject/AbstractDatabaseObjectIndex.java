@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.joining;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -121,6 +122,24 @@ abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
             namedObject ->
                 namedObject.getSchema().equals(schema) && namedObject.getName().equals(name))
         .min(comparator);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Optional<D> lookup(final String fullName) {
+    // Do not filter out blank names - just null names
+    if (fullName == null) {
+      return Optional.empty();
+    }
+    // Looked up by full name in sorted order
+    final Collection<D> sortedObjects = getObjects();
+    for (final D namedObject : sortedObjects) {
+      if (fullName.equals(namedObject.getFullName())) {
+        // Match the first named object found, searching in sorted order
+        return Optional.of(namedObject);
+      }
+    }
+    return Optional.empty();
   }
 
   /** {@inheritDoc} */

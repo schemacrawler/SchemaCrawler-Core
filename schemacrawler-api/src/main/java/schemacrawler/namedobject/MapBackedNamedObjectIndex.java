@@ -117,6 +117,27 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
 
   /** {@inheritDoc} */
   @Override
+  public Optional<N> lookup(final String fullName) {
+    // Schema names may be blank, but cannot be null
+    // So do not filter out blank names
+    if (fullName == null) {
+      return Optional.empty();
+    }
+    // Schemas need to be looked up by full name in sorted order
+    // Schema full names can be the same, since either the
+    // catalog or schema may be null, depending on the database
+    final Collection<N> sortedObjects = getObjects();
+    for (final N namedObject : sortedObjects) {
+      if (fullName.equals(namedObject.getFullName())) {
+        // Match the first named object found, searching in sorted order
+        return Optional.of(namedObject);
+      }
+    }
+    return Optional.empty();
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public Optional<N> remove(final N namedObject) {
     if (namedObject == null) {
       return Optional.empty();
