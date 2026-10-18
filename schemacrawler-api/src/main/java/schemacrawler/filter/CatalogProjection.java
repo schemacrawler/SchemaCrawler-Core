@@ -8,20 +8,16 @@
 
 package schemacrawler.filter;
 
-import static java.util.Objects.compare;
-import static java.util.Objects.requireNonNullElse;
-import static schemacrawler.namedobject.NamedObjectSort.alphabetical;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.function.Predicate;
+import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
 import schemacrawler.namedobject.ImmutableNamedObjectIndex;
 import schemacrawler.namedobject.SchemaIndex;
 import schemacrawler.schema.Catalog;
@@ -32,8 +28,6 @@ import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.JdbcDriverInfo;
-import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
@@ -41,16 +35,14 @@ import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
 
-final class CatalogProjection implements Catalog {
+/** Fixed membership with independently mutable, shallowly copied catalog attributes. */
+final class CatalogProjection extends AbstractNamedObjectWithAttributes implements Catalog {
 
   @Serial private static final long serialVersionUID = -8541112200327727237L;
-
-  private static final String REMARKS_ATTRIBUTE = "REMARKS";
 
   private final CrawlInfo crawlInfo;
   private final DatabaseInfo databaseInfo;
   private final JdbcDriverInfo jdbcDriverInfo;
-  private final Map<String, Object> attributesMap;
   private final ImmutableNamedObjectIndex<DatabaseUser> databaseUsers;
   private final SchemaIndex schemas;
   private final ImmutableNamedObjectIndex<ColumnDataType> columnDataTypes;
@@ -91,10 +83,11 @@ final class CatalogProjection implements Catalog {
       final Collection<Synonym> synonyms,
       final Collection<ColumnDataType> columnDataTypes,
       final Collection<DatabaseUser> databaseUsers) {
+    super("");
     this.crawlInfo = crawlInfo;
     this.databaseInfo = databaseInfo;
     this.jdbcDriverInfo = jdbcDriverInfo;
-    this.attributesMap = Map.copyOf(requireNonNullElse(attributesMap, Map.of()));
+    addAttributes(attributesMap);
     this.schemas = new SchemaIndex(schemas);
     this.tables = new ImmutableNamedObjectIndex<>(tables);
     this.routines = new ImmutableNamedObjectIndex<>(routines);
@@ -104,34 +97,9 @@ final class CatalogProjection implements Catalog {
     this.databaseUsers = new ImmutableNamedObjectIndex<>(databaseUsers);
   }
 
-  /**
-   * Looks up a routine by its schema and ordinary name.
-   *
-   * <p>Null or blank names are not treated as wildcards; use the collection lookup to enumerate
-   * routines in a schema.
-   *
-   * @param schema Schema to match
-   * @param name Ordinary routine name
-   * @return The natural-order first match, or empty if an argument is null or blank
-   */
   @Override
-  public int compareTo(final NamedObject other) {
-    return compare(this, other, alphabetical);
-  }
-
-  @Override
-  public <T> T getAttribute(final String name) {
-    return getAttribute(name, null);
-  }
-
-  @Override
-  public <T> T getAttribute(final String name, final T defaultValue) {
-    return (T) attributesMap.getOrDefault(name, defaultValue);
-  }
-
-  @Override
-  public Map<String, Object> getAttributes() {
-    return Collections.unmodifiableMap(new TreeMap<>(attributesMap));
+  public boolean equals(final Object obj) {
+    return this == obj;
   }
 
   /** {@inheritDoc} */
@@ -162,25 +130,10 @@ final class CatalogProjection implements Catalog {
     return List.copyOf(databaseUsers.getObjects());
   }
 
-  @Override
-  public String getFullName() {
-    return getName();
-  }
-
   /** {@inheritDoc} */
   @Override
   public JdbcDriverInfo getJdbcDriverInfo() {
     return jdbcDriverInfo;
-  }
-
-  @Override
-  public String getName() {
-    return "";
-  }
-
-  @Override
-  public String getRemarks() {
-    return getAttribute(REMARKS_ATTRIBUTE, "");
   }
 
   /** {@inheritDoc} */
@@ -260,26 +213,8 @@ final class CatalogProjection implements Catalog {
   }
 
   @Override
-  public boolean hasAttribute(final String name) {
-    return attributesMap.containsKey(name);
-  }
-
-  @Override
-  public boolean hasRemarks() {
-    return !isBlank(getRemarks());
-  }
-
-  @Override
-  public NamedObjectKey key() {
-    return new NamedObjectKey(getName());
-  }
-
-  @Override
-  public <T> Optional<T> lookupAttribute(final String name) {
-    if (name == null) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(getAttribute(name));
+  public int hashCode() {
+    return System.identityHashCode(this);
   }
 
   @Override
@@ -345,20 +280,5 @@ final class CatalogProjection implements Catalog {
   @Override
   public <T extends Table> Optional<T> lookupTable(final Schema schema, final String name) {
     return (Optional<T>) tables.lookup(schema, name);
-  }
-
-  @Override
-  public void removeAttribute(final String name) {
-    throw new UnsupportedOperationException("Catalog projection attributes are immutable");
-  }
-
-  @Override
-  public <T> void setAttribute(final String name, final T value) {
-    throw new UnsupportedOperationException("Catalog projection attributes are immutable");
-  }
-
-  @Override
-  public void setRemarks(final String remarks) {
-    throw new UnsupportedOperationException("Catalog projection remarks are immutable");
   }
 }

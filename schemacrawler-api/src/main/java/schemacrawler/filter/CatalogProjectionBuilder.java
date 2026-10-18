@@ -42,9 +42,13 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 
 /**
- * Builds catalog projections with immutable membership from a loaded catalog.
+ * Builds catalog projections with fixed membership from a loaded catalog.
  *
- * <p>Projection does not retrieve metadata or broaden the source catalog's membership.
+ * <p>Projection does not retrieve metadata or broaden the source catalog's membership. Members and
+ * attribute values remain shared references, but catalog attribute mappings and remarks are
+ * independently mutable. Attribute enumeration returns a mutable, detached, name-sorted map. This
+ * does not synchronize mutable values or provide whole-catalog thread safety. Projections have
+ * reference identity and blank names and render as an empty string.
  */
 public final class CatalogProjectionBuilder {
 
@@ -90,7 +94,7 @@ public final class CatalogProjectionBuilder {
     schemaCrawlerOptions = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
   }
 
-  /** Builds an immutable projection from the source catalog. */
+  /** Builds a fixed-membership projection with independently mutable catalog attributes. */
   public Catalog build() {
     final List<Schema> eligibleSchemas = sortedCopy(catalog.getSchemas());
     final List<Schema> schemas = filterSchemas(eligibleSchemas);

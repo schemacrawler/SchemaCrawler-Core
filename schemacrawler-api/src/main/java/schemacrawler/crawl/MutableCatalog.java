@@ -78,6 +78,11 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
     databaseUsers = new NamedObjectList<>();
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj;
+  }
+
   /** {@inheritDoc} */
   @Override
   public Collection<ColumnDataType> getColumnDataTypes() {
@@ -186,6 +191,11 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   @Override
   public Collection<Table> getTables(final Schema schema) {
     return List.copyOf(tables.getObjects(schema));
+  }
+
+  @Override
+  public int hashCode() {
+    return System.identityHashCode(this);
   }
 
   /** {@inheritDoc} */

@@ -18,6 +18,7 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +56,30 @@ public class CatalogProjectionIndexTest {
     public int compareTo(final NamedObject other) {
       return Integer.compare(order, ((OrderedLightTable) other).order);
     }
+  }
+
+  @Test
+  public void emptyConstructorKeepsBlankNameAndCopiesAttributes() {
+    final Map<String, Object> attributes = new HashMap<>();
+    attributes.put("baseline", "before");
+    attributes.put("REMARKS", "remarks");
+    final CatalogProjection projection =
+        new CatalogProjection("ignored name", null, null, null, attributes);
+    attributes.put("baseline", "after");
+
+    assertThat(projection.getName(), is(""));
+    assertThat(projection.getFullName(), is(""));
+    assertThat(projection.toString(), is(""));
+    assertThat(projection.getAttribute("baseline", ""), is("before"));
+    assertThat(projection.getRemarks(), is("remarks"));
+    projection.setAttribute("new", "value");
+    assertThat(attributes.containsKey("new"), is(false));
+
+    final CatalogProjection withoutAttributes =
+        new CatalogProjection("ignored name", null, null, null, null);
+    assertThat(withoutAttributes.getAttributes(), is(Map.of()));
+    withoutAttributes.setRemarks(" mutable ");
+    assertThat(withoutAttributes.getRemarks(), is("mutable"));
   }
 
   @Test

@@ -11,7 +11,14 @@ package schemacrawler.schema;
 import java.util.Collection;
 import java.util.Optional;
 
-/** Database and connection information. */
+/**
+ * Database and connection information.
+ *
+ * <p>Catalogs have reference equality and use {@link System#identityHashCode(Object)} for hashing,
+ * independently of their metadata, members, or attributes. Names and full names are blank; natural
+ * comparison is not an identity test. Identity belongs to each instance, including a deserialized
+ * instance.
+ */
 public interface Catalog extends NamedObject, AttributedObject, DescribedObject {
 
   /**
