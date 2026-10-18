@@ -11,7 +11,6 @@ package schemacrawler.namedobject;
 import static java.util.stream.Collectors.joining;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,33 +24,35 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 
-public final class SchemaIndex implements NamedObjectIndex<Schema>, Serializable {
+public final class MapBackedNamedObjectIndex<N extends NamedObject>
+    implements NamedObjectIndex<N>, BuildableIndex<N> {
 
   @Serial private static final long serialVersionUID = -569749297532359027L;
 
-  private final Map<NamedObjectKey, Schema> objects;
+  private final Map<NamedObjectKey, N> objects;
 
-  public SchemaIndex() {
+  public MapBackedNamedObjectIndex() {
     objects = new ConcurrentHashMap<>();
   }
 
-  public SchemaIndex(final Collection<Schema> schemas) {
+  public MapBackedNamedObjectIndex(final Collection<N> schemas) {
     if (schemas == null) {
       objects = Map.of();
     } else {
-      final Map<NamedObjectKey, Schema> schemasMap = new HashMap<>();
-      for (final Schema schema : schemas) {
-        schemasMap.put(schema.key(), schema);
+      final Map<NamedObjectKey, N> schemasMap = new HashMap<>();
+      for (final N namedObject : schemas) {
+        schemasMap.put(namedObject.key(), namedObject);
       }
       objects = Map.copyOf(schemasMap);
     }
   }
 
-  public boolean add(final Schema schema) {
-    if (schema == null) {
+  @Override
+  public boolean add(final N namedObject) {
+    if (namedObject == null) {
       return false;
     }
-    objects.put(schema.key(), schema);
+    objects.put(namedObject.key(), namedObject);
     return true;
   }
 
@@ -66,15 +67,15 @@ public final class SchemaIndex implements NamedObjectIndex<Schema>, Serializable
 
   /** {@inheritDoc} */
   @Override
-  public List<Schema> getObjects() {
-    final List<Schema> sortedValues = new ArrayList<>(objects.values());
+  public List<N> getObjects() {
+    final List<N> sortedValues = new ArrayList<>(objects.values());
     Collections.sort(sortedValues);
     return List.copyOf(sortedValues);
   }
 
   /** {@inheritDoc} */
   @Override
-  public List<Schema> getObjects(final Schema schema) {
+  public List<N> getObjects(final Schema schema) {
     throw new UnsupportedOperationException();
   }
 
@@ -85,13 +86,13 @@ public final class SchemaIndex implements NamedObjectIndex<Schema>, Serializable
   }
 
   @Override
-  public Iterator<Schema> iterator() {
+  public Iterator<N> iterator() {
     return getObjects().iterator();
   }
 
   /** {@inheritDoc} */
   @Override
-  public Optional<Schema> lookup(final NamedObjectKey key) {
+  public Optional<N> lookup(final NamedObjectKey key) {
     if (key == null) {
       return Optional.empty();
     }
@@ -100,8 +101,17 @@ public final class SchemaIndex implements NamedObjectIndex<Schema>, Serializable
 
   /** {@inheritDoc} */
   @Override
-  public Optional<Schema> lookup(final Schema schema, final String name) {
+  public Optional<N> lookup(final Schema schema, final String name) {
     throw new UnsupportedOperationException();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Optional<N> remove(final N namedObject) {
+    if (namedObject == null) {
+      return Optional.empty();
+    }
+    return Optional.ofNullable(objects.remove(namedObject.key()));
   }
 
   /** {@inheritDoc} */
@@ -112,7 +122,7 @@ public final class SchemaIndex implements NamedObjectIndex<Schema>, Serializable
 
   /** {@inheritDoc} */
   @Override
-  public List<Schema> snapshot() {
+  public List<N> snapshot() {
     return List.copyOf(objects.values());
   }
 

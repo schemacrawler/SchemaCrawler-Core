@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
-import schemacrawler.namedobject.SchemaIndex;
+import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -47,7 +47,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   private final MutableDatabaseInfo databaseInfo;
   private final MutableJdbcDriverInfo jdbcDriverInfo;
   private final NamedObjectList<ImmutableDatabaseUser> databaseUsers;
-  private final SchemaIndex schemas;
+  private final MapBackedNamedObjectIndex<Schema> schemas;
   private final NamedObjectList<MutableColumnDataType> columnDataTypes;
   private final NamedObjectList<MutableTable> tables;
   private final NamedObjectList<MutableRoutine> routines;
@@ -69,7 +69,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
     crawlInfo =
         new ImmutableCrawlInfo(title, databaseInfo, jdbcDriverInfo, databaseServerFingerprint);
 
-    schemas = new SchemaIndex();
+    schemas = new MapBackedNamedObjectIndex<>();
     columnDataTypes = new NamedObjectList<>();
     tables = new NamedObjectList<>();
     routines = new NamedObjectList<>();
@@ -276,7 +276,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
     routines.add(routine);
   }
 
-  Schema addSchema(final SchemaReference schema) {
+  Schema addSchema(final Schema schema) {
     schemas.add(schema);
     return schema;
   }

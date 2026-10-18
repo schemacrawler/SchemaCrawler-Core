@@ -29,7 +29,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
-import schemacrawler.namedobject.SchemaIndex;
+import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
@@ -42,7 +42,7 @@ public class SchemaIndexTest {
     final Schema first = new SchemaReference("CATALOG", "first");
     final Schema second = new SchemaReference("CATALOG", "second");
     final List<Schema> source = new ArrayList<>(List.of(first));
-    final SchemaIndex index = new SchemaIndex(source);
+    final MapBackedNamedObjectIndex<Schema> index = new MapBackedNamedObjectIndex<>(source);
     source.clear();
     source.add(second);
 
@@ -57,12 +57,13 @@ public class SchemaIndexTest {
   public void duplicateKeysReplacePreviousSchemaInBothConstructionModes() {
     final Schema first = new SchemaReference("CATALOG", "SCHEMA");
     final Schema replacement = new SchemaReference("CATALOG", "SCHEMA");
-    final SchemaIndex mutable = new SchemaIndex();
+    final MapBackedNamedObjectIndex<Schema> mutable = new MapBackedNamedObjectIndex<>();
     assertThat(mutable.add(first), is(true));
     assertThat(mutable.add(replacement), is(true));
-    final SchemaIndex immutable = new SchemaIndex(List.of(first, replacement));
+    final MapBackedNamedObjectIndex<Schema> immutable =
+        new MapBackedNamedObjectIndex<>(List.of(first, replacement));
 
-    for (final SchemaIndex index : List.of(mutable, immutable)) {
+    for (final MapBackedNamedObjectIndex<Schema> index : List.of(mutable, immutable)) {
       assertThat(index.size(), is(1));
       assertThat(index.lookup(first.key()).orElseThrow(), sameInstance(replacement));
       assertThat(index.getObjects(), contains(sameInstance(replacement)));
@@ -71,11 +72,14 @@ public class SchemaIndexTest {
 
   @Test
   public void emptyIndexesAndMissingKeysReturnEmptyResults() {
-    final SchemaIndex mutable = new SchemaIndex();
+    final MapBackedNamedObjectIndex<Schema> mutable = new MapBackedNamedObjectIndex<>();
     assertThat(mutable.add(null), is(false));
 
-    for (final SchemaIndex index :
-        List.of(mutable, new SchemaIndex(List.of()), new SchemaIndex(null))) {
+    for (final MapBackedNamedObjectIndex<Schema> index :
+        List.of(
+            mutable,
+            new MapBackedNamedObjectIndex<Schema>(List.of()),
+            new MapBackedNamedObjectIndex<Schema>(null))) {
       assertThat(index.isEmpty(), is(true));
       assertThat(index.size(), is(0));
       assertThat(index.getObjects(), is(empty()));
@@ -93,7 +97,7 @@ public class SchemaIndexTest {
   public void enumerationAndIteratorsAreDetachedAndUnmodifiable() {
     final Schema first = new SchemaReference("CATALOG", "first");
     final Schema second = new SchemaReference("CATALOG", "second");
-    final SchemaIndex index = new SchemaIndex();
+    final MapBackedNamedObjectIndex<Schema> index = new MapBackedNamedObjectIndex<>();
     index.add(first);
     final List<Schema> values = index.getObjects();
     final List<Schema> snapshot = index.snapshot();
@@ -125,13 +129,13 @@ public class SchemaIndexTest {
 
     final List<Schema> shuffled = new ArrayList<>(List.of(schema1, schema2, schema3));
     Collections.shuffle(shuffled, new Random(repetition.getCurrentRepetition()));
-    final SchemaIndex mutable = new SchemaIndex();
+    final MapBackedNamedObjectIndex<Schema> mutable = new MapBackedNamedObjectIndex<>();
     for (final Schema schema : shuffled) {
       assertThat(mutable.add(schema), is(true));
     }
-    final SchemaIndex immutable = new SchemaIndex(shuffled);
+    final MapBackedNamedObjectIndex<Schema> immutable = new MapBackedNamedObjectIndex<>(shuffled);
 
-    for (final SchemaIndex index : List.of(mutable, immutable)) {
+    for (final MapBackedNamedObjectIndex<Schema> index : List.of(mutable, immutable)) {
       assertThat(index.isEmpty(), is(false));
       assertThat(index.size(), is(3));
       assertThat(
@@ -158,12 +162,13 @@ public class SchemaIndexTest {
     final Schema third = new SchemaReference("SCHEMA", null);
     first.setAttribute("attribute", "value");
     final List<Schema> schemas = List.of(third, second, first);
-    final SchemaIndex mutable = new SchemaIndex();
+    final MapBackedNamedObjectIndex<Schema> mutable = new MapBackedNamedObjectIndex<>();
     schemas.forEach(mutable::add);
 
-    final SchemaIndex mutableCopy = SerializationUtils.clone(mutable);
-    final SchemaIndex immutableCopy = SerializationUtils.clone(new SchemaIndex(schemas));
-    for (final SchemaIndex index : List.of(mutableCopy, immutableCopy)) {
+    final MapBackedNamedObjectIndex<Schema> mutableCopy = SerializationUtils.clone(mutable);
+    final MapBackedNamedObjectIndex<Schema> immutableCopy =
+        SerializationUtils.clone(new MapBackedNamedObjectIndex<>(schemas));
+    for (final MapBackedNamedObjectIndex<Schema> index : List.of(mutableCopy, immutableCopy)) {
       assertThat(index.getObjects(), contains(first, second, third));
       assertThat(index.size(), is(3));
       for (final Schema schema : schemas) {
@@ -187,11 +192,12 @@ public class SchemaIndexTest {
         .thenThrow(new AssertionError("Snapshot must not compare schemas"));
     when(second.compareTo(any(NamedObject.class)))
         .thenThrow(new AssertionError("Snapshot must not compare schemas"));
-    final SchemaIndex mutable = new SchemaIndex();
+    final MapBackedNamedObjectIndex<Schema> mutable = new MapBackedNamedObjectIndex<>();
     mutable.add(first);
     mutable.add(second);
 
-    for (final SchemaIndex index : List.of(mutable, new SchemaIndex(List.of(first, second)))) {
+    for (final MapBackedNamedObjectIndex<Schema> index :
+        List.of(mutable, new MapBackedNamedObjectIndex<>(List.of(first, second)))) {
       assertThat(index.snapshot(), containsInAnyOrder(sameInstance(first), sameInstance(second)));
     }
   }

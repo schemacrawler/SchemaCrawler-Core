@@ -19,7 +19,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
 import schemacrawler.namedobject.ImmutableNamedObjectIndex;
-import schemacrawler.namedobject.SchemaIndex;
+import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -44,7 +45,7 @@ final class CatalogProjection extends AbstractNamedObjectWithAttributes implemen
   private final DatabaseInfo databaseInfo;
   private final JdbcDriverInfo jdbcDriverInfo;
   private final ImmutableNamedObjectIndex<DatabaseUser> databaseUsers;
-  private final SchemaIndex schemas;
+  private final NamedObjectIndex<Schema> schemas;
   private final ImmutableNamedObjectIndex<ColumnDataType> columnDataTypes;
   private final ImmutableNamedObjectIndex<Table> tables;
   private final ImmutableNamedObjectIndex<Routine> routines;
@@ -88,7 +89,7 @@ final class CatalogProjection extends AbstractNamedObjectWithAttributes implemen
     this.databaseInfo = databaseInfo;
     this.jdbcDriverInfo = jdbcDriverInfo;
     addAttributes(attributesMap);
-    this.schemas = new SchemaIndex(schemas);
+    this.schemas = new MapBackedNamedObjectIndex<>(schemas);
     this.tables = new ImmutableNamedObjectIndex<>(tables);
     this.routines = new ImmutableNamedObjectIndex<>(routines);
     this.sequences = new ImmutableNamedObjectIndex<>(sequences);

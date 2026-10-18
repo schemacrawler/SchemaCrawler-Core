@@ -29,7 +29,7 @@ import schemacrawler.schema.Schema;
  * @param <N> Named-object type
  */
 public final class ConcurrentNamedObjectIndex<N extends NamedObject>
-    extends AbstractNamedObjectIndex<N> {
+    extends AbstractNamedObjectIndex<N> implements BuildableIndex<N> {
 
   @Serial private static final long serialVersionUID = -1089958942591485649L;
 
@@ -38,13 +38,8 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
     super(new ConcurrentHashMap<>());
   }
 
-  /**
-   * Adds or replaces an object by its complete key.
-   *
-   * @param namedObject Object to add
-   * @return Whether the object was added; false if the object is null
-   * @throws NullPointerException if the object's key is null
-   */
+  /** {@inheritDoc} */
+  @Override
   public boolean add(final N namedObject) {
     if (namedObject == null) {
       return false;
@@ -70,12 +65,8 @@ public final class ConcurrentNamedObjectIndex<N extends NamedObject>
     return lookup(namedObject.key().with(name));
   }
 
-  /**
-   * Removes and returns the object mapped to the supplied object's complete key.
-   *
-   * @param namedObject Object whose complete key identifies the mapping to remove
-   * @return The removed object, if present; empty if the object is null or absent
-   */
+  /** {@inheritDoc} */
+  @Override
   public Optional<N> remove(final N namedObject) {
     if (namedObject == null) {
       return Optional.empty();
