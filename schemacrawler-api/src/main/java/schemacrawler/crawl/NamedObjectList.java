@@ -52,6 +52,11 @@ final class NamedObjectList<D extends DatabaseObject> implements DatabaseObjectI
     return objects.getObjects(schema);
   }
 
+  @Override
+  public List<D> getObjects(Schema schema, String name) {
+    return objects.getObjects(schema, name);
+  }
+
   /** {@inheritDoc} */
   @Override
   public boolean isEmpty() {

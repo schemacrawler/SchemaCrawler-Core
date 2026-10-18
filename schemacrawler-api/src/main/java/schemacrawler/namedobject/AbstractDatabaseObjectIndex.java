@@ -10,6 +10,7 @@ package schemacrawler.namedobject;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
+import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -91,6 +92,25 @@ abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
 
   /** {@inheritDoc} */
   @Override
+  public List<D> getObjects(final Schema schema, final String name) {
+    if (schema == null || isBlank(name)) {
+      return List.of();
+    }
+    final Predicate<DatabaseObject> filter =
+        new FilterForSchema(schema).and(object -> object.getName().equals(name));
+    final List<D> filteredObjects = new ArrayList<>();
+    for (final D object : snapshot()) {
+      if (!filter.test(object)) {
+        continue;
+      }
+      filteredObjects.add(object);
+    }
+    Collections.sort(filteredObjects);
+    return List.copyOf(filteredObjects);
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public final boolean isEmpty() {
     return objects.isEmpty();
   }
@@ -115,13 +135,9 @@ abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
     if (schema == null || name == null) {
       return Optional.empty();
     }
+    final List<D> objects = getObjects(schema, name);
     final Comparator<D> comparator = Comparator.naturalOrder();
-    return snapshot().stream()
-        .filter(DatabaseObject.class::isInstance)
-        .filter(
-            namedObject ->
-                namedObject.getSchema().equals(schema) && namedObject.getName().equals(name))
-        .min(comparator);
+    return objects.stream().min(comparator);
   }
 
   /** {@inheritDoc} */

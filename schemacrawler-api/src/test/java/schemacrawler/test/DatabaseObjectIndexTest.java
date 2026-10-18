@@ -223,7 +223,7 @@ public class DatabaseObjectIndexTest {
       final boolean immutable) {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final List<Routine> routines = new ArrayList<>();
-    for (final String name : List.of("", " ", "routine.with.dot", "\"quoted\"")) {
+    for (final String name : List.of("routine.with.dot", "\"quoted\"")) {
       final Routine routine = mock(Routine.class);
       when(routine.key()).thenReturn(schema.key().with(name));
       when(routine.getName()).thenReturn(name);

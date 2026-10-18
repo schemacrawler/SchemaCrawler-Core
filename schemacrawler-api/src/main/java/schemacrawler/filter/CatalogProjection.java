@@ -8,15 +8,11 @@
 
 package schemacrawler.filter;
 
-import static us.fatehi.utility.Utility.isBlank;
-
 import java.io.Serial;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
 import schemacrawler.namedobject.ImmutableDatabaseObjectIndex;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
@@ -26,7 +22,6 @@ import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseInfo;
-import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.Routine;
@@ -152,17 +147,7 @@ final class CatalogProjection extends AbstractNamedObjectWithAttributes implemen
   /** {@inheritDoc} */
   @Override
   public Collection<Routine> getRoutines(final Schema schema, final String routineName) {
-    Predicate<DatabaseObject> filter = routine -> true;
-    if (!isBlank(routineName)) {
-      filter = filter.and(routine -> routine.getName().equals(routineName));
-    }
-    final Collection<Routine> routines = new ArrayList<>();
-    for (final Routine routine : getRoutines(schema)) {
-      if (filter.test(routine)) {
-        routines.add(routine);
-      }
-    }
-    return routines;
+    return List.copyOf(routines.getObjects(schema, routineName));
   }
 
   /** {@inheritDoc} */

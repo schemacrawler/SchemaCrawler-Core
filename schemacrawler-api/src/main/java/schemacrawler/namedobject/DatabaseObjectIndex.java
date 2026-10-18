@@ -34,6 +34,8 @@ public interface DatabaseObjectIndex<D extends DatabaseObject> extends NamedObje
    */
   List<D> getObjects(Schema schema);
 
+  List<D> getObjects(Schema schema, String name);
+
   /**
    * Looks up a database object by an equal schema and exact object name.
    *
