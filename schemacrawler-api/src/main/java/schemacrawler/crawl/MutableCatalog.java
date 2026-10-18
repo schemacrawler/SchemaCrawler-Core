@@ -46,7 +46,7 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
   private final ImmutableCrawlInfo crawlInfo;
   private final MutableDatabaseInfo databaseInfo;
   private final MutableJdbcDriverInfo jdbcDriverInfo;
-  private final NamedObjectList<ImmutableDatabaseUser> databaseUsers;
+  private final MapBackedNamedObjectIndex<DatabaseUser> databaseUsers;
   private final MapBackedNamedObjectIndex<Schema> schemas;
   private final NamedObjectList<MutableColumnDataType> columnDataTypes;
   private final NamedObjectList<MutableTable> tables;
@@ -69,13 +69,13 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
     crawlInfo =
         new ImmutableCrawlInfo(title, databaseInfo, jdbcDriverInfo, databaseServerFingerprint);
 
+    databaseUsers = new MapBackedNamedObjectIndex<>();
     schemas = new MapBackedNamedObjectIndex<>();
     columnDataTypes = new NamedObjectList<>();
     tables = new NamedObjectList<>();
     routines = new NamedObjectList<>();
     sequences = new NamedObjectList<>();
     synonyms = new NamedObjectList<>();
-    databaseUsers = new NamedObjectList<>();
   }
 
   @Override

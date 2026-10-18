@@ -44,7 +44,7 @@ final class CatalogProjection extends AbstractNamedObjectWithAttributes implemen
   private final CrawlInfo crawlInfo;
   private final DatabaseInfo databaseInfo;
   private final JdbcDriverInfo jdbcDriverInfo;
-  private final ImmutableNamedObjectIndex<DatabaseUser> databaseUsers;
+  private final NamedObjectIndex<DatabaseUser> databaseUsers;
   private final NamedObjectIndex<Schema> schemas;
   private final ImmutableNamedObjectIndex<ColumnDataType> columnDataTypes;
   private final ImmutableNamedObjectIndex<Table> tables;
@@ -89,13 +89,13 @@ final class CatalogProjection extends AbstractNamedObjectWithAttributes implemen
     this.databaseInfo = databaseInfo;
     this.jdbcDriverInfo = jdbcDriverInfo;
     addAttributes(attributesMap);
+    this.databaseUsers = new MapBackedNamedObjectIndex<>(databaseUsers);
     this.schemas = new MapBackedNamedObjectIndex<>(schemas);
     this.tables = new ImmutableNamedObjectIndex<>(tables);
     this.routines = new ImmutableNamedObjectIndex<>(routines);
     this.sequences = new ImmutableNamedObjectIndex<>(sequences);
     this.synonyms = new ImmutableNamedObjectIndex<>(synonyms);
     this.columnDataTypes = new ImmutableNamedObjectIndex<>(columnDataTypes);
-    this.databaseUsers = new ImmutableNamedObjectIndex<>(databaseUsers);
   }
 
   @Override
