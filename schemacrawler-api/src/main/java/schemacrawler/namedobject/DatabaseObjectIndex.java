@@ -14,15 +14,14 @@ import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Schema;
 
 /**
- * Provides read-only lookup and enumeration of named objects.
+ * Adds schema-scoped enumeration and ordinary-name lookup to a named-object index.
  *
  * <p>The interface does not specify whether membership is immutable or thread-safe. Values are
  * detached, unmodifiable lists in natural order and sorting them takes O(n log n) comparisons.
  * Snapshots are detached and unmodifiable, take O(n) time, and have unspecified iteration order.
  * Elements are shared references.
  *
- * @param <K> Complete lookup-key type
- * @param <D> Named-object type
+ * @param <D> Database-object type
  */
 public interface DatabaseObjectIndex<D extends DatabaseObject> extends NamedObjectIndex<D> {
 
@@ -30,7 +29,7 @@ public interface DatabaseObjectIndex<D extends DatabaseObject> extends NamedObje
    * Gets a detached, unmodifiable list of objects for an equal schema in natural order. The
    * operation scans the index and sorts the matching objects.
    *
-   * @param schema Schema to match using {@link Schema#equals(Object)}
+   * @param schema Schema to match using {@link Object#equals(Object)}
    * @return Naturally ordered objects for the schema, or an empty list if the schema is null
    */
   List<D> getObjects(Schema schema);
@@ -43,7 +42,7 @@ public interface DatabaseObjectIndex<D extends DatabaseObject> extends NamedObje
    * ties have unspecified selection, and this operation does not identify a unique overload.
    * Indexed database objects are expected to have non-null schemas.
    *
-   * @param schema Schema to match using {@link Schema#equals(Object)}
+   * @param schema Schema to match using {@link Object#equals(Object)}
    * @param name Exact object name
    * @return The selected matching object, if present; empty if a query argument is null
    */

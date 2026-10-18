@@ -23,7 +23,6 @@ import schemacrawler.schema.NamedObjectKey;
  * Snapshots are detached and unmodifiable, take O(n) time, and have unspecified iteration order.
  * Elements are shared references.
  *
- * @param <K> Complete lookup-key type
  * @param <N> Named-object type
  */
 public interface NamedObjectIndex<N extends NamedObject> extends Serializable, Iterable<N> {
@@ -44,7 +43,7 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
   List<N> getObjects();
 
   /**
-   * Checks whether the index contains any named objects.
+   * Checks whether the index contains no named objects.
    *
    * @return Whether the index contains no objects
    */

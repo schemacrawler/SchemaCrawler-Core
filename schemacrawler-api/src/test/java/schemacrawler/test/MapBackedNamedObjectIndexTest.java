@@ -19,7 +19,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.Serial;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -29,13 +31,95 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import schemacrawler.namedobject.AbstractNamedObject;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.SchemaReference;
 
-public class SchemaIndexTest {
+public class MapBackedNamedObjectIndexTest {
+
+  private static final class OrderedNamedObject extends AbstractNamedObject {
+
+    @Serial private static final long serialVersionUID = 1L;
+
+    private int order;
+
+    OrderedNamedObject(final String name, final int order) {
+      super(name);
+      this.order = order;
+    }
+
+    @Override
+    public int compareTo(final NamedObject other) {
+      return Integer.compare(order, ((OrderedNamedObject) other).order);
+    }
+  }
+
+  @Test
+  public void mutationUsesCompleteKeysAndReturnsTheActualRemovedValue() {
+    final MapBackedNamedObjectIndex<Schema> index = new MapBackedNamedObjectIndex<>();
+    final Schema first = new SchemaReference(null, "SCHEMA");
+    final Schema replacement = new SchemaReference(null, "SCHEMA");
+    final Schema distinct = new SchemaReference("", "SCHEMA");
+    index.add(first);
+    index.add(replacement);
+    index.add(distinct);
+    assertThat(index.remove(first).orElseThrow(), sameInstance(replacement));
+    assertThat(index.lookup(first.key()), is(Optional.empty()));
+    assertThat(index.remove(first), is(Optional.empty()));
+    assertThat(index.lookup(distinct.key()).orElseThrow(), sameInstance(distinct));
+    assertThat(index.remove(null), is(Optional.empty()));
+  }
+
+  @Test
+  public void immutableMembershipRejectsRemovalAndNullEntriesOrKeys() {
+    final Schema schema = new SchemaReference("CATALOG", "SCHEMA");
+    for (final MapBackedNamedObjectIndex<Schema> index :
+        List.of(
+            new MapBackedNamedObjectIndex<>(List.of(schema)),
+            new MapBackedNamedObjectIndex<Schema>(null),
+            new MapBackedNamedObjectIndex<Schema>(List.of()))) {
+      assertThrows(UnsupportedOperationException.class, () -> index.remove(schema));
+      assertThrows(UnsupportedOperationException.class, () -> index.add(schema));
+      assertThat(index.add(null), is(false));
+      assertThat(index.remove(null), is(Optional.empty()));
+    }
+    assertThrows(
+        NullPointerException.class,
+        () -> new MapBackedNamedObjectIndex<>(Arrays.asList((Schema) null)));
+    final Schema withoutKey = mock(Schema.class);
+    assertThrows(
+        NullPointerException.class, () -> new MapBackedNamedObjectIndex<>(List.of(withoutKey)));
+    final MapBackedNamedObjectIndex<Schema> mutable = new MapBackedNamedObjectIndex<>();
+    assertThrows(NullPointerException.class, () -> mutable.add(withoutKey));
+    assertThrows(NullPointerException.class, () -> mutable.remove(withoutKey));
+  }
+
+  @ParameterizedTest(name = "immutable={0}")
+  @ValueSource(booleans = {true, false})
+  public void genericNamedObjectsAreSortedAfreshWithoutChangingPriorResults(
+      final boolean immutable) {
+    final OrderedNamedObject first = new OrderedNamedObject("first", 1);
+    final OrderedNamedObject second = new OrderedNamedObject("second", 2);
+    final MapBackedNamedObjectIndex<OrderedNamedObject> index;
+    if (immutable) {
+      index = new MapBackedNamedObjectIndex<>(List.of(second, first));
+    } else {
+      index = new MapBackedNamedObjectIndex<>();
+      index.add(second);
+      index.add(first);
+    }
+    final List<OrderedNamedObject> previous = index.getObjects();
+    second.order = 0;
+    assertThat(previous, contains(first, second));
+    assertThat(index.getObjects(), contains(second, first));
+    assertThat(index.toString(), is("second, first"));
+    assertThat(index.lookup(first.key()).orElseThrow(), sameInstance(first));
+  }
 
   @Test
   public void collectionConstructorCopiesMembershipAndRejectsMutation() {
@@ -49,6 +133,7 @@ public class SchemaIndexTest {
     assertThat(index.getObjects(), contains(sameInstance(first)));
     assertThat(index.containsKey(second.key()), is(false));
     assertThrows(UnsupportedOperationException.class, () -> index.add(second));
+    assertThrows(UnsupportedOperationException.class, () -> index.remove(first));
     first.setAttribute("shared", "value");
     assertThat(index.lookup(first.key()).orElseThrow().getAttribute("shared"), is("value"));
   }
@@ -179,7 +264,9 @@ public class SchemaIndexTest {
     }
     final Schema additional = new SchemaReference("OTHER", "SCHEMA");
     assertThat(mutableCopy.add(additional), is(true));
+    assertThat(mutableCopy.remove(additional).orElseThrow(), sameInstance(additional));
     assertThrows(UnsupportedOperationException.class, () -> immutableCopy.add(additional));
+    assertThrows(UnsupportedOperationException.class, () -> immutableCopy.remove(first));
   }
 
   @Test

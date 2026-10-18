@@ -26,6 +26,7 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 
+/** Shares keyed storage and schema-aware read operations between database-object indexes. */
 abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
     implements DatabaseObjectIndex<D>, Serializable {
 
@@ -47,10 +48,8 @@ abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
 
   private final Map<NamedObjectKey, D> objects;
 
-  /** Creates an index from a provided. */
+  /** Uses the supplied storage map directly; subclasses determine its mutation policy. */
   public AbstractDatabaseObjectIndex(final Map<NamedObjectKey, D> objects) {
-    // NOTE: Base class stores the provided storage map directly without making a
-    // defensive copy
     this.objects = requireNonNull(objects, "Objects cannot be null");
   }
 

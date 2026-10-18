@@ -11,6 +11,14 @@ package schemacrawler.namedobject;
 import java.util.Optional;
 import schemacrawler.schema.NamedObject;
 
+/**
+ * Provides optional keyed membership mutation.
+ *
+ * <p>Implementations with immutable membership may reject non-null mutation requests with {@link
+ * UnsupportedOperationException}. This interface does not guarantee thread safety.
+ *
+ * @param <N> Named-object type
+ */
 public interface BuildableIndex<N extends NamedObject> {
 
   /**
@@ -19,6 +27,7 @@ public interface BuildableIndex<N extends NamedObject> {
    * @param namedObject Object to add
    * @return Whether the object was added; false if the object is null
    * @throws NullPointerException if the object's key is null
+   * @throws UnsupportedOperationException if membership is immutable
    */
   boolean add(N namedObject);
 
@@ -27,6 +36,8 @@ public interface BuildableIndex<N extends NamedObject> {
    *
    * @param namedObject Object whose complete key identifies the mapping to remove
    * @return The removed object, if present; empty if the object is null or absent
+   * @throws NullPointerException if the object's key is null
+   * @throws UnsupportedOperationException if membership is immutable
    */
   Optional<N> remove(N namedObject);
 }

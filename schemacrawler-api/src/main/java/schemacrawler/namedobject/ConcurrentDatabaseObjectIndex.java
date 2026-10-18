@@ -16,21 +16,21 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Schema;
 
 /**
- * Provides a concurrent mutable index of named objects keyed by each object's complete key.
+ * Provides a concurrent mutable index of database objects keyed by each object's complete key.
  *
  * <p>Adding an object replaces any existing object with its key. Individual map operations are
  * thread-safe, and snapshots are weakly consistent during concurrent membership changes. A snapshot
  * is not an atomic point-in-time view. Schema/name lookup filters the snapshot and selects the
  * natural-order first match; comparison ties have unspecified selection. Compound operations,
  * cross-index transactions, and object state are not synchronized. Objects are shared references;
- * comparison and identity keys must remain stable, and comparison state must remain stable while
- * values are sorted. Returned lists are detached and unmodifiable. The index is serializable when
- * its objects are serializable.
+ * identity keys must remain stable, and comparison state must remain stable while values are
+ * sorted. Returned lists are detached and unmodifiable. The index is serializable when its objects
+ * are serializable.
  *
- * @param <D> Named-object type
+ * @param <D> Database-object type
  */
 public final class ConcurrentDatabaseObjectIndex<D extends DatabaseObject>
-    extends AbstractDatabaseObjectIndex<D> implements BuildableIndex<D> {
+    extends AbstractDatabaseObjectIndex<D> implements BuildableIndex<D>, DependantObjectIndex<D> {
 
   @Serial private static final long serialVersionUID = -1089958942591485649L;
 
@@ -56,6 +56,7 @@ public final class ConcurrentDatabaseObjectIndex<D extends DatabaseObject>
    * @param name Dependent object name
    * @return Dependent object if found; empty if either argument is null or no object matches
    */
+  @Override
   public Optional<D> lookup(final NamedObject namedObject, final String name) {
     if (namedObject == null || name == null) {
       return Optional.empty();

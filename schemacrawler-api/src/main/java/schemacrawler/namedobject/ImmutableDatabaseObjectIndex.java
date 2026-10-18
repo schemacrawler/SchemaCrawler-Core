@@ -19,7 +19,7 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 
 /**
- * Provides immutable membership for named objects keyed by each object's complete key.
+ * Provides immutable membership for database objects keyed by each object's complete key.
  *
  * <p>When keys are duplicated, the first object in collection encounter order is retained. The
  * collection is detached, but objects are shared references. Keys must remain stable. Values are
@@ -29,7 +29,7 @@ import schemacrawler.schema.NamedObjectKey;
  * lists are detached and unmodifiable. The index is shallowly immutable and serializable when its
  * objects are serializable.
  *
- * @param <D> Named-object type
+ * @param <D> Database-object type
  */
 public final class ImmutableDatabaseObjectIndex<D extends DatabaseObject>
     extends AbstractDatabaseObjectIndex<D> {

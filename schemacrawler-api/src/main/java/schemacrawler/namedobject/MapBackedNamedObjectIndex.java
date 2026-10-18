@@ -23,6 +23,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 
+/**
+ * Indexes named objects by complete key, with last-encountered duplicate replacement.
+ *
+ * <p>The no-argument constructor creates concurrent mutable membership. The collection constructor
+ * creates detached immutable membership; non-null add/remove requests then throw {@link
+ * UnsupportedOperationException}. Null add/remove requests remain no-ops in either mode. Objects
+ * are shared references and keys must remain stable.
+ *
+ * <p>Sorted enumeration makes a fresh O(n log n) sort; comparison state must remain stable during
+ * sorting. Snapshots copy membership in O(n) without comparing objects. Returned lists and
+ * iterators are detached and unmodifiable. Concurrent enumeration is weakly consistent, not an
+ * atomic snapshot. Element state, compound operations, and cross-index transactions are not
+ * synchronized. Serialization preserves the membership mode when elements are serializable.
+ *
+ * @param <N> Named-object type
+ */
 public final class MapBackedNamedObjectIndex<N extends NamedObject>
     implements NamedObjectIndex<N>, BuildableIndex<N> {
 
@@ -30,19 +46,26 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
 
   private final Map<NamedObjectKey, N> objects;
 
+  /** Creates an empty concurrent mutable index. */
   public MapBackedNamedObjectIndex() {
     objects = new ConcurrentHashMap<>();
   }
 
-  public MapBackedNamedObjectIndex(final Collection<N> schemas) {
-    if (schemas == null) {
+  /**
+   * Copies a collection into immutable membership, retaining the last object for each key.
+   *
+   * @param values Objects to index; null creates an empty immutable index
+   * @throws NullPointerException if an element or its key is null
+   */
+  public MapBackedNamedObjectIndex(final Collection<N> values) {
+    if (values == null) {
       objects = Map.of();
     } else {
-      final Map<NamedObjectKey, N> schemasMap = new HashMap<>();
-      for (final N namedObject : schemas) {
-        schemasMap.put(namedObject.key(), namedObject);
+      final Map<NamedObjectKey, N> objectsMap = new HashMap<>();
+      for (final N namedObject : values) {
+        objectsMap.put(namedObject.key(), namedObject);
       }
-      objects = Map.copyOf(schemasMap);
+      objects = Map.copyOf(objectsMap);
     }
   }
 
