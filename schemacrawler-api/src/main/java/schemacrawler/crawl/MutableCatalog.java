@@ -8,17 +8,17 @@
 
 package schemacrawler.crawl;
 
+import static java.util.Objects.requireNonNull;
+import static us.fatehi.utility.Utility.isBlank;
+
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-
-import static java.util.Objects.requireNonNull;
-
-import static us.fatehi.utility.Utility.isBlank;
-
+import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
+import schemacrawler.namedobject.SchemaIndex;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -43,16 +43,16 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
   @Serial private static final long serialVersionUID = 4051323422934251828L;
 
-  private final NamedObjectList<MutableColumnDataType> columnDataTypes = new NamedObjectList<>();
+  private final ImmutableCrawlInfo crawlInfo;
   private final MutableDatabaseInfo databaseInfo;
   private final MutableJdbcDriverInfo jdbcDriverInfo;
-  private final NamedObjectList<MutableRoutine> routines = new NamedObjectList<>();
-  private final NamedObjectList<SchemaReference> schemas = new NamedObjectList<>();
-  private final NamedObjectList<MutableSequence> sequences = new NamedObjectList<>();
-  private final NamedObjectList<MutableSynonym> synonyms = new NamedObjectList<>();
-  private final NamedObjectList<MutableTable> tables = new NamedObjectList<>();
-  private final NamedObjectList<ImmutableDatabaseUser> databaseUsers = new NamedObjectList<>();
-  private final ImmutableCrawlInfo crawlInfo;
+  private final NamedObjectList<ImmutableDatabaseUser> databaseUsers;
+  private final SchemaIndex schemas;
+  private final NamedObjectList<MutableColumnDataType> columnDataTypes;
+  private final NamedObjectList<MutableTable> tables;
+  private final NamedObjectList<MutableRoutine> routines;
+  private final NamedObjectList<MutableSequence> sequences;
+  private final NamedObjectList<MutableSynonym> synonyms;
 
   MutableCatalog(
       final String title,
@@ -68,6 +68,14 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
             .build();
     crawlInfo =
         new ImmutableCrawlInfo(title, databaseInfo, jdbcDriverInfo, databaseServerFingerprint);
+
+    schemas = new SchemaIndex();
+    columnDataTypes = new NamedObjectList<>();
+    tables = new NamedObjectList<>();
+    routines = new NamedObjectList<>();
+    sequences = new NamedObjectList<>();
+    synonyms = new NamedObjectList<>();
+    databaseUsers = new NamedObjectList<>();
   }
 
   /** {@inheritDoc} */
@@ -202,14 +210,18 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
   /** {@inheritDoc} */
   @Override
-  public Optional<SchemaReference> lookupSchema(final String name) {
-    // Schemas need to be looked up by full name, since either the
-    // catalog or schema may be null, depending on the database
-    if (name == null) { // Schema names may be blank
+  public Optional<Schema> lookupSchema(final String name) {
+    // Schema names may be blank, but cannot be null
+    if (name == null) {
       return Optional.empty();
     }
-    for (final SchemaReference schema : schemas) {
+    // Schemas need to be looked up by full name in sorted order
+    // Schema full names can be the same, since either the
+    // catalog or schema may be null, depending on the database
+    final Collection<Schema> sortedSchemas = getSchemas();
+    for (final Schema schema : sortedSchemas) {
       if (name.equals(schema.getFullName())) {
+        // Match the first schema found, searching in sorted order
         return Optional.of(schema);
       }
     }
@@ -273,10 +285,6 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
   NamedObjectList<MutableRoutine> getAllRoutines() {
     return routines;
-  }
-
-  NamedObjectList<SchemaReference> getAllSchemas() {
-    return schemas;
   }
 
   NamedObjectList<MutableTable> getAllTables() {

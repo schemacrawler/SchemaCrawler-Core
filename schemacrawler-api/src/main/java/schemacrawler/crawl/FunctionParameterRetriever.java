@@ -141,7 +141,7 @@ final class FunctionParameterRetriever extends AbstractRetriever {
       parameter.setNullable(isNullable);
       parameter.setRemarks(remarks);
 
-      parameter.addAttributes(results.getAttributes());
+      parameter.addAttributesFrom(results.getAttributes());
 
       LOGGER.log(Level.FINER, new StringFormat("Adding parameter to function <%s>", parameter));
       function.addParameter(parameter);

@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.crawl.LightTable;
-import schemacrawler.utility.NamedObjectIndex;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
 
 public class NamedObjectListIndexTest {

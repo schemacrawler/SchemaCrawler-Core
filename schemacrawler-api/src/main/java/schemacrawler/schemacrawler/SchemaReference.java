@@ -8,11 +8,10 @@
 
 package schemacrawler.schemacrawler;
 
-import static java.util.Objects.compare;
-import static schemacrawler.utility.NamedObjectSort.alphabetical;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,7 +43,21 @@ public final class SchemaReference implements Schema {
   /** {@inheritDoc} */
   @Override
   public int compareTo(final NamedObject obj) {
-    return compare(this, obj, alphabetical);
+    if (this == obj) {
+      return 0;
+    }
+    if (obj == null || !(obj instanceof final Schema other)) {
+      return 1;
+    }
+
+    final int result =
+        Comparator.nullsFirst(String::compareTo).compare(catalogName, other.getCatalogName());
+
+    if (result != 0) {
+      return result;
+    }
+
+    return Comparator.nullsFirst(String::compareTo).compare(schemaName, other.getName());
   }
 
   @Override
@@ -52,10 +65,9 @@ public final class SchemaReference implements Schema {
     if (this == obj) {
       return true;
     }
-    if (obj == null || !(obj instanceof SchemaReference)) {
+    if (obj == null || !(obj instanceof final Schema other)) {
       return false;
     }
-    final Schema other = (Schema) obj;
     return Objects.equals(catalogName, other.getCatalogName())
         && Objects.equals(schemaName, other.getName());
   }

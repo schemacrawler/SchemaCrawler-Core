@@ -12,7 +12,9 @@ import static java.util.Objects.hash;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
+import java.util.Map;
 import java.util.Objects;
+import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
@@ -118,6 +120,10 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
       return;
     }
     fullName = identifiers.quoteFullName(this);
+  }
+
+  final void addAttributesFrom(final Map<String, Object> values) {
+    addAttributes(values);
   }
 
   private void buildFullName() {

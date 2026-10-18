@@ -140,7 +140,7 @@ final class RoutineExtRetriever extends AbstractRetriever {
       routine.setRoutineBodyType(routineBodyType);
       routine.setDefinition(definition);
 
-      routine.addAttributes(results.getAttributes());
+      routine.addAttributesFrom(results.getAttributes());
     }
     return routineOptional.isPresent();
   }

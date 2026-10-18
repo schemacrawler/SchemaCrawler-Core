@@ -13,9 +13,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.Serial;
 import java.util.Collection;
@@ -25,10 +22,8 @@ import java.util.Optional;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
@@ -106,14 +101,22 @@ public class CatalogProjectionIndexTest {
 
   @Test
   public void ambiguousSchemaFullNameSelectsMinimumStructuredKey() {
-    final String fullName = "CATALOG.shared";
-    final Schema higherKey = schema(fullName, "shared", new NamedObjectKey("CATALOG", "z"));
-    final Schema lowerKey = schema(fullName, "shared", new NamedObjectKey("CATALOG", "a"));
-    final CatalogProjection projection =
-        projection(List.of(higherKey, lowerKey), List.of(), List.of());
+    final String schemaName = "SCHEMA";
+    final Schema schema1 = new SchemaReference("", schemaName);
+    final Schema schema2 = new SchemaReference(null, schemaName);
+    final Schema schema3 = new SchemaReference(schemaName, null);
 
-    assertThat(projection.getSchemas().size(), is(2));
-    assertThat(projection.lookupSchema(fullName).orElseThrow(), sameInstance(lowerKey));
+    assertThat(schema1.getFullName(), is(schemaName));
+    assertThat(schema2.getFullName(), is(schemaName));
+    assertThat(schema3.getFullName(), is(schemaName));
+
+    final CatalogProjection projection =
+        projection(List.of(schema2, schema1, schema3), List.of(), List.of());
+
+    final Collection<Schema> schemas = projection.getSchemas();
+    assertThat(schemas.size(), is(3));
+    assertThat(schemas, is(List.of(schema2, schema1, schema3)));
+    assertThat(projection.lookupSchema(schemaName).orElseThrow(), sameInstance(schema2));
   }
 
   @Test
@@ -187,23 +190,5 @@ public class CatalogProjectionIndexTest {
         synonyms,
         columnDataTypes,
         databaseUsers);
-  }
-
-  private static <N extends DatabaseObject> N schemaLess(
-      final Class<N> objectClass, final String name) {
-    final N object = mock(objectClass);
-    when(object.getSchema()).thenReturn(null);
-    when(object.getName()).thenReturn(name);
-    when(object.key()).thenReturn(new NamedObjectKey("schema-less", name));
-    return object;
-  }
-
-  private static Schema schema(final String fullName, final String name, final NamedObjectKey key) {
-    final Schema schema = mock(Schema.class);
-    when(schema.getFullName()).thenReturn(fullName);
-    when(schema.getName()).thenReturn(name);
-    when(schema.key()).thenReturn(key);
-    when(schema.compareTo(any(NamedObject.class))).thenReturn(0);
-    return schema;
   }
 }

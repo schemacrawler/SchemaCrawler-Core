@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.filter.InclusionRuleFilter;
 import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Synonym;
@@ -78,7 +79,7 @@ final class SynonymRetriever extends AbstractRetriever {
     }
     final Query synonymsDefinitionSql = informationSchemaViews.getQuery(EXT_SYNONYMS);
 
-    final NamedObjectList<SchemaReference> schemas = getAllSchemas();
+    final NamedObjectIndex<Schema> schemas = getAllSchemas();
 
     final String name = "synonyms";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
@@ -135,7 +136,7 @@ final class SynonymRetriever extends AbstractRetriever {
 
           synonym.setReferencedObject(referencedObject);
 
-          synonym.addAttributes(results.getAttributes());
+          synonym.addAttributesFrom(results.getAttributes());
 
           catalog.addSynonym(synonym);
           retrievalCounts.countIncluded();

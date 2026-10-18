@@ -175,7 +175,7 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     foreignKey.setUpdateRule(updateRule);
     foreignKey.setDeleteRule(deleteRule);
     foreignKey.setDeferrability(deferrability);
-    foreignKey.addAttributes(results.getAttributes());
+    foreignKey.addAttributesFrom(results.getAttributes());
 
     associateForeignKeyTable(foreignKey, fkColumn, pkColumn, fkTable, isFkColumnPartial);
 

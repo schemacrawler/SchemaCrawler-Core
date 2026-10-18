@@ -10,7 +10,7 @@ package schemacrawler.crawl;
 
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
-import static schemacrawler.utility.NamedObjectSort.alphabetical;
+import static schemacrawler.namedobject.NamedObjectSort.alphabetical;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 

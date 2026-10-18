@@ -127,7 +127,7 @@ final class IndexRetriever extends AbstractRetriever {
         index.setDefinition(definition);
         index.setRemarks(remarks);
 
-        index.addAttributes(results.getAttributes());
+        index.addAttributesFrom(results.getAttributes());
 
         retrievalCounts.countIncluded();
       }
@@ -207,7 +207,7 @@ final class IndexRetriever extends AbstractRetriever {
     index.setCardinality(cardinality);
     index.setPages(pages);
     index.setFilterCondition(filterCondition);
-    index.addAttributes(results.getAttributes());
+    index.addAttributesFrom(results.getAttributes());
 
     return true;
   }

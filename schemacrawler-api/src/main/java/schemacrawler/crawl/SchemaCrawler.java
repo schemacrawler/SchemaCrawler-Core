@@ -54,14 +54,15 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.RoutineType;
+import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.LimitOptions;
 import schemacrawler.schemacrawler.LoadOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaInfoLevel;
-import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.exceptions.DatabaseAccessException;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
@@ -252,7 +253,7 @@ public final class SchemaCrawler {
             () -> retriever.retrieveSchemas(options.limitOptions().get(ruleForSchemaInclusion)))
         .submit();
 
-    final NamedObjectList<SchemaReference> schemas = retriever.getAllSchemas();
+    final NamedObjectIndex<Schema> schemas = retriever.getAllSchemas();
     if (schemas.isEmpty()) {
       throw new ExecutionRuntimeException("No matching schemas found");
     }

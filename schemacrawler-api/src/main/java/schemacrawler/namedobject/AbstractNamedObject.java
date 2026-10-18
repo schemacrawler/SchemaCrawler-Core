@@ -6,34 +6,32 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.crawl;
+package schemacrawler.namedobject;
 
 import static java.util.Objects.compare;
 import static java.util.Objects.hash;
-import static schemacrawler.utility.NamedObjectSort.alphabetical;
+import static schemacrawler.namedobject.NamedObjectSort.alphabetical;
 
 import java.io.Serial;
 import java.util.Objects;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.schemacrawler.ModelImplementation;
 
-/** Represents a named object. */
-@ModelImplementation
-abstract class AbstractNamedObject implements NamedObject {
+/**
+ * Base implementation for named objects.
+ *
+ * <p>Subclasses provide the appropriate visibility and any domain-specific behavior. The name is
+ * fixed at construction; the lookup key is created lazily from that name.
+ */
+public abstract class AbstractNamedObject implements NamedObject {
 
   @Serial private static final long serialVersionUID = -1486322887991472729L;
 
   private final String name;
   private transient NamedObjectKey key;
 
-  /**
-   * Effective Java - Item 17 - Minimize Mutability - Package-private constructors make a class
-   * effectively final
-   *
-   * @param name Name of the named object
-   */
-  AbstractNamedObject(final String name) {
+  /** Creates a named object with an immutable name. */
+  protected AbstractNamedObject(final String name) {
     this.name = name;
   }
 

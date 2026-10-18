@@ -211,7 +211,7 @@ final class TableExtRetriever extends AbstractRetriever {
 
         table.setDefinition(definition);
 
-        table.addAttributes(results.getAttributes());
+        table.addAttributesFrom(results.getAttributes());
         retrievalCounts.countIncluded();
       }
     } catch (final Exception e) {
@@ -247,7 +247,7 @@ final class TableExtRetriever extends AbstractRetriever {
     }
 
     final MutableColumn column = columnOptional.get();
-    column.addAttributes(results.getAttributes());
+    column.addAttributesFrom(results.getAttributes());
     return true;
   }
 
@@ -267,7 +267,7 @@ final class TableExtRetriever extends AbstractRetriever {
     }
 
     final MutableTable table = tableOptional.get();
-    table.addAttributes(results.getAttributes());
+    table.addAttributesFrom(results.getAttributes());
 
     return true;
   }

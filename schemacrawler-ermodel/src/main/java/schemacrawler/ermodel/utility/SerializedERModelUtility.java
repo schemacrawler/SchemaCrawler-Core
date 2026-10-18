@@ -30,6 +30,7 @@ public final class SerializedERModelUtility {
           Pattern.compile("us\\.fatehi\\.utility\\.database\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.Multimap"),
           Pattern.compile("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"),
+          Pattern.compile("schemacrawler\\.namedobject\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.ermodel\\.model\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.ermodel\\.implementation\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.ermodel\\.associations\\.[A-Z].*"),

@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.utility;
+package schemacrawler.namedobject;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;

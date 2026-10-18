@@ -133,7 +133,7 @@ final class TriggerRetriever extends AbstractRetriever {
     trigger.withQuoting(getRetrieverConnection().getIdentifiers());
 
     trigger.setEventManipulationTypes(eventManipulationTypes);
-    trigger.addAttributes(results.getAttributes());
+    trigger.addAttributesFrom(results.getAttributes());
 
     // Add trigger to the table
     table.addTrigger(trigger);

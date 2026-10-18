@@ -21,13 +21,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.SearchableType;
 import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.Multimap;
 import us.fatehi.utility.logging.UtilityLogger;
@@ -71,7 +71,7 @@ final class DataTypeRetriever extends AbstractRetriever {
 
   void retrieveUserDefinedColumnDataTypes() throws SQLException {
 
-    final NamedObjectList<SchemaReference> schemas = getAllSchemas();
+    final NamedObjectIndex<Schema> schemas = getAllSchemas();
 
     final String name = "user-defined column data types";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
@@ -81,7 +81,7 @@ final class DataTypeRetriever extends AbstractRetriever {
           new StringFormat("Retrieving user-defined data types for schema <%s>", schema));
       requireNonNull(schema, "No schema provided");
 
-      final Optional<SchemaReference> schemaOptional = catalog.lookupSchema(schema.getFullName());
+      final Optional<Schema> schemaOptional = catalog.lookupSchema(schema.getFullName());
       if (schemaOptional.isEmpty()) {
         LOGGER.log(
             Level.INFO,
@@ -156,7 +156,7 @@ final class DataTypeRetriever extends AbstractRetriever {
     columnDataType.setMaximumScale(maximumScale);
     columnDataType.setNumPrecisionRadix(numPrecisionRadix);
 
-    columnDataType.addAttributes(results.getAttributes());
+    columnDataType.addAttributesFrom(results.getAttributes());
 
     // NOTE: Column data type was already added to the catalog during lookup and
     // create
@@ -190,7 +190,7 @@ final class DataTypeRetriever extends AbstractRetriever {
     columnDataType.setBaseType(baseType);
     columnDataType.setRemarks(remarks);
 
-    columnDataType.addAttributes(results.getAttributes());
+    columnDataType.addAttributesFrom(results.getAttributes());
 
     // NOTE: Column data type was already added to the catalog during lookup and
     // create

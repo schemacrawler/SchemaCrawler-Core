@@ -147,7 +147,7 @@ final class TableColumnRetriever extends AbstractRetriever {
         column.setDefaultValue(defaultValue);
       }
 
-      column.addAttributes(results.getAttributes());
+      column.addAttributesFrom(results.getAttributes());
 
       LOGGER.log(
           Level.FINER,

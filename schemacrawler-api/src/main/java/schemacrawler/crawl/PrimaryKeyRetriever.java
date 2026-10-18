@@ -91,7 +91,7 @@ final class PrimaryKeyRetriever extends AbstractRetriever {
       primaryKey.addColumn(pkColumn);
     }
 
-    primaryKey.addAttributes(results.getAttributes());
+    primaryKey.addAttributesFrom(results.getAttributes());
   }
 
   private void retrievePrimaryKeysFromDataDictionary() throws WrappedSQLException {

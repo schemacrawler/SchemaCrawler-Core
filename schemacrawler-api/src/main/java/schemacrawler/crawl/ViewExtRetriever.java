@@ -155,7 +155,7 @@ final class ViewExtRetriever extends AbstractRetriever {
     view.setCheckOption(checkOption);
     view.setUpdatable(updatable);
 
-    view.addAttributes(results.getAttributes());
+    view.addAttributesFrom(results.getAttributes());
 
     return true;
   }

@@ -24,11 +24,11 @@ import schemacrawler.ermodel.model.EntitySubtype;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.namedobject.ConcurrentNamedObjectIndex;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schemacrawler.ModelImplementation;
-import schemacrawler.utility.ConcurrentNamedObjectIndex;
 
 @ModelImplementation
 class MutableERModel implements ERModel {

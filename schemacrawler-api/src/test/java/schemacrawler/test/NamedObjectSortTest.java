@@ -18,10 +18,10 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import schemacrawler.namedobject.NamedObjectSort;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.test.utility.TestNamedObject;
 import schemacrawler.test.utility.TestNamedObjectNullName;
-import schemacrawler.utility.NamedObjectSort;
 
 public class NamedObjectSortTest {
 

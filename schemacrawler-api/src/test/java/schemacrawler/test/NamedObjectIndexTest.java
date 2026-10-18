@@ -31,6 +31,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
+import schemacrawler.namedobject.ConcurrentNamedObjectIndex;
+import schemacrawler.namedobject.ImmutableNamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
@@ -38,9 +41,6 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.TestNamedObject;
 import schemacrawler.test.utility.crawl.LightProcedure;
-import schemacrawler.utility.ConcurrentNamedObjectIndex;
-import schemacrawler.utility.ImmutableNamedObjectIndex;
-import schemacrawler.utility.NamedObjectIndex;
 
 public class NamedObjectIndexTest {
 

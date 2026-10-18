@@ -8,7 +8,10 @@
 
 package schemacrawler.filter;
 
-import static schemacrawler.utility.NamedObjectSort.alphabetical;
+import static java.util.Objects.compare;
+import static java.util.Objects.requireNonNullElse;
+import static schemacrawler.namedobject.NamedObjectSort.alphabetical;
+import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.util.ArrayList;
@@ -19,12 +22,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Predicate;
-
-import static java.util.Objects.compare;
-import static java.util.Objects.requireNonNullElse;
-
-import static us.fatehi.utility.Utility.isBlank;
-
+import schemacrawler.namedobject.ImmutableNamedObjectIndex;
+import schemacrawler.namedobject.SchemaIndex;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
@@ -41,7 +40,6 @@ import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
-import schemacrawler.utility.ImmutableNamedObjectIndex;
 
 final class CatalogProjection implements Catalog {
 
@@ -53,13 +51,13 @@ final class CatalogProjection implements Catalog {
   private final DatabaseInfo databaseInfo;
   private final JdbcDriverInfo jdbcDriverInfo;
   private final Map<String, Object> attributesMap;
-  private final ImmutableNamedObjectIndex<Schema> schemas;
+  private final ImmutableNamedObjectIndex<DatabaseUser> databaseUsers;
+  private final SchemaIndex schemas;
+  private final ImmutableNamedObjectIndex<ColumnDataType> columnDataTypes;
   private final ImmutableNamedObjectIndex<Table> tables;
   private final ImmutableNamedObjectIndex<Routine> routines;
   private final ImmutableNamedObjectIndex<Sequence> sequences;
   private final ImmutableNamedObjectIndex<Synonym> synonyms;
-  private final ImmutableNamedObjectIndex<ColumnDataType> columnDataTypes;
-  private final ImmutableNamedObjectIndex<DatabaseUser> databaseUsers;
 
   CatalogProjection(
       final String name,
@@ -97,7 +95,7 @@ final class CatalogProjection implements Catalog {
     this.databaseInfo = databaseInfo;
     this.jdbcDriverInfo = jdbcDriverInfo;
     this.attributesMap = Map.copyOf(requireNonNullElse(attributesMap, Map.of()));
-    this.schemas = new ImmutableNamedObjectIndex<>(schemas);
+    this.schemas = new SchemaIndex(schemas);
     this.tables = new ImmutableNamedObjectIndex<>(tables);
     this.routines = new ImmutableNamedObjectIndex<>(routines);
     this.sequences = new ImmutableNamedObjectIndex<>(sequences);
@@ -311,16 +309,22 @@ final class CatalogProjection implements Catalog {
    * @return The matching schema, if present
    */
   @Override
-  public <S extends Schema> Optional<S> lookupSchema(final String name) {
-	    // Schemas need to be looked up by full name, since either the
-	    // catalog or schema may be null, depending on the database
-	    if (name == null) { // Schema names may be blank
+  public Optional<Schema> lookupSchema(final String name) {
+    // Schema names may be blank, but cannot be null
+    if (name == null) {
       return Optional.empty();
     }
-    return (Optional<S>)
-        schemas.snapshot().stream()
-            .filter(schema -> name.equals(schema.getFullName()))
-            .findFirst();
+    // Schemas need to be looked up by full name in sorted order
+    // Schema full names can be the same, since either the
+    // catalog or schema may be null, depending on the database
+    final Collection<Schema> sortedSchemas = getSchemas();
+    for (final Schema schema : sortedSchemas) {
+      if (name.equals(schema.getFullName())) {
+        // Match the first schema found, searching in sorted order
+        return Optional.of(schema);
+      }
+    }
+    return Optional.empty();
   }
 
   @Override

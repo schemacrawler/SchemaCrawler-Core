@@ -3,6 +3,11 @@
 SchemaCrawler Core release notes.
 [SchemaCrawler Changelog](https://www.schemacrawler.com/changes-report.html)
 
+## Unreleased
+
+- Move reusable named-object support to `schemacrawler.namedobject`; this is a source and binary compatibility change.
+- Stop supporting historical Java-serialized catalogs and models that contain the previous named-object support class descriptors. Newly serialized catalogs and models remain supported.
+
 
 <a name="v17.15.2"></a>
 ## Release v17.15.2 - 2026-09-10

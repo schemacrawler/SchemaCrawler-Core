@@ -318,7 +318,7 @@ final class TableConstraintRetriever extends AbstractRetriever {
     }
 
     tableConstraint.setDefinition(definition);
-    tableConstraint.addAttributes(results.getAttributes());
+    tableConstraint.addAttributesFrom(results.getAttributes());
 
     return true;
   }
@@ -357,7 +357,7 @@ final class TableConstraintRetriever extends AbstractRetriever {
     tableConstraint.setDeferrable(deferrable);
     tableConstraint.setInitiallyDeferred(initiallyDeferred);
 
-    tableConstraint.addAttributes(results.getAttributes());
+    tableConstraint.addAttributesFrom(results.getAttributes());
 
     // Add constraint to table
     table.addTableConstraint(tableConstraint);

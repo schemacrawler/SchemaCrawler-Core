@@ -36,6 +36,7 @@ public final class SerializedCatalogUtility {
           Pattern.compile("us\\.fatehi\\.utility\\.jdbc\\.driver\\.[A-Z].*"),
           Pattern.compile("us\\.fatehi\\.utility\\.jdbc\\.serverfingerprint\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"),
+          Pattern.compile("schemacrawler\\.namedobject\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.utility\\.[A-Z].*"),
           Pattern.compile("schemacrawler\\.[A-Z].*"),
           Pattern.compile("(\\[L)?java\\.(lang|util)\\..*"),

@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.utility;
+package schemacrawler.namedobject;
 
 import java.io.Serial;
 import java.util.Optional;

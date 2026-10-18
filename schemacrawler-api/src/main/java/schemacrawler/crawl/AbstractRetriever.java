@@ -19,6 +19,8 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.namedobject.SchemaIndex;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
@@ -77,8 +79,8 @@ abstract class AbstractRetriever {
     return belongsToCatalog && belongsToSchema;
   }
 
-  final NamedObjectList<SchemaReference> getAllSchemas() {
-    return catalog.getAllSchemas();
+  final NamedObjectIndex<Schema> getAllSchemas() {
+    return new SchemaIndex(catalog.getSchemas());
   }
 
   final Map<String, String> getLimitMap() {

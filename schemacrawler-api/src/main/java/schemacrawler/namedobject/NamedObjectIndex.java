@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.utility;
+package schemacrawler.namedobject;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -20,8 +20,9 @@ import schemacrawler.schema.Schema;
  * Provides read-only lookup and enumeration of named objects.
  *
  * <p>The interface does not specify whether membership is immutable or thread-safe. Values are
- * detached, unmodifiable lists in natural order. Snapshots are detached and unmodifiable, with
- * unspecified iteration order.
+ * detached, unmodifiable lists in natural order and sorting them takes O(n log n) comparisons.
+ * Snapshots are detached and unmodifiable, take O(n) time, and have unspecified iteration order.
+ * Elements are shared references.
  *
  * @param <K> Complete lookup-key type
  * @param <N> Named-object type
@@ -37,14 +38,15 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
   boolean containsKey(final NamedObjectKey key);
 
   /**
-   * Gets a detached, unmodifiable list of objects in natural order.
+   * Gets a detached, unmodifiable list of objects freshly sorted in natural order.
    *
    * @return Naturally ordered objects
    */
   List<N> getObjects();
 
   /**
-   * Gets a detached, unmodifiable list of objects for an equal schema in natural order.
+   * Gets a detached, unmodifiable list of objects for an equal schema in natural order. The
+   * operation scans the index and sorts the matching objects.
    *
    * @param schema Schema to match using {@link Schema#equals(Object)}
    * @return Naturally ordered objects for the schema, or an empty list if the schema is null
@@ -88,7 +90,8 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
   int size();
 
   /**
-   * Gets a detached, unmodifiable unsorted collection of objects.
+   * Gets a detached, unmodifiable unsorted collection of objects in O(n) time, without comparing
+   * elements.
    *
    * @return Detached objects in unspecified order
    */

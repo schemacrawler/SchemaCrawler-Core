@@ -13,11 +13,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import schemacrawler.namedobject.ConcurrentNamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
-import schemacrawler.utility.ConcurrentNamedObjectIndex;
-import schemacrawler.utility.NamedObjectIndex;
 
 /**
  * Ordered list of named objects, that can be searched associatively. NamedObjectList has the

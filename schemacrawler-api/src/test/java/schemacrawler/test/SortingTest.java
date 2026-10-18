@@ -17,6 +17,7 @@ import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
 import java.sql.Connection;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import schemacrawler.namedobject.NamedObjectSort;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ForeignKey;
@@ -27,7 +28,6 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.DatabaseTestUtility;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.utility.NamedObjectSort;
 
 @WithTestDatabase
 public class SortingTest {
