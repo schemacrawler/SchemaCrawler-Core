@@ -3,13 +3,6 @@
 SchemaCrawler Core release notes.
 [SchemaCrawler Changelog](https://www.schemacrawler.com/changes-report.html)
 
-## Unreleased
-
-- Move reusable named-object support to `schemacrawler.namedobject`; this is a source and binary compatibility change.
-- Stop supporting historical Java-serialized catalogs and models that contain the previous named-object support class descriptors. Newly serialized catalogs and models remain supported.
-- Catalogs now use reference equality and identity hashing rather than name-based equality.
-- Catalog projections retain fixed membership and shared member objects, but allow independent attribute and remarks mutation. Attribute maps are mutable detached copies; attribute values remain shallowly shared. Projection string rendering is now blank, matching its name.
-
 
 <a name="v17.15.2"></a>
 ## Release v17.15.2 - 2026-09-10
