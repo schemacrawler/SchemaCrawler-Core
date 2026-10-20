@@ -12,6 +12,7 @@ import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import schemacrawler.namedobject.BuildableDependantObjectIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Privilege;
@@ -25,7 +26,7 @@ final class MutableColumn extends AbstractColumn<Table> implements Column {
 
   @Serial private static final long serialVersionUID = 3834591019449528633L;
 
-  private final ConcurrentDatabaseObjectIndex<MutablePrivilege<Column>> privileges =
+  private final BuildableDependantObjectIndex<MutablePrivilege<Column>> privileges =
       new ConcurrentDatabaseObjectIndex<>();
   private String defaultValue;
   private boolean isAutoIncremented;

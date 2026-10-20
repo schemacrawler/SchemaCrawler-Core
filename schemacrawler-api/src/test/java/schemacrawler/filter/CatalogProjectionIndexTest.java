@@ -214,12 +214,12 @@ public class CatalogProjectionIndexTest {
         null,
         null,
         Map.of(),
+        databaseUsers,
         schemas,
+        columnDataTypes,
         tables,
         routines,
         sequences,
-        synonyms,
-        columnDataTypes,
-        databaseUsers);
+        synonyms);
   }
 }

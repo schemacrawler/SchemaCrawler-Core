@@ -86,7 +86,6 @@ public final class CatalogProjectionBuilder {
   }
 
   private final Catalog catalog;
-
   private SchemaCrawlerOptions schemaCrawlerOptions;
 
   private CatalogProjectionBuilder(final Catalog catalog) {
@@ -142,13 +141,13 @@ public final class CatalogProjectionBuilder {
         catalog.getDatabaseInfo(),
         catalog.getJdbcDriverInfo(),
         catalog.getAttributes(),
+        databaseUsers,
         schemas,
+        columnDataTypes,
         tables,
         routines,
         sequences,
-        synonyms,
-        columnDataTypes,
-        databaseUsers);
+        synonyms);
   }
 
   /**

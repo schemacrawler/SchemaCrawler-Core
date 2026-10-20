@@ -30,7 +30,7 @@ import schemacrawler.schema.Schema;
  * @param <D> Database-object type
  */
 public final class ConcurrentDatabaseObjectIndex<D extends DatabaseObject>
-    extends AbstractDatabaseObjectIndex<D> implements BuildableIndex<D>, DependantObjectIndex<D> {
+    extends AbstractDatabaseObjectIndex<D> implements BuildableDependantObjectIndex<D> {
 
   @Serial private static final long serialVersionUID = -1089958942591485649L;
 

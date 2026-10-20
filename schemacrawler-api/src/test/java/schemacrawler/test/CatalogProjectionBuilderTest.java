@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
@@ -702,7 +703,9 @@ public class CatalogProjectionBuilderTest {
     when(catalog.getColumnDataTypes()).thenReturn(List.of());
     when(catalog.getDatabaseUsers()).thenReturn(List.of());
     for (final Table table : tables) {
-      when(catalog.lookupTable(table.getSchema(), table.getName())).thenReturn(Optional.of(table));
+      Mockito.<Optional<? extends Table>>when(
+              catalog.lookupTable(table.getSchema(), table.getName()))
+          .thenReturn(Optional.of(table));
     }
     return catalog;
   }

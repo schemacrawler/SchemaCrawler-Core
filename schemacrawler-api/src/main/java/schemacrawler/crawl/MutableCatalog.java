@@ -11,24 +11,16 @@ package schemacrawler.crawl;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
+import schemacrawler.namedobject.AbstractCatalog;
+import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
-import schemacrawler.schema.Catalog;
-import schemacrawler.schema.Column;
-import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
-import schemacrawler.schema.Sequence;
-import schemacrawler.schema.Synonym;
-import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.SchemaReference;
 import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
 import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder;
@@ -37,27 +29,60 @@ import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder
  * Database and connection information. Created from metadata returned by a JDBC call, and other
  * sources of information.
  */
-final class MutableCatalog extends AbstractNamedObjectWithAttributes implements Catalog {
+final class MutableCatalog
+    extends AbstractCatalog<
+        MutableColumnDataType, MutableTable, MutableRoutine, MutableSequence, MutableSynonym> {
 
-  @Serial private static final long serialVersionUID = 4051323422934251828L;
+  @Serial private static final long serialVersionUID = 1L;
 
   private final ImmutableCrawlInfo crawlInfo;
   private final MutableDatabaseInfo databaseInfo;
   private final MutableJdbcDriverInfo jdbcDriverInfo;
   private final MapBackedNamedObjectIndex<DatabaseUser> databaseUsers;
   private final MapBackedNamedObjectIndex<Schema> schemas;
-  private final ConcurrentDatabaseObjectIndex<MutableColumnDataType> columnDataTypes;
-  private final ConcurrentDatabaseObjectIndex<MutableTable> tables;
-  private final ConcurrentDatabaseObjectIndex<MutableRoutine> routines;
-  private final ConcurrentDatabaseObjectIndex<MutableSequence> sequences;
-  private final ConcurrentDatabaseObjectIndex<MutableSynonym> synonyms;
+  private final BuildableDatabaseObjectIndex<MutableColumnDataType> columnDataTypes;
+  private final BuildableDatabaseObjectIndex<MutableTable> tables;
+  private final BuildableDatabaseObjectIndex<MutableRoutine> routines;
+  private final BuildableDatabaseObjectIndex<MutableSequence> sequences;
+  private final BuildableDatabaseObjectIndex<MutableSynonym> synonyms;
 
   MutableCatalog(
       final String title,
       final MutableDatabaseInfo databaseInfo,
       final MutableJdbcDriverInfo jdbcDriverInfo) {
-    super("");
+    this(
+        title,
+        databaseInfo,
+        jdbcDriverInfo,
+        new MapBackedNamedObjectIndex<>(),
+        new MapBackedNamedObjectIndex<>(),
+        new ConcurrentDatabaseObjectIndex<>(),
+        new ConcurrentDatabaseObjectIndex<>(),
+        new ConcurrentDatabaseObjectIndex<>(),
+        new ConcurrentDatabaseObjectIndex<>(),
+        new ConcurrentDatabaseObjectIndex<>());
+  }
 
+  private MutableCatalog(
+      final String title,
+      final MutableDatabaseInfo databaseInfo,
+      final MutableJdbcDriverInfo jdbcDriverInfo,
+      final MapBackedNamedObjectIndex<DatabaseUser> databaseUsers,
+      final MapBackedNamedObjectIndex<Schema> schemas,
+      final BuildableDatabaseObjectIndex<MutableColumnDataType> columnDataTypes,
+      final BuildableDatabaseObjectIndex<MutableTable> tables,
+      final BuildableDatabaseObjectIndex<MutableRoutine> routines,
+      final BuildableDatabaseObjectIndex<MutableSequence> sequences,
+      final BuildableDatabaseObjectIndex<MutableSynonym> synonyms) {
+    super(
+        new SchemaReference(),
+        databaseUsers,
+        schemas,
+        columnDataTypes,
+        tables,
+        routines,
+        sequences,
+        synonyms);
     this.databaseInfo = requireNonNull(databaseInfo, "No database information provided");
     this.jdbcDriverInfo = requireNonNull(jdbcDriverInfo, "No JDBC driver information provided");
     final DatabaseServerFingerprint databaseServerFingerprint =
@@ -67,30 +92,13 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
     crawlInfo =
         new ImmutableCrawlInfo(title, databaseInfo, jdbcDriverInfo, databaseServerFingerprint);
 
-    databaseUsers = new MapBackedNamedObjectIndex<>();
-    schemas = new MapBackedNamedObjectIndex<>();
-    columnDataTypes = new ConcurrentDatabaseObjectIndex<>();
-    tables = new ConcurrentDatabaseObjectIndex<>();
-    routines = new ConcurrentDatabaseObjectIndex<>();
-    sequences = new ConcurrentDatabaseObjectIndex<>();
-    synonyms = new ConcurrentDatabaseObjectIndex<>();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<ColumnDataType> getColumnDataTypes() {
-    return List.copyOf(columnDataTypes.getObjects());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<ColumnDataType> getColumnDataTypes(final Schema schema) {
-    return List.copyOf(columnDataTypes.getObjects(schema));
+    this.databaseUsers = databaseUsers;
+    this.schemas = schemas;
+    this.columnDataTypes = columnDataTypes;
+    this.tables = tables;
+    this.routines = routines;
+    this.sequences = sequences;
+    this.synonyms = synonyms;
   }
 
   @Override
@@ -105,135 +113,8 @@ final class MutableCatalog extends AbstractNamedObjectWithAttributes implements 
 
   /** {@inheritDoc} */
   @Override
-  public Collection<DatabaseUser> getDatabaseUsers() {
-    return List.copyOf(databaseUsers.getObjects());
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public MutableJdbcDriverInfo getJdbcDriverInfo() {
     return jdbcDriverInfo;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Routine> getRoutines() {
-    return List.copyOf(routines.getObjects());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Routine> getRoutines(final Schema schema) {
-    return List.copyOf(routines.getObjects(schema));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Routine> getRoutines(final Schema schema, final String routineName) {
-    return List.copyOf(routines.getObjects(schema, routineName));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Schema> getSchemas() {
-    return List.copyOf(schemas.getObjects());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Sequence> getSequences() {
-    return List.copyOf(sequences.getObjects());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Sequence> getSequences(final Schema schema) {
-    return List.copyOf(sequences.getObjects(schema));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Synonym> getSynonyms() {
-    return List.copyOf(synonyms.getObjects());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Synonym> getSynonyms(final Schema schema) {
-    return List.copyOf(synonyms.getObjects(schema));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<ColumnDataType> getSystemColumnDataTypes() {
-    return getColumnDataTypes(new SchemaReference());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Table> getTables() {
-    return List.copyOf(tables.getObjects());
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Collection<Table> getTables(final Schema schema) {
-    return List.copyOf(tables.getObjects(schema));
-  }
-
-  @Override
-  public int hashCode() {
-    return System.identityHashCode(this);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<Column> lookupColumn(
-      final Schema schema, final String tableName, final String name) {
-    return tables.lookup(schema, tableName).flatMap(table -> table.lookupColumn(name));
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<MutableColumnDataType> lookupColumnDataType(
-      final Schema schema, final String name) {
-    return columnDataTypes.lookup(schema, name);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<MutableRoutine> lookupRoutine(final Schema schema, final String name) {
-    return routines.lookup(schema, name);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<Schema> lookupSchema(final String name) {
-    return schemas.lookup(name);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<MutableSequence> lookupSequence(final Schema schemaRef, final String name) {
-    return sequences.lookup(schemaRef, name);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<MutableSynonym> lookupSynonym(final Schema schemaRef, final String name) {
-    return synonyms.lookup(schemaRef, name);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<MutableColumnDataType> lookupSystemColumnDataType(final String name) {
-    return lookupColumnDataType(new SchemaReference(), name);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<MutableTable> lookupTable(final Schema schemaRef, final String name) {
-    return tables.lookup(schemaRef, name);
   }
 
   void addColumnDataType(final MutableColumnDataType columnDataType) {

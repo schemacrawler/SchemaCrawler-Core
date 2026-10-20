@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import schemacrawler.namedobject.BuildableDependantObjectIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
@@ -52,19 +53,19 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
 
   @Serial private static final long serialVersionUID = 3257290248802284852L;
 
-  private final ConcurrentDatabaseObjectIndex<MutableColumn> columns =
+  private final BuildableDependantObjectIndex<MutableColumn> columns =
       new ConcurrentDatabaseObjectIndex<>();
-  private final ConcurrentDatabaseObjectIndex<TableConstraint> constraints =
+  private final BuildableDependantObjectIndex<TableConstraint> constraints =
       new ConcurrentDatabaseObjectIndex<>();
-  private final ConcurrentDatabaseObjectIndex<MutableForeignKey> foreignKeys =
+  private final BuildableDependantObjectIndex<MutableForeignKey> foreignKeys =
       new ConcurrentDatabaseObjectIndex<>();
-  private final ConcurrentDatabaseObjectIndex<MutableColumn> hiddenColumns =
+  private final BuildableDependantObjectIndex<MutableColumn> hiddenColumns =
       new ConcurrentDatabaseObjectIndex<>();
-  private final ConcurrentDatabaseObjectIndex<MutableIndex> indexes =
+  private final BuildableDependantObjectIndex<MutableIndex> indexes =
       new ConcurrentDatabaseObjectIndex<>();
-  private final ConcurrentDatabaseObjectIndex<MutablePrivilege<Table>> privileges =
+  private final BuildableDependantObjectIndex<MutablePrivilege<Table>> privileges =
       new ConcurrentDatabaseObjectIndex<>();
-  private final ConcurrentDatabaseObjectIndex<MutableTrigger> triggers =
+  private final BuildableDependantObjectIndex<MutableTrigger> triggers =
       new ConcurrentDatabaseObjectIndex<>();
   private final Set<DatabaseObject> usedByObjects = new HashSet<>();
   private MutablePrimaryKey primaryKey;

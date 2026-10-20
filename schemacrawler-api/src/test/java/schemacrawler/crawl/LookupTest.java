@@ -86,28 +86,29 @@ public class LookupTest {
 
     assertThat(catalog.lookupSchema(null), isEmpty());
     assertThat(catalog.lookupSchema(NOTHING_AT_ALL), isEmpty());
-    assertThat(catalog.lookupSchema("PUBLIC.BOOKS"), isPresentAndIs(schema));
+    assertThat(catalog.lookupSchema("PUBLIC.BOOKS").orElseThrow(), is(schema));
 
     final Sequence sequence = new MutableSequence(schema, "PUBLISHER_ID_SEQ");
     assertThat(catalog.lookupSequence(schema, null), isEmpty());
     assertThat(catalog.lookupSequence(schema, NOTHING_AT_ALL), isEmpty());
-    assertThat(catalog.lookupSequence(schema, "PUBLISHER_ID_SEQ"), isPresentAndIs(sequence));
+    assertThat(catalog.lookupSequence(schema, "PUBLISHER_ID_SEQ").orElseThrow(), is(sequence));
 
     final Synonym synonym = new MutableSynonym(schema, "PUBLICATIONS");
     assertThat(catalog.lookupSynonym(schema, null), isEmpty());
     assertThat(catalog.lookupSynonym(schema, NOTHING_AT_ALL), isEmpty());
-    assertThat(catalog.lookupSynonym(schema, "PUBLICATIONS"), isPresentAndIs(synonym));
+    assertThat(catalog.lookupSynonym(schema, "PUBLICATIONS").orElseThrow(), is(synonym));
 
     final ColumnDataType systemColumnDataType =
         new MutableColumnDataType(new SchemaReference(), "VARCHAR", DataTypeType.system);
     assertThat(catalog.lookupSystemColumnDataType(null), isEmpty());
     assertThat(catalog.lookupSystemColumnDataType(NOTHING_AT_ALL), isEmpty());
-    assertThat(catalog.lookupSystemColumnDataType("VARCHAR"), isPresentAndIs(systemColumnDataType));
+    assertThat(
+        catalog.lookupSystemColumnDataType("VARCHAR").orElseThrow(), is(systemColumnDataType));
 
     final Table table = new TablePartial(schema, "AUTHORS");
     assertThat(catalog.lookupTable(schema, null), isEmpty());
     assertThat(catalog.lookupTable(schema, NOTHING_AT_ALL), isEmpty());
-    assertThat(catalog.lookupTable(schema, "AUTHORS"), isPresentAndIs(table));
+    assertThat(catalog.lookupTable(schema, "AUTHORS").orElseThrow(), is(table));
   }
 
   @Test

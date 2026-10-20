@@ -15,6 +15,7 @@ import java.io.Serial;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import schemacrawler.namedobject.BuildableDependantObjectIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
@@ -28,7 +29,7 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
 
   @Serial private static final long serialVersionUID = 4051326747138079028L;
 
-  private final ConcurrentDatabaseObjectIndex<MutableIndexColumn> columns =
+  private final BuildableDependantObjectIndex<MutableIndexColumn> columns =
       new ConcurrentDatabaseObjectIndex<>();
   private String definition;
   private long cardinality;

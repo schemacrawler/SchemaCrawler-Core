@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import schemacrawler.namedobject.AbstractCatalog;
 import schemacrawler.namedobject.AbstractNamedObject;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
 import schemacrawler.schemacrawler.ModelImplementation;
@@ -148,6 +149,7 @@ public class ModelTest {
   public void reusableNamedObjectBasesArePublicAndNotModelImplementations() {
     assertPublicUnclassifiedSupportBase(AbstractNamedObject.class);
     assertPublicUnclassifiedSupportBase(AbstractNamedObjectWithAttributes.class);
+    assertPublicUnclassifiedSupportBase(AbstractCatalog.class);
   }
 
   @Test

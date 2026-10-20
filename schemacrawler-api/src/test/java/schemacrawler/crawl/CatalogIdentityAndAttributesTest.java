@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,16 +30,172 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.ColumnDataType;
+import schemacrawler.schema.DataTypeType;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
+import schemacrawler.schemacrawler.LimitOptions;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
+import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.utility.SerializedCatalogUtility;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
 
 public class CatalogIdentityAndAttributesTest {
+
+  @Test
+  public void readOperationsStayEquivalentAcrossCatalogImplementations() throws Exception {
+    final MutableCatalog source = newCatalog();
+    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
+    final Schema otherSchema = new SchemaReference("CATALOG", "OTHER");
+    source.addSchema(schema);
+    source.addSchema(otherSchema);
+    final MutableTable table = new MutableTable(schema, "TABLE");
+    table.setTableType(new TableType("TABLE"));
+    final MutableColumn column = new MutableColumn(table, "COLUMN");
+    table.addColumn(column);
+    source.addTable(table);
+    final MutableProcedure later = new MutableProcedure(schema, "run", "z");
+    final MutableProcedure earlier = new MutableProcedure(schema, "run", "a");
+    source.addRoutine(later);
+    source.addRoutine(earlier);
+    final MutableSequence sequence = new MutableSequence(schema, "SEQUENCE");
+    source.addSequence(sequence);
+    final MutableSynonym synonym = new MutableSynonym(schema, "SYNONYM");
+    source.addSynonym(synonym);
+    final MutableColumnDataType dataType =
+        new MutableColumnDataType(schema, "TYPE", DataTypeType.user_defined);
+    final MutableColumnDataType systemType =
+        new MutableColumnDataType(new SchemaReference(), "SYSTEM", DataTypeType.system);
+    source.addColumnDataType(dataType);
+    source.addColumnDataType(systemType);
+    final ImmutableDatabaseUser user = new ImmutableDatabaseUser("USER");
+    source.addDatabaseUser(user);
+
+    final Optional<MutableTable> mutableTable = source.lookupTable(schema, "TABLE");
+    final Optional<MutableRoutine> mutableRoutine = source.lookupRoutine(schema, "run");
+    final Optional<MutableColumnDataType> mutableType = source.lookupColumnDataType(schema, "TYPE");
+    final Optional<MutableColumnDataType> mutableSystemType =
+        source.lookupSystemColumnDataType("SYSTEM");
+    final Optional<MutableSequence> mutableSequence = source.lookupSequence(schema, "SEQUENCE");
+    final Optional<MutableSynonym> mutableSynonym = source.lookupSynonym(schema, "SYNONYM");
+    assertThat(mutableTable.orElseThrow(), sameInstance(table));
+    assertThat(mutableRoutine.orElseThrow(), sameInstance(earlier));
+    assertThat(mutableType.orElseThrow(), sameInstance(dataType));
+    assertThat(mutableSystemType.orElseThrow(), sameInstance(systemType));
+    assertThat(mutableSequence.orElseThrow(), sameInstance(sequence));
+    assertThat(mutableSynonym.orElseThrow(), sameInstance(synonym));
+
+    final LimitOptions limitOptions =
+        LimitOptionsBuilder.builder()
+            .includeAllRoutines()
+            .includeAllSequences()
+            .includeAllSynonyms()
+            .build();
+    final SchemaCrawlerOptions options =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions().withLimitOptions(limitOptions);
+    final Catalog projection =
+        CatalogProjectionBuilder.builder(source).withOptions(options).build();
+
+    for (final Catalog catalog : List.of(source, projection)) {
+      final Optional<? extends Table> publicTable = catalog.lookupTable(schema, "TABLE");
+      final Optional<? extends ColumnDataType> publicType =
+          catalog.lookupColumnDataType(schema, "TYPE");
+      assertThat(publicTable.orElseThrow(), sameInstance(table));
+      assertThat(publicType.orElseThrow(), sameInstance(dataType));
+      assertThat(catalog.getSchemas(), contains(otherSchema, schema));
+      assertThat(catalog.getTables(), contains(sameInstance(table)));
+      assertThat(catalog.getTables(schema), contains(sameInstance(table)));
+      assertThat(catalog.getRoutines(), contains(earlier, later));
+      assertThat(catalog.getRoutines(schema), contains(earlier, later));
+      assertThat(catalog.getRoutines(schema, "run"), contains(earlier, later));
+      assertThat(catalog.getSequences(), contains(sameInstance(sequence)));
+      assertThat(catalog.getSequences(schema), contains(sameInstance(sequence)));
+      assertThat(catalog.getSynonyms(), contains(sameInstance(synonym)));
+      assertThat(catalog.getSynonyms(schema), contains(sameInstance(synonym)));
+      assertThat(catalog.getColumnDataTypes(schema), contains(sameInstance(dataType)));
+      assertThat(catalog.getSystemColumnDataTypes(), contains(sameInstance(systemType)));
+      assertThat(
+          List.copyOf(catalog.getColumnDataTypes()), is(List.copyOf(source.getColumnDataTypes())));
+      assertThat(catalog.getDatabaseUsers(), contains(sameInstance(user)));
+      assertThat(catalog.getCrawlInfo(), sameInstance(source.getCrawlInfo()));
+      assertThat(catalog.getDatabaseInfo(), sameInstance(source.getDatabaseInfo()));
+      assertThat(catalog.getJdbcDriverInfo(), sameInstance(source.getJdbcDriverInfo()));
+      assertThat(catalog.lookupSchema(schema.getFullName()).orElseThrow(), sameInstance(schema));
+      assertThat(catalog.lookupTable(schema, "TABLE").orElseThrow(), sameInstance(table));
+      assertThat(
+          catalog.lookupColumn(schema, "TABLE", "COLUMN").orElseThrow(), sameInstance(column));
+      assertThat(
+          catalog.lookupColumnDataType(schema, "TYPE").orElseThrow(), sameInstance(dataType));
+      assertThat(
+          catalog.lookupSystemColumnDataType("SYSTEM").orElseThrow(), sameInstance(systemType));
+      assertThat(catalog.lookupRoutine(schema, "run").orElseThrow(), sameInstance(earlier));
+      assertThat(catalog.lookupSequence(schema, "SEQUENCE").orElseThrow(), sameInstance(sequence));
+      assertThat(catalog.lookupSynonym(schema, "SYNONYM").orElseThrow(), sameInstance(synonym));
+
+      for (final Collection<?> values :
+          List.of(
+              catalog.getSchemas(),
+              catalog.getTables(),
+              catalog.getTables(schema),
+              catalog.getRoutines(),
+              catalog.getRoutines(schema),
+              catalog.getRoutines(schema, "run"),
+              catalog.getSequences(),
+              catalog.getSequences(schema),
+              catalog.getSynonyms(),
+              catalog.getSynonyms(schema),
+              catalog.getColumnDataTypes(),
+              catalog.getColumnDataTypes(schema),
+              catalog.getSystemColumnDataTypes(),
+              catalog.getDatabaseUsers())) {
+        assertThrows(UnsupportedOperationException.class, values::clear);
+      }
+      for (final Schema absentSchema : new Schema[] {null, otherSchema}) {
+        assertThat(catalog.getTables(absentSchema), is(empty()));
+        assertThat(catalog.getRoutines(absentSchema), is(empty()));
+        assertThat(catalog.getSequences(absentSchema), is(empty()));
+        assertThat(catalog.getSynonyms(absentSchema), is(empty()));
+        assertThat(catalog.getColumnDataTypes(absentSchema), is(empty()));
+        assertThat(catalog.lookupTable(absentSchema, "TABLE"), is(Optional.empty()));
+        assertThat(catalog.lookupRoutine(absentSchema, "run"), is(Optional.empty()));
+        assertThat(catalog.lookupSequence(absentSchema, "SEQUENCE"), is(Optional.empty()));
+        assertThat(catalog.lookupSynonym(absentSchema, "SYNONYM"), is(Optional.empty()));
+        assertThat(catalog.lookupColumnDataType(absentSchema, "TYPE"), is(Optional.empty()));
+        assertThat(catalog.lookupColumn(absentSchema, "TABLE", "COLUMN"), is(Optional.empty()));
+      }
+      for (final String absentName : new String[] {null, "", " \t ", "MISSING"}) {
+        assertThat(catalog.lookupSchema(absentName), is(Optional.empty()));
+        assertThat(catalog.lookupTable(schema, absentName), is(Optional.empty()));
+        assertThat(catalog.lookupRoutine(schema, absentName), is(Optional.empty()));
+        assertThat(catalog.getRoutines(schema, absentName), is(empty()));
+        assertThat(catalog.lookupSequence(schema, absentName), is(Optional.empty()));
+        assertThat(catalog.lookupSynonym(schema, absentName), is(Optional.empty()));
+        assertThat(catalog.lookupColumnDataType(schema, absentName), is(Optional.empty()));
+        assertThat(catalog.lookupSystemColumnDataType(absentName), is(Optional.empty()));
+        assertThat(catalog.lookupColumn(schema, "TABLE", absentName), is(Optional.empty()));
+        assertThat(catalog.lookupColumn(schema, absentName, "COLUMN"), is(Optional.empty()));
+      }
+    }
+    for (final Catalog original : List.of(source, projection)) {
+      final Catalog copy = roundTrip(original);
+      assertThat(copy.getSystemColumnDataTypes().size(), is(1));
+      assertThat(
+          copy.lookupSystemColumnDataType("SYSTEM").orElseThrow(),
+          sameInstance(copy.getSystemColumnDataTypes().iterator().next()));
+      assertThat(copy.lookupSystemColumnDataType("TYPE"), is(Optional.empty()));
+    }
+    final Collection<Table> previous = source.getTables();
+    final MutableTable added = new MutableTable(schema, "ADDED");
+    added.setTableType(new TableType("table"));
+    source.addTable(added);
+    assertThat(previous, contains(sameInstance(table)));
+    assertThat(source.getTables(), contains(added, table));
+    assertThat(projection.getTables(), contains(sameInstance(table)));
+  }
 
   @Test
   public void attributeMappingsAreIndependentInBothConstructorPaths() throws Exception {

@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.Serial;
 import java.util.List;
 import java.util.Optional;
+import schemacrawler.namedobject.BuildableDependantObjectIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.ProcedureParameter;
@@ -24,7 +25,7 @@ import schemacrawler.schema.Schema;
 final class MutableProcedure extends MutableRoutine implements Procedure {
 
   @Serial private static final long serialVersionUID = 3906925686089134130L;
-  private final ConcurrentDatabaseObjectIndex<MutableProcedureParameter> columns =
+  private final BuildableDependantObjectIndex<MutableProcedureParameter> columns =
       new ConcurrentDatabaseObjectIndex<>();
   private ProcedureReturnType returnType;
 
