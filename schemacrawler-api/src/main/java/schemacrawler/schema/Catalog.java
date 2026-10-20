@@ -18,10 +18,6 @@ import java.util.Optional;
  * independently of their metadata, members, or attributes. Names and full names are blank; natural
  * comparison is not an identity test. Identity belongs to each instance, including a deserialized
  * instance.
- *
- * <p>Lookup result subtypes are determined by the catalog implementation, not selected by callers.
- * Callers using this interface receive bounded-wildcard optionals; implementations may specialize
- * their return types.
  */
 public interface Catalog extends NamedObject, AttributedObject, DescribedObject {
 
@@ -148,7 +144,7 @@ public interface Catalog extends NamedObject, AttributedObject, DescribedObject 
    * @param dataTypeName Unqualified column data-type name
    * @return Column data type
    */
-  Optional<? extends ColumnDataType> lookupColumnDataType(Schema schema, String dataTypeName);
+  <C extends ColumnDataType> Optional<C> lookupColumnDataType(Schema schema, String dataTypeName);
 
   /**
    * Gets a routine by unqualified name.
@@ -157,7 +153,7 @@ public interface Catalog extends NamedObject, AttributedObject, DescribedObject 
    * @param routineName Unqualified routine name
    * @return Routine.
    */
-  Optional<? extends Routine> lookupRoutine(Schema schema, String routineName);
+  <R extends Routine> Optional<R> lookupRoutine(Schema schema, String routineName);
 
   /**
    * Gets a schema by name.
@@ -165,7 +161,7 @@ public interface Catalog extends NamedObject, AttributedObject, DescribedObject 
    * @param name Schema name
    * @return Schema.
    */
-  Optional<? extends Schema> lookupSchema(String name);
+  <S extends Schema> Optional<S> lookupSchema(String name);
 
   /**
    * Gets the sequence by unqualified name.
@@ -174,7 +170,7 @@ public interface Catalog extends NamedObject, AttributedObject, DescribedObject 
    * @param sequenceName Unqualified sequence name
    * @return Sequence.
    */
-  Optional<? extends Sequence> lookupSequence(Schema schema, String sequenceName);
+  <S extends Sequence> Optional<S> lookupSequence(Schema schema, String sequenceName);
 
   /**
    * Gets the synonym by unqualified name.
@@ -183,7 +179,7 @@ public interface Catalog extends NamedObject, AttributedObject, DescribedObject 
    * @param synonymName Unqualified synonym name
    * @return Synonym.
    */
-  Optional<? extends Synonym> lookupSynonym(Schema schema, String synonymName);
+  <S extends Synonym> Optional<S> lookupSynonym(Schema schema, String synonymName);
 
   /**
    * Gets the column data types defined by the RDBMS system, by name.
@@ -191,7 +187,7 @@ public interface Catalog extends NamedObject, AttributedObject, DescribedObject 
    * @param name Column data type name
    * @return Column data type
    */
-  Optional<? extends ColumnDataType> lookupSystemColumnDataType(String name);
+  <C extends ColumnDataType> Optional<C> lookupSystemColumnDataType(String name);
 
   /**
    * Gets a table by unqualified name.
@@ -200,5 +196,5 @@ public interface Catalog extends NamedObject, AttributedObject, DescribedObject 
    * @param tableName Unqualified table name
    * @return Table.
    */
-  Optional<? extends Table> lookupTable(Schema schema, String tableName);
+  <T extends Table> Optional<T> lookupTable(Schema schema, String tableName);
 }
