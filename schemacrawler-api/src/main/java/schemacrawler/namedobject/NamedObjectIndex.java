@@ -18,14 +18,19 @@ import schemacrawler.schema.NamedObjectKey;
 /**
  * Provides read-only lookup and enumeration of named objects.
  *
- * <p>The interface does not specify whether membership is immutable or thread-safe. Values are
- * detached, unmodifiable lists in natural order and sorting them takes O(n log n) comparisons.
- * Snapshots are detached and unmodifiable, take O(n) time, and have unspecified iteration order.
- * Elements are shared references.
+ * <p>Membership mutability and thread safety depend on the implementation. {@link #getObjects()}
+ * and iteration use detached, unmodifiable lists freshly sorted in natural order, requiring O(n log
+ * n) comparisons in the general case. {@link #snapshot()} copies membership in O(n) time without
+ * comparing objects and has unspecified iteration order. Elements are shared references: their
+ * complete keys must remain stable while indexed, and their comparison state must remain stable
+ * during sorting. Equal comparison results have unspecified relative order.
+ *
+ * <p>The index hierarchy is sealed; external implementations are not supported.
  *
  * @param <N> Named-object type
  */
-public interface NamedObjectIndex<N extends NamedObject> extends Serializable, Iterable<N> {
+public sealed interface NamedObjectIndex<N extends NamedObject> extends Serializable, Iterable<N>
+    permits DatabaseObjectIndex, MapBackedNamedObjectIndex {
 
   /**
    * Checks whether the index contains the complete key.
@@ -58,7 +63,11 @@ public interface NamedObjectIndex<N extends NamedObject> extends Serializable, I
   Optional<N> lookup(NamedObjectKey key);
 
   /**
-   * Looks up the natural-order first object with an exact full name, including blank names.
+   * Looks up the natural-order first object with an exact full name.
+   *
+   * <p>Comparison ties have unspecified selection. Blank-name handling depends on the
+   * implementation: {@link MapBackedNamedObjectIndex} accepts blank full names, whereas database
+   * object indexes reject them.
    *
    * @param fullName Full named object name
    * @return The object, if present; empty if the full name is null or absent

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
-import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
@@ -53,20 +53,20 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
 
   @Serial private static final long serialVersionUID = 3257290248802284852L;
 
-  private final BuildableDependantObjectIndex<MutableColumn> columns =
-      new ConcurrentDatabaseObjectIndex<>();
-  private final BuildableDependantObjectIndex<TableConstraint> constraints =
-      new ConcurrentDatabaseObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutableForeignKey> foreignKeys =
-      new ConcurrentDatabaseObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutableColumn> hiddenColumns =
-      new ConcurrentDatabaseObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutableIndex> indexes =
-      new ConcurrentDatabaseObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutablePrivilege<Table>> privileges =
-      new ConcurrentDatabaseObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutableTrigger> triggers =
-      new ConcurrentDatabaseObjectIndex<>();
+  private final BuildableDependantObjectIndex<MutableColumn, Table> columns =
+      new ConcurrentDependantObjectIndex<>();
+  private final BuildableDependantObjectIndex<TableConstraint, Table> constraints =
+      new ConcurrentDependantObjectIndex<>();
+  private final BuildableDependantObjectIndex<MutableForeignKey, Table> foreignKeys =
+      new ConcurrentDependantObjectIndex<>();
+  private final BuildableDependantObjectIndex<MutableColumn, Table> hiddenColumns =
+      new ConcurrentDependantObjectIndex<>();
+  private final BuildableDependantObjectIndex<MutableIndex, Table> indexes =
+      new ConcurrentDependantObjectIndex<>();
+  private final BuildableDependantObjectIndex<MutablePrivilege<Table>, Table> privileges =
+      new ConcurrentDependantObjectIndex<>();
+  private final BuildableDependantObjectIndex<MutableTrigger, Table> triggers =
+      new ConcurrentDependantObjectIndex<>();
   private final Set<DatabaseObject> usedByObjects = new HashSet<>();
   private MutablePrimaryKey primaryKey;
   private int sortIndex;

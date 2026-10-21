@@ -16,14 +16,17 @@ import schemacrawler.schema.Schema;
 /**
  * Adds schema-scoped enumeration and ordinary-name lookup to a named-object index.
  *
- * <p>The interface does not specify whether membership is immutable or thread-safe. Values are
- * detached, unmodifiable lists in natural order and sorting them takes O(n log n) comparisons.
- * Snapshots are detached and unmodifiable, take O(n) time, and have unspecified iteration order.
- * Elements are shared references.
+ * <p>Schema-scoped operations scan an unsorted snapshot before sorting only the matching objects.
+ * Matching uses schema equality and exact, case-sensitive names; indexed objects must have non-null
+ * schemas. Membership mutability and thread safety depend on the implementation.
+ *
+ * <p>Both schema/name lookup and inherited full-name lookup reject null or blank names.
+ * Complete-key lookup does not apply this name validation.
  *
  * @param <D> Database-object type
  */
-public interface DatabaseObjectIndex<D extends DatabaseObject> extends NamedObjectIndex<D> {
+public sealed interface DatabaseObjectIndex<D extends DatabaseObject> extends NamedObjectIndex<D>
+    permits AbstractDatabaseObjectIndex, BuildableDatabaseObjectIndex, DependantObjectIndex {
 
   /**
    * Gets a detached, unmodifiable list of objects for an equal schema in natural order. The
@@ -54,8 +57,8 @@ public interface DatabaseObjectIndex<D extends DatabaseObject> extends NamedObje
    *
    * @param schema Schema to match using {@link Object#equals(Object)}
    * @param name Exact object name
-   * @return The selected match, if present; empty if the schema is null or the name is null or
-   *     blank
+   * @return The selected match, if present; empty if the schema is null, the name is null or blank,
+   *     or no object matches
    */
   Optional<D> lookup(Schema schema, String name);
 }

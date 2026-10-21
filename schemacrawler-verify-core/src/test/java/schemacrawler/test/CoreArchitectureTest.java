@@ -23,6 +23,8 @@ import com.tngtech.archunit.core.domain.JavaModifier;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.crawl.SchemaCrawler;
+import schemacrawler.namedobject.BuildableIndex;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 
 public class CoreArchitectureTest extends BaseArchitectureTest {
@@ -78,6 +80,23 @@ public class CoreArchitectureTest extends BaseArchitectureTest {
             .toList();
     assertThat(
         "Only public crawl constructors may adapt full options", forbiddenConstructors, empty());
+  }
+
+  @Test
+  public void namedObjectIndexHierarchyIsSealed() {
+    final List<String> extensibleIndexes =
+        classes.stream()
+            .filter(
+                javaClass ->
+                    javaClass.isAssignableTo(NamedObjectIndex.class)
+                        || javaClass.isAssignableTo(BuildableIndex.class))
+            .filter(
+                javaClass ->
+                    !javaClass.reflect().isSealed()
+                        && !javaClass.getModifiers().contains(JavaModifier.FINAL))
+            .map(JavaClass::getName)
+            .toList();
+    assertThat("Index types must be sealed or final", extensibleIndexes, empty());
   }
 
   @Override

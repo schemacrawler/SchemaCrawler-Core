@@ -13,10 +13,11 @@ import schemacrawler.schema.DatabaseObject;
 /**
  * Combines database-object reads with optional keyed membership mutation.
  *
- * <p>Inherits mutation behavior from {@link BuildableIndex}, without adding mutability or
- * thread-safety guarantees.
+ * <p>Reads follow {@link DatabaseObjectIndex}; mutations follow {@link BuildableIndex}. The
+ * concrete implementation specifies membership mutability and thread safety.
  *
  * @param <D> Database-object type
  */
-public interface BuildableDatabaseObjectIndex<D extends DatabaseObject>
-    extends DatabaseObjectIndex<D>, BuildableIndex<D> {}
+public sealed interface BuildableDatabaseObjectIndex<D extends DatabaseObject>
+    extends DatabaseObjectIndex<D>, BuildableIndex<D>
+    permits AbstractConcurrentIndex, BuildableDependantObjectIndex {}

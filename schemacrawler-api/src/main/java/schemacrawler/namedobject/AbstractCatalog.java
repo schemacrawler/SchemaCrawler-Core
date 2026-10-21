@@ -78,8 +78,8 @@ public abstract class AbstractCatalog<
       final DatabaseObjectIndex<S> sequences,
       final DatabaseObjectIndex<Y> synonyms) {
     super("");
-    this.databaseUsers = requireNonNull(databaseUsers, "No database-user index provided");
     this.systemSchema = requireNonNull(systemSchema, "No system schema provided");
+    this.databaseUsers = requireNonNull(databaseUsers, "No database-user index provided");
     this.schemas = requireNonNull(schemas, "No schema index provided");
     this.columnDataTypes = requireNonNull(columnDataTypes, "No column data-type index provided");
     this.tables = requireNonNull(tables, "No table index provided");

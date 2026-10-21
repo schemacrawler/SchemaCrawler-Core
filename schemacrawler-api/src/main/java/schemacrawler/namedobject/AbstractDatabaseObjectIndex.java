@@ -28,9 +28,17 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 
-/** Shares keyed storage and schema-aware read operations between database-object indexes. */
-abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
-    implements DatabaseObjectIndex<D>, Serializable {
+/**
+ * Shares keyed storage and schema-aware read operations between database-object indexes.
+ *
+ * <p>Schema-scoped enumeration filters an unsorted snapshot before comparing matching objects.
+ * Subclasses select the storage map and its mutation and concurrency policies.
+ *
+ * @param <D> Database-object type
+ */
+abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
+    implements DatabaseObjectIndex<D>, Serializable
+    permits AbstractConcurrentIndex, ImmutableDatabaseObjectIndex {
 
   private static final class FilterForSchema implements Predicate<DatabaseObject> {
 
@@ -50,7 +58,12 @@ abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
 
   private final Map<NamedObjectKey, D> objects;
 
-  /** Uses the supplied storage map directly; subclasses determine its mutation policy. */
+  /**
+   * Uses the supplied storage map directly, without copying it.
+   *
+   * @param objects Storage map with non-null objects and complete keys
+   * @throws NullPointerException if the storage map is null
+   */
   public AbstractDatabaseObjectIndex(final Map<NamedObjectKey, D> objects) {
     this.objects = requireNonNull(objects, "Objects cannot be null");
   }
@@ -115,6 +128,7 @@ abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
     return objects.isEmpty();
   }
 
+  /** Returns an unmodifiable iterator over a freshly sorted, detached list. */
   @Override
   public Iterator<D> iterator() {
     return getObjects().iterator();
@@ -143,16 +157,13 @@ abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
   /** {@inheritDoc} */
   @Override
   public Optional<D> lookup(final String fullName) {
-    // Do not filter out blank names - just null names
-    if (fullName == null) {
+    if (isBlank(fullName)) {
       return Optional.empty();
     }
-    // Looked up by full name in sorted order
-    final Collection<D> sortedObjects = getObjects();
-    for (final D namedObject : sortedObjects) {
-      if (fullName.equals(namedObject.getFullName())) {
-        // Match the first named object found, searching in sorted order
-        return Optional.of(namedObject);
+    final Collection<D> objects = getObjects();
+    for (final D object : objects) {
+      if (fullName.equals(object.getFullName())) {
+        return Optional.of(object);
       }
     }
     return Optional.empty();
@@ -176,7 +187,7 @@ abstract class AbstractDatabaseObjectIndex<D extends DatabaseObject>
     return getObjects().stream().map(NamedObject::toString).collect(joining(", "));
   }
 
-  /** Access to storage map for subclasses. */
+  /** Returns the backing map for membership operations in permitted subclasses. */
   Map<NamedObjectKey, D> internalMap() {
     return objects;
   }

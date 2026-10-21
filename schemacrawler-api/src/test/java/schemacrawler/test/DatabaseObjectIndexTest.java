@@ -30,9 +30,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
 import schemacrawler.namedobject.DatabaseObjectIndex;
 import schemacrawler.namedobject.DependantObjectIndex;
 import schemacrawler.namedobject.ImmutableDatabaseObjectIndex;
+import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -81,25 +83,22 @@ public class DatabaseObjectIndexTest {
   }
 
   @Test
-  public void dependentLookupDispatchesSchemasAndAppendsOtherParentKeys() {
+  public void dependentLookupAppendsParentKeysAndHandlesMissingArguments() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final Routine earlier = new LightProcedure(schema, "run", "a");
-    final Routine later = new LightProcedure(schema, "run", "z");
-    final ConcurrentDatabaseObjectIndex<DatabaseObject> mutable =
-        new ConcurrentDatabaseObjectIndex<>();
-    mutable.add(later);
-    mutable.add(earlier);
     final LightTable table = new LightTable(schema, "TABLE");
-    final DatabaseObject column = table.addColumn("COLUMN");
+    final Table otherParent = new LightTable(schema, "OTHER");
+    final Column column = table.addColumn("COLUMN");
+    final ConcurrentDependantObjectIndex<Column, Table> mutable =
+        new ConcurrentDependantObjectIndex<>();
     mutable.add(column);
-    final DependantObjectIndex<DatabaseObject> index = mutable;
-    final NamedObject schemaParent = schema;
+    final DependantObjectIndex<Column, Table> index = mutable;
 
-    assertThat(index.lookup(schemaParent, "run").orElseThrow(), sameInstance(earlier));
     assertThat(index.lookup(table, "COLUMN").orElseThrow(), sameInstance(column));
+    assertThat(index.lookup(otherParent, "COLUMN"), is(Optional.empty()));
     assertThat(index.lookup(table, "missing"), is(Optional.empty()));
-    assertThat(index.lookup((NamedObject) null, "COLUMN"), is(Optional.empty()));
+    assertThat(index.lookup((Table) null, "COLUMN"), is(Optional.empty()));
     assertThat(index.lookup(table, null), is(Optional.empty()));
+    assertThat(index.lookup(schema, "COLUMN").orElseThrow(), sameInstance(column));
   }
 
   @Test
@@ -215,9 +214,9 @@ public class DatabaseObjectIndexTest {
 
     assertThat(index.lookup(schema, "run").orElseThrow(), sameInstance(earlier));
     assertThat(index.getObjects(schema, "run"), contains(earlier, later));
-    assertThat(index.lookup(earlier.getFullName()).orElseThrow(), sameInstance(earlier));
     assertThrows(
         UnsupportedOperationException.class, () -> index.getObjects(schema, "run").clear());
+    assertThat(index.lookup(earlier.getFullName()).orElseThrow(), sameInstance(earlier));
     assertThat(index.lookup(schema, "a"), is(Optional.empty()));
     for (final Routine routine : List.of(earlier, later, nullSpecific, emptySpecific)) {
       assertThat(index.lookup(routine.key()).orElseThrow(), sameInstance(routine));
@@ -249,8 +248,7 @@ public class DatabaseObjectIndexTest {
 
   @ParameterizedTest(name = "immutable={0}")
   @ValueSource(booleans = {true, false})
-  public void schemaNameQueriesRejectBlankNamesWithoutRejectingExactKeysOrFullNames(
-      final boolean immutable) {
+  public void nameQueriesRejectBlankNamesWithoutRejectingExactKeys(final boolean immutable) {
     final Schema schema = new SchemaReference();
     final Table blank = mock(Table.class);
     when(blank.key()).thenReturn(schema.key().with(""));
@@ -261,12 +259,9 @@ public class DatabaseObjectIndexTest {
     for (final String name : Arrays.asList(null, "", " ", "\t")) {
       assertThat(index.lookup(schema, name), is(Optional.empty()));
       assertThat(index.getObjects(schema, name), is(empty()));
-      if (index instanceof final ConcurrentDatabaseObjectIndex<Table> concurrent) {
-        assertThat(concurrent.lookup((NamedObject) schema, name), is(Optional.empty()));
-      }
     }
     assertThat(index.lookup(blank.key()).orElseThrow(), sameInstance(blank));
-    assertThat(index.lookup("").orElseThrow(), sameInstance(blank));
+    assertThat(index.lookup(""), is(Optional.empty()));
   }
 
   @ParameterizedTest(name = "immutable={0}")
@@ -286,17 +281,36 @@ public class DatabaseObjectIndexTest {
   }
 
   @Test
-  public void concurrentSerializationRetainsMutationAndParentLookup() {
+  public void concurrentSerializationRetainsMutationAndKeyLookup() {
     final LightTable table = new LightTable("TABLE");
     final DatabaseObject column = table.addColumn("COLUMN");
     final ConcurrentDatabaseObjectIndex<DatabaseObject> original =
         new ConcurrentDatabaseObjectIndex<>();
     original.add(column);
     final ConcurrentDatabaseObjectIndex<DatabaseObject> copy = SerializationUtils.clone(original);
-    assertThat(copy.lookup(table, "COLUMN").orElseThrow().key(), is(column.key()));
+    assertThat(copy.lookup(column.key()).orElseThrow().key(), is(column.key()));
     assertThat(copy.remove(column).isPresent(), is(true));
     assertThat(copy.add(table), is(true));
     assertThat(copy.lookup(table.key()).orElseThrow(), sameInstance(table));
+  }
+
+  @Test
+  public void dependentSerializationRetainsMutationAndParentLookup() {
+    final LightTable table = new LightTable("TABLE");
+    final Column column = table.addColumn("COLUMN");
+    final ConcurrentDependantObjectIndex<Column, Table> original =
+        new ConcurrentDependantObjectIndex<>();
+    original.add(column);
+
+    final ConcurrentDependantObjectIndex<Column, Table> copy = SerializationUtils.clone(original);
+    final Column copiedColumn = copy.lookup(table, "COLUMN").orElseThrow();
+    assertThat(copiedColumn.key(), is(column.key()));
+    assertThat(copy.lookup(column.key()).orElseThrow(), sameInstance(copiedColumn));
+    assertThat(copy.remove(column).orElseThrow(), sameInstance(copiedColumn));
+    assertThat(copy.lookup(table, "COLUMN"), is(Optional.empty()));
+    assertThat(copy.add(column), is(true));
+    assertThat(copy.lookup(table, "COLUMN").orElseThrow(), sameInstance(column));
+    assertThat(original.lookup(table, "COLUMN").orElseThrow(), sameInstance(column));
   }
 
   private static <D extends DatabaseObject> DatabaseObjectIndex<D> index(

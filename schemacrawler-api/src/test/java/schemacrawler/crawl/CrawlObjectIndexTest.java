@@ -24,11 +24,12 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ForeignKey;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Schema;
+import schemacrawler.schema.Table;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schemacrawler.SchemaReference;
 import us.fatehi.utility.database.ConnectionInfoBuilder;
@@ -36,18 +37,16 @@ import us.fatehi.utility.database.ConnectionInfoBuilder;
 public class CrawlObjectIndexTest {
 
   @Test
-  public void routineIndexDispatchesSchemaParentsAndPreservesSpecificKeys() {
+  public void routineIndexUsesSchemaLookupAndPreservesSpecificKeys() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final MutableProcedure later = new MutableProcedure(schema, "run", "specific_z");
     final MutableProcedure earlier = new MutableProcedure(schema, "run", "specific_a");
-    final BuildableDependantObjectIndex<MutableRoutine> routines =
+    final BuildableDatabaseObjectIndex<MutableRoutine> routines =
         new ConcurrentDatabaseObjectIndex<>();
     routines.add(later);
     routines.add(earlier);
-    final NamedObject schemaParent = schema;
 
     assertThat(routines.lookup(schema, "run").orElseThrow(), sameInstance(earlier));
-    assertThat(routines.lookup(schemaParent, "run").orElseThrow(), sameInstance(earlier));
     assertThat(routines.getObjects(schema, "run"), contains(earlier, later));
     assertThat(routines.lookup(earlier.key()).orElseThrow(), sameInstance(earlier));
     assertThat(routines.lookup(later.key()).orElseThrow(), sameInstance(later));
@@ -77,8 +76,8 @@ public class CrawlObjectIndexTest {
     final MutableColumn second = new MutableColumn(parent, "SECOND");
     first.setOrdinalPosition(1);
     second.setOrdinalPosition(2);
-    final BuildableDependantObjectIndex<MutableColumn> children =
-        new ConcurrentDatabaseObjectIndex<>();
+    final BuildableDependantObjectIndex<MutableColumn, Table> children =
+        new ConcurrentDependantObjectIndex<>();
     final BuildableDatabaseObjectIndex<MutableColumn> databaseObjects = children;
     assertThat(children.add(null), is(false));
     assertThat(children.remove(null), is(Optional.empty()));
@@ -88,7 +87,8 @@ public class CrawlObjectIndexTest {
     assertThat(before, contains(first, second));
     assertThat(children.lookup(parent, "FIRST").orElseThrow(), sameInstance(first));
     assertThat(children.lookup(otherParent, "FIRST"), is(Optional.empty()));
-    assertThat(children.lookup((NamedObject) null, "FIRST"), is(Optional.empty()));
+    assertThat(children.lookup(parent, "MISSING"), is(Optional.empty()));
+    assertThat(children.lookup((Table) null, "FIRST"), is(Optional.empty()));
     assertThat(children.lookup(parent, null), is(Optional.empty()));
     assertThat(databaseObjects.lookup(schema, "FIRST").orElseThrow(), sameInstance(first));
     final MutableColumn replacement = new MutableColumn(parent, "FIRST");

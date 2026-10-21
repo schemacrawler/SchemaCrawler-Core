@@ -33,9 +33,10 @@ import schemacrawler.schema.NamedObjectKey;
  *
  * <p>Sorted enumeration makes a fresh O(n log n) sort; comparison state must remain stable during
  * sorting. Snapshots copy membership in O(n) without comparing objects. Returned lists and
- * iterators are detached and unmodifiable. Concurrent enumeration is weakly consistent, not an
- * atomic snapshot. Element state, compound operations, and cross-index transactions are not
- * synchronized. Serialization preserves the membership mode when elements are serializable.
+ * iterators are detached and unmodifiable. In mutable mode, individual membership operations are
+ * thread-safe and enumeration is weakly consistent, not an atomic snapshot. Element state, compound
+ * operations, and cross-index transactions are not synchronized. Serialization preserves the
+ * membership mode when elements are serializable.
  *
  * @param <N> Named-object type
  */
@@ -69,6 +70,7 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
     }
   }
 
+  /** {@inheritDoc} */
   @Override
   public boolean add(final N namedObject) {
     if (namedObject == null) {
@@ -101,6 +103,7 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
     return objects.isEmpty();
   }
 
+  /** Returns an unmodifiable iterator over a freshly sorted, detached list. */
   @Override
   public Iterator<N> iterator() {
     return getObjects().iterator();
@@ -118,18 +121,14 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
   /** {@inheritDoc} */
   @Override
   public Optional<N> lookup(final String fullName) {
-    // Schema names may be blank, but cannot be null
-    // So do not filter out blank names
+    // Blank schema full names are valid lookup targets.
     if (fullName == null) {
       return Optional.empty();
     }
-    // Schemas need to be looked up by full name in sorted order
-    // Schema full names can be the same, since either the
-    // catalog or schema may be null, depending on the database
+    // Distinct schema keys can share a full name; use natural order to select a match.
     final Collection<N> sortedObjects = getObjects();
     for (final N namedObject : sortedObjects) {
       if (fullName.equals(namedObject.getFullName())) {
-        // Match the first named object found, searching in sorted order
         return Optional.of(namedObject);
       }
     }

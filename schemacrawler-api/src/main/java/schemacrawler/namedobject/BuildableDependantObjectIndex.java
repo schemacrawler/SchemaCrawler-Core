@@ -9,14 +9,18 @@
 package schemacrawler.namedobject;
 
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.DependantObject;
 
 /**
  * Combines dependent-object reads with optional keyed membership mutation.
  *
- * <p>The lookup parent need not have the indexed child's type. Inherits mutation behavior from
- * {@link BuildableIndex}, without adding mutability or thread-safety guarantees.
+ * <p>Parent/name lookup follows {@link DependantObjectIndex}; mutations follow {@link
+ * BuildableIndex}. The concrete implementation specifies membership mutability and thread safety.
  *
- * @param <D> Database-object type
+ * @param <DO> Dependent-object type
+ * @param <D> Parent database-object type
  */
-public interface BuildableDependantObjectIndex<D extends DatabaseObject>
-    extends DependantObjectIndex<D>, BuildableDatabaseObjectIndex<D> {}
+public sealed interface BuildableDependantObjectIndex<
+        DO extends DependantObject<D>, D extends DatabaseObject>
+    extends DependantObjectIndex<DO, D>, BuildableDatabaseObjectIndex<DO>
+    permits ConcurrentDependantObjectIndex {}
