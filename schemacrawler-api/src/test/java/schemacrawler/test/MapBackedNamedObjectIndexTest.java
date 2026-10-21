@@ -17,6 +17,8 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.Serial;
@@ -302,5 +304,66 @@ public class MapBackedNamedObjectIndexTest {
         List.of(mutable, new MapBackedNamedObjectIndex<>(List.of(first, second)))) {
       assertThat(index.snapshot(), containsInAnyOrder(sameInstance(first), sameInstance(second)));
     }
+  }
+
+  @ParameterizedTest(name = "immutable={0}")
+  @ValueSource(booleans = {true, false})
+  public void fullNameLookupDoesNotCompareUnrelatedOrSingleMatchingObjects(
+      final boolean immutable) {
+    for (final String name : List.of("SCHEMA.with.dot", "\"SCHEMA\"", "", " ", "\t")) {
+      final NamedObject matching = mock(NamedObject.class);
+      final NamedObject unrelated = mock(NamedObject.class);
+      when(matching.key()).thenReturn(new NamedObjectKey("matching"));
+      when(unrelated.key()).thenReturn(new NamedObjectKey("unrelated"));
+      when(matching.getFullName()).thenReturn(name);
+      when(unrelated.getFullName()).thenReturn("unrelated");
+      when(matching.compareTo(any(NamedObject.class)))
+          .thenThrow(new AssertionError("Single match must not be compared"));
+      when(unrelated.compareTo(any(NamedObject.class)))
+          .thenThrow(new AssertionError("Unrelated object must not be compared"));
+      final MapBackedNamedObjectIndex<NamedObject> index;
+      if (immutable) {
+        index = new MapBackedNamedObjectIndex<>(List.of(unrelated, matching));
+      } else {
+        index = new MapBackedNamedObjectIndex<>();
+        index.add(unrelated);
+        index.add(matching);
+      }
+
+      assertThat(index.lookup(name).orElseThrow(), sameInstance(matching));
+      assertThat(index.lookup("missing"), is(Optional.empty()));
+      assertThat(index.lookup(name + "suffix"), is(Optional.empty()));
+      if (name.startsWith("SCHEMA")) {
+        assertThat(index.lookup("schema.with.dot"), is(Optional.empty()));
+      }
+      assertThat(index.lookup("prefix" + name), is(Optional.empty()));
+      assertThat(index.lookup((String) null), is(Optional.empty()));
+      verify(matching, never()).compareTo(any(NamedObject.class));
+      verify(unrelated, never()).compareTo(any(NamedObject.class));
+    }
+  }
+
+  @ParameterizedTest(name = "immutable={0}")
+  @ValueSource(booleans = {true, false})
+  public void fullNameLookupPropagatesMatchingComparisonFailures(final boolean immutable) {
+    final NamedObject first = mock(NamedObject.class);
+    final NamedObject second = mock(NamedObject.class);
+    final AssertionError failure = new AssertionError("Matching objects cannot be compared");
+    when(first.key()).thenReturn(new NamedObjectKey("first"));
+    when(second.key()).thenReturn(new NamedObjectKey("second"));
+    for (final NamedObject object : List.of(first, second)) {
+      when(object.getFullName()).thenReturn("same");
+      when(object.compareTo(any(NamedObject.class))).thenThrow(failure);
+    }
+    final MapBackedNamedObjectIndex<NamedObject> index;
+    if (immutable) {
+      index = new MapBackedNamedObjectIndex<>(List.of(second, first));
+    } else {
+      index = new MapBackedNamedObjectIndex<>();
+      index.add(second);
+      index.add(first);
+    }
+    assertThat(
+        assertThrows(AssertionError.class, () -> index.lookup("same")), sameInstance(failure));
   }
 }

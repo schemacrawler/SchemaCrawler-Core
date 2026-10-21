@@ -255,7 +255,7 @@ final class IndexRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "indexes from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final MutableTable table : allTables.getObjects()) {
+    for (final MutableTable table : allTables.snapshot()) {
       LOGGER.log(Level.INFO, new StringFormat("Retrieving %s for %s", name, table.key()));
 
       final Schema tableSchema = table.getSchema();

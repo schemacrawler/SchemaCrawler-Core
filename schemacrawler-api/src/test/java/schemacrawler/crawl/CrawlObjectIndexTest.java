@@ -10,6 +10,7 @@ package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,6 +29,7 @@ import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.ResultsColumn;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableRelationshipType;
@@ -160,6 +162,12 @@ public class CrawlObjectIndexTest {
     assertThat(index.lookup(first.key()).orElseThrow(), sameInstance(replacement));
     assertThat(table.lookupColumn("FIRST").orElseThrow(), sameInstance(replacement));
     assertThat(table.lookupColumn("HIDDEN").orElseThrow(), sameInstance(hidden));
+    final MutableColumn otherHidden = new MutableColumn(table, "OTHER_HIDDEN");
+    final Collection<Column> previousHidden = table.getHiddenColumns();
+    table.addHiddenColumn(otherHidden);
+    assertThat(previousHidden, contains(hidden));
+    assertThat(table.getHiddenColumns(), containsInAnyOrder(hidden, otherHidden));
+    assertThrows(UnsupportedOperationException.class, previousHidden::clear);
     assertThat(table.lookupColumn(null), is(Optional.empty()));
     assertThrows(UnsupportedOperationException.class, previous::clear);
   }
@@ -193,6 +201,82 @@ public class CrawlObjectIndexTest {
     final NamedObjectIndex<MutableTable> tables = catalog.getAllTables();
     new TablesGraph(tables).setTablesSortIndexes();
     assertThat(tables.getObjects(), contains(parent, middle, child));
+  }
+
+  @Test
+  public void foreignKeyGroupsAndRelatedTablesKeepTheirExplicitOrdering() {
+    final Schema schema = new SchemaReference();
+    final MutableTable center = new MutableTable(schema, "CENTER");
+    final MutableTable parentA = new MutableTable(schema, "A_PARENT");
+    final MutableTable parentZ = new MutableTable(schema, "Z_PARENT");
+    final MutableTable childA = new MutableTable(schema, "A_CHILD");
+    final MutableTable childZ = new MutableTable(schema, "Z_CHILD");
+    final MutableForeignKey importedA = foreignKey("A_IMPORTED", center, parentA, "A_COLUMN");
+    final MutableForeignKey importedZ = foreignKey("Z_IMPORTED", center, parentZ, "Z_COLUMN");
+    final MutableForeignKey exportedA = foreignKey("A_EXPORTED", childA, center);
+    final MutableForeignKey exportedZ = foreignKey("Z_EXPORTED", childZ, center);
+    final MutableForeignKey duplicateParent = foreignKey("B_IMPORTED", center, parentA, "B_COLUMN");
+    for (final MutableForeignKey foreignKey :
+        List.of(exportedZ, importedZ, exportedA, duplicateParent, importedA)) {
+      center.addForeignKey(foreignKey);
+    }
+
+    assertThat(center.getImportedForeignKeys(), contains(importedA, duplicateParent, importedZ));
+    assertThat(center.getExportedForeignKeys(), contains(exportedA, exportedZ));
+    assertThat(
+        center.getForeignKeys(),
+        contains(importedA, duplicateParent, importedZ, exportedA, exportedZ));
+    assertThat(center.getRelatedTables(TableRelationshipType.parent), contains(parentA, parentZ));
+    assertThat(center.getRelatedTables(TableRelationshipType.child), contains(childA, childZ));
+    final Collection<ForeignKey> exportedCopy = center.getExportedForeignKeys();
+    exportedCopy.clear();
+    final Collection<ForeignKey> allCopy = center.getForeignKeys();
+    allCopy.clear();
+    assertThat(center.getExportedForeignKeys(), contains(exportedA, exportedZ));
+    assertThat(center.getForeignKeys().size(), is(5));
+  }
+
+  @Test
+  public void graphOrdersSameLevelAndDisconnectedTablesBeforeViews() {
+    final Schema schema = new SchemaReference();
+    final MutableTable root = new MutableTable(schema, "Z_ROOT");
+    final MutableTable childA = new MutableTable(schema, "A_CHILD");
+    final MutableTable childB = new MutableTable(schema, "B_CHILD");
+    final MutableTable disconnected = new MutableTable(schema, "M_FREE");
+    final MutableView viewA = new MutableView(schema, "A_VIEW");
+    final MutableView viewZ = new MutableView(schema, "Z_VIEW");
+    childA.addForeignKey(foreignKey("FK_A", childA, root));
+    childB.addForeignKey(foreignKey("FK_B", childB, root));
+    final BuildableDatabaseObjectIndex<MutableTable> tables = new ConcurrentDatabaseObjectIndex<>();
+    for (final MutableTable table : List.of(viewZ, childB, root, viewA, childA, disconnected)) {
+      tables.add(table);
+    }
+
+    new TablesGraph(tables).setTablesSortIndexes();
+
+    assertThat(tables.getObjects(), contains(disconnected, root, childA, childB, viewA, viewZ));
+  }
+
+  @Test
+  public void resultColumnLookupKeepsFirstPositionalCaseInsensitiveMatch() {
+    final MutableTable table = new MutableTable(new SchemaReference(), "TABLE");
+    final MutableResultsColumn first = new MutableResultsColumn(table, "FIRST", "Alias");
+    final MutableResultsColumn second = new MutableResultsColumn(table, "SECOND", "ALIAS");
+    first.setOrdinalPosition(1);
+    second.setOrdinalPosition(2);
+    final MutableResultsColumns columns = new MutableResultsColumns("results");
+    columns.addColumn(second);
+    columns.addColumn(first);
+
+    assertThat(columns.getColumns(), contains(first, second));
+    assertThat(columns.lookupColumn("alias").orElseThrow(), sameInstance(first));
+    assertThat(columns.lookupColumn("second").orElseThrow(), sameInstance(second));
+    assertThat(
+        columns.lookupColumn(first.getFullName().toLowerCase()).orElseThrow(), sameInstance(first));
+    final List<ResultsColumn> previous = columns.getColumns();
+    columns.addColumn(new MutableResultsColumn(table, "THIRD", "third"));
+    assertThat(previous, contains(first, second));
+    assertThrows(UnsupportedOperationException.class, previous::clear);
   }
 
   @Test
@@ -240,8 +324,16 @@ public class CrawlObjectIndexTest {
 
   private static MutableForeignKey foreignKey(
       final String name, final MutableTable child, final MutableTable parent) {
-    final MutableColumn childColumn = new MutableColumn(child, "COLUMN");
-    final MutableColumn parentColumn = new MutableColumn(parent, "COLUMN");
+    return foreignKey(name, child, parent, "COLUMN");
+  }
+
+  private static MutableForeignKey foreignKey(
+      final String name,
+      final MutableTable child,
+      final MutableTable parent,
+      final String columnName) {
+    final MutableColumn childColumn = new MutableColumn(child, columnName);
+    final MutableColumn parentColumn = new MutableColumn(parent, columnName);
     child.addColumn(childColumn);
     parent.addColumn(parentColumn);
     return new MutableForeignKey(name, new ImmutableColumnReference(1, childColumn, parentColumn));

@@ -200,7 +200,7 @@ final class FunctionParameterRetriever extends AbstractRetriever {
       final InclusionRuleFilter<FunctionParameter> parameterFilter) {
     final String name = "function parameters from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final MutableRoutine routine : allRoutines.getObjects()) {
+    for (final MutableRoutine routine : allRoutines.snapshot()) {
       if (routine.getRoutineType() != RoutineType.function) {
         continue;
       }

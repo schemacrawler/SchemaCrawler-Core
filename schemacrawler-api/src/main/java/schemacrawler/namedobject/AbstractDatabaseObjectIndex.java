@@ -8,6 +8,7 @@
 
 package schemacrawler.namedobject;
 
+import static java.util.Comparator.naturalOrder;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static us.fatehi.utility.Utility.isBlank;
@@ -15,7 +16,6 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -160,13 +160,9 @@ abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
     if (isBlank(fullName)) {
       return Optional.empty();
     }
-    final Collection<D> objects = getObjects();
-    for (final D object : objects) {
-      if (fullName.equals(object.getFullName())) {
-        return Optional.of(object);
-      }
-    }
-    return Optional.empty();
+    return snapshot().stream()
+        .filter(object -> fullName.equals(object.getFullName()))
+        .min(naturalOrder());
   }
 
   /** {@inheritDoc} */

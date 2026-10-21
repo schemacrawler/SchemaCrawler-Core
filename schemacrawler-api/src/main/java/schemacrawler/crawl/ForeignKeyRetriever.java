@@ -258,7 +258,7 @@ final class ForeignKeyRetriever extends AbstractRetriever {
       final DatabaseMetaData metaData = connection.getMetaData();
       final Map<NamedObjectKey, MutableForeignKey> foreignKeys = new ConcurrentHashMap<>();
       final RetrievalCounts retrievalCounts = new RetrievalCounts("foreign keys");
-      for (final MutableTable table : allTables.getObjects()) {
+      for (final MutableTable table : allTables.snapshot()) {
         if (table.getTableType().isView()) {
           continue;
         }

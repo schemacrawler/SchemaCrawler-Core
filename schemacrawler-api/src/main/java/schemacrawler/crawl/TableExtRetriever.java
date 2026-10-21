@@ -91,10 +91,10 @@ final class TableExtRetriever extends AbstractRetriever {
           getRetrieverConnection().getEnumDataTypeHelper();
 
       final NamedObjectIndex<MutableTable> tables = catalog.getAllTables();
-      for (final MutableTable table : tables.getObjects()) {
+      for (final MutableTable table : tables.snapshot()) {
         retrievalCounts.count();
         final NamedObjectIndex<MutableColumn> columns = table.getAllColumns();
-        for (final MutableColumn column : columns.getObjects()) {
+        for (final MutableColumn column : columns.snapshot()) {
           MutableColumnDataType columnDataType = (MutableColumnDataType) column.getColumnDataType();
 
           // Check for enumerated column data-types

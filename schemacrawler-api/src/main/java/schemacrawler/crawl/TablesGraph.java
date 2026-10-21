@@ -32,7 +32,7 @@ final class TablesGraph extends DirectedGraph<Table> {
       return;
     }
 
-    for (final Table table : tables.getObjects()) {
+    for (final Table table : tables.snapshot()) {
       addVertex(table);
       for (final ForeignKey foreignKey : table.getForeignKeys()) {
         for (final ColumnReference columnRef : foreignKey) {

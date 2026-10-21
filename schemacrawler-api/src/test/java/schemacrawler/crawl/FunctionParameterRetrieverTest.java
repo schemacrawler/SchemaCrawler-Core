@@ -12,6 +12,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static schemacrawler.schema.ParameterModeType.in;
 import static schemacrawler.schema.ParameterModeType.inOut;
@@ -31,6 +35,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.IncludeAll;
 import schemacrawler.schema.FunctionParameter;
+import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.ParameterModeType;
 import schemacrawler.schemacrawler.MetadataRetrievalStrategy;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
@@ -40,6 +45,34 @@ import us.fatehi.test.utility.TestObjectUtility.Results;
 
 @DisableLogging
 public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTest {
+
+  @Test
+  public void metadataTraversalVisitsOverloadsWithoutComparingIncompleteRoutines()
+      throws SQLException {
+    when(retrieverConnection.get(functionParametersRetrievalStrategy))
+        .thenReturn(MetadataRetrievalStrategy.metadata);
+    final SchemaReference schema = new SchemaReference(null, null);
+    final MutableFunction first = spy(new MutableFunction(schema, "run", "first"));
+    final MutableFunction second = spy(new MutableFunction(schema, "run", "second"));
+    final MutableProcedure excluded = spy(new MutableProcedure(schema, "other", "other"));
+    for (final MutableRoutine routine : new MutableRoutine[] {second, excluded, first}) {
+      doThrow(new AssertionError("Retrieval must not compare routines"))
+          .when(routine)
+          .compareTo(any(NamedObject.class));
+      allRoutines.add(routine);
+    }
+    final DatabaseMetaData metaData = connection.getMetaData();
+    when(metaData.getFunctionColumns(any(), any(), any(), any()))
+        .thenAnswer(
+            invocation ->
+                mockResultSet(new Results(new String[] {"FUNCTION_NAME"}, new Object[0][])));
+
+    ((FunctionParameterRetriever) retriever)
+        .retrieveFunctionParameters(allRoutines, new IncludeAll());
+
+    verify(metaData, times(2)).getFunctionColumns(null, null, "run", null);
+    assertThat(allRoutines.size(), is(3));
+  }
 
   @Test
   public void testParameterModeMapping() throws SQLException {

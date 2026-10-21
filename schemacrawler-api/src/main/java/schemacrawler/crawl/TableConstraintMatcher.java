@@ -34,7 +34,7 @@ final class TableConstraintMatcher extends AbstractRetriever {
 
   void matchTableConstraints(final NamedObjectIndex<MutableTable> allTables) {
     requireNonNull(allTables, "No tables provided");
-    for (final MutableTable mutableTable : allTables.getObjects()) {
+    for (final MutableTable mutableTable : allTables.snapshot()) {
       if (mutableTable == null) {
         continue;
       }

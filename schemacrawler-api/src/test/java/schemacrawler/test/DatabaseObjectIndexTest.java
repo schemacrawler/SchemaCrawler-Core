@@ -17,6 +17,8 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.Serial;
@@ -80,6 +82,51 @@ public class DatabaseObjectIndexTest {
     assertThat(index.remove(first), is(Optional.empty()));
     assertThat(index.isEmpty(), is(true));
     assertThat(previous, contains(sameInstance(first)));
+  }
+
+  @ParameterizedTest(name = "immutable={0}")
+  @ValueSource(booleans = {true, false})
+  public void fullNameLookupDoesNotCompareUnrelatedOrSingleMatchingObjects(
+      final boolean immutable) {
+    for (final String fullName : List.of("PUBLIC.TABLE", "\"PUBLIC\".\"TABLE.WITH.DOT\"")) {
+      final Table matching = mock(Table.class);
+      final Table unrelated = mock(Table.class);
+      when(matching.key()).thenReturn(new NamedObjectKey("matching"));
+      when(unrelated.key()).thenReturn(new NamedObjectKey("unrelated"));
+      when(matching.getFullName()).thenReturn(fullName);
+      when(unrelated.getFullName()).thenReturn("unrelated");
+      when(matching.compareTo(any(NamedObject.class)))
+          .thenThrow(new AssertionError("Single match must not be compared"));
+      when(unrelated.compareTo(any(NamedObject.class)))
+          .thenThrow(new AssertionError("Unrelated object must not be compared"));
+      final DatabaseObjectIndex<Table> index = index(immutable, List.of(unrelated, matching));
+
+      assertThat(index.lookup(fullName).orElseThrow(), sameInstance(matching));
+      assertThat(index.lookup("missing"), is(Optional.empty()));
+      assertThat(index.lookup(fullName.toLowerCase()), is(Optional.empty()));
+      for (final String blank : Arrays.asList(null, "", " ", "\t")) {
+        assertThat(index.lookup(blank), is(Optional.empty()));
+      }
+      verify(matching, never()).compareTo(any(NamedObject.class));
+      verify(unrelated, never()).compareTo(any(NamedObject.class));
+    }
+  }
+
+  @ParameterizedTest(name = "immutable={0}")
+  @ValueSource(booleans = {true, false})
+  public void fullNameLookupPropagatesMatchingComparisonFailures(final boolean immutable) {
+    final Table first = mock(Table.class);
+    final Table second = mock(Table.class);
+    final AssertionError failure = new AssertionError("Matching objects cannot be compared");
+    when(first.key()).thenReturn(new NamedObjectKey("first"));
+    when(second.key()).thenReturn(new NamedObjectKey("second"));
+    for (final Table object : List.of(first, second)) {
+      when(object.getFullName()).thenReturn("same");
+      when(object.compareTo(any(NamedObject.class))).thenThrow(failure);
+    }
+    final DatabaseObjectIndex<Table> index = index(immutable, List.of(second, first));
+    assertThat(
+        assertThrows(AssertionError.class, () -> index.lookup("same")), sameInstance(failure));
   }
 
   @Test

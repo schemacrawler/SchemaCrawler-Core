@@ -137,7 +137,7 @@ final class PrimaryKeyRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "primary keys from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final MutableTable table : allTables.getObjects()) {
+    for (final MutableTable table : allTables.snapshot()) {
       if (table.getTableType().isView()) {
         continue;
       }

@@ -135,7 +135,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public Collection<Column> getHiddenColumns() {
-    return Set.copyOf(hiddenColumns.getObjects());
+    return Set.copyOf(hiddenColumns.snapshot());
   }
 
   @Override
@@ -166,7 +166,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   public Collection<Table> getRelatedTables(final TableRelationshipType tableRelationshipType) {
     final Set<Table> relatedTables = new HashSet<>();
     if (tableRelationshipType != null && tableRelationshipType != TableRelationshipType.none) {
-      final List<MutableForeignKey> foreignKeysList = new ArrayList<>(foreignKeys.getObjects());
+      final List<MutableForeignKey> foreignKeysList = new ArrayList<>(foreignKeys.snapshot());
       for (final ForeignKey foreignKey : foreignKeysList) {
         for (final ColumnReference columnReference : foreignKey) {
           final Table parentTable = columnReference.getPrimaryKeyColumn().getParent();
@@ -391,7 +391,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
       final NamedObjectIndex<? extends R> tableReferences,
       final TableAssociationType tableAssociationType) {
 
-    final List<R> foreignKeysList = new ArrayList<>(tableReferences.getObjects());
+    final List<R> foreignKeysList = new ArrayList<>(tableReferences.snapshot());
     if (tableAssociationType != null && tableAssociationType != TableAssociationType.all) {
       for (final Iterator<R> iterator = foreignKeysList.iterator(); iterator.hasNext(); ) {
         final R foreignKey = iterator.next();

@@ -251,7 +251,7 @@ final class TableColumnRetriever extends AbstractRetriever {
         TaskRunners.getTaskRunner("retrieve-table-columns-from-metadata")) {
       final String name = "table columns from metadata";
       final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-      for (final MutableTable table : allTables.getObjects()) {
+      for (final MutableTable table : allTables.snapshot()) {
         taskRunner.add(
             new TaskDefinition(
                 table.getFullName(),

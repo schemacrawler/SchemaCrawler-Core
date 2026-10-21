@@ -8,6 +8,7 @@
 
 package schemacrawler.namedobject;
 
+import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 
 import java.io.Serial;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 
@@ -125,14 +127,11 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
     if (fullName == null) {
       return Optional.empty();
     }
-    // Distinct schema keys can share a full name; use natural order to select a match.
-    final Collection<N> sortedObjects = getObjects();
-    for (final N namedObject : sortedObjects) {
-      if (fullName.equals(namedObject.getFullName())) {
-        return Optional.of(namedObject);
-      }
-    }
-    return Optional.empty();
+    // Distinct schema keys can share a full name
+    // Use natural order to select a match
+    return snapshot().stream()
+        .filter(namedObject -> fullName.equals(namedObject.getFullName()))
+        .min(naturalOrder());
   }
 
   /** {@inheritDoc} */

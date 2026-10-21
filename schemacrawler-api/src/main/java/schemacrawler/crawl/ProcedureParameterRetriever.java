@@ -202,7 +202,7 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "procedure parameters from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final MutableRoutine routine : allRoutines.getObjects()) {
+    for (final MutableRoutine routine : allRoutines.snapshot()) {
       if (routine.getRoutineType() != RoutineType.procedure) {
         continue;
       }
