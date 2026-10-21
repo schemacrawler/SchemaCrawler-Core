@@ -99,7 +99,7 @@ public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTe
       ((FunctionParameterRetriever) retriever)
           .retrieveFunctionParameters(allRoutines, new IncludeAll());
 
-      final MutableFunction function = (MutableFunction) allRoutines.iterator().next();
+      final MutableFunction function = (MutableFunction) allRoutines.getObjects().iterator().next();
       final Optional<MutableFunctionParameter> paramOptional = function.lookupParameter(paramName);
 
       assertThat(
@@ -132,7 +132,7 @@ public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTe
     ((FunctionParameterRetriever) retriever)
         .retrieveFunctionParameters(allRoutines, new IncludeAll());
 
-    final MutableFunction function = (MutableFunction) allRoutines.iterator().next();
+    final MutableFunction function = (MutableFunction) allRoutines.getObjects().iterator().next();
     assertThat(function.getParameters(), hasSize(1));
 
     final FunctionParameter parameter = function.getParameters().get(0);
@@ -157,7 +157,7 @@ public class FunctionParameterRetrieverTest extends AbstractParameterRetrieverTe
     ((FunctionParameterRetriever) retriever)
         .retrieveFunctionParameters(allRoutines, new IncludeAll());
 
-    final MutableFunction function = (MutableFunction) allRoutines.iterator().next();
+    final MutableFunction function = (MutableFunction) allRoutines.getObjects().iterator().next();
     assertThat(function.getParameters(), hasSize(1));
 
     final FunctionParameter parameter = function.getParameters().get(0);

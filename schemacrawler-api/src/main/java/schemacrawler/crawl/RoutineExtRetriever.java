@@ -216,7 +216,7 @@ final class RoutineExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "routine definitions";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
       if (catalog.getRoutines(schema).isEmpty()) {
         continue;
       }
@@ -264,7 +264,7 @@ final class RoutineExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "routine references";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
       if (catalog.getRoutines(schema).isEmpty()) {
         continue;
       }

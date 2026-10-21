@@ -297,7 +297,7 @@ final class TableExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "columns with attibutes over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
       if (catalog.getTables(schema).isEmpty()) {
         continue;
       }
@@ -347,7 +347,7 @@ final class TableExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "tables with attributes over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
       if (catalog.getTables(schema).isEmpty()) {
         continue;
       }

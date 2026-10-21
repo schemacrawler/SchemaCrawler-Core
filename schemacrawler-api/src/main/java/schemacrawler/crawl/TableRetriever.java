@@ -168,7 +168,7 @@ final class TableRetriever extends AbstractRetriever {
 
     final String name = "tables from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       LOGGER.log(Level.INFO, new StringFormat("Retrieving %s for %s", name, schema));
 
       final TableTypes supportedTableTypes = getRetrieverConnection().getTableTypes();

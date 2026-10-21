@@ -322,7 +322,7 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     final Map<NamedObjectKey, MutableForeignKey> foreignKeys = new HashMap<>();
     final String name = "foreign keys";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
       if (catalog.getTables(schema).isEmpty()) {
         continue;
       }

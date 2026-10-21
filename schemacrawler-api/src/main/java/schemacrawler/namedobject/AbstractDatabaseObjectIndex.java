@@ -17,8 +17,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -128,12 +126,6 @@ abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
     return objects.isEmpty();
   }
 
-  /** Returns an unmodifiable iterator over a freshly sorted, detached list. */
-  @Override
-  public Iterator<D> iterator() {
-    return getObjects().iterator();
-  }
-
   /** {@inheritDoc} */
   @Override
   public final Optional<D> lookup(final NamedObjectKey key) {
@@ -150,8 +142,7 @@ abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
       return Optional.empty();
     }
     final List<D> objects = getObjects(schema, name);
-    final Comparator<D> comparator = Comparator.naturalOrder();
-    return objects.stream().min(comparator);
+    return objects.stream().findFirst();
   }
 
   /** {@inheritDoc} */

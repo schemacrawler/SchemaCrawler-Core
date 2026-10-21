@@ -172,7 +172,6 @@ public class DatabaseObjectIndexTest {
     assertThat(index.size(), is(0));
     assertThat(index.getObjects(), is(empty()));
     assertThat(index.snapshot(), is(empty()));
-    assertThat(index.iterator().hasNext(), is(false));
     assertThat(index.toString(), is(""));
     assertThat(index.containsKey(null), is(false));
     assertThat(index.containsKey(schema.key()), is(false));
@@ -209,7 +208,7 @@ public class DatabaseObjectIndexTest {
     final DatabaseObjectIndex<Table> index = index(immutable, List.of(second, first));
     final List<Table> values = index.getObjects();
     final List<Table> snapshot = new ArrayList<>(index.snapshot());
-    final Iterator<Table> iterator = index.iterator();
+    final Iterator<Table> iterator = index.getObjects().iterator();
     second.order = 0;
 
     assertThat(values, contains(first, second));

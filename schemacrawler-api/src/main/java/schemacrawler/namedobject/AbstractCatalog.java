@@ -184,6 +184,31 @@ public abstract class AbstractCatalog<
     return System.identityHashCode(this);
   }
 
+  @Override
+  public boolean hasRoutines() {
+    return !routines.isEmpty();
+  }
+
+  @Override
+  public boolean hasSchemas() {
+    return !schemas.isEmpty();
+  }
+
+  @Override
+  public boolean hasSequences() {
+    return !sequences.isEmpty();
+  }
+
+  @Override
+  public boolean hasSynonyms() {
+    return !synonyms.isEmpty();
+  }
+
+  @Override
+  public boolean hasTables() {
+    return !tables.isEmpty();
+  }
+
   /** {@inheritDoc} */
   @Override
   public Optional<Column> lookupColumn(

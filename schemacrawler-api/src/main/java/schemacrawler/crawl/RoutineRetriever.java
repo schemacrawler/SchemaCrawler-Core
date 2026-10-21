@@ -206,7 +206,7 @@ final class RoutineRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "functions from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       LOGGER.log(Level.INFO, new StringFormat("Retrieving %s for %s", name, schema.key()));
 
       final String catalogName = schema.getCatalogName();
@@ -250,7 +250,7 @@ final class RoutineRetriever extends AbstractRetriever {
 
     final String name = "functions from data dictionary over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       try (final Connection connection = getRetrieverConnection().getConnection(name);
           final SchemaSetter schemaSetter = new SchemaSetter(connection, schema);
           final Statement statement = connection.createStatement();
@@ -335,7 +335,7 @@ final class RoutineRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "procedures from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       LOGGER.log(Level.INFO, new StringFormat("%s for %s".formatted(name, schema)));
 
       final String catalogName = schema.getCatalogName();
@@ -377,7 +377,7 @@ final class RoutineRetriever extends AbstractRetriever {
 
     final String name = "procedures from data dictionary over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       try (final Connection connection = getRetrieverConnection().getConnection(name);
           final SchemaSetter schemaSetter = new SchemaSetter(connection, schema);
           final Statement statement = connection.createStatement();

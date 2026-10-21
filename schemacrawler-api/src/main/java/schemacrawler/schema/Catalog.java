@@ -127,6 +127,16 @@ public interface Catalog extends NamedObject, AttributedObject, DescribedObject 
    */
   Collection<Table> getTables(Schema schema);
 
+  boolean hasRoutines();
+
+  boolean hasSchemas();
+
+  boolean hasSequences();
+
+  boolean hasSynonyms();
+
+  boolean hasTables();
+
   /**
    * Gets a table column by unqualified name.
    *

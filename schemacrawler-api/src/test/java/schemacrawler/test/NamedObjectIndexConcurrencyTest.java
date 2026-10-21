@@ -71,9 +71,7 @@ public class NamedObjectIndexConcurrencyTest {
           index.snapshot();
           firstTraversal.countDown();
           for (int iteration = 0; iteration < 100; iteration++) {
-            index.snapshot();
-            index.getObjects();
-            index.forEach(table -> index.lookup(table.key()));
+            index.getObjects().forEach(table -> index.lookup(table.key()));
           }
           return null;
         });

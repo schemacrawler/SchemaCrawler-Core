@@ -99,7 +99,8 @@ public class ProcedureParameterRetrieverTest extends AbstractParameterRetrieverT
       ((ProcedureParameterRetriever) retriever)
           .retrieveProcedureParameters(allRoutines, new IncludeAll());
 
-      final MutableProcedure procedure = (MutableProcedure) allRoutines.iterator().next();
+      final MutableProcedure procedure =
+          (MutableProcedure) allRoutines.getObjects().iterator().next();
       final Optional<MutableProcedureParameter> paramOptional =
           procedure.lookupParameter(paramName);
 
@@ -133,7 +134,8 @@ public class ProcedureParameterRetrieverTest extends AbstractParameterRetrieverT
     ((ProcedureParameterRetriever) retriever)
         .retrieveProcedureParameters(allRoutines, new IncludeAll());
 
-    final MutableProcedure procedure = (MutableProcedure) allRoutines.iterator().next();
+    final MutableProcedure procedure =
+        (MutableProcedure) allRoutines.getObjects().iterator().next();
     assertThat(procedure.getParameters(), hasSize(1));
 
     final ProcedureParameter parameter = procedure.getParameters().get(0);
@@ -158,7 +160,8 @@ public class ProcedureParameterRetrieverTest extends AbstractParameterRetrieverT
     ((ProcedureParameterRetriever) retriever)
         .retrieveProcedureParameters(allRoutines, new IncludeAll());
 
-    final MutableProcedure procedure = (MutableProcedure) allRoutines.iterator().next();
+    final MutableProcedure procedure =
+        (MutableProcedure) allRoutines.getObjects().iterator().next();
     assertThat(procedure.getParameters(), hasSize(1));
 
     final ProcedureParameter parameter = procedure.getParameters().get(0);

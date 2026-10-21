@@ -171,7 +171,6 @@ public class MapBackedNamedObjectIndexTest {
       assertThat(index.size(), is(0));
       assertThat(index.getObjects(), is(empty()));
       assertThat(index.snapshot(), is(empty()));
-      assertThat(index.iterator().hasNext(), is(false));
       assertThat(index.toString(), is(""));
       assertThat(index.containsKey(null), is(false));
       assertThat(index.containsKey(new NamedObjectKey("missing", "schema")), is(false));
@@ -190,7 +189,7 @@ public class MapBackedNamedObjectIndexTest {
     index.add(first);
     final List<Schema> values = index.getObjects();
     final List<Schema> snapshot = index.snapshot();
-    final Iterator<Schema> iterator = index.iterator();
+    final Iterator<Schema> iterator = index.getObjects().iterator();
     index.add(second);
 
     assertThat(values, contains(sameInstance(first)));
@@ -232,7 +231,7 @@ public class MapBackedNamedObjectIndexTest {
           contains(sameInstance(schema2), sameInstance(schema1), sameInstance(schema3)));
       assertThat(index.snapshot(), containsInAnyOrder(schema1, schema2, schema3));
       final List<Schema> iterated = new ArrayList<>();
-      index.forEach(iterated::add);
+      index.getObjects().forEach(iterated::add);
       assertThat(iterated, contains(schema2, schema1, schema3));
       for (final Schema schema : shuffled) {
         assertThat(index.containsKey(schema.key()), is(true));

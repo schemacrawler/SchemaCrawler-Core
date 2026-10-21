@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.SearchableType;
@@ -71,11 +70,9 @@ final class DataTypeRetriever extends AbstractRetriever {
 
   void retrieveUserDefinedColumnDataTypes() throws SQLException {
 
-    final NamedObjectIndex<Schema> schemas = getAllSchemas();
-
     final String name = "user-defined column data types";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
       LOGGER.log(
           Level.INFO,
           new StringFormat("Retrieving user-defined data types for schema <%s>", schema));

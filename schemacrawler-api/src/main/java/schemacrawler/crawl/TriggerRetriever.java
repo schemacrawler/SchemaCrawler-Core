@@ -189,7 +189,7 @@ final class TriggerRetriever extends AbstractRetriever {
   private void retrieveTriggerOverSchemas(final Query triggerInformationSql) throws SQLException {
     final String name = "trigger definitions";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
       if (catalog.getTables(schema).isEmpty()) {
         continue;
       }

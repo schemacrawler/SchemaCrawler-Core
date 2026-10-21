@@ -230,7 +230,7 @@ final class ViewExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "additional view information";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
       if (catalog.getTables(schema).isEmpty()) {
         continue;
       }
@@ -289,7 +289,7 @@ final class ViewExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "views for table usage";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
       if (catalog.getTables(schema).isEmpty()) {
         continue;
       }
