@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -36,21 +35,7 @@ import schemacrawler.schema.Schema;
  */
 abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
     implements DatabaseObjectIndex<D>, Serializable
-    permits AbstractConcurrentIndex, ImmutableDatabaseObjectIndex {
-
-  private static final class FilterForSchema implements Predicate<DatabaseObject> {
-
-    private final Schema schema;
-
-    FilterForSchema(final Schema schema) {
-      this.schema = requireNonNull(schema, "No schema provided");
-    }
-
-    @Override
-    public boolean test(final DatabaseObject databaseObject) {
-      return databaseObject != null && databaseObject.getSchema().equals(schema);
-    }
-  }
+    permits AbstractConcurrentIndex, ImmutableDatabaseObjectIndex, ImmutableRoutineIndex {
 
   @Serial private static final long serialVersionUID = -6220925141708190854L;
 
@@ -85,7 +70,7 @@ abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
 
   /** {@inheritDoc} */
   @Override
-  public List<D> getObjects(final Schema schema) {
+  public final List<D> getObjects(final Schema schema) {
     if (schema == null) {
       return List.of();
     }
@@ -104,20 +89,11 @@ abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
   /** {@inheritDoc} */
   @Override
   public List<D> getObjects(final Schema schema, final String name) {
-    if (schema == null || isBlank(name)) {
+    final Optional<D> lookedupObject = lookup(schema, name);
+    if (lookedupObject.isEmpty()) {
       return List.of();
     }
-    final Predicate<DatabaseObject> filter =
-        new FilterForSchema(schema).and(object -> object.getName().equals(name));
-    final List<D> filteredObjects = new ArrayList<>();
-    for (final D object : snapshot()) {
-      if (!filter.test(object)) {
-        continue;
-      }
-      filteredObjects.add(object);
-    }
-    Collections.sort(filteredObjects);
-    return List.copyOf(filteredObjects);
+    return List.of(lookedupObject.get());
   }
 
   /** {@inheritDoc} */
@@ -137,12 +113,11 @@ abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
 
   /** {@inheritDoc} */
   @Override
-  public final Optional<D> lookup(final Schema schema, final String name) {
+  public Optional<D> lookup(final Schema schema, final String name) {
     if (schema == null || name == null) {
       return Optional.empty();
     }
-    final List<D> objects = getObjects(schema, name);
-    return objects.stream().findFirst();
+    return lookup(schema.key().with(name));
   }
 
   /** {@inheritDoc} */

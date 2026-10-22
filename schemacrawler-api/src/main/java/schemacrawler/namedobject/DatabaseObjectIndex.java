@@ -16,12 +16,14 @@ import schemacrawler.schema.Schema;
 /**
  * Adds schema-scoped enumeration and ordinary-name lookup to a named-object index.
  *
- * <p>Schema-scoped operations scan an unsorted snapshot before sorting only the matching objects.
- * Matching uses schema equality and exact, case-sensitive names; indexed objects must have non-null
- * schemas. Membership mutability and thread safety depend on the implementation.
+ * <p>Schema-scoped enumeration scans an unsorted snapshot before sorting matching objects.
+ * Schema/name lookup uses the complete key formed from the schema key and ordinary name.
+ * Implementations for object types with overloads may override these operations to scan all
+ * matching objects. Membership mutability and thread safety depend on the implementation.
  *
- * <p>Both schema/name lookup and inherited full-name lookup reject null or blank names.
- * Complete-key lookup does not apply this name validation.
+ * <p>Schema/name lookup rejects null arguments. Its default exact-key implementation may match a
+ * blank name; specializations may define different name boundaries. Inherited full-name lookup
+ * rejects null or blank names. Complete-key lookup does not apply name validation.
  *
  * @param <D> Database-object type
  */
@@ -38,27 +40,26 @@ public sealed interface DatabaseObjectIndex<D extends DatabaseObject> extends Na
   List<D> getObjects(Schema schema);
 
   /**
-   * Gets a detached, unmodifiable list matching an equal schema and exact ordinary name in natural
-   * order, including all overloads.
+   * Gets detached, unmodifiable objects matching an equal schema and exact ordinary name in natural
+   * order. The default keyed implementation returns at most one object; implementations supporting
+   * overloaded names may return all matches.
    *
    * @param schema Schema to match using {@link Object#equals(Object)}
    * @param name Exact object name
-   * @return Naturally ordered matches; empty if the schema is null or the name is null or blank
+   * @return Naturally ordered matches; empty if either argument is null or no object matches
    */
   List<D> getObjects(Schema schema, String name);
 
   /**
    * Looks up a database object by an equal schema and exact object name.
    *
-   * <p>This lookup is independent of the object's complete membership key. Blank names are
-   * rejected. Implementations select the natural-order first matching object; natural comparison
-   * ties have unspecified selection, and this operation does not identify a unique overload.
-   * Indexed database objects are expected to have non-null schemas.
+   * <p>The default keyed implementation forms a key from the schema key and ordinary name. Types
+   * with overloaded names may override this operation to select a matching object. Indexed database
+   * objects are expected to have non-null schemas.
    *
    * @param schema Schema to match using {@link Object#equals(Object)}
    * @param name Exact object name
-   * @return The selected match, if present; empty if the schema is null, the name is null or blank,
-   *     or no object matches
+   * @return The selected match, if present; empty if either argument is null or no object matches
    */
   Optional<D> lookup(Schema schema, String name);
 }

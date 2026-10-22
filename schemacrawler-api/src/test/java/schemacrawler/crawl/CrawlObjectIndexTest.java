@@ -26,6 +26,7 @@ import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
+import schemacrawler.namedobject.ConcurrentRoutineIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ForeignKey;
@@ -43,8 +44,7 @@ public class CrawlObjectIndexTest {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final MutableProcedure later = new MutableProcedure(schema, "run", "specific_z");
     final MutableProcedure earlier = new MutableProcedure(schema, "run", "specific_a");
-    final BuildableDatabaseObjectIndex<MutableRoutine> routines =
-        new ConcurrentDatabaseObjectIndex<>();
+    final BuildableDatabaseObjectIndex<MutableRoutine> routines = new ConcurrentRoutineIndex<>();
     routines.add(later);
     routines.add(earlier);
 
@@ -92,7 +92,7 @@ public class CrawlObjectIndexTest {
     assertThat(children.lookup(parent, "MISSING"), is(Optional.empty()));
     assertThat(children.lookup((Table) null, "FIRST"), is(Optional.empty()));
     assertThat(children.lookup(parent, null), is(Optional.empty()));
-    assertThat(databaseObjects.lookup(schema, "FIRST").orElseThrow(), sameInstance(first));
+    assertThat(databaseObjects.lookup(schema, "FIRST"), is(Optional.empty()));
     final MutableColumn replacement = new MutableColumn(parent, "FIRST");
     replacement.setOrdinalPosition(3);
     databaseObjects.add(replacement);

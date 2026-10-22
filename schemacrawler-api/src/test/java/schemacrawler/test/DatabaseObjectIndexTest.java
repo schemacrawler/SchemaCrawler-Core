@@ -33,6 +33,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
+import schemacrawler.namedobject.ConcurrentRoutineIndex;
 import schemacrawler.namedobject.DatabaseObjectIndex;
 import schemacrawler.namedobject.DependantObjectIndex;
 import schemacrawler.namedobject.ImmutableDatabaseObjectIndex;
@@ -145,7 +146,7 @@ public class DatabaseObjectIndexTest {
     assertThat(index.lookup(table, "missing"), is(Optional.empty()));
     assertThat(index.lookup((Table) null, "COLUMN"), is(Optional.empty()));
     assertThat(index.lookup(table, null), is(Optional.empty()));
-    assertThat(index.lookup(schema, "COLUMN").orElseThrow(), sameInstance(column));
+    assertThat(index.lookup(schema, "COLUMN"), is(Optional.empty()));
   }
 
   @Test
@@ -247,16 +248,17 @@ public class DatabaseObjectIndexTest {
     assertThrows(UnsupportedOperationException.class, scoped::clear);
   }
 
-  @ParameterizedTest(name = "immutable={0}")
-  @ValueSource(booleans = {true, false})
-  public void schemaLookupSelectsNaturalFirstOverloadAndUsesCompleteKeys(final boolean immutable) {
+  @Test
+  public void routineIndexSelectsNaturalFirstOverloadAndPreservesCompleteKeys() {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final Routine earlier = new LightProcedure(schema, "run", "a");
     final Routine later = new LightProcedure(schema, "run", "z");
     final Routine nullSpecific = new LightProcedure(schema, "nullable", null);
     final Routine emptySpecific = new LightProcedure(schema, "nullable", "");
-    final DatabaseObjectIndex<Routine> index =
-        index(immutable, List.of(later, earlier, nullSpecific, emptySpecific));
+    final ConcurrentRoutineIndex<Routine> index = new ConcurrentRoutineIndex<>();
+    for (final Routine routine : List.of(later, earlier, nullSpecific, emptySpecific)) {
+      index.add(routine);
+    }
 
     assertThat(index.lookup(schema, "run").orElseThrow(), sameInstance(earlier));
     assertThat(index.getObjects(schema, "run"), contains(earlier, later));
@@ -275,17 +277,17 @@ public class DatabaseObjectIndexTest {
   @ValueSource(booleans = {true, false})
   public void ordinaryNamesMatchLiterallyIncludingQuotedAndDottedNames(final boolean immutable) {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final List<Routine> routines = new ArrayList<>();
+    final List<Table> tables = new ArrayList<>();
     for (final String name : List.of("routine.with.dot", "\"quoted\"")) {
-      final Routine routine = mock(Routine.class);
-      when(routine.key()).thenReturn(schema.key().with(name));
-      when(routine.getName()).thenReturn(name);
-      when(routine.getSchema()).thenReturn(schema);
-      routines.add(routine);
+      final Table table = mock(Table.class);
+      when(table.key()).thenReturn(schema.key().with(name));
+      when(table.getName()).thenReturn(name);
+      when(table.getSchema()).thenReturn(schema);
+      tables.add(table);
     }
-    final DatabaseObjectIndex<Routine> index = index(immutable, routines);
-    for (final Routine routine : routines) {
-      assertThat(index.lookup(schema, routine.getName()).orElseThrow(), sameInstance(routine));
+    final DatabaseObjectIndex<Table> index = index(immutable, tables);
+    for (final Table table : tables) {
+      assertThat(index.lookup(schema, table.getName()).orElseThrow(), sameInstance(table));
     }
     assertThat(index.lookup(schema, "\"routine.with.dot\""), is(Optional.empty()));
     assertThat(index.lookup(schema, "quoted"), is(Optional.empty()));
@@ -294,7 +296,7 @@ public class DatabaseObjectIndexTest {
 
   @ParameterizedTest(name = "immutable={0}")
   @ValueSource(booleans = {true, false})
-  public void nameQueriesRejectBlankNamesWithoutRejectingExactKeys(final boolean immutable) {
+  public void schemaNameLookupUsesExactKeysIncludingBlankNames(final boolean immutable) {
     final Schema schema = new SchemaReference();
     final Table blank = mock(Table.class);
     when(blank.key()).thenReturn(schema.key().with(""));
@@ -302,10 +304,12 @@ public class DatabaseObjectIndexTest {
     when(blank.getName()).thenReturn("");
     when(blank.getFullName()).thenReturn("");
     final DatabaseObjectIndex<Table> index = index(immutable, List.of(blank));
-    for (final String name : Arrays.asList(null, "", " ", "\t")) {
+    for (final String name : Arrays.asList(null, " ", "\t")) {
       assertThat(index.lookup(schema, name), is(Optional.empty()));
       assertThat(index.getObjects(schema, name), is(empty()));
     }
+    assertThat(index.lookup(schema, "").orElseThrow(), sameInstance(blank));
+    assertThat(index.getObjects(schema, ""), contains(sameInstance(blank)));
     assertThat(index.lookup(blank.key()).orElseThrow(), sameInstance(blank));
     assertThat(index.lookup(""), is(Optional.empty()));
   }
@@ -314,15 +318,14 @@ public class DatabaseObjectIndexTest {
   @ValueSource(booleans = {true, false})
   public void serializationPreservesSortedValuesAndSchemaLookup(final boolean immutable) {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final Routine earlier = new LightProcedure(schema, "run", "a");
-    final Routine later = new LightProcedure(schema, "run", "z");
-    final DatabaseObjectIndex<Routine> original = index(immutable, List.of(later, earlier));
-    final DatabaseObjectIndex<Routine> copy = SerializationUtils.clone(original);
+    final Table earlier = new LightTable(schema, "A");
+    final Table later = new LightTable(schema, "Z");
+    final DatabaseObjectIndex<Table> original = index(immutable, List.of(later, earlier));
+    final DatabaseObjectIndex<Table> copy = SerializationUtils.clone(original);
     assertThat(
-        copy.getObjects().stream().map(Routine::key).toList(),
-        contains(earlier.key(), later.key()));
+        copy.getObjects().stream().map(Table::key).toList(), contains(earlier.key(), later.key()));
     assertThat(copy.snapshot().size(), is(2));
-    assertThat(copy.lookup(schema, "run").orElseThrow().key(), is(earlier.key()));
+    assertThat(copy.lookup(schema, "A").orElseThrow().key(), is(earlier.key()));
     assertThat(copy.toString(), is(original.toString()));
   }
 

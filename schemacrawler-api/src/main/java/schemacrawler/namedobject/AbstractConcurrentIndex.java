@@ -29,7 +29,7 @@ import schemacrawler.schema.DatabaseObject;
  */
 public abstract sealed class AbstractConcurrentIndex<D extends DatabaseObject>
     extends AbstractDatabaseObjectIndex<D> implements BuildableDatabaseObjectIndex<D>
-    permits ConcurrentDatabaseObjectIndex, ConcurrentDependantObjectIndex {
+    permits ConcurrentDatabaseObjectIndex, ConcurrentRoutineIndex, ConcurrentDependantObjectIndex {
 
   @Serial private static final long serialVersionUID = -1089958942591485649L;
 

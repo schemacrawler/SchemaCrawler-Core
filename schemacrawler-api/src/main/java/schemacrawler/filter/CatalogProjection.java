@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import schemacrawler.namedobject.AbstractCatalog;
 import schemacrawler.namedobject.ImmutableDatabaseObjectIndex;
+import schemacrawler.namedobject.ImmutableRoutineIndex;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.CrawlInfo;
@@ -75,7 +76,7 @@ final class CatalogProjection
         new MapBackedNamedObjectIndex<>(schemas),
         new ImmutableDatabaseObjectIndex<>(columnDataTypes),
         new ImmutableDatabaseObjectIndex<>(tables),
-        new ImmutableDatabaseObjectIndex<>(routines),
+        new ImmutableRoutineIndex<>(routines),
         new ImmutableDatabaseObjectIndex<>(sequences),
         new ImmutableDatabaseObjectIndex<>(synonyms));
     this.crawlInfo = crawlInfo;

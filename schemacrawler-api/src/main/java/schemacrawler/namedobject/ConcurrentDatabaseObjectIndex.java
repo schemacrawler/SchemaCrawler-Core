@@ -9,7 +9,6 @@
 package schemacrawler.namedobject;
 
 import java.io.Serial;
-import java.util.Optional;
 import schemacrawler.schema.DatabaseObject;
 
 /**
@@ -27,23 +26,4 @@ public final class ConcurrentDatabaseObjectIndex<D extends DatabaseObject>
 
   /** Creates an empty concurrent index. */
   public ConcurrentDatabaseObjectIndex() {}
-
-  /** {@inheritDoc} */
-  @Override
-  public boolean add(final D object) {
-    if (object == null) {
-      return false;
-    }
-    internalMap().put(object.key(), object);
-    return true;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public Optional<D> remove(final D object) {
-    if (object == null) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(internalMap().remove(object.key()));
-  }
 }

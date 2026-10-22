@@ -15,6 +15,7 @@ import java.util.Optional;
 import schemacrawler.namedobject.AbstractCatalog;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.ConcurrentRoutineIndex;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.CrawlInfo;
@@ -58,7 +59,7 @@ final class MutableCatalog
         new MapBackedNamedObjectIndex<>(),
         new ConcurrentDatabaseObjectIndex<>(),
         new ConcurrentDatabaseObjectIndex<>(),
-        new ConcurrentDatabaseObjectIndex<>(),
+        new ConcurrentRoutineIndex<>(),
         new ConcurrentDatabaseObjectIndex<>(),
         new ConcurrentDatabaseObjectIndex<>());
   }
