@@ -147,15 +147,15 @@ final class MutableCatalog
   }
 
   NamedObjectIndex<MutableRoutine> getAllRoutines() {
-    return new MapBackedNamedObjectIndex<>(routines.snapshot());
+    return routines;
   }
 
   NamedObjectIndex<Schema> getAllSchemas() {
-    return new MapBackedNamedObjectIndex<>(schemas.snapshot());
+    return schemas;
   }
 
   NamedObjectIndex<MutableTable> getAllTables() {
-    return new MapBackedNamedObjectIndex<>(tables.snapshot());
+    return tables;
   }
 
   Optional<MutableRoutine> lookupRoutine(final NamedObjectKey routineLookupKey) {

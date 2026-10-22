@@ -45,7 +45,7 @@ final class ViewExtRetriever extends AbstractRetriever {
    * @throws SQLException On a SQL exception
    */
   void retrieveViewInformation() throws SQLException {
-    if (catalog.getTables().isEmpty()) {
+    if (!catalog.hasTables()) {
       LOGGER.log(Level.FINE, "No tables found");
       return;
     }
@@ -90,7 +90,7 @@ final class ViewExtRetriever extends AbstractRetriever {
    * @throws SQLException On a SQL exception
    */
   void retrieveViewTableUsage() throws SQLException {
-    if (catalog.getTables().isEmpty()) {
+    if (!catalog.hasTables()) {
       LOGGER.log(Level.FINE, "No tables found");
       return;
     }

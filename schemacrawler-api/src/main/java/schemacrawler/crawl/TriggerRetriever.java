@@ -49,7 +49,7 @@ final class TriggerRetriever extends AbstractRetriever {
    * @throws SQLException On a SQL exception
    */
   void retrieveTriggerInformation() throws SQLException {
-    if (catalog.getTables().isEmpty()) {
+    if (!catalog.hasTables()) {
       LOGGER.log(Level.FINE, "No tables found");
       return;
     }

@@ -121,7 +121,7 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
     }
     // Distinct schema keys can share a full name
     // Use natural order to select a match
-    return snapshot().stream()
+    return objects.values().stream()
         .filter(namedObject -> fullName.equals(namedObject.getFullName()))
         .min(naturalOrder());
   }

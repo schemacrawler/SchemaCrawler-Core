@@ -23,10 +23,11 @@ import schemacrawler.schema.NamedObjectKey;
  * <p>When keys are duplicated, the first object in collection encounter order is retained. The
  * membership is copied from the collection, but objects are shared references. Keys must remain
  * stable. Sorted enumeration sorts afresh on each call; objects must have stable comparison state
- * during a sort. Schema/name lookup returns the natural-order first matching object, with
- * comparison ties unspecified. Snapshots have unspecified iteration order and do not compare
- * objects. Returned lists are detached and unmodifiable. The index is shallowly immutable and
- * serializable when its objects are serializable.
+ * during a sort. By default, schema/name lookup uses a direct complete-key read. Overload-aware
+ * mode instead selects the natural-order first prefix match, with comparison ties unspecified.
+ * Snapshots have unspecified iteration order and do not compare objects. Returned lists are
+ * detached and unmodifiable. The index is shallowly immutable and serializable when its objects are
+ * serializable.
  *
  * @param <D> Database-object type
  */

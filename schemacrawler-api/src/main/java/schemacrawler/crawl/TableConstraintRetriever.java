@@ -266,7 +266,7 @@ final class TableConstraintRetriever extends AbstractRetriever {
    * @throws SQLException On a SQL exception
    */
   void retrieveTableConstraints() throws SQLException {
-    if (catalog.getTables().isEmpty()) {
+    if (!catalog.hasTables()) {
       LOGGER.log(Level.FINE, "No tables found");
       return;
     }

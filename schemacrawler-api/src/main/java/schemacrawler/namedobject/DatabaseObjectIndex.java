@@ -22,6 +22,13 @@ import schemacrawler.schema.Schema;
  * prefix and select the natural minimum. Membership mutability and thread safety depend on the
  * implementation.
  *
+ * <p>For n indexed objects and m matches, schema enumeration takes O(n + m log m) time. Schema
+ * existence short-circuits in O(n) worst-case time without retrieving values. Ordinary schema/name
+ * reads use expected O(1) map lookup; overload-aware singular lookup takes O(n) time and collection
+ * lookup takes O(n + m log m) time, assuming bounded key lengths. Prefix scans do not create
+ * whole-index snapshots. Concurrent traversal is weakly consistent, not atomic; values removed
+ * between key traversal and retrieval are omitted.
+ *
  * <p>Schema/name lookup rejects null schemas and null or blank names. Inherited full-name lookup
  * also rejects null or blank names. Complete-key lookup does not apply name validation.
  *
