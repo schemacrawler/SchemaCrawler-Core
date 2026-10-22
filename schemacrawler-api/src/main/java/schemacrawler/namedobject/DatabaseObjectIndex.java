@@ -16,14 +16,14 @@ import schemacrawler.schema.Schema;
 /**
  * Adds schema-scoped enumeration and ordinary-name lookup to a named-object index.
  *
- * <p>Schema-scoped enumeration scans an unsorted snapshot before sorting matching objects.
- * Schema/name lookup uses the complete key formed from the schema key and ordinary name.
- * Implementations for object types with overloads may override these operations to scan all
- * matching objects. Membership mutability and thread safety depend on the implementation.
+ * <p>Schema-scoped enumeration filters stored keys before sorting matching objects. Keys must be
+ * stable hierarchical keys beginning with the schema key. Ordinary schema/name lookup uses the
+ * complete key formed from the schema key and ordinary name; overload-aware indexes scan for that
+ * prefix and select the natural minimum. Membership mutability and thread safety depend on the
+ * implementation.
  *
- * <p>Schema/name lookup rejects null arguments. Its default exact-key implementation may match a
- * blank name; specializations may define different name boundaries. Inherited full-name lookup
- * rejects null or blank names. Complete-key lookup does not apply name validation.
+ * <p>Schema/name lookup rejects null schemas and null or blank names. Inherited full-name lookup
+ * also rejects null or blank names. Complete-key lookup does not apply name validation.
  *
  * @param <D> Database-object type
  */
@@ -31,44 +31,45 @@ public sealed interface DatabaseObjectIndex<D extends DatabaseObject> extends Na
     permits AbstractDatabaseObjectIndex, BuildableDatabaseObjectIndex, DependantObjectIndex {
 
   /**
-   * Gets a detached, unmodifiable list of objects for an equal schema in natural order. The
-   * operation scans the index and sorts the matching objects.
+   * Gets a detached, unmodifiable list of objects for a schema key in natural order. The operation
+   * scans the index and sorts the matching objects.
    *
-   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @param schema Schema whose structured key prefix must match
    * @return Naturally ordered objects for the schema, or an empty list if the schema is null
    */
   List<D> getObjects(Schema schema);
 
   /**
-   * Gets detached, unmodifiable objects matching an equal schema and exact ordinary name in natural
-   * order. The default keyed implementation returns at most one object; implementations supporting
-   * overloaded names may return all matches.
+   * Gets detached, unmodifiable objects matching a schema key and exact ordinary name in natural
+   * order. Ordinary indexes return at most one object; overload-aware indexes return all matches.
    *
-   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @param schema Schema whose structured key must match
    * @param name Exact object name
-   * @return Naturally ordered matches; empty if either argument is null or no object matches
+   * @return Naturally ordered matches; empty if the schema is null, the name is null or blank, or
+   *     no object matches
    */
   List<D> getObjects(Schema schema, String name);
 
   /**
-   * Checks whether the index contains any objects for an equal schema, without sorting or
+   * Checks whether the index contains any objects for a schema key, without sorting or
    * natural-order comparisons.
    *
-   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @param schema Schema whose structured key prefix must match
    * @return Whether any objects match; false if the schema is null
    */
   boolean hasObjects(Schema schema);
 
   /**
-   * Looks up a database object by an equal schema and exact object name.
+   * Looks up a database object by a schema key and exact object name.
    *
-   * <p>The default keyed implementation forms a key from the schema key and ordinary name. Types
-   * with overloaded names may override this operation to select a matching object. Indexed database
-   * objects are expected to have non-null schemas.
+   * <p>Ordinary indexes form a complete key from the schema key and ordinary name. Overload-aware
+   * indexes select the natural minimum among matching key prefixes; comparison ties have
+   * unspecified selection. Indexed database objects are expected to have non-null schemas.
    *
-   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @param schema Schema whose structured key must match
    * @param name Exact object name
-   * @return The selected match, if present; empty if either argument is null or no object matches
+   * @return The selected match, if present; empty if the schema is null, the name is null or blank,
+   *     or no object matches
    */
   Optional<D> lookup(Schema schema, String name);
 }

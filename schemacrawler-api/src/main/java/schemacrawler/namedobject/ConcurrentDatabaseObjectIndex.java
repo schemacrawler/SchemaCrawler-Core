@@ -26,4 +26,14 @@ public final class ConcurrentDatabaseObjectIndex<D extends DatabaseObject>
 
   /** Creates an empty concurrent index. */
   public ConcurrentDatabaseObjectIndex() {}
+
+  /**
+   * Creates an empty concurrent index with optional overload-aware schema/name lookup.
+   *
+   * @param supportsOverloads Whether schema/name queries match appended key components, as for
+   *     routine specific names; false retains direct exact-key lookup
+   */
+  public ConcurrentDatabaseObjectIndex(final boolean supportsOverloads) {
+    super(supportsOverloads);
+  }
 }

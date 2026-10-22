@@ -10,6 +10,7 @@ package schemacrawler.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,11 @@ import schemacrawler.namedobject.BuildableIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.schema.Routine;
+import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
+import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.crawl.LightProcedure;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class NamedObjectIndexConcurrencyTest {
@@ -32,6 +37,53 @@ public class NamedObjectIndexConcurrencyTest {
   @Test
   public void concurrentDatabaseIndexRetainsKeysDuringOverlappingTraversal() throws Exception {
     verifyConcurrentMembership(new ConcurrentDatabaseObjectIndex<Table>());
+  }
+
+  @Test
+  public void schemaAndOverloadKeyTraversalToleratesConcurrentMembershipChanges() throws Exception {
+    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
+    final ConcurrentDatabaseObjectIndex<Routine> index = new ConcurrentDatabaseObjectIndex<>(true);
+    final Routine retained = new LightProcedure(schema, "run", "retained");
+    index.add(retained);
+    final List<Routine> detached = index.getObjects(schema);
+    final CountDownLatch firstTraversal = new CountDownLatch(1);
+    final CountDownLatch firstMutation = new CountDownLatch(1);
+    final List<Callable<Void>> workers =
+        List.of(
+            () -> {
+              if (!firstTraversal.await(10, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("Traversal did not start");
+              }
+              for (int iteration = 0; iteration < 1000; iteration++) {
+                final Routine temporary = new LightProcedure(schema, "run", "temporary");
+                index.add(temporary);
+                index.add(new LightProcedure(schema, "run", "temporary"));
+                index.remove(temporary);
+                firstMutation.countDown();
+              }
+              return null;
+            },
+            () -> {
+              index.getObjects(schema);
+              firstTraversal.countDown();
+              if (!firstMutation.await(10, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("Mutation did not start");
+              }
+              for (int iteration = 0; iteration < 1000; iteration++) {
+                assertThat(index.hasObjects(schema), is(true));
+                index.getObjects(schema).forEach(routine -> assertThat(routine, notNullValue()));
+                index
+                    .getObjects(schema, "run")
+                    .forEach(routine -> assertThat(routine, notNullValue()));
+                assertThat(index.lookup(schema, "run").isPresent(), is(true));
+              }
+              return null;
+            });
+    runTogether(workers);
+    assertThat(index.size(), is(1));
+    assertThat(index.lookup(schema, "run").orElseThrow(), is(retained));
+    assertThat(detached.size(), is(1));
+    assertThat(detached.get(0), is(retained));
   }
 
   @Test

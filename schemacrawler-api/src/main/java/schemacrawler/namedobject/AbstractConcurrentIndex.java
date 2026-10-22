@@ -18,8 +18,8 @@ import schemacrawler.schema.DatabaseObject;
  *
  * <p>Adding an object replaces any existing object with its key. Individual map operations are
  * thread-safe, and snapshots are weakly consistent during concurrent membership changes. A snapshot
- * is not an atomic point-in-time view. Schema/name lookup filters the snapshot and selects the
- * natural-order first match; comparison ties have unspecified selection. Compound operations,
+ * is not an atomic point-in-time view. Overload-aware schema/name lookup filters keys and selects
+ * the natural-order first match; comparison ties have unspecified selection. Compound operations,
  * cross-index transactions, and object state are not synchronized. Objects are shared references;
  * complete keys must remain stable, and comparison state must remain stable while values are
  * sorted. Returned lists are detached and unmodifiable. The index is serializable when its objects
@@ -29,13 +29,22 @@ import schemacrawler.schema.DatabaseObject;
  */
 public abstract sealed class AbstractConcurrentIndex<D extends DatabaseObject>
     extends AbstractDatabaseObjectIndex<D> implements BuildableDatabaseObjectIndex<D>
-    permits ConcurrentDatabaseObjectIndex, ConcurrentRoutineIndex, ConcurrentDependantObjectIndex {
+    permits ConcurrentDatabaseObjectIndex, ConcurrentDependantObjectIndex {
 
   @Serial private static final long serialVersionUID = -1089958942591485649L;
 
   /** Creates an empty concurrent index. */
   public AbstractConcurrentIndex() {
-    super(new ConcurrentHashMap<>());
+    this(false);
+  }
+
+  /**
+   * Creates an empty concurrent index with the supplied ordinary-name lookup policy.
+   *
+   * @param supportsOverloads Whether schema/name queries match appended key components
+   */
+  protected AbstractConcurrentIndex(final boolean supportsOverloads) {
+    super(new ConcurrentHashMap<>(), supportsOverloads);
   }
 
   /** {@inheritDoc} */

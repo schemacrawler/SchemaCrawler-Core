@@ -54,6 +54,20 @@ public final class ImmutableDatabaseObjectIndex<D extends DatabaseObject>
    * @throws NullPointerException if the collection, an object, or an object's key is null
    */
   public ImmutableDatabaseObjectIndex(final Collection<? extends D> values) {
-    super(immutableNamedObjectMap(values));
+    this(values, false);
+  }
+
+  /**
+   * Copies membership with optional overload-aware schema/name lookup, retaining the first object
+   * encountered for each complete key.
+   *
+   * @param values Objects to index
+   * @param supportsOverloads Whether schema/name queries match appended key components, as for
+   *     routine specific names; false retains direct exact-key lookup
+   * @throws NullPointerException if the collection, an object, or an object's key is null
+   */
+  public ImmutableDatabaseObjectIndex(
+      final Collection<? extends D> values, final boolean supportsOverloads) {
+    super(immutableNamedObjectMap(values), supportsOverloads);
   }
 }

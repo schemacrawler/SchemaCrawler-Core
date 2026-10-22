@@ -26,7 +26,6 @@ import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
 import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
-import schemacrawler.namedobject.ConcurrentRoutineIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ForeignKey;
@@ -44,7 +43,8 @@ public class CrawlObjectIndexTest {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
     final MutableProcedure later = new MutableProcedure(schema, "run", "specific_z");
     final MutableProcedure earlier = new MutableProcedure(schema, "run", "specific_a");
-    final BuildableDatabaseObjectIndex<MutableRoutine> routines = new ConcurrentRoutineIndex<>();
+    final BuildableDatabaseObjectIndex<MutableRoutine> routines =
+        new ConcurrentDatabaseObjectIndex<>(true);
     routines.add(later);
     routines.add(earlier);
 

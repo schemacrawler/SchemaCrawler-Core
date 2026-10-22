@@ -8,6 +8,8 @@
 
 package schemacrawler.namedobject;
 
+import static us.fatehi.utility.Utility.isBlank;
+
 import java.io.Serial;
 import java.util.Optional;
 import schemacrawler.schema.DatabaseObject;
@@ -35,7 +37,7 @@ public final class ConcurrentDependantObjectIndex<
   /** {@inheritDoc} */
   @Override
   public Optional<DO> lookup(final D object, final String name) {
-    if (object == null || name == null) {
+    if (object == null || isBlank(name)) {
       return Optional.empty();
     }
     return lookup(object.key().with(name));

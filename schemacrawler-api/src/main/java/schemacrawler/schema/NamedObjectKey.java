@@ -13,6 +13,7 @@ import static us.fatehi.utility.Utility.convertForComparison;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
 public final class NamedObjectKey implements Serializable, Comparable<NamedObjectKey> {
 
@@ -82,6 +83,27 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
     }
     final String name = key[key.length - 1];
     return convertForComparison(name) + "_" + Integer.toHexString(hashCode());
+  }
+
+  /**
+   * Tests whether this key begins with the supplied sequence of whole components.
+   *
+   * <p>Components match exactly, including case and null-versus-empty distinctions. An empty prefix
+   * matches every key; a null prefix does not match.
+   *
+   * @param key Prefix to match
+   * @return Whether all prefix components match the beginning of this key
+   */
+  public boolean startsWith(final NamedObjectKey key) {
+    if (key == null || key.key.length > this.key.length) {
+      return false;
+    }
+    for (int index = 0; index < key.key.length; index++) {
+      if (!Objects.equals(this.key[index], key.key[index])) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
