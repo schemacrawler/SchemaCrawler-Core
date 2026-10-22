@@ -31,7 +31,7 @@ import schemacrawler.schema.NamedObjectKey;
  * @param <N> Named-object type
  */
 public sealed interface NamedObjectIndex<N extends NamedObject> extends Serializable
-    permits DatabaseObjectIndex, MapBackedNamedObjectIndex {
+    permits DatabaseObjectIndex, BuildableNamedObjectIndex {
 
   /**
    * Checks whether the index contains the complete key.

@@ -25,7 +25,7 @@ import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.model.RelationshipCardinality;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
-import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.BuildableNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
@@ -42,9 +42,9 @@ class MutableERModel implements ERModel {
 
   private final BuildableDatabaseObjectIndex<Table> tablesIndex;
   private final Set<TableReference> unmodeledTableReferences;
-  private final MapBackedNamedObjectIndex<Entity> entitiesIndex;
-  private final MapBackedNamedObjectIndex<Relationship> relationshipsIndex;
-  private final MapBackedNamedObjectIndex<Relationship> implicitRelationshipsIndex;
+  private final BuildableNamedObjectIndex<Entity> entitiesIndex;
+  private final BuildableNamedObjectIndex<Relationship> relationshipsIndex;
+  private final BuildableNamedObjectIndex<Relationship> implicitRelationshipsIndex;
 
   public MutableERModel() {
     tablesIndex = NamedObjectIndexes.newBuildableDatabaseObjectIndex();

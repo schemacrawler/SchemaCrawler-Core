@@ -12,7 +12,7 @@ import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.util.List;
-import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.BuildableNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraint;
@@ -25,7 +25,7 @@ sealed class MutableTableConstraint extends AbstractDependantObject<Table>
 
   @Serial private static final long serialVersionUID = 1155277343302693656L;
 
-  private final MapBackedNamedObjectIndex<MutableTableConstraintColumn> columns =
+  private final BuildableNamedObjectIndex<MutableTableConstraintColumn> columns =
       NamedObjectIndexes.newBuildableNamedObjectIndex();
   private String definition;
   private boolean deferrable;

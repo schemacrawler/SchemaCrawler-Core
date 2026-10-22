@@ -40,8 +40,8 @@ import schemacrawler.schema.NamedObjectKey;
  *
  * @param <N> Named-object type
  */
-public final class MapBackedNamedObjectIndex<N extends NamedObject>
-    implements NamedObjectIndex<N>, BuildableIndex<N> {
+final class MapBackedNamedObjectIndex<N extends NamedObject>
+    implements BuildableNamedObjectIndex<N> {
 
   @Serial private static final long serialVersionUID = -569749297532359027L;
 

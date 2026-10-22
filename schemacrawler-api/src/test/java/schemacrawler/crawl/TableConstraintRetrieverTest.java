@@ -29,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
-import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.BuildableNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -191,7 +191,7 @@ public class TableConstraintRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     // Create a list of tables to retrieve constraints for
-    final MapBackedNamedObjectIndex<MutableTable> allTables =
+    final BuildableNamedObjectIndex<MutableTable> allTables =
         NamedObjectIndexes.newBuildableNamedObjectIndex();
     for (final Table table : catalog.getTables()) {
       if (table instanceof final MutableTable mutableTable) {
@@ -252,7 +252,7 @@ public class TableConstraintRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     // Create a list of tables to retrieve constraints for
-    final MapBackedNamedObjectIndex<MutableTable> allTables =
+    final BuildableNamedObjectIndex<MutableTable> allTables =
         NamedObjectIndexes.newBuildableNamedObjectIndex();
     for (final Schema schema : catalog.getSchemas()) {
       for (final Table table : catalog.getTables(schema)) {

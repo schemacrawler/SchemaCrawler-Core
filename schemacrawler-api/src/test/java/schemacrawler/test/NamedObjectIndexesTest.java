@@ -23,8 +23,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
+import schemacrawler.namedobject.BuildableNamedObjectIndex;
 import schemacrawler.namedobject.DatabaseObjectIndex;
-import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Routine;
@@ -42,10 +43,10 @@ public class NamedObjectIndexesTest {
     final Schema replacement = new SchemaReference(null, "APP");
     final Schema distinct = new SchemaReference("", "APP");
     final Schema blank = new SchemaReference();
-    final MapBackedNamedObjectIndex<Schema> schemas = NamedObjectIndexes.newBuildableSchemaIndex();
-    final MapBackedNamedObjectIndex<Schema> namedObjects =
+    final BuildableNamedObjectIndex<Schema> schemas = NamedObjectIndexes.newBuildableSchemaIndex();
+    final BuildableNamedObjectIndex<Schema> namedObjects =
         NamedObjectIndexes.newBuildableNamedObjectIndex();
-    for (final MapBackedNamedObjectIndex<Schema> index : List.of(schemas, namedObjects)) {
+    for (final BuildableNamedObjectIndex<Schema> index : List.of(schemas, namedObjects)) {
       assertTrue(index.isEmpty());
       index.add(first);
       index.add(replacement);
@@ -69,18 +70,15 @@ public class NamedObjectIndexesTest {
     final Schema distinct = new SchemaReference("", "APP");
     final Schema blank = new SchemaReference();
     final List<Schema> source = new ArrayList<>(List.of(first, replacement, distinct, blank));
-    final MapBackedNamedObjectIndex<Schema> schemas =
-        NamedObjectIndexes.newImmutableSchemaIndex(source);
-    final MapBackedNamedObjectIndex<Schema> namedObjects =
+    final NamedObjectIndex<Schema> schemas = NamedObjectIndexes.newImmutableSchemaIndex(source);
+    final NamedObjectIndex<Schema> namedObjects =
         NamedObjectIndexes.newImmutableNamedObjectIndex(source);
     source.clear();
-    for (final MapBackedNamedObjectIndex<Schema> index : List.of(schemas, namedObjects)) {
+    for (final NamedObjectIndex<Schema> index : List.of(schemas, namedObjects)) {
       assertEquals(3, index.size());
       assertSame(replacement, index.lookup(first.key()).orElseThrow());
       assertSame(distinct, index.lookup(distinct.key()).orElseThrow());
       assertSame(blank, index.lookup("").orElseThrow());
-      assertThrows(UnsupportedOperationException.class, () -> index.add(first));
-      assertThrows(UnsupportedOperationException.class, () -> index.remove(first));
       assertThrows(UnsupportedOperationException.class, () -> index.snapshot().clear());
     }
     assertTrue(NamedObjectIndexes.newImmutableNamedObjectIndex(null).isEmpty());

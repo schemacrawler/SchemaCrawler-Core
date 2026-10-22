@@ -23,7 +23,7 @@ import schemacrawler.schema.NamedObject;
  * @param <N> Named-object type
  */
 public sealed interface BuildableIndex<N extends NamedObject>
-    permits BuildableDatabaseObjectIndex, MapBackedNamedObjectIndex {
+    permits BuildableDatabaseObjectIndex, BuildableNamedObjectIndex {
 
   /**
    * Adds or replaces an object by its complete key.

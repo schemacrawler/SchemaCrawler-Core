@@ -14,7 +14,7 @@ import java.io.Serial;
 import java.util.Optional;
 import schemacrawler.namedobject.AbstractCatalog;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
-import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.BuildableNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.CrawlInfo;
@@ -38,8 +38,8 @@ final class MutableCatalog
   private final ImmutableCrawlInfo crawlInfo;
   private final MutableDatabaseInfo databaseInfo;
   private final MutableJdbcDriverInfo jdbcDriverInfo;
-  private final MapBackedNamedObjectIndex<DatabaseUser> databaseUsers;
-  private final MapBackedNamedObjectIndex<Schema> schemas;
+  private final BuildableNamedObjectIndex<DatabaseUser> databaseUsers;
+  private final BuildableNamedObjectIndex<Schema> schemas;
   private final BuildableDatabaseObjectIndex<MutableColumnDataType> columnDataTypes;
   private final BuildableDatabaseObjectIndex<MutableTable> tables;
   private final BuildableDatabaseObjectIndex<MutableRoutine> routines;
@@ -67,8 +67,8 @@ final class MutableCatalog
       final String title,
       final MutableDatabaseInfo databaseInfo,
       final MutableJdbcDriverInfo jdbcDriverInfo,
-      final MapBackedNamedObjectIndex<DatabaseUser> databaseUsers,
-      final MapBackedNamedObjectIndex<Schema> schemas,
+      final BuildableNamedObjectIndex<DatabaseUser> databaseUsers,
+      final BuildableNamedObjectIndex<Schema> schemas,
       final BuildableDatabaseObjectIndex<MutableColumnDataType> columnDataTypes,
       final BuildableDatabaseObjectIndex<MutableTable> tables,
       final BuildableDatabaseObjectIndex<MutableRoutine> routines,

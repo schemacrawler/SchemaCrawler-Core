@@ -57,7 +57,7 @@ public final class NamedObjectIndexes {
    * @return A new mutable index
    */
   public static <N extends NamedObject>
-      MapBackedNamedObjectIndex<N> newBuildableNamedObjectIndex() {
+      BuildableNamedObjectIndex<N> newBuildableNamedObjectIndex() {
     return new MapBackedNamedObjectIndex<>();
   }
 
@@ -77,7 +77,7 @@ public final class NamedObjectIndexes {
    * @param <S> Schema type
    * @return A new mutable index
    */
-  public static <S extends Schema> MapBackedNamedObjectIndex<S> newBuildableSchemaIndex() {
+  public static <S extends Schema> BuildableNamedObjectIndex<S> newBuildableSchemaIndex() {
     return new MapBackedNamedObjectIndex<>();
   }
 
@@ -103,7 +103,7 @@ public final class NamedObjectIndexes {
    * @return A new immutable index
    * @throws NullPointerException if an object or its key is null
    */
-  public static <N extends NamedObject> MapBackedNamedObjectIndex<N> newImmutableNamedObjectIndex(
+  public static <N extends NamedObject> NamedObjectIndex<N> newImmutableNamedObjectIndex(
       final Collection<N> values) {
     return new MapBackedNamedObjectIndex<>(values);
   }
@@ -130,7 +130,7 @@ public final class NamedObjectIndexes {
    * @return A new immutable index
    * @throws NullPointerException if a schema or its key is null
    */
-  public static <S extends Schema> MapBackedNamedObjectIndex<S> newImmutableSchemaIndex(
+  public static <S extends Schema> NamedObjectIndex<S> newImmutableSchemaIndex(
       final Collection<S> values) {
     return new MapBackedNamedObjectIndex<>(values);
   }

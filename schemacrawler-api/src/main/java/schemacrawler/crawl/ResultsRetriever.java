@@ -19,7 +19,7 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
-import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.BuildableNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.JavaSqlType;
 import schemacrawler.schema.NamedObjectKey;
@@ -39,7 +39,7 @@ final class ResultsRetriever {
 
   private final ResultSetMetaData resultsMetaData;
   private final JavaSqlTypes javaSqlTypes;
-  private final MapBackedNamedObjectIndex<Schema> schemas;
+  private final BuildableNamedObjectIndex<Schema> schemas;
   private final BuildableDatabaseObjectIndex<Table> tables;
 
   ResultsRetriever(final ResultSet resultSet) throws SQLException {

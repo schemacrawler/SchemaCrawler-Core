@@ -18,7 +18,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
-import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.BuildableNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.test.utility.crawl.LightTable;
@@ -38,7 +38,7 @@ public class NamedObjectSupportExtensionTest {
   public void publicAttributeBaseSupportsExternalSubclassesAndGenericIndexes() {
     final ExtendedNamedObject object = new ExtendedNamedObject("object");
     object.setAttribute("attribute", "value");
-    final MapBackedNamedObjectIndex<ExtendedNamedObject> mutable =
+    final BuildableNamedObjectIndex<ExtendedNamedObject> mutable =
         NamedObjectIndexes.newBuildableNamedObjectIndex();
     mutable.add(object);
     final NamedObjectIndex<ExtendedNamedObject> index = mutable;
