@@ -19,8 +19,8 @@ import schemacrawler.schema.NamedObjectKey;
  * Provides read-only lookup and enumeration of named objects.
  *
  * <p>Membership mutability and thread safety depend on the implementation. {@link #getObjects()}
- * and iteration use detached, unmodifiable lists freshly sorted in natural order, requiring O(n log
- * n) comparisons in the general case. {@link #snapshot()} copies membership in O(n) time without
+ * returns a detached, unmodifiable list freshly sorted in natural order, requiring O(n log n)
+ * comparisons in the general case. {@link #snapshot()} copies membership in O(n) time without
  * comparing objects and has unspecified iteration order. Elements are shared references: their
  * complete keys must remain stable while indexed, and their comparison state must remain stable
  * during sorting. Equal comparison results have unspecified relative order.

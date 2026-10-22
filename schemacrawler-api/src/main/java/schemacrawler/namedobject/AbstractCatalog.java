@@ -190,6 +190,11 @@ public abstract class AbstractCatalog<
   }
 
   @Override
+  public boolean hasRoutines(final Schema schema) {
+    return routines.hasObjects(schema);
+  }
+
+  @Override
   public boolean hasSchemas() {
     return !schemas.isEmpty();
   }
@@ -200,13 +205,28 @@ public abstract class AbstractCatalog<
   }
 
   @Override
+  public boolean hasSequences(final Schema schema) {
+    return sequences.hasObjects(schema);
+  }
+
+  @Override
   public boolean hasSynonyms() {
     return !synonyms.isEmpty();
   }
 
   @Override
+  public boolean hasSynonyms(final Schema schema) {
+    return synonyms.hasObjects(schema);
+  }
+
+  @Override
   public boolean hasTables() {
     return !tables.isEmpty();
+  }
+
+  @Override
+  public boolean hasTables(final Schema schema) {
+    return tables.hasObjects(schema);
   }
 
   /** {@inheritDoc} */

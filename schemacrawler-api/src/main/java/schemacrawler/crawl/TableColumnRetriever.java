@@ -302,7 +302,7 @@ final class TableColumnRetriever extends AbstractRetriever {
     final String name = "table columns from metadata over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : schemas) {
-      if (catalog.getTables(schema).isEmpty()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

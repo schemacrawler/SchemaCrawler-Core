@@ -436,7 +436,7 @@ final class TableConstraintRetriever extends AbstractRetriever {
     final String name = "check constraint definitions";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : getAllSchemas().snapshot()) {
-      if (catalog.getTables(schema).isEmpty()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);
@@ -485,7 +485,7 @@ final class TableConstraintRetriever extends AbstractRetriever {
     final String name = "table constraints columns";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : getAllSchemas().snapshot()) {
-      if (catalog.getTables(schema).isEmpty()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);
@@ -544,7 +544,7 @@ final class TableConstraintRetriever extends AbstractRetriever {
     final String name = "table constraints";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : getAllSchemas().snapshot()) {
-      if (catalog.getTables(schema).isEmpty()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

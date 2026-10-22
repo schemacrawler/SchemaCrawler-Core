@@ -253,7 +253,7 @@ final class FunctionParameterRetriever extends AbstractRetriever {
     final String name = "function parameters from data dictionary over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : schemas) {
-      if (catalog.getRoutines(schema).isEmpty()) {
+      if (!catalog.hasRoutines(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

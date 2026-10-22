@@ -217,7 +217,7 @@ final class RoutineExtRetriever extends AbstractRetriever {
     final String name = "routine definitions";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : getAllSchemas().snapshot()) {
-      if (catalog.getRoutines(schema).isEmpty()) {
+      if (!catalog.hasRoutines(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);
@@ -265,7 +265,7 @@ final class RoutineExtRetriever extends AbstractRetriever {
     final String name = "routine references";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : getAllSchemas().snapshot()) {
-      if (catalog.getRoutines(schema).isEmpty()) {
+      if (!catalog.hasRoutines(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

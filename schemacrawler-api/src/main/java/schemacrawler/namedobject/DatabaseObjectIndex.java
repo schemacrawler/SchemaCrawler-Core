@@ -51,6 +51,15 @@ public sealed interface DatabaseObjectIndex<D extends DatabaseObject> extends Na
   List<D> getObjects(Schema schema, String name);
 
   /**
+   * Checks whether the index contains any objects for an equal schema, without sorting or
+   * natural-order comparisons.
+   *
+   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @return Whether any objects match; false if the schema is null
+   */
+  boolean hasObjects(Schema schema);
+
+  /**
    * Looks up a database object by an equal schema and exact object name.
    *
    * <p>The default keyed implementation forms a key from the schema key and ordinary name. Types

@@ -32,11 +32,11 @@ import schemacrawler.schema.NamedObjectKey;
  * are shared references and keys must remain stable.
  *
  * <p>Sorted enumeration makes a fresh O(n log n) sort; comparison state must remain stable during
- * sorting. Snapshots copy membership in O(n) without comparing objects. Returned lists and
- * iterators are detached and unmodifiable. In mutable mode, individual membership operations are
- * thread-safe and enumeration is weakly consistent, not an atomic snapshot. Element state, compound
- * operations, and cross-index transactions are not synchronized. Serialization preserves the
- * membership mode when elements are serializable.
+ * sorting. Snapshots copy membership in O(n) without comparing objects. Returned lists are detached
+ * and unmodifiable. In mutable mode, individual membership operations are thread-safe and
+ * enumeration is weakly consistent, not an atomic snapshot. Element state, compound operations, and
+ * cross-index transactions are not synchronized. Serialization preserves the membership mode when
+ * elements are serializable.
  *
  * @param <N> Named-object type
  */

@@ -180,7 +180,7 @@ final class PrimaryKeyRetriever extends AbstractRetriever {
     final String name = "primary keys from data dictionary";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : schemas) {
-      if (catalog.getTables(schema).isEmpty()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

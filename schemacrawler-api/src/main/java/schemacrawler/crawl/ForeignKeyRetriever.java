@@ -323,7 +323,7 @@ final class ForeignKeyRetriever extends AbstractRetriever {
     final String name = "foreign keys";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : getAllSchemas().snapshot()) {
-      if (catalog.getTables(schema).isEmpty()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);
