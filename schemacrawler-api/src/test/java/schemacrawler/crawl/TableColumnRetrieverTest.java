@@ -41,6 +41,8 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.IncludeAll;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
+import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectSort;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Schema;
@@ -58,7 +60,6 @@ import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.utility.NamedObjectSort;
 import us.fatehi.test.utility.TestWriter;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 import us.fatehi.utility.IOUtility;
@@ -523,7 +524,7 @@ public class TableColumnRetrieverTest {
 
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
-    final NamedObjectList<MutableTable> allTables = catalog.getAllTables();
+    final NamedObjectIndex<MutableTable> allTables = catalog.getAllTables();
 
     final TableColumnRetriever tableColumnRetriever =
         new TableColumnRetriever(retrieverConnection, catalog, options.crawlOptions());

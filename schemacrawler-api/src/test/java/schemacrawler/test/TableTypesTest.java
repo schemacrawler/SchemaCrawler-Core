@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
+import schemacrawler.namedobject.NamedObjectSort;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.Schema;
@@ -29,7 +30,6 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
-import schemacrawler.utility.NamedObjectSort;
 import us.fatehi.test.utility.TestWriter;
 
 @WithTestDatabase

@@ -15,10 +15,8 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.ermodel.model.Entity;
@@ -26,6 +24,8 @@ import schemacrawler.ermodel.model.EntitySubtype;
 import schemacrawler.ermodel.model.EntityType;
 import schemacrawler.ermodel.model.Relationship;
 import schemacrawler.ermodel.model.RelationshipCardinality;
+import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
@@ -39,24 +39,24 @@ class MutableERModel implements ERModel {
   private static final EnumSet<EntityType> VALID_ENTITY_TYPES =
       EnumSet.of(EntityType.strong_entity, EntityType.weak_entity, EntityType.subtype);
 
-  private final Map<NamedObjectKey, Table> tablesMap;
+  private final ConcurrentDatabaseObjectIndex<Table> tablesMap;
   private final Set<TableReference> unmodeledTableReferences;
-  private final Map<NamedObjectKey, Entity> entitiesMap;
-  private final Map<NamedObjectKey, Relationship> relationshipsMap;
-  private final Map<NamedObjectKey, Relationship> implicitRelationshipsMap;
+  private final MapBackedNamedObjectIndex<Entity> entitiesMap;
+  private final MapBackedNamedObjectIndex<Relationship> relationshipsMap;
+  private final MapBackedNamedObjectIndex<Relationship> implicitRelationshipsMap;
 
   public MutableERModel() {
-    tablesMap = new ConcurrentHashMap<>();
+    tablesMap = new ConcurrentDatabaseObjectIndex<>();
     unmodeledTableReferences = new CopyOnWriteArraySet<>();
-    entitiesMap = new ConcurrentHashMap<>();
-    relationshipsMap = new ConcurrentHashMap<>();
-    implicitRelationshipsMap = new ConcurrentHashMap<>();
+    entitiesMap = new MapBackedNamedObjectIndex<>();
+    relationshipsMap = new MapBackedNamedObjectIndex<>();
+    implicitRelationshipsMap = new MapBackedNamedObjectIndex<>();
   }
 
   @Override
   public Collection<Entity> getEntities() {
     return List.copyOf(
-        entitiesMap.values().stream()
+        entitiesMap.snapshot().stream()
             .filter(entity -> VALID_ENTITY_TYPES.contains(entity.getType()))
             .sorted()
             .toList());
@@ -68,7 +68,7 @@ class MutableERModel implements ERModel {
       return List.of();
     }
     return List.copyOf(
-        entitiesMap.values().stream()
+        entitiesMap.snapshot().stream()
             .filter(entity -> entity.getType().equals(entityType))
             .sorted()
             .toList());
@@ -77,13 +77,13 @@ class MutableERModel implements ERModel {
   @Override
   public Collection<Relationship> getImplicitRelationships() {
     final Set<Relationship> implicitRelationships =
-        new HashSet<>(implicitRelationshipsMap.values());
+        new HashSet<>(implicitRelationshipsMap.snapshot());
     return List.copyOf(implicitRelationships.stream().sorted().toList());
   }
 
   @Override
   public Collection<Relationship> getRelationships() {
-    return List.copyOf(relationshipsMap.values().stream().sorted().toList());
+    return relationshipsMap.getObjects();
   }
 
   @Override
@@ -93,7 +93,7 @@ class MutableERModel implements ERModel {
       return List.of();
     }
     return List.copyOf(
-        relationshipsMap.values().stream()
+        relationshipsMap.snapshot().stream()
             .filter(relationship -> relationship.getType().equals(cardinality))
             .sorted()
             .toList());
@@ -113,7 +113,7 @@ class MutableERModel implements ERModel {
 
   @Override
   public Collection<Table> getTables() {
-    return List.copyOf(tablesMap.values().stream().sorted().toList());
+    return tablesMap.getObjects();
   }
 
   @Override
@@ -123,16 +123,15 @@ class MutableERModel implements ERModel {
 
   @Override
   public Collection<Table> getUnmodeledTables() {
-    return tablesMap.keySet().stream()
+    return tablesMap.snapshot().stream()
         // Not a valid entity
         .filter(
-            key -> {
-              final Entity entity = entitiesMap.get(key);
+            table -> {
+              final Entity entity = entitiesMap.lookup(table.key()).orElse(null);
               return entity == null || !VALID_ENTITY_TYPES.contains(entity.getType());
             })
         // Not a bridge table
-        .filter(not(key -> relationshipsMap.containsKey(key)))
-        .map(key -> tablesMap.get(key))
+        .filter(not(table -> relationshipsMap.containsKey(table.key())))
         .sorted()
         .toList();
   }
@@ -147,15 +146,12 @@ class MutableERModel implements ERModel {
     // Only bridge tables can be looked up by this method, since the relationship
     // key for many--many
     // relationships is the same as the bridge table key
-    if (relationshipsMap.containsKey(key)) {
-      return Optional.of(relationshipsMap.get(key));
-    }
-    return Optional.empty();
+    return relationshipsMap.lookup(key);
   }
 
   @Override
   public Optional<Entity> lookupEntity(final String entityName) {
-    return entitiesMap.values().stream()
+    return entitiesMap.snapshot().stream()
         .filter(entity -> entity.getFullName().equals(entityName))
         .findFirst();
   }
@@ -166,7 +162,7 @@ class MutableERModel implements ERModel {
       return Optional.empty();
     }
     final NamedObjectKey key = table.key();
-    return Optional.ofNullable(entitiesMap.get(key));
+    return entitiesMap.lookup(key);
   }
 
   @Override
@@ -174,7 +170,7 @@ class MutableERModel implements ERModel {
     if (relationshipName == null) {
       return Optional.empty();
     }
-    return relationshipsMap.values().stream()
+    return relationshipsMap.snapshot().stream()
         .filter(relationship -> relationship.getFullName().equals(relationshipName))
         .findFirst();
   }
@@ -185,18 +181,13 @@ class MutableERModel implements ERModel {
       return Optional.empty();
     }
     final NamedObjectKey key = tableRef.key();
-    if (relationshipsMap.containsKey(key)) {
-      return Optional.of(relationshipsMap.get(key));
-    }
-    if (implicitRelationshipsMap.containsKey(key)) {
-      return Optional.of(implicitRelationshipsMap.get(key));
-    }
-    return Optional.empty();
+    final Optional<Relationship> relationship = relationshipsMap.lookup(key);
+    return relationship.isPresent() ? relationship : implicitRelationshipsMap.lookup(key);
   }
 
   void addEntity(final Entity entity) {
     if (entity != null) {
-      entitiesMap.put(entity.key(), entity);
+      entitiesMap.add(entity);
     }
   }
 
@@ -205,7 +196,7 @@ class MutableERModel implements ERModel {
       return;
     }
 
-    implicitRelationshipsMap.put(relationship.key(), relationship);
+    implicitRelationshipsMap.add(relationship);
 
     final MutableEntity leftEntity = (MutableEntity) relationship.getLeftEntity();
     if (leftEntity != null) {
@@ -223,7 +214,7 @@ class MutableERModel implements ERModel {
       return;
     }
 
-    relationshipsMap.put(relationship.key(), relationship);
+    relationshipsMap.add(relationship);
 
     final MutableEntity leftEntity = (MutableEntity) relationship.getLeftEntity();
     if (leftEntity != null) {
@@ -238,7 +229,7 @@ class MutableERModel implements ERModel {
 
   void addTable(final Table table) {
     if (table != null) {
-      tablesMap.put(table.key(), table);
+      tablesMap.add(table);
     }
   }
 
@@ -249,7 +240,7 @@ class MutableERModel implements ERModel {
   }
 
   private Collection<EntitySubtype> getSubtypes() {
-    return entitiesMap.values().stream()
+    return entitiesMap.snapshot().stream()
         .filter(entity -> EntityType.subtype.equals(entity.getType()))
         .map(entity -> (EntitySubtype) entity)
         .toList();

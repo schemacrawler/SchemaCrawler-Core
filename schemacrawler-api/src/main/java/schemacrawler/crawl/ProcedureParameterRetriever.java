@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.filter.InclusionRuleFilter;
 import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.ParameterModeType;
 import schemacrawler.schema.ProcedureParameter;
@@ -52,7 +53,8 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
   }
 
   void retrieveProcedureParameters(
-      final NamedObjectList<MutableRoutine> allRoutines, final InclusionRule parameterInclusionRule)
+      final NamedObjectIndex<MutableRoutine> allRoutines,
+      final InclusionRule parameterInclusionRule)
       throws SQLException {
     requireNonNull(allRoutines, "No procedures provided");
 
@@ -85,7 +87,7 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
 
   private boolean createProcedureParameter(
       final MetadataResultSet results,
-      final NamedObjectList<MutableRoutine> allRoutines,
+      final NamedObjectIndex<MutableRoutine> allRoutines,
       final InclusionRuleFilter<ProcedureParameter> parameterFilter) {
     final String columnCatalogName = normalizeCatalogName(results.getString("PROCEDURE_CAT"));
     final String schemaName = normalizeSchemaName(results.getString("PROCEDURE_SCHEM"));
@@ -142,7 +144,7 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
       parameter.setNullable(isNullable);
       parameter.setRemarks(remarks);
 
-      parameter.addAttributes(results.getAttributes());
+      parameter.addAttributesFrom(results.getAttributes());
 
       LOGGER.log(Level.FINER, new StringFormat("Adding parameter to procedure <%s>", parameter));
       procedure.addParameter(parameter);
@@ -170,7 +172,7 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
   }
 
   private void retrieveProcedureParametersFromDataDictionary(
-      final NamedObjectList<MutableRoutine> allRoutines,
+      final NamedObjectIndex<MutableRoutine> allRoutines,
       final InclusionRuleFilter<ProcedureParameter> parameterFilter)
       throws SQLException {
     final InformationSchemaViews informationSchemaViews =
@@ -195,12 +197,12 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
   }
 
   private void retrieveProcedureParametersFromMetadata(
-      final NamedObjectList<MutableRoutine> allRoutines,
+      final NamedObjectIndex<MutableRoutine> allRoutines,
       final InclusionRuleFilter<ProcedureParameter> parameterFilter)
       throws SQLException {
     final String name = "procedure parameters from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final MutableRoutine routine : allRoutines) {
+    for (final MutableRoutine routine : allRoutines.snapshot()) {
       if (routine.getRoutineType() != RoutineType.procedure) {
         continue;
       }
@@ -232,7 +234,7 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
   }
 
   private void retrieveProcedureParametersOverSchemas(
-      final NamedObjectList<MutableRoutine> allRoutines,
+      final NamedObjectIndex<MutableRoutine> allRoutines,
       final InclusionRuleFilter<ProcedureParameter> parameterFilter)
       throws SQLException {
 
@@ -248,7 +250,7 @@ final class ProcedureParameterRetriever extends AbstractRetriever {
     final String name = "procedure parameters from data dictionary over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
     for (final Schema schema : schemas) {
-      if (catalog.getRoutines(schema).isEmpty()) {
+      if (!catalog.hasRoutines(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

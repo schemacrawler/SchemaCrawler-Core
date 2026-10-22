@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.crawl;
+package schemacrawler.namedobject;
 
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.trimToEmpty;
@@ -20,7 +20,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import schemacrawler.schema.AttributedObject;
 import schemacrawler.schema.DescribedObject;
 
-abstract class AbstractNamedObjectWithAttributes extends AbstractNamedObject
+/**
+ * Base implementation for named objects with mutable attributes and remarks.
+ *
+ * <p>Attribute mappings are held in a concurrent map. Returned maps are detached and sorted by
+ * attribute name; attribute values are shared references and are not made thread-safe by this
+ * class.
+ */
+public abstract class AbstractNamedObjectWithAttributes extends AbstractNamedObject
     implements AttributedObject, DescribedObject {
 
   private static final String REMARKS_ATTRIBUTE = "REMARKS";
@@ -29,13 +36,8 @@ abstract class AbstractNamedObjectWithAttributes extends AbstractNamedObject
 
   private final Map<String, Object> attributeMap;
 
-  /**
-   * Effective Java - Item 17 - Minimize Mutability - Package-private constructors make a class
-   * effectively final
-   *
-   * @param name Name of the named object
-   */
-  AbstractNamedObjectWithAttributes(final String name) {
+  /** Creates a named object with an immutable name and an initially empty attribute map. */
+  protected AbstractNamedObjectWithAttributes(final String name) {
     super(name);
     attributeMap = new ConcurrentHashMap<>();
   }
@@ -115,6 +117,11 @@ abstract class AbstractNamedObjectWithAttributes extends AbstractNamedObject
     setAttribute(REMARKS_ATTRIBUTE, trimToEmpty(remarks));
   }
 
+  /**
+   * Adds non-null mappings from the supplied map, retaining references to their values.
+   *
+   * @param values mappings to add; null is ignored
+   */
   protected final void addAttributes(final Map<String, Object> values) {
     if (values == null) {
       return;

@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.utility;
+package schemacrawler.namedobject;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import schemacrawler.schema.NamedObject;
 
+/** Comparators for named objects, including case-insensitive alphabetical and natural order. */
 public enum NamedObjectSort implements Comparator<NamedObject> {
 
   /** Alphabetical sort, case-insensitive. */
@@ -25,6 +26,12 @@ public enum NamedObjectSort implements Comparator<NamedObject> {
   /** Natural sort. */
   natural(naturalOrder());
 
+  /**
+   * Gets the named-object comparator for the requested alphabetical or natural ordering.
+   *
+   * @param alphabeticalSort whether to sort alphabetically
+   * @return the corresponding comparator
+   */
   public static NamedObjectSort getNamedObjectSort(final boolean alphabeticalSort) {
     if (alphabeticalSort) {
       return NamedObjectSort.alphabetical;

@@ -19,6 +19,7 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
@@ -77,7 +78,7 @@ abstract class AbstractRetriever {
     return belongsToCatalog && belongsToSchema;
   }
 
-  final NamedObjectList<SchemaReference> getAllSchemas() {
+  final NamedObjectIndex<Schema> getAllSchemas() {
     return catalog.getAllSchemas();
   }
 

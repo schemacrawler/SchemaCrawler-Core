@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import schemacrawler.crawl.MutablePrivilege.PrivilegeGrant;
 import schemacrawler.inclusionrule.ExcludeAll;
 import schemacrawler.inclusionrule.IncludeAll;
+import schemacrawler.namedobject.AbstractNamedObject;
+import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;

@@ -11,7 +11,14 @@ package schemacrawler.schema;
 import java.util.Collection;
 import java.util.Optional;
 
-/** Database and connection information. */
+/**
+ * Database and connection information.
+ *
+ * <p>Catalogs have reference equality and use {@link System#identityHashCode(Object)} for hashing,
+ * independently of their metadata, members, or attributes. Names and full names are blank; natural
+ * comparison is not an identity test. Identity belongs to each instance, including a deserialized
+ * instance.
+ */
 public interface Catalog extends NamedObject, AttributedObject, DescribedObject {
 
   /**
@@ -119,6 +126,73 @@ public interface Catalog extends NamedObject, AttributedObject, DescribedObject 
    * @return Tables
    */
   Collection<Table> getTables(Schema schema);
+
+  /**
+   * Checks whether the catalog contains any routines.
+   *
+   * @return Whether any routines are present
+   */
+  boolean hasRoutines();
+
+  /**
+   * Checks whether the catalog contains any routines for an equal schema.
+   *
+   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @return Whether any routines match; false if the schema is null
+   */
+  boolean hasRoutines(Schema schema);
+
+  /**
+   * Checks whether the catalog contains any schemas.
+   *
+   * @return Whether any schemas are present
+   */
+  boolean hasSchemas();
+
+  /**
+   * Checks whether the catalog contains any sequences.
+   *
+   * @return Whether any sequences are present
+   */
+  boolean hasSequences();
+
+  /**
+   * Checks whether the catalog contains any sequences for an equal schema.
+   *
+   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @return Whether any sequences match; false if the schema is null
+   */
+  boolean hasSequences(Schema schema);
+
+  /**
+   * Checks whether the catalog contains any synonyms.
+   *
+   * @return Whether any synonyms are present
+   */
+  boolean hasSynonyms();
+
+  /**
+   * Checks whether the catalog contains any synonyms for an equal schema.
+   *
+   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @return Whether any synonyms match; false if the schema is null
+   */
+  boolean hasSynonyms(Schema schema);
+
+  /**
+   * Checks whether the catalog contains any tables.
+   *
+   * @return Whether any tables are present
+   */
+  boolean hasTables();
+
+  /**
+   * Checks whether the catalog contains any tables for an equal schema.
+   *
+   * @param schema Schema to match using {@link Object#equals(Object)}
+   * @return Whether any tables match; false if the schema is null
+   */
+  boolean hasTables(Schema schema);
 
   /**
    * Gets a table column by unqualified name.

@@ -38,6 +38,7 @@ module us.fatehi.schemacrawler.schemacrawler {
   exports schemacrawler.schemacrawler.exceptions;
   exports schemacrawler.filter;
   exports schemacrawler.inclusionrule;
+  exports schemacrawler.namedobject;
   exports schemacrawler.plugin;
   exports schemacrawler.utility;
   // Do NOT export schemacrawler.crawl - this is an internal implementation package

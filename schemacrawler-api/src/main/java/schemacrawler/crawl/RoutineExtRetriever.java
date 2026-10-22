@@ -140,7 +140,7 @@ final class RoutineExtRetriever extends AbstractRetriever {
       routine.setRoutineBodyType(routineBodyType);
       routine.setDefinition(definition);
 
-      routine.addAttributes(results.getAttributes());
+      routine.addAttributesFrom(results.getAttributes());
     }
     return routineOptional.isPresent();
   }
@@ -216,8 +216,8 @@ final class RoutineExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "routine definitions";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
-      if (catalog.getRoutines(schema).isEmpty()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
+      if (!catalog.hasRoutines(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);
@@ -264,8 +264,8 @@ final class RoutineExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "routine references";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
-      if (catalog.getRoutines(schema).isEmpty()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
+      if (!catalog.hasRoutines(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

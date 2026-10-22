@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import schemacrawler.filter.CatalogProjectionBuilder;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
 import schemacrawler.schema.Catalog;
@@ -406,16 +407,20 @@ public class CatalogProjectionBuilderTest {
         .thenReturn(Map.of("baseline", "before", "REMARKS", "baseline remarks"));
     final Catalog projection = CatalogProjectionBuilder.builder(source).build();
 
-    assertThrows(
-        UnsupportedOperationException.class, () -> projection.setAttribute("new", "value"));
-    assertThrows(UnsupportedOperationException.class, () -> projection.removeAttribute("baseline"));
-    assertThrows(UnsupportedOperationException.class, () -> projection.setRemarks("changed"));
-    assertThrows(
-        UnsupportedOperationException.class, () -> projection.getAttributes().put("new", "value"));
-    assertThat(source.hasAttribute("projection"), is(false));
     assertThat(projection.getAttribute("baseline", ""), is("before"));
     assertThat(projection.hasAttribute("REMARKS"), is(true));
     assertThat(projection.getRemarks(), is("baseline remarks"));
+    projection.setAttribute("new", "value");
+    projection.removeAttribute("baseline");
+    projection.setRemarks("changed");
+    projection.getAttributes().put("detached", "value");
+    assertThat(projection.getAttribute("new", ""), is("value"));
+    assertThat(projection.hasAttribute("baseline"), is(false));
+    assertThat(projection.getRemarks(), is("changed"));
+    assertThat(projection.hasAttribute("detached"), is(false));
+    assertThat(source.getAttributes().get("baseline"), is("before"));
+    assertThat(source.getAttributes().get("REMARKS"), is("baseline remarks"));
+    assertThat(source.getAttributes().containsKey("new"), is(false));
   }
 
   @Test
@@ -666,6 +671,7 @@ public class CatalogProjectionBuilderTest {
     final T databaseObject = mock(objectClass);
     when(databaseObject.getSchema()).thenReturn(schema);
     when(databaseObject.getName()).thenReturn(name);
+    when(databaseObject.key()).thenReturn(schema.key().with(name));
     return databaseObject;
   }
 
@@ -697,7 +703,9 @@ public class CatalogProjectionBuilderTest {
     when(catalog.getColumnDataTypes()).thenReturn(List.of());
     when(catalog.getDatabaseUsers()).thenReturn(List.of());
     for (final Table table : tables) {
-      when(catalog.lookupTable(table.getSchema(), table.getName())).thenReturn(Optional.of(table));
+      Mockito.<Optional<? extends Table>>when(
+              catalog.lookupTable(table.getSchema(), table.getName()))
+          .thenReturn(Optional.of(table));
     }
     return catalog;
   }

@@ -233,7 +233,7 @@ final class DatabaseInfoRetriever extends AbstractRetriever {
         LOGGER.log(Level.FINER, new StringFormat("Retrieving database user name: %s", username));
 
         final ImmutableDatabaseUser databaseUser = new ImmutableDatabaseUser(username);
-        databaseUser.addAttributes(results.getAttributes());
+        databaseUser.addAttributesFrom(results.getAttributes());
         catalog.addDatabaseUser(databaseUser);
         retrievalCounts.countIncluded();
       }

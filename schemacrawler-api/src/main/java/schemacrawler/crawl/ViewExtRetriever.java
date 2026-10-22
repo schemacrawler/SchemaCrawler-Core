@@ -45,7 +45,7 @@ final class ViewExtRetriever extends AbstractRetriever {
    * @throws SQLException On a SQL exception
    */
   void retrieveViewInformation() throws SQLException {
-    if (catalog.getTables().isEmpty()) {
+    if (!catalog.hasTables()) {
       LOGGER.log(Level.FINE, "No tables found");
       return;
     }
@@ -90,7 +90,7 @@ final class ViewExtRetriever extends AbstractRetriever {
    * @throws SQLException On a SQL exception
    */
   void retrieveViewTableUsage() throws SQLException {
-    if (catalog.getTables().isEmpty()) {
+    if (!catalog.hasTables()) {
       LOGGER.log(Level.FINE, "No tables found");
       return;
     }
@@ -155,7 +155,7 @@ final class ViewExtRetriever extends AbstractRetriever {
     view.setCheckOption(checkOption);
     view.setUpdatable(updatable);
 
-    view.addAttributes(results.getAttributes());
+    view.addAttributesFrom(results.getAttributes());
 
     return true;
   }
@@ -230,8 +230,8 @@ final class ViewExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "additional view information";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
-      if (catalog.getTables(schema).isEmpty()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);
@@ -289,8 +289,8 @@ final class ViewExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "views for table usage";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
-      if (catalog.getTables(schema).isEmpty()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

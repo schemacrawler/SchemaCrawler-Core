@@ -20,10 +20,15 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import schemacrawler.namedobject.AbstractCatalog;
+import schemacrawler.namedobject.AbstractNamedObject;
+import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
+import schemacrawler.schemacrawler.ModelImplementation;
 
 @TestInstance(PER_CLASS)
 public class ModelTest {
@@ -54,9 +59,8 @@ public class ModelTest {
   //
   // Java package-private visibility is strictly per-package. Splitting into subpackages would
   // require making these classes at least public — immediately exposing them.
-  // Although schemacrawler.crawl is exported from the JPMS module (for MetadataResultSet and
-  // ResultsCrawler access), the package-private Mutable* and @Retriever classes remain
-  // inaccessible. These tests enforce the architectural boundary.
+  // The named-object bases are reusable public API, not model implementations; the crawl package
+  // remains internal. These tests enforce the architectural boundary.
   @Test
   public void model() {
 
@@ -142,6 +146,13 @@ public class ModelTest {
   }
 
   @Test
+  public void reusableNamedObjectBasesArePublicAndNotModelImplementations() {
+    assertPublicUnclassifiedSupportBase(AbstractNamedObject.class);
+    assertPublicUnclassifiedSupportBase(AbstractNamedObjectWithAttributes.class);
+    assertPublicUnclassifiedSupportBase(AbstractCatalog.class);
+  }
+
+  @Test
   public void packageCycles() {
     slices()
         .matching("schemacrawler.(**)..")
@@ -150,5 +161,10 @@ public class ModelTest {
         .beFreeOfCycles()
         .because("packages should have a clear, acyclic dependency structure")
         .check(classes);
+  }
+
+  private void assertPublicUnclassifiedSupportBase(final Class<?> supportBase) {
+    assertThat(Modifier.isPublic(supportBase.getModifiers()), is(true));
+    assertThat(supportBase.isAnnotationPresent(ModelImplementation.class), is(false));
   }
 }

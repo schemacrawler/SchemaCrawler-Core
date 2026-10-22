@@ -128,7 +128,7 @@ class AttributesLoader extends AbstractERModelLoader<AttributesLoaderOptions> {
 
   private void loadRemarks(final Catalog catalog, final CatalogAttributes catalogAttributes) {
     for (final TableAttributes tableAttributes : catalogAttributes.getTables()) {
-      final Optional<Table> lookupTable =
+      final Optional<? extends Table> lookupTable =
           catalog.lookupTable(tableAttributes.getSchema(), tableAttributes.getName());
       final Table table;
       if (lookupTable.isEmpty()) {

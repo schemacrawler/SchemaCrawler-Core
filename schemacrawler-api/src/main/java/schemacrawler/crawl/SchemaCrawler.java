@@ -54,14 +54,15 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.RoutineType;
+import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.LimitOptions;
 import schemacrawler.schemacrawler.LoadOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaInfoLevel;
-import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.exceptions.DatabaseAccessException;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
@@ -213,7 +214,7 @@ public final class SchemaCrawler {
                 retriever.retrieveRoutines(routineTypes, limitOptions.get(ruleForRoutineInclusion)))
         .submit();
 
-    final NamedObjectList<MutableRoutine> allRoutines = catalog.getAllRoutines();
+    final NamedObjectIndex<MutableRoutine> allRoutines = catalog.getAllRoutines();
     LOGGER.log(Level.INFO, new StringFormat("Retrieved %d routines", allRoutines.size()));
     if (allRoutines.isEmpty()) {
       return;
@@ -252,7 +253,7 @@ public final class SchemaCrawler {
             () -> retriever.retrieveSchemas(options.limitOptions().get(ruleForSchemaInclusion)))
         .submit();
 
-    final NamedObjectList<SchemaReference> schemas = retriever.getAllSchemas();
+    final NamedObjectIndex<Schema> schemas = retriever.getAllSchemas();
     if (schemas.isEmpty()) {
       throw new ExecutionRuntimeException("No matching schemas found");
     }
@@ -342,7 +343,7 @@ public final class SchemaCrawler {
             })
         .submit();
 
-    final NamedObjectList<MutableTable> allTables = catalog.getAllTables();
+    final NamedObjectIndex<MutableTable> allTables = catalog.getAllTables();
     LOGGER.log(Level.INFO, new StringFormat("Retrieved %d tables", allTables.size()));
     if (allTables.isEmpty()) {
       return;

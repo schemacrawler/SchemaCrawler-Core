@@ -49,7 +49,7 @@ final class TriggerRetriever extends AbstractRetriever {
    * @throws SQLException On a SQL exception
    */
   void retrieveTriggerInformation() throws SQLException {
-    if (catalog.getTables().isEmpty()) {
+    if (!catalog.hasTables()) {
       LOGGER.log(Level.FINE, "No tables found");
       return;
     }
@@ -133,7 +133,7 @@ final class TriggerRetriever extends AbstractRetriever {
     trigger.withQuoting(getRetrieverConnection().getIdentifiers());
 
     trigger.setEventManipulationTypes(eventManipulationTypes);
-    trigger.addAttributes(results.getAttributes());
+    trigger.addAttributesFrom(results.getAttributes());
 
     // Add trigger to the table
     table.addTrigger(trigger);
@@ -189,8 +189,8 @@ final class TriggerRetriever extends AbstractRetriever {
   private void retrieveTriggerOverSchemas(final Query triggerInformationSql) throws SQLException {
     final String name = "trigger definitions";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
-      if (catalog.getTables(schema).isEmpty()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

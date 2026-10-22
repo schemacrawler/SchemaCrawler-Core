@@ -25,12 +25,12 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import schemacrawler.inclusionrule.IncludeAll;
+import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.InformationSchemaKey;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.InformationSchemaViewsBuilder;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
-import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.SchemaRetrievalOptions;
 import schemacrawler.schemacrawler.SchemaRetrievalOptionsBuilder;
 import schemacrawler.test.utility.WithTestDatabase;
@@ -83,8 +83,8 @@ public class SchemaRetrieverTest {
 
     verify(databaseMetaData, times(0)).getSchemas();
     assertThat(
-        schemaRetriever.getAllSchemas().values().stream()
-            .map(SchemaReference::getFullName)
+        schemaRetriever.getAllSchemas().getObjects().stream()
+            .map(Schema::getFullName)
             .collect(toList()),
         is(
             asList(

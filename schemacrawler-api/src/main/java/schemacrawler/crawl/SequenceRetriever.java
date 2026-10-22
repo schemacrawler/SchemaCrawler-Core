@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.filter.InclusionRuleFilter;
 import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schemacrawler.CrawlOptions;
@@ -64,7 +65,7 @@ final class SequenceRetriever extends AbstractRetriever {
     }
     final Query sequencesDefinitionSql = informationSchemaViews.getQuery(SEQUENCES);
 
-    final NamedObjectList<SchemaReference> schemas = getAllSchemas();
+    final NamedObjectIndex<Schema> schemas = getAllSchemas();
 
     final String name = "sequences";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
@@ -79,7 +80,7 @@ final class SequenceRetriever extends AbstractRetriever {
         final String sequenceName = results.getString("SEQUENCE_NAME");
 
         final Schema schema = new SchemaReference(catalogName, schemaName);
-        if (!schemas.contains(schema)) {
+        if (!schemas.containsKey(schema.key())) {
           continue;
         }
 
@@ -100,7 +101,7 @@ final class SequenceRetriever extends AbstractRetriever {
           sequence.setIncrement(longIncrement);
           sequence.setCycle(cycle);
 
-          sequence.addAttributes(results.getAttributes());
+          sequence.addAttributesFrom(results.getAttributes());
 
           catalog.addSequence(sequence);
           retrievalCounts.countIncluded();

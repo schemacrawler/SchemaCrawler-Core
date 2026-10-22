@@ -20,6 +20,7 @@ import java.sql.Statement;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.plugin.EnumDataTypeHelper;
 import schemacrawler.plugin.EnumDataTypeInfo;
 import schemacrawler.schema.Schema;
@@ -89,11 +90,11 @@ final class TableExtRetriever extends AbstractRetriever {
       final EnumDataTypeHelper enumDataTypeHelper =
           getRetrieverConnection().getEnumDataTypeHelper();
 
-      final NamedObjectList<MutableTable> tables = catalog.getAllTables();
-      for (final MutableTable table : tables) {
+      final NamedObjectIndex<MutableTable> tables = catalog.getAllTables();
+      for (final MutableTable table : tables.snapshot()) {
         retrievalCounts.count();
-        final NamedObjectList<MutableColumn> columns = table.getAllColumns();
-        for (final MutableColumn column : columns) {
+        final NamedObjectIndex<MutableColumn> columns = table.getAllColumns();
+        for (final MutableColumn column : columns.snapshot()) {
           MutableColumnDataType columnDataType = (MutableColumnDataType) column.getColumnDataType();
 
           // Check for enumerated column data-types
@@ -211,7 +212,7 @@ final class TableExtRetriever extends AbstractRetriever {
 
         table.setDefinition(definition);
 
-        table.addAttributes(results.getAttributes());
+        table.addAttributesFrom(results.getAttributes());
         retrievalCounts.countIncluded();
       }
     } catch (final Exception e) {
@@ -247,7 +248,7 @@ final class TableExtRetriever extends AbstractRetriever {
     }
 
     final MutableColumn column = columnOptional.get();
-    column.addAttributes(results.getAttributes());
+    column.addAttributesFrom(results.getAttributes());
     return true;
   }
 
@@ -267,7 +268,7 @@ final class TableExtRetriever extends AbstractRetriever {
     }
 
     final MutableTable table = tableOptional.get();
-    table.addAttributes(results.getAttributes());
+    table.addAttributesFrom(results.getAttributes());
 
     return true;
   }
@@ -296,8 +297,8 @@ final class TableExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "columns with attibutes over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
-      if (catalog.getTables(schema).isEmpty()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);
@@ -346,8 +347,8 @@ final class TableExtRetriever extends AbstractRetriever {
       throws SQLException {
     final String name = "tables with attributes over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : getAllSchemas()) {
-      if (catalog.getTables(schema).isEmpty()) {
+    for (final Schema schema : getAllSchemas().snapshot()) {
+      if (!catalog.hasTables(schema)) {
         continue;
       }
       try (final Connection connection = getRetrieverConnection().getConnection(name);

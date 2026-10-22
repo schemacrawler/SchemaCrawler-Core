@@ -12,6 +12,8 @@ import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
+import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.schema.CheckOptionType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -22,7 +24,8 @@ final class MutableView extends MutableTable implements View {
 
   @Serial private static final long serialVersionUID = 3257290248802284852L;
 
-  private final NamedObjectList<MutableTable> tableUsage = new NamedObjectList<>();
+  private final BuildableDatabaseObjectIndex<MutableTable> tableUsage =
+      new ConcurrentDatabaseObjectIndex<>();
   private CheckOptionType checkOption;
   private boolean updatable;
 
@@ -44,7 +47,7 @@ final class MutableView extends MutableTable implements View {
   /** {@inheritDoc} */
   @Override
   public Collection<Table> getTableUsage() {
-    return List.copyOf(tableUsage.values());
+    return List.copyOf(tableUsage.getObjects());
   }
 
   /** {@inheritDoc} */

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Table;
@@ -24,14 +25,14 @@ final class TablesGraph extends DirectedGraph<Table> {
 
   private static final Logger LOGGER = Logger.getLogger(TablesGraph.class.getName());
 
-  TablesGraph(final NamedObjectList<MutableTable> tables) {
+  TablesGraph(final NamedObjectIndex<MutableTable> tables) {
     super("catalog");
 
     if (tables == null) {
       return;
     }
 
-    for (final Table table : tables) {
+    for (final Table table : tables.snapshot()) {
       addVertex(table);
       for (final ForeignKey foreignKey : table.getForeignKeys()) {
         for (final ColumnReference columnRef : foreignKey) {

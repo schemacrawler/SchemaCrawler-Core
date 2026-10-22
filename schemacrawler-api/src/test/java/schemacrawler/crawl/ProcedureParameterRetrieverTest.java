@@ -12,6 +12,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static schemacrawler.schema.ParameterModeType.in;
 import static schemacrawler.schema.ParameterModeType.inOut;
@@ -30,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.IncludeAll;
+import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.ParameterModeType;
 import schemacrawler.schema.ProcedureParameter;
 import schemacrawler.schemacrawler.MetadataRetrievalStrategy;
@@ -40,6 +45,34 @@ import us.fatehi.test.utility.TestObjectUtility.Results;
 
 @DisableLogging
 public class ProcedureParameterRetrieverTest extends AbstractParameterRetrieverTest {
+
+  @Test
+  public void metadataTraversalVisitsOverloadsWithoutComparingIncompleteRoutines()
+      throws SQLException {
+    when(retrieverConnection.get(procedureParametersRetrievalStrategy))
+        .thenReturn(MetadataRetrievalStrategy.metadata);
+    final SchemaReference schema = new SchemaReference(null, null);
+    final MutableProcedure first = spy(new MutableProcedure(schema, "run", "first"));
+    final MutableProcedure second = spy(new MutableProcedure(schema, "run", "second"));
+    final MutableFunction excluded = spy(new MutableFunction(schema, "other", "other"));
+    for (final MutableRoutine routine : new MutableRoutine[] {second, excluded, first}) {
+      doThrow(new AssertionError("Retrieval must not compare routines"))
+          .when(routine)
+          .compareTo(any(NamedObject.class));
+      allRoutines.add(routine);
+    }
+    final DatabaseMetaData metaData = connection.getMetaData();
+    when(metaData.getProcedureColumns(any(), any(), any(), any()))
+        .thenAnswer(
+            invocation ->
+                mockResultSet(new Results(new String[] {"PROCEDURE_NAME"}, new Object[0][])));
+
+    ((ProcedureParameterRetriever) retriever)
+        .retrieveProcedureParameters(allRoutines, new IncludeAll());
+
+    verify(metaData, times(2)).getProcedureColumns(null, null, "run", null);
+    assertThat(allRoutines.size(), is(3));
+  }
 
   @Test
   public void testParameterModeMapping() throws SQLException {
@@ -66,7 +99,8 @@ public class ProcedureParameterRetrieverTest extends AbstractParameterRetrieverT
       ((ProcedureParameterRetriever) retriever)
           .retrieveProcedureParameters(allRoutines, new IncludeAll());
 
-      final MutableProcedure procedure = (MutableProcedure) allRoutines.iterator().next();
+      final MutableProcedure procedure =
+          (MutableProcedure) allRoutines.getObjects().iterator().next();
       final Optional<MutableProcedureParameter> paramOptional =
           procedure.lookupParameter(paramName);
 
@@ -100,7 +134,8 @@ public class ProcedureParameterRetrieverTest extends AbstractParameterRetrieverT
     ((ProcedureParameterRetriever) retriever)
         .retrieveProcedureParameters(allRoutines, new IncludeAll());
 
-    final MutableProcedure procedure = (MutableProcedure) allRoutines.iterator().next();
+    final MutableProcedure procedure =
+        (MutableProcedure) allRoutines.getObjects().iterator().next();
     assertThat(procedure.getParameters(), hasSize(1));
 
     final ProcedureParameter parameter = procedure.getParameters().get(0);
@@ -125,7 +160,8 @@ public class ProcedureParameterRetrieverTest extends AbstractParameterRetrieverT
     ((ProcedureParameterRetriever) retriever)
         .retrieveProcedureParameters(allRoutines, new IncludeAll());
 
-    final MutableProcedure procedure = (MutableProcedure) allRoutines.iterator().next();
+    final MutableProcedure procedure =
+        (MutableProcedure) allRoutines.getObjects().iterator().next();
     assertThat(procedure.getParameters(), hasSize(1));
 
     final ProcedureParameter parameter = procedure.getParameters().get(0);

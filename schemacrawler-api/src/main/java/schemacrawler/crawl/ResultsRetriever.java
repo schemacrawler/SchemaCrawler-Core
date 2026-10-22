@@ -18,6 +18,8 @@ import java.sql.SQLException;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.schema.JavaSqlType;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.ResultsColumns;
@@ -36,8 +38,8 @@ final class ResultsRetriever {
 
   private final ResultSetMetaData resultsMetaData;
   private final JavaSqlTypes javaSqlTypes;
-  private final NamedObjectList<Schema> schemas;
-  private final NamedObjectList<Table> tables;
+  private final MapBackedNamedObjectIndex<Schema> schemas;
+  private final ConcurrentDatabaseObjectIndex<Table> tables;
 
   ResultsRetriever(final ResultSet resultSet) throws SQLException {
     // NOTE: Do not check if the result set is closed, since some JDBC
@@ -45,8 +47,8 @@ final class ResultsRetriever {
     requireNonNull(resultSet, "Cannot retrieve metadata for null results");
     resultsMetaData = resultSet.getMetaData();
     javaSqlTypes = new JavaSqlTypes();
-    schemas = new NamedObjectList<>();
-    tables = new NamedObjectList<>();
+    schemas = new MapBackedNamedObjectIndex<>();
+    tables = new ConcurrentDatabaseObjectIndex<>();
   }
 
   /**

@@ -44,7 +44,11 @@ public class SerializationTest {
 
     final Catalog clonedCatalog = SerializationUtils.clone(catalog);
 
-    assertThat(catalog, equalTo(clonedCatalog));
+    assertThat(catalog.equals(clonedCatalog), is(false));
+    assertThat(clonedCatalog.equals(catalog), is(false));
+    assertThat(clonedCatalog.hashCode(), is(System.identityHashCode(clonedCatalog)));
+    assertThat(clonedCatalog.getAttributes(), equalTo(catalog.getAttributes()));
+    assertThat(clonedCatalog.getSchemas(), equalTo(catalog.getSchemas()));
 
     assertThat("Could not obtain catalog", clonedCatalog, notNullValue());
     assertThat("Could not find any schemas", clonedCatalog.getSchemas(), is(not(empty())));

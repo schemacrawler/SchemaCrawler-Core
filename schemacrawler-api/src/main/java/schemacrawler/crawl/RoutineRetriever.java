@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.filter.InclusionRuleFilter;
 import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Function;
 import schemacrawler.schema.FunctionReturnType;
 import schemacrawler.schema.NamedObjectKey;
@@ -34,7 +35,6 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.logging.UtilityLogger;
 import us.fatehi.utility.string.StringFormat;
@@ -70,7 +70,7 @@ final class RoutineRetriever extends AbstractRetriever {
 
   private boolean createFunction(
       final MetadataResultSet results,
-      final NamedObjectList<SchemaReference> schemas,
+      final NamedObjectIndex<Schema> schemas,
       final InclusionRuleFilter<Function> functionFilter) {
     final String catalogName = normalizeCatalogName(results.getString("FUNCTION_CAT"));
     final String schemaName = normalizeSchemaName(results.getString("FUNCTION_SCHEM"));
@@ -88,7 +88,7 @@ final class RoutineRetriever extends AbstractRetriever {
     final String remarks = results.getString("REMARKS");
     final String specificName = results.getString("SPECIFIC_NAME");
 
-    final Optional<SchemaReference> optionalSchema =
+    final Optional<Schema> optionalSchema =
         schemas.lookup(new NamedObjectKey(catalogName, schemaName));
     if (optionalSchema.isEmpty()) {
       return false;
@@ -99,7 +99,7 @@ final class RoutineRetriever extends AbstractRetriever {
     if (functionFilter.test(function)) {
       function.setReturnType(functionType);
       function.setRemarks(remarks);
-      function.addAttributes(results.getAttributes());
+      function.addAttributesFrom(results.getAttributes());
 
       catalog.addRoutine(function);
       return true;
@@ -110,7 +110,7 @@ final class RoutineRetriever extends AbstractRetriever {
 
   private boolean createProcedure(
       final MetadataResultSet results,
-      final NamedObjectList<SchemaReference> schemas,
+      final NamedObjectIndex<Schema> schemas,
       final InclusionRuleFilter<Procedure> procedureFilter) {
     final String catalogName = normalizeCatalogName(results.getString("PROCEDURE_CAT"));
     final String schemaName = normalizeSchemaName(results.getString("PROCEDURE_SCHEM"));
@@ -127,7 +127,7 @@ final class RoutineRetriever extends AbstractRetriever {
     final String remarks = results.getString("REMARKS");
     final String specificName = results.getString("SPECIFIC_NAME");
 
-    final Optional<SchemaReference> optionalSchema =
+    final Optional<Schema> optionalSchema =
         schemas.lookup(new NamedObjectKey(catalogName, schemaName));
     if (optionalSchema.isEmpty()) {
       return false;
@@ -138,7 +138,7 @@ final class RoutineRetriever extends AbstractRetriever {
     if (procedureFilter.test(procedure)) {
       procedure.setReturnType(procedureType);
       procedure.setRemarks(remarks);
-      procedure.addAttributes(results.getAttributes());
+      procedure.addAttributesFrom(results.getAttributes());
 
       catalog.addRoutine(procedure);
       return true;
@@ -149,7 +149,7 @@ final class RoutineRetriever extends AbstractRetriever {
 
   private void retrieveFunctions(final InclusionRule routineInclusionRule) throws SQLException {
 
-    final NamedObjectList<SchemaReference> schemas = getAllSchemas();
+    final NamedObjectIndex<Schema> schemas = getAllSchemas();
 
     final InclusionRuleFilter<Function> functionFilter =
         new InclusionRuleFilter<>(routineInclusionRule, false);
@@ -177,8 +177,7 @@ final class RoutineRetriever extends AbstractRetriever {
   }
 
   private void retrieveFunctionsFromDataDictionary(
-      final NamedObjectList<SchemaReference> schemas,
-      final InclusionRuleFilter<Function> functionFilter)
+      final NamedObjectIndex<Schema> schemas, final InclusionRuleFilter<Function> functionFilter)
       throws SQLException {
     final InformationSchemaViews informationSchemaViews =
         getRetrieverConnection().getInformationSchemaViews();
@@ -203,12 +202,11 @@ final class RoutineRetriever extends AbstractRetriever {
   }
 
   private void retrieveFunctionsFromMetadata(
-      final NamedObjectList<SchemaReference> schemas,
-      final InclusionRuleFilter<Function> functionFilter)
+      final NamedObjectIndex<Schema> schemas, final InclusionRuleFilter<Function> functionFilter)
       throws SQLException {
     final String name = "functions from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       LOGGER.log(Level.INFO, new StringFormat("Retrieving %s for %s", name, schema.key()));
 
       final String catalogName = schema.getCatalogName();
@@ -240,8 +238,7 @@ final class RoutineRetriever extends AbstractRetriever {
   }
 
   private void retrieveFunctionsOverSchemas(
-      final NamedObjectList<SchemaReference> schemas,
-      final InclusionRuleFilter<Function> functionFilter)
+      final NamedObjectIndex<Schema> schemas, final InclusionRuleFilter<Function> functionFilter)
       throws SQLException {
 
     final InformationSchemaViews informationSchemaViews =
@@ -253,7 +250,7 @@ final class RoutineRetriever extends AbstractRetriever {
 
     final String name = "functions from data dictionary over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       try (final Connection connection = getRetrieverConnection().getConnection(name);
           final SchemaSetter schemaSetter = new SchemaSetter(connection, schema);
           final Statement statement = connection.createStatement();
@@ -277,7 +274,7 @@ final class RoutineRetriever extends AbstractRetriever {
 
   private void retrieveProcedures(final InclusionRule routineInclusionRule) throws SQLException {
 
-    final NamedObjectList<SchemaReference> schemas = getAllSchemas();
+    final NamedObjectIndex<Schema> schemas = getAllSchemas();
 
     final InclusionRuleFilter<Procedure> procedureFilter =
         new InclusionRuleFilter<>(routineInclusionRule, false);
@@ -310,8 +307,7 @@ final class RoutineRetriever extends AbstractRetriever {
   }
 
   private void retrieveProceduresFromDataDictionary(
-      final NamedObjectList<SchemaReference> schemas,
-      final InclusionRuleFilter<Procedure> procedureFilter)
+      final NamedObjectIndex<Schema> schemas, final InclusionRuleFilter<Procedure> procedureFilter)
       throws SQLException {
     final InformationSchemaViews informationSchemaViews =
         getRetrieverConnection().getInformationSchemaViews();
@@ -335,12 +331,11 @@ final class RoutineRetriever extends AbstractRetriever {
   }
 
   private void retrieveProceduresFromMetadata(
-      final NamedObjectList<SchemaReference> schemas,
-      final InclusionRuleFilter<Procedure> procedureFilter)
+      final NamedObjectIndex<Schema> schemas, final InclusionRuleFilter<Procedure> procedureFilter)
       throws SQLException {
     final String name = "procedures from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       LOGGER.log(Level.INFO, new StringFormat("%s for %s".formatted(name, schema)));
 
       final String catalogName = schema.getCatalogName();
@@ -370,8 +365,7 @@ final class RoutineRetriever extends AbstractRetriever {
   }
 
   private void retrieveProceduresOverSchemas(
-      final NamedObjectList<SchemaReference> schemas,
-      final InclusionRuleFilter<Procedure> procedureFilter)
+      final NamedObjectIndex<Schema> schemas, final InclusionRuleFilter<Procedure> procedureFilter)
       throws SQLException {
 
     final InformationSchemaViews informationSchemaViews =
@@ -383,7 +377,7 @@ final class RoutineRetriever extends AbstractRetriever {
 
     final String name = "procedures from data dictionary over schemas";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       try (final Connection connection = getRetrieverConnection().getConnection(name);
           final SchemaSetter schemaSetter = new SchemaSetter(connection, schema);
           final Statement statement = connection.createStatement();

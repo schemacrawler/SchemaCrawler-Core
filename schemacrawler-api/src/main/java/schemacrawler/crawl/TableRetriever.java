@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.filter.InclusionRuleFilter;
 import schemacrawler.inclusionrule.InclusionRule;
+import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -28,7 +29,6 @@ import schemacrawler.schema.TableTypes;
 import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
-import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.string.StringFormat;
 
@@ -52,7 +52,7 @@ final class TableRetriever extends AbstractRetriever {
       throws SQLException {
     requireNonNull(tableTypes, "No table types provided");
 
-    final NamedObjectList<SchemaReference> schemas = getAllSchemas();
+    final NamedObjectIndex<Schema> schemas = getAllSchemas();
 
     final InclusionRuleFilter<Table> tableFilter =
         new InclusionRuleFilter<>(tableInclusionRule, false);
@@ -76,7 +76,7 @@ final class TableRetriever extends AbstractRetriever {
 
   private boolean createTable(
       final MetadataResultSet results,
-      final NamedObjectList<SchemaReference> schemas,
+      final NamedObjectIndex<Schema> schemas,
       final InclusionRuleFilter<Table> tableFilter,
       final TableTypes filteredTableTypes) {
     final String catalogName = normalizeCatalogName(results.getString("TABLE_CAT"));
@@ -88,7 +88,7 @@ final class TableRetriever extends AbstractRetriever {
     final String tableTypeString = results.getString("TABLE_TYPE");
     final String remarks = results.getString("REMARKS");
 
-    final Optional<SchemaReference> optionalSchema =
+    final Optional<Schema> optionalSchema =
         schemas.lookup(new NamedObjectKey(catalogName, schemaName));
     if (optionalSchema.isEmpty()) {
       return false;
@@ -117,7 +117,7 @@ final class TableRetriever extends AbstractRetriever {
     if (tableFilter.test(table)) {
       table.setTableType(tableType);
       table.setRemarks(remarks);
-      table.addAttributes(results.getAttributes());
+      table.addAttributesFrom(results.getAttributes());
 
       catalog.addTable(table);
       return true;
@@ -127,7 +127,7 @@ final class TableRetriever extends AbstractRetriever {
   }
 
   private void retrieveTablesFromDataDictionary(
-      final NamedObjectList<SchemaReference> schemas,
+      final NamedObjectIndex<Schema> schemas,
       final TableTypes tableTypes,
       final InclusionRuleFilter<Table> tableFilter)
       throws SQLException {
@@ -161,14 +161,14 @@ final class TableRetriever extends AbstractRetriever {
   }
 
   private void retrieveTablesFromMetadata(
-      final NamedObjectList<SchemaReference> schemas,
+      final NamedObjectIndex<Schema> schemas,
       final String tableNamePattern,
       final TableTypes tableTypes,
       final InclusionRuleFilter<Table> tableFilter) {
 
     final String name = "tables from metadata";
     final RetrievalCounts retrievalCounts = new RetrievalCounts(name);
-    for (final Schema schema : schemas) {
+    for (final Schema schema : schemas.snapshot()) {
       LOGGER.log(Level.INFO, new StringFormat("Retrieving %s for %s", name, schema));
 
       final TableTypes supportedTableTypes = getRetrieverConnection().getTableTypes();
