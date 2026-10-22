@@ -15,7 +15,8 @@ import schemacrawler.schema.DependantObject;
  * Combines dependent-object reads with optional keyed membership mutation.
  *
  * <p>Parent/name lookup follows {@link DependantObjectIndex}; mutations follow {@link
- * BuildableIndex}. The concrete implementation specifies membership mutability and thread safety.
+ * BuildableNamedObjectIndex}. The concrete implementation specifies membership mutability and
+ * thread safety.
  *
  * @param <DO> Dependent-object type
  * @param <D> Parent database-object type

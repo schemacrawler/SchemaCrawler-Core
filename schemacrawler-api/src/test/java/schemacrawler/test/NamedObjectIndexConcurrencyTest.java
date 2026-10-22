@@ -22,7 +22,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
-import schemacrawler.namedobject.BuildableIndex;
+import schemacrawler.namedobject.BuildableNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Routine;
@@ -92,7 +92,7 @@ public class NamedObjectIndexConcurrencyTest {
     verifyConcurrentMembership(NamedObjectIndexes.<Table>newBuildableNamedObjectIndex());
   }
 
-  private static <I extends NamedObjectIndex<Table> & BuildableIndex<Table>>
+  private static <I extends NamedObjectIndex<Table> & BuildableNamedObjectIndex<Table>>
       void verifyConcurrentMembership(final I index) throws Exception {
     final CountDownLatch firstWrites = new CountDownLatch(4);
     final CountDownLatch firstTraversal = new CountDownLatch(1);

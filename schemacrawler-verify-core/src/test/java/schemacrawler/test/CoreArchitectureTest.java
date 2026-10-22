@@ -23,7 +23,7 @@ import com.tngtech.archunit.core.domain.JavaModifier;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.crawl.SchemaCrawler;
-import schemacrawler.namedobject.BuildableIndex;
+import schemacrawler.namedobject.BuildableNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 
@@ -117,8 +117,7 @@ public class CoreArchitectureTest extends BaseArchitectureTest {
         classes.stream()
             .filter(
                 javaClass ->
-                    javaClass.isAssignableTo(NamedObjectIndex.class)
-                        || javaClass.isAssignableTo(BuildableIndex.class))
+                    javaClass.isAssignableTo(NamedObjectIndex.class))
             .filter(
                 javaClass ->
                     !javaClass.reflect().isSealed()
