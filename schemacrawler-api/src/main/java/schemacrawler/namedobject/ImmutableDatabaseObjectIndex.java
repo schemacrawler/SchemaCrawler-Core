@@ -31,7 +31,7 @@ import schemacrawler.schema.NamedObjectKey;
  *
  * @param <D> Database-object type
  */
-public final class ImmutableDatabaseObjectIndex<D extends DatabaseObject>
+final class ImmutableDatabaseObjectIndex<D extends DatabaseObject>
     extends AbstractDatabaseObjectIndex<D> {
 
   @Serial private static final long serialVersionUID = -4924635231319889869L;
@@ -54,7 +54,7 @@ public final class ImmutableDatabaseObjectIndex<D extends DatabaseObject>
    * @param values Objects to index
    * @throws NullPointerException if the collection, an object, or an object's key is null
    */
-  public ImmutableDatabaseObjectIndex(final Collection<? extends D> values) {
+  ImmutableDatabaseObjectIndex(final Collection<? extends D> values) {
     this(values, false);
   }
 
@@ -67,7 +67,7 @@ public final class ImmutableDatabaseObjectIndex<D extends DatabaseObject>
    *     routine specific names; false retains direct exact-key lookup
    * @throws NullPointerException if the collection, an object, or an object's key is null
    */
-  public ImmutableDatabaseObjectIndex(
+  ImmutableDatabaseObjectIndex(
       final Collection<? extends D> values, final boolean supportsOverloads) {
     super(immutableNamedObjectMap(values), supportsOverloads);
   }

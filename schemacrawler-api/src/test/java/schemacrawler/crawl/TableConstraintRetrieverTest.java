@@ -30,6 +30,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraint;
@@ -190,7 +191,8 @@ public class TableConstraintRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     // Create a list of tables to retrieve constraints for
-    final MapBackedNamedObjectIndex<MutableTable> allTables = new MapBackedNamedObjectIndex<>();
+    final MapBackedNamedObjectIndex<MutableTable> allTables =
+        NamedObjectIndexes.newBuildableNamedObjectIndex();
     for (final Table table : catalog.getTables()) {
       if (table instanceof final MutableTable mutableTable) {
         final Collection<TableConstraint> tableConstraints = table.getTableConstraints();
@@ -250,7 +252,8 @@ public class TableConstraintRetrieverTest {
     final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
 
     // Create a list of tables to retrieve constraints for
-    final MapBackedNamedObjectIndex<MutableTable> allTables = new MapBackedNamedObjectIndex<>();
+    final MapBackedNamedObjectIndex<MutableTable> allTables =
+        NamedObjectIndexes.newBuildableNamedObjectIndex();
     for (final Schema schema : catalog.getSchemas()) {
       for (final Table table : catalog.getTables(schema)) {
         if (table instanceof final MutableTable mutableTable) {

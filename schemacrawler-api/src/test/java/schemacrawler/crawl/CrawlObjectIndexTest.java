@@ -24,9 +24,8 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
-import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
-import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.ResultsColumn;
@@ -44,7 +43,7 @@ public class CrawlObjectIndexTest {
     final MutableProcedure later = new MutableProcedure(schema, "run", "specific_z");
     final MutableProcedure earlier = new MutableProcedure(schema, "run", "specific_a");
     final BuildableDatabaseObjectIndex<MutableRoutine> routines =
-        new ConcurrentDatabaseObjectIndex<>(true);
+        NamedObjectIndexes.newBuildableRoutineIndex();
     routines.add(later);
     routines.add(earlier);
 
@@ -79,7 +78,7 @@ public class CrawlObjectIndexTest {
     first.setOrdinalPosition(1);
     second.setOrdinalPosition(2);
     final BuildableDependantObjectIndex<MutableColumn, Table> children =
-        new ConcurrentDependantObjectIndex<>();
+        NamedObjectIndexes.newBuildableDependantObjectIndex();
     final BuildableDatabaseObjectIndex<MutableColumn> databaseObjects = children;
     assertThat(children.add(null), is(false));
     assertThat(children.remove(null), is(Optional.empty()));
@@ -247,7 +246,8 @@ public class CrawlObjectIndexTest {
     final MutableView viewZ = new MutableView(schema, "Z_VIEW");
     childA.addForeignKey(foreignKey("FK_A", childA, root));
     childB.addForeignKey(foreignKey("FK_B", childB, root));
-    final BuildableDatabaseObjectIndex<MutableTable> tables = new ConcurrentDatabaseObjectIndex<>();
+    final BuildableDatabaseObjectIndex<MutableTable> tables =
+        NamedObjectIndexes.newBuildableDatabaseObjectIndex();
     for (final MutableTable table : List.of(viewZ, childB, root, viewA, childA, disconnected)) {
       tables.add(table);
     }

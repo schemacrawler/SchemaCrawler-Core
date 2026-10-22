@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
-import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.DatabaseObject;
@@ -53,20 +53,13 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
 
   @Serial private static final long serialVersionUID = 3257290248802284852L;
 
-  private final BuildableDependantObjectIndex<MutableColumn, Table> columns =
-      new ConcurrentDependantObjectIndex<>();
-  private final BuildableDependantObjectIndex<TableConstraint, Table> constraints =
-      new ConcurrentDependantObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutableForeignKey, Table> foreignKeys =
-      new ConcurrentDependantObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutableColumn, Table> hiddenColumns =
-      new ConcurrentDependantObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutableIndex, Table> indexes =
-      new ConcurrentDependantObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutablePrivilege<Table>, Table> privileges =
-      new ConcurrentDependantObjectIndex<>();
-  private final BuildableDependantObjectIndex<MutableTrigger, Table> triggers =
-      new ConcurrentDependantObjectIndex<>();
+  private final BuildableDependantObjectIndex<MutableColumn, Table> columns;
+  private final BuildableDependantObjectIndex<TableConstraint, Table> constraints;
+  private final BuildableDependantObjectIndex<MutableForeignKey, Table> foreignKeys;
+  private final BuildableDependantObjectIndex<MutableColumn, Table> hiddenColumns;
+  private final BuildableDependantObjectIndex<MutableIndex, Table> indexes;
+  private final BuildableDependantObjectIndex<MutablePrivilege<Table>, Table> privileges;
+  private final BuildableDependantObjectIndex<MutableTrigger, Table> triggers;
   private final Set<DatabaseObject> usedByObjects = new HashSet<>();
   private MutablePrimaryKey primaryKey;
   private int sortIndex;
@@ -77,6 +70,14 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   MutableTable(final Schema schema, final String name) {
     super(schema, name);
     requireNotBlank(name, "No table name provided");
+
+    columns = NamedObjectIndexes.newBuildableDependantObjectIndex();
+    constraints = NamedObjectIndexes.newBuildableDependantObjectIndex();
+    foreignKeys = NamedObjectIndexes.newBuildableDependantObjectIndex();
+    hiddenColumns = NamedObjectIndexes.newBuildableDependantObjectIndex();
+    indexes = NamedObjectIndexes.newBuildableDependantObjectIndex();
+    privileges = NamedObjectIndexes.newBuildableDependantObjectIndex();
+    triggers = NamedObjectIndexes.newBuildableDependantObjectIndex();
 
     // Set default values
     definition = "";

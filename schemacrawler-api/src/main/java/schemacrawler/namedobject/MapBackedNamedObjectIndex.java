@@ -48,7 +48,7 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
   private final Map<NamedObjectKey, N> objects;
 
   /** Creates an empty concurrent mutable index. */
-  public MapBackedNamedObjectIndex() {
+  MapBackedNamedObjectIndex() {
     objects = new ConcurrentHashMap<>();
   }
 
@@ -58,7 +58,7 @@ public final class MapBackedNamedObjectIndex<N extends NamedObject>
    * @param values Objects to index; null creates an empty immutable index
    * @throws NullPointerException if an element or its key is null
    */
-  public MapBackedNamedObjectIndex(final Collection<N> values) {
+  MapBackedNamedObjectIndex(final Collection<N> values) {
     if (values == null) {
       objects = Map.of();
     } else {

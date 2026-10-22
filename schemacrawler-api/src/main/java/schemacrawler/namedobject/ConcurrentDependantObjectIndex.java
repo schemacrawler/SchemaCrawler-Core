@@ -25,14 +25,13 @@ import schemacrawler.schema.DependantObject;
  * @param <DO> Dependent-object type
  * @param <D> Parent database-object type
  */
-public final class ConcurrentDependantObjectIndex<
-        DO extends DependantObject<D>, D extends DatabaseObject>
+final class ConcurrentDependantObjectIndex<DO extends DependantObject<D>, D extends DatabaseObject>
     extends AbstractConcurrentIndex<DO> implements BuildableDependantObjectIndex<DO, D> {
 
   @Serial private static final long serialVersionUID = -1089958942591485649L;
 
   /** Creates an empty concurrent index of dependent objects. */
-  public ConcurrentDependantObjectIndex() {}
+  ConcurrentDependantObjectIndex() {}
 
   /** {@inheritDoc} */
   @Override

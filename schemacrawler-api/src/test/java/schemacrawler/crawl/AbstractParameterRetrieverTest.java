@@ -18,7 +18,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
-import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schemacrawler.InformationSchemaViews;
 import schemacrawler.schemacrawler.Query;
@@ -34,7 +35,7 @@ public abstract class AbstractParameterRetrieverTest {
   protected Connection connection;
   protected MutableCatalog catalog;
   protected AbstractRetriever retriever;
-  protected ConcurrentDatabaseObjectIndex<MutableRoutine> allRoutines;
+  protected BuildableDatabaseObjectIndex<MutableRoutine> allRoutines;
   protected RetrieverConnection retrieverConnection;
 
   @BeforeEach
@@ -75,7 +76,7 @@ public abstract class AbstractParameterRetrieverTest {
     createRetriever(options);
 
     // Initialize routines index
-    allRoutines = new ConcurrentDatabaseObjectIndex<>();
+    allRoutines = NamedObjectIndexes.newBuildableDatabaseObjectIndex();
   }
 
   /**

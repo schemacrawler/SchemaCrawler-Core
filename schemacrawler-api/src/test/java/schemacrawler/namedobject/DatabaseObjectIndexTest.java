@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.test;
+package schemacrawler.namedobject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -31,11 +31,6 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
-import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
-import schemacrawler.namedobject.DatabaseObjectIndex;
-import schemacrawler.namedobject.DependantObjectIndex;
-import schemacrawler.namedobject.ImmutableDatabaseObjectIndex;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;

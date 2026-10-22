@@ -34,7 +34,7 @@ public abstract sealed class AbstractConcurrentIndex<D extends DatabaseObject>
   @Serial private static final long serialVersionUID = -1089958942591485649L;
 
   /** Creates an empty concurrent index. */
-  public AbstractConcurrentIndex() {
+  AbstractConcurrentIndex() {
     this(false);
   }
 
@@ -43,7 +43,7 @@ public abstract sealed class AbstractConcurrentIndex<D extends DatabaseObject>
    *
    * @param supportsOverloads Whether schema/name queries match appended key components
    */
-  protected AbstractConcurrentIndex(final boolean supportsOverloads) {
+  AbstractConcurrentIndex(final boolean supportsOverloads) {
     super(new ConcurrentHashMap<>(), supportsOverloads);
   }
 

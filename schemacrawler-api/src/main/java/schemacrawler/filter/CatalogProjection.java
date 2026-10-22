@@ -13,8 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import schemacrawler.namedobject.AbstractCatalog;
-import schemacrawler.namedobject.ImmutableDatabaseObjectIndex;
-import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseInfo;
@@ -71,13 +70,13 @@ final class CatalogProjection
       final Collection<Synonym> synonyms) {
     super(
         new SchemaReference(),
-        new MapBackedNamedObjectIndex<>(databaseUsers),
-        new MapBackedNamedObjectIndex<>(schemas),
-        new ImmutableDatabaseObjectIndex<>(columnDataTypes),
-        new ImmutableDatabaseObjectIndex<>(tables),
-        new ImmutableDatabaseObjectIndex<>(routines, true),
-        new ImmutableDatabaseObjectIndex<>(sequences),
-        new ImmutableDatabaseObjectIndex<>(synonyms));
+        NamedObjectIndexes.newImmutableNamedObjectIndex(databaseUsers),
+        NamedObjectIndexes.newImmutableSchemaIndex(schemas),
+        NamedObjectIndexes.newImmutableDatabaseObjectIndex(columnDataTypes),
+        NamedObjectIndexes.newImmutableDatabaseObjectIndex(tables),
+        NamedObjectIndexes.newImmutableRoutineIndex(routines),
+        NamedObjectIndexes.newImmutableDatabaseObjectIndex(sequences),
+        NamedObjectIndexes.newImmutableDatabaseObjectIndex(synonyms));
     this.crawlInfo = crawlInfo;
     this.databaseInfo = databaseInfo;
     this.jdbcDriverInfo = jdbcDriverInfo;

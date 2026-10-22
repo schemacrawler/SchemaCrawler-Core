@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import schemacrawler.namedobject.AbstractNamedObject;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.ResultsColumn;
 import schemacrawler.schema.ResultsColumns;
 
@@ -23,7 +24,7 @@ final class MutableResultsColumns extends AbstractNamedObject implements Results
   @Serial private static final long serialVersionUID = 5204766782914559188L;
 
   private final MapBackedNamedObjectIndex<MutableResultsColumn> columns =
-      new MapBackedNamedObjectIndex<>();
+      NamedObjectIndexes.newBuildableNamedObjectIndex();
 
   MutableResultsColumns(final String name) {
     super(name);

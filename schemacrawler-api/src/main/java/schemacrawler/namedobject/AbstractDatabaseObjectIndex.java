@@ -49,7 +49,7 @@ abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
    * @param objects Storage map with non-null objects and complete keys
    * @throws NullPointerException if the storage map is null
    */
-  public AbstractDatabaseObjectIndex(final Map<NamedObjectKey, D> objects) {
+  AbstractDatabaseObjectIndex(final Map<NamedObjectKey, D> objects) {
     this(objects, false);
   }
 
@@ -60,7 +60,7 @@ abstract sealed class AbstractDatabaseObjectIndex<D extends DatabaseObject>
    * @param supportsOverloads Whether schema/name queries match appended key components
    * @throws NullPointerException if the storage map is null
    */
-  public AbstractDatabaseObjectIndex(
+  AbstractDatabaseObjectIndex(
       final Map<NamedObjectKey, D> objects, final boolean supportsOverloads) {
     this.objects = requireNonNull(objects, "Objects cannot be null");
     this.supportsOverloads = supportsOverloads;

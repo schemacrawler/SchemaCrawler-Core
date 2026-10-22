@@ -83,6 +83,35 @@ public class CoreArchitectureTest extends BaseArchitectureTest {
   }
 
   @Test
+  public void namedObjectIndexConstructorsArePackagePrivate() {
+    final List<String> exposedConstructors =
+        classes.stream()
+            .filter(javaClass -> javaClass.isAssignableTo(NamedObjectIndex.class))
+            .flatMap(javaClass -> javaClass.getConstructors().stream())
+            .filter(
+                constructor ->
+                    constructor.getModifiers().contains(JavaModifier.PUBLIC)
+                        || constructor.getModifiers().contains(JavaModifier.PROTECTED)
+                        || constructor.getModifiers().contains(JavaModifier.PRIVATE))
+            .map(constructor -> constructor.getFullName())
+            .toList();
+    assertThat("Index constructors must be package-private", exposedConstructors, empty());
+  }
+
+  @Test
+  public void namedObjectIndexesAreCreatedThroughFactories() {
+    final List<String> directConstruction =
+        classes.stream()
+            .filter(javaClass -> !javaClass.getPackageName().equals("schemacrawler.namedobject"))
+            .flatMap(javaClass -> javaClass.getConstructorCallsFromSelf().stream())
+            .filter(call -> call.getTarget().getOwner().isAssignableTo(NamedObjectIndex.class))
+            .map(call -> call.getDescription())
+            .toList();
+    assertThat(
+        "Index construction must use explicit named-object factories", directConstruction, empty());
+  }
+
+  @Test
   public void namedObjectIndexHierarchyIsSealed() {
     final List<String> extensibleIndexes =
         classes.stream()

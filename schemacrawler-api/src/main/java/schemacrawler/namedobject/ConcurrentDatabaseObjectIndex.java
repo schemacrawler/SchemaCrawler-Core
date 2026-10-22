@@ -19,13 +19,13 @@ import schemacrawler.schema.DatabaseObject;
  *
  * @param <D> Database-object type
  */
-public final class ConcurrentDatabaseObjectIndex<D extends DatabaseObject>
+final class ConcurrentDatabaseObjectIndex<D extends DatabaseObject>
     extends AbstractConcurrentIndex<D> {
 
   @Serial private static final long serialVersionUID = -1089958942591485649L;
 
   /** Creates an empty concurrent index. */
-  public ConcurrentDatabaseObjectIndex() {}
+  ConcurrentDatabaseObjectIndex() {}
 
   /**
    * Creates an empty concurrent index with optional overload-aware schema/name lookup.
@@ -33,7 +33,7 @@ public final class ConcurrentDatabaseObjectIndex<D extends DatabaseObject>
    * @param supportsOverloads Whether schema/name queries match appended key components, as for
    *     routine specific names; false retains direct exact-key lookup
    */
-  public ConcurrentDatabaseObjectIndex(final boolean supportsOverloads) {
+  ConcurrentDatabaseObjectIndex(final boolean supportsOverloads) {
     super(supportsOverloads);
   }
 }

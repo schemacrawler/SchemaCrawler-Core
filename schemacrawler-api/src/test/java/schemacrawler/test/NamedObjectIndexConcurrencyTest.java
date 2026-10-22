@@ -21,10 +21,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
+import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.BuildableIndex;
-import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
-import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
@@ -36,13 +36,14 @@ public class NamedObjectIndexConcurrencyTest {
 
   @Test
   public void concurrentDatabaseIndexRetainsKeysDuringOverlappingTraversal() throws Exception {
-    verifyConcurrentMembership(new ConcurrentDatabaseObjectIndex<Table>());
+    verifyConcurrentMembership(NamedObjectIndexes.<Table>newBuildableDatabaseObjectIndex());
   }
 
   @Test
   public void schemaAndOverloadKeyTraversalToleratesConcurrentMembershipChanges() throws Exception {
     final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final ConcurrentDatabaseObjectIndex<Routine> index = new ConcurrentDatabaseObjectIndex<>(true);
+    final BuildableDatabaseObjectIndex<Routine> index =
+        NamedObjectIndexes.newBuildableRoutineIndex();
     final Routine retained = new LightProcedure(schema, "run", "retained");
     index.add(retained);
     final List<Routine> detached = index.getObjects(schema);
@@ -88,7 +89,7 @@ public class NamedObjectIndexConcurrencyTest {
 
   @Test
   public void mutableMapBackedIndexRetainsKeysDuringOverlappingTraversal() throws Exception {
-    verifyConcurrentMembership(new MapBackedNamedObjectIndex<Table>());
+    verifyConcurrentMembership(NamedObjectIndexes.<Table>newBuildableNamedObjectIndex());
   }
 
   private static <I extends NamedObjectIndex<Table> & BuildableIndex<Table>>

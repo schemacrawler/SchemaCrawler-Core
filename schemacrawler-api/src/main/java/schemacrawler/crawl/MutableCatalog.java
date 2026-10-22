@@ -14,9 +14,9 @@ import java.io.Serial;
 import java.util.Optional;
 import schemacrawler.namedobject.AbstractCatalog;
 import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
-import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.CrawlInfo;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.NamedObjectKey;
@@ -54,13 +54,13 @@ final class MutableCatalog
         title,
         databaseInfo,
         jdbcDriverInfo,
-        new MapBackedNamedObjectIndex<>(),
-        new MapBackedNamedObjectIndex<>(),
-        new ConcurrentDatabaseObjectIndex<>(),
-        new ConcurrentDatabaseObjectIndex<>(),
-        new ConcurrentDatabaseObjectIndex<>(true),
-        new ConcurrentDatabaseObjectIndex<>(),
-        new ConcurrentDatabaseObjectIndex<>());
+        NamedObjectIndexes.newBuildableNamedObjectIndex(),
+        NamedObjectIndexes.newBuildableSchemaIndex(),
+        NamedObjectIndexes.newBuildableDatabaseObjectIndex(),
+        NamedObjectIndexes.newBuildableDatabaseObjectIndex(),
+        NamedObjectIndexes.newBuildableRoutineIndex(),
+        NamedObjectIndexes.newBuildableDatabaseObjectIndex(),
+        NamedObjectIndexes.newBuildableDatabaseObjectIndex());
   }
 
   private MutableCatalog(

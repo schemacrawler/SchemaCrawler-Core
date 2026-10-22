@@ -17,9 +17,10 @@ import java.util.List;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
-import schemacrawler.namedobject.ConcurrentDatabaseObjectIndex;
+import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.MapBackedNamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class NamedObjectSupportExtensionTest {
@@ -38,7 +39,7 @@ public class NamedObjectSupportExtensionTest {
     final ExtendedNamedObject object = new ExtendedNamedObject("object");
     object.setAttribute("attribute", "value");
     final MapBackedNamedObjectIndex<ExtendedNamedObject> mutable =
-        new MapBackedNamedObjectIndex<>();
+        NamedObjectIndexes.newBuildableNamedObjectIndex();
     mutable.add(object);
     final NamedObjectIndex<ExtendedNamedObject> index = mutable;
     assertSame(object, index.lookup(object.key()).orElseThrow());
@@ -51,8 +52,8 @@ public class NamedObjectSupportExtensionTest {
   public void databaseIndexesAreUsableOutsideSupportPackage() {
     final LightTable namedObject = new LightTable("table");
     namedObject.setAttribute("attribute", "value");
-    final ConcurrentDatabaseObjectIndex<LightTable> mutableIndex =
-        new ConcurrentDatabaseObjectIndex<>();
+    final BuildableDatabaseObjectIndex<LightTable> mutableIndex =
+        NamedObjectIndexes.newBuildableDatabaseObjectIndex();
     final NamedObjectIndex<LightTable> index = mutableIndex;
 
     assertTrue(mutableIndex.add(namedObject));

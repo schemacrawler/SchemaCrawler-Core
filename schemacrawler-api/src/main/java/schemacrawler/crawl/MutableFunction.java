@@ -14,7 +14,7 @@ import java.io.Serial;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
-import schemacrawler.namedobject.ConcurrentDependantObjectIndex;
+import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Function;
 import schemacrawler.schema.FunctionParameter;
 import schemacrawler.schema.FunctionReturnType;
@@ -26,14 +26,14 @@ final class MutableFunction extends MutableRoutine implements Function {
 
   @Serial private static final long serialVersionUID = 3906925686089134130L;
 
-  private final BuildableDependantObjectIndex<MutableFunctionParameter, Function> columns =
-      new ConcurrentDependantObjectIndex<>();
+  private final BuildableDependantObjectIndex<MutableFunctionParameter, Function> columns;
   private FunctionReturnType returnType;
 
   MutableFunction(final Schema schema, final String name, final String specificName) {
     super(schema, name, specificName);
     // Default values
     returnType = FunctionReturnType.unknown;
+    columns = NamedObjectIndexes.newBuildableDependantObjectIndex();
   }
 
   /** {@inheritDoc} */

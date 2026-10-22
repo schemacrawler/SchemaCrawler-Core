@@ -25,7 +25,8 @@ import schemacrawler.schema.NamedObjectKey;
  * complete keys must remain stable while indexed, and their comparison state must remain stable
  * during sorting. Equal comparison results have unspecified relative order.
  *
- * <p>The index hierarchy is sealed; external implementations are not supported.
+ * <p>The index hierarchy is sealed; external implementations are not supported. Create indexes
+ * through {@link NamedObjectIndexes}; implementation constructors are package-private.
  *
  * @param <N> Named-object type
  */
