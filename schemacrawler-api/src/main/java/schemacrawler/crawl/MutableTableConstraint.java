@@ -25,8 +25,7 @@ sealed class MutableTableConstraint extends AbstractDependantObject<Table>
 
   @Serial private static final long serialVersionUID = 1155277343302693656L;
 
-  private final BuildableNamedObjectIndex<MutableTableConstraintColumn> columns =
-      NamedObjectIndexes.newBuildableNamedObjectIndex();
+  private final BuildableNamedObjectIndex<MutableTableConstraintColumn> columns;
   private String definition;
   private boolean deferrable;
   private boolean initiallyDeferred;
@@ -35,6 +34,7 @@ sealed class MutableTableConstraint extends AbstractDependantObject<Table>
 
   MutableTableConstraint(final Table parent, final String name) {
     super(new TablePointer(parent), name);
+    columns = NamedObjectIndexes.newBuildableNamedObjectIndex();
     definition = "";
   }
 

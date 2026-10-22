@@ -23,11 +23,11 @@ final class MutableResultsColumns extends AbstractNamedObject implements Results
 
   @Serial private static final long serialVersionUID = 5204766782914559188L;
 
-  private final BuildableNamedObjectIndex<MutableResultsColumn> columns =
-      NamedObjectIndexes.newBuildableNamedObjectIndex();
+  private final BuildableNamedObjectIndex<MutableResultsColumn> columns;
 
   MutableResultsColumns(final String name) {
     super(name);
+    columns = NamedObjectIndexes.newBuildableNamedObjectIndex();
   }
 
   /** {@inheritDoc} */
