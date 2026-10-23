@@ -42,7 +42,7 @@ public enum NamedObjectSort implements Comparator<NamedObject> {
   private final Comparator<NamedObject> comparator;
 
   NamedObjectSort(final Comparator<NamedObject> comparator) {
-    this.comparator = nullsLast(comparator);
+    this.comparator = nullsLast(comparator.thenComparing(NamedObject::key));
   }
 
   /** {@inheritDoc} */
