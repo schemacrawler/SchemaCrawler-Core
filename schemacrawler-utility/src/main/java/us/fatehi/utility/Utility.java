@@ -39,28 +39,34 @@ public final class Utility {
   }
 
   /**
-   * Roughly converts database object names so that they can be compared with others in a
-   * case-insensitive way. This code is not meant to "correct" from a Unicode perspective, but a
-   * quick and dirty way of stripping out quote characters, and lower-casing them for comparison.
+   * Produces a lossy, locale-independent comparison form of a database object name. Retains only
+   * characters recognized by {@link Character#isLetterOrDigit(char)}, underscores, and dots,
+   * lowercasing retained characters with {@link Character#toLowerCase(char)}. Quotes, other
+   * punctuation, and whitespace are discarded, so distinct identifiers can produce the same result.
+   *
+   * <p>This method does not perform Unicode normalization or full case folding. Supplementary
+   * letters and combining marks are discarded; canonically equivalent strings can produce different
+   * results. This comparison form must not be used as an object identity.
    *
    * @param text Text to convert
-   * @return Text that can be compared
+   * @return Lossy comparison text, or an empty string for null or empty input
    */
   public static String convertForComparison(final String text) {
     if (text == null || text.length() == 0) {
       return "";
     }
 
-    final StringBuilder builder = new StringBuilder(text.length());
-    for (int i = 0; i < text.length(); i++) {
-      final char ch = text.charAt(i);
-      if (Character.isLetterOrDigit(ch) || ch == '_' || ch == '.') {
-        builder.append(Character.toLowerCase(ch));
-      }
-    }
+    final StringBuilder result = new StringBuilder();
+    text.codePoints()
+        .forEach(
+            cp -> {
+              if (Character.isLetterOrDigit(cp) || cp == '_' || cp == '.') {
+                result.appendCodePoint(Character.toLowerCase(cp));
+              }
+            });
 
-    final String textWithoutQuotes = builder.toString();
-    return textWithoutQuotes;
+    final String identifier = result.toString();
+    return identifier;
   }
 
   /**

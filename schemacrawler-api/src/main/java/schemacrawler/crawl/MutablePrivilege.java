@@ -15,6 +15,7 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -49,18 +50,25 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
      */
     @Override
     public int compareTo(final Grant<D> otherGrant) {
-      int compare = 0;
+      if (this == otherGrant) {
+        return 0;
+      }
+      if (otherGrant == null) {
+        return -1;
+      }
+
+      final Comparator<String> compareNullableStrings =
+          Comparator.nullsLast(Comparator.naturalOrder());
+
+      int compare = compareNullableStrings.compare(grantor, otherGrant.getGrantor());
       if (compare == 0) {
-        if (grantor == null) {
-          return -1;
-        }
-        compare = grantor.compareTo(otherGrant.getGrantor());
+        compare = compareNullableStrings.compare(grantee, otherGrant.getGrantee());
       }
       if (compare == 0) {
-        if (grantee == null) {
-          return -1;
-        }
-        compare = grantee.compareTo(otherGrant.getGrantee());
+        compare = getParent().key().compareTo(otherGrant.getParent().key());
+      }
+      if (compare == 0) {
+        compare = Boolean.compare(isGrantable, otherGrant.isGrantable());
       }
       return compare;
     }
@@ -75,8 +83,8 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
       }
       final PrivilegeGrant other = (PrivilegeGrant) obj;
       return Objects.equals(getParent(), other.getParent())
-          && Objects.equals(grantee, other.grantee)
           && Objects.equals(grantor, other.grantor)
+          && Objects.equals(grantee, other.grantee)
           && isGrantable == other.isGrantable;
     }
 
@@ -132,7 +140,7 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
   }
 
   void addGrant(final String grantor, final String grantee, final boolean isGrantable) {
-    if (!(isBlank(grantor) && isBlank(grantee))) {
+    if ((!isBlank(grantor) || !isBlank(grantee))) {
       grants.add(new PrivilegeGrant(grantor, grantee, isGrantable));
     }
   }
