@@ -42,6 +42,13 @@ public class DatabaseServerTypeTest {
 
     assertThat(databaseServerType0, lessThan(databaseServerType1));
     assertThat(databaseServerType1, greaterThan(databaseServerType0));
+
+    final DatabaseServerType otherKnown = new DatabaseServerType("otherdb", "OtherDB");
+    final DatabaseServerType unknownCopy = new DatabaseServerType("unknown", "Unknown");
+    assertThat(databaseServerType1, lessThan(otherKnown));
+    assertThat(otherKnown, greaterThan(databaseServerType1));
+    assertThat(databaseServerType0, comparesEqualTo(unknownCopy));
+    assertThat(unknownCopy, comparesEqualTo(databaseServerType0));
   }
 
   @Test

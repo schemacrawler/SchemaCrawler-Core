@@ -37,7 +37,7 @@ abstract class AbstractDatabaseObjectBacked<DO extends DatabaseObject>
   @Override
   public int compareTo(final NamedObject namedObj) {
     if (namedObj == null) {
-      return 1;
+      return -1;
     }
     return key().compareTo(namedObj.key());
   }

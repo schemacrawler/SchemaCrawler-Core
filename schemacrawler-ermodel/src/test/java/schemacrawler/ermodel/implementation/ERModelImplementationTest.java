@@ -70,7 +70,7 @@ public class ERModelImplementationTest {
     assertThat(rel1.compareTo(rel2) < 0, is(true));
     assertThat(rel2.compareTo(rel1) > 0, is(true));
     assertThat(rel1.compareTo(rel1), is(0));
-    assertThat(rel1.compareTo(null), is(1));
+    assertThat(rel1.compareTo(null), is(-1));
 
     // equals
     assertThat(rel1.equals(rel1), is(true));
@@ -129,7 +129,7 @@ public class ERModelImplementationTest {
     assertThat(rel.compareTo(rel2) < 0, is(true));
     assertThat(rel2.compareTo(rel) > 0, is(true));
     assertThat(rel.compareTo(rel), is(0));
-    assertThat(rel.compareTo(null), is(1));
+    assertThat(rel.compareTo(null), is(-1));
 
     // equals
     assertThat(rel.equals(rel), is(true));

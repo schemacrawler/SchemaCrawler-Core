@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toCollection;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -22,6 +23,14 @@ import java.util.Set;
 @UtilityMarker
 public class CollectionsUtility {
 
+  /**
+   * Compares lists by size, then by elements, placing null lists and null elements last.
+   *
+   * @param <T> Comparable element type
+   * @param list1 First list
+   * @param list2 Second list
+   * @return The comparison result
+   */
   public static <T extends Comparable<? super T>> int compareLists(
       final List<? extends T> list1, final List<? extends T> list2) {
 
@@ -29,15 +38,16 @@ public class CollectionsUtility {
       return 0;
     }
     if (list1 == null) {
-      return -1;
+      return 1;
     }
     if (list2 == null) {
-      return 1;
+      return -1;
     }
 
     int comparison = Integer.compare(list1.size(), list2.size());
 
     if (comparison == 0) {
+      final Comparator<T> elementComparator = Comparator.nullsLast(Comparator.naturalOrder());
       final Iterator<? extends T> iter1 = list1.iterator();
       final Iterator<? extends T> iter2 = list2.iterator();
 
@@ -45,7 +55,7 @@ public class CollectionsUtility {
         final T object1 = iter1.next();
         final T object2 = iter2.next();
 
-        comparison = object1.compareTo(object2);
+        comparison = Objects.compare(object1, object2, elementComparator);
       }
     }
 

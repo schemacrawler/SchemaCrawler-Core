@@ -45,11 +45,9 @@ public record DatabaseServerType(PropertyName propertyName)
     if (equals(o)) {
       return 0;
     }
-    if (o.isUnknownDatabaseSystem()) {
-      return 1;
-    }
-    if (isUnknownDatabaseSystem()) {
-      return -1;
+    final int comparison = Boolean.compare(o.isUnknownDatabaseSystem(), isUnknownDatabaseSystem());
+    if (comparison != 0) {
+      return comparison;
     }
     return propertyName.compareTo(o.propertyName);
   }

@@ -19,7 +19,7 @@ import java.util.Comparator;
 public interface Property extends Serializable, Comparable<Property> {
 
   Comparator<Property> comparator =
-      nullsLast(comparing(Property::getName, String.CASE_INSENSITIVE_ORDER));
+      nullsLast(comparing(Property::getName, nullsLast(String.CASE_INSENSITIVE_ORDER)));
 
   @Override
   default int compareTo(final Property otherProperty) {

@@ -34,24 +34,22 @@ public final class CommandRegistry extends BasePluginCommandRegistry<SchemaCrawl
   private static CommandRegistry registrySingleton;
 
   public static final Comparator<? super SchemaCrawlerCommandProvider> commandProviderComparator =
-      (commandProvider1, commandProvider2) -> {
-        final String fallbackProviderTypeName = "OperationCommandProvider";
-        if (commandProvider1 == null || commandProvider2 == null) {
-          throw new IllegalArgumentException("Null command provider found");
-        }
-        final String typeName1 = commandProvider1.getClass().getSimpleName();
-        final String typeName2 = commandProvider2.getClass().getSimpleName();
-        if (typeName1.equals(typeName2)) {
-          return 0;
-        }
-        if (fallbackProviderTypeName.equals(typeName1)) {
-          return 1;
-        }
-        if (fallbackProviderTypeName.equals(typeName2)) {
-          return -1;
-        }
-        return typeName1.compareTo(typeName2);
-      };
+      Comparator.nullsLast(
+          (commandProvider1, commandProvider2) -> {
+            final String fallbackProviderTypeName = "OperationCommandProvider";
+            final String typeName1 = commandProvider1.getClass().getSimpleName();
+            final String typeName2 = commandProvider2.getClass().getSimpleName();
+            if (typeName1.equals(typeName2)) {
+              return 0;
+            }
+            if (fallbackProviderTypeName.equals(typeName1)) {
+              return 1;
+            }
+            if (fallbackProviderTypeName.equals(typeName2)) {
+              return -1;
+            }
+            return typeName1.compareTo(typeName2);
+          });
 
   public static CommandRegistry getRegistry() {
     if (registrySingleton == null) {

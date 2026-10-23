@@ -13,11 +13,15 @@ import static us.fatehi.utility.Utility.convertForComparison;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 
 public final class NamedObjectKey implements Serializable, Comparable<NamedObjectKey> {
 
   @Serial private static final long serialVersionUID = -5008609072012459037L;
+
+  private static final Comparator<String> componentComparator =
+      Comparator.nullsLast(Comparator.naturalOrder());
 
   private final String[] key;
 
@@ -29,12 +33,18 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
     }
   }
 
+  /**
+   * Compares whole key components lexicographically, with null components and null keys last.
+   *
+   * @param other Key to compare
+   * @return The comparison result
+   */
   @Override
   public int compareTo(final NamedObjectKey other) {
     if (other == null) {
-      return 1;
+      return -1;
     }
-    return Arrays.compare(key, other.key);
+    return Arrays.compare(key, other.key, componentComparator);
   }
 
   @Override

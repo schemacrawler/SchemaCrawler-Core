@@ -8,6 +8,8 @@
 
 package schemacrawler.crawl;
 
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsLast;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
@@ -15,6 +17,7 @@ import java.io.Serial;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
@@ -75,7 +78,8 @@ abstract sealed class MutableRoutine extends AbstractDatabaseObject implements R
       }
 
       if (comparison == 0) {
-        comparison = getSpecificName().compareTo(other.getSpecificName());
+        comparison =
+            Objects.compare(getSpecificName(), other.getSpecificName(), nullsLast(naturalOrder()));
       }
     }
 

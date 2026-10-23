@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -95,14 +94,12 @@ public class CommandProviderSortTest {
 
   @Test
   public void sortNull() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> CommandRegistry.commandProviderComparator.compare(null, null));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> CommandRegistry.commandProviderComparator.compare(testCommandProvider, null));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> CommandRegistry.commandProviderComparator.compare(null, fallbackCommandProvider));
+    assertThat(CommandRegistry.commandProviderComparator.compare(null, null), is(0));
+    assertThat(
+        CommandRegistry.commandProviderComparator.compare(testCommandProvider, null),
+        is(lessThan(0)));
+    assertThat(
+        CommandRegistry.commandProviderComparator.compare(null, fallbackCommandProvider),
+        is(greaterThan(0)));
   }
 }

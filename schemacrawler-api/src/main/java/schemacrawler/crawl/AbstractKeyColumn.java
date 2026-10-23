@@ -50,7 +50,7 @@ abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> i
     int comparison = 0;
 
     if (obj instanceof final AbstractKeyColumn other) {
-      comparison = keyOrdinalPosition - other.keyOrdinalPosition;
+      comparison = Integer.compare(keyOrdinalPosition, other.keyOrdinalPosition);
     }
 
     if (comparison == 0) {

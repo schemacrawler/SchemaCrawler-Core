@@ -46,18 +46,21 @@ public final class SchemaReference implements Schema {
     if (this == obj) {
       return 0;
     }
-    if (obj == null || !(obj instanceof final Schema other)) {
+    if (obj == null) {
+      return -1;
+    }
+    if (!(obj instanceof final Schema other)) {
       return 1;
     }
 
     final int result =
-        Comparator.nullsFirst(String::compareTo).compare(catalogName, other.getCatalogName());
+        Comparator.nullsLast(String::compareTo).compare(catalogName, other.getCatalogName());
 
     if (result != 0) {
       return result;
     }
 
-    return Comparator.nullsFirst(String::compareTo).compare(schemaName, other.getName());
+    return Comparator.nullsLast(String::compareTo).compare(schemaName, other.getName());
   }
 
   @Override

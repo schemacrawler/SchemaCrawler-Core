@@ -11,19 +11,46 @@ package schemacrawler.test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import schemacrawler.namedobject.NamedObjectSort;
 import schemacrawler.schema.NamedObject;
+import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.test.utility.TestNamedObject;
 import schemacrawler.test.utility.TestNamedObjectNullName;
 
 public class NamedObjectSortTest {
+
+  @Test
+  public void alphabeticalNullNamesAndTieBreakingKeysSortLast() {
+    final NamedObject named = mock(NamedObject.class);
+    final NamedObject unnamed = mock(NamedObject.class);
+    final NamedObject missingKey = mock(NamedObject.class);
+    when(named.getFullName()).thenReturn("NAME");
+    when(named.key()).thenReturn(new NamedObjectKey("NAME"));
+    when(unnamed.key()).thenReturn(new NamedObjectKey());
+    when(missingKey.getFullName()).thenReturn("name");
+    final NamedObjectSort comparator = NamedObjectSort.alphabetical;
+    assertTrue(comparator.compare(named, unnamed) < 0);
+    assertTrue(comparator.compare(unnamed, named) > 0);
+    assertTrue(comparator.compare(named, missingKey) == 0);
+    assertTrue(comparator.compare(missingKey, named) == 0);
+    for (final NamedObjectSort sort : NamedObjectSort.values()) {
+      assertTrue(sort.compare(named, null) < 0);
+      assertTrue(sort.compare(null, named) > 0);
+      assertEquals(0, sort.compare(null, null));
+    }
+  }
 
   @ParameterizedTest
   @ValueSource(booleans = {true, false, true, false, false, true})
@@ -69,11 +96,6 @@ public class NamedObjectSortTest {
     }
     expected.add(nullNamedObject);
     expected.add(null);
-
-    if (sortAlphabetically) {
-      expected.remove(nullNamedObject);
-      expected.add(0, nullNamedObject);
-    }
 
     return expected;
   }

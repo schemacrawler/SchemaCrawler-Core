@@ -53,6 +53,8 @@ public class JavaSqlTypeTest {
     assertThat(javaSqlType.getDefaultMappedClass(), is(Object.class));
     assertThat(javaSqlType.getJavaSqlTypeGroup(), is(JavaSqlTypeGroup.unknown));
     assertThat(javaSqlType.toString(), is("null\tnull\tunknown"));
+    assertThat(javaSqlType.compareTo(JavaSqlType.UNKNOWN), is(greaterThan(0)));
+    assertThat(JavaSqlType.UNKNOWN.compareTo(javaSqlType), is(lessThan(0)));
   }
 
   @Test

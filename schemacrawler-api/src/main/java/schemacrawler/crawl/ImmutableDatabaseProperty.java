@@ -34,7 +34,7 @@ class ImmutableDatabaseProperty extends AbstractProperty {
   @Serial private static final long serialVersionUID = -7150431683440256142L;
 
   private static final Comparator<Property> comparator =
-      nullsLast(comparing(Property::getDescription, CASE_INSENSITIVE_ORDER));
+      nullsLast(comparing(Property::getDescription, nullsLast(CASE_INSENSITIVE_ORDER)));
   private static final Set<Entry<Pattern, String>> acronyms;
 
   static {

@@ -58,7 +58,7 @@ abstract sealed class AbstractColumn<P extends DatabaseObject> extends AbstractD
     int comparison = 0;
 
     if (comparison == 0) {
-      comparison = ordinalPosition - other.getOrdinalPosition();
+      comparison = Integer.compare(ordinalPosition, other.getOrdinalPosition());
     }
     if (comparison == 0) {
       comparison = super.compareTo(other);

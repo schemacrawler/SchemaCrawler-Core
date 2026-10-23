@@ -8,6 +8,8 @@
 
 package schemacrawler.crawl;
 
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsLast;
 import static java.util.Objects.hash;
 import static java.util.Objects.requireNonNull;
 
@@ -58,13 +60,15 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
     }
 
     if (obj instanceof final DatabaseObject object2) {
-      final int schemaCompareTo = getSchema().compareTo(object2.getSchema());
+      final int schemaCompareTo =
+          Objects.compare(getSchema(), object2.getSchema(), nullsLast(naturalOrder()));
       if (schemaCompareTo != 0) {
         return schemaCompareTo;
       }
       if (this instanceof final TypedObject object && obj instanceof final TypedObject object1) {
         try {
-          final int typeCompareTo = object.getType().compareTo(object1.getType());
+          final int typeCompareTo =
+              Objects.compare(object.getType(), object1.getType(), nullsLast(naturalOrder()));
           if (typeCompareTo != 0) {
             return typeCompareTo;
           }

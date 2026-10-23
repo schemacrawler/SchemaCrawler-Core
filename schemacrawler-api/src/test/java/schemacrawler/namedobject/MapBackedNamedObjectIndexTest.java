@@ -226,18 +226,18 @@ public class MapBackedNamedObjectIndexTest {
       assertThat(index.size(), is(3));
       assertThat(
           index.getObjects(),
-          contains(sameInstance(schema2), sameInstance(schema1), sameInstance(schema3)));
+          contains(sameInstance(schema1), sameInstance(schema3), sameInstance(schema2)));
       assertThat(index.snapshot(), containsInAnyOrder(schema1, schema2, schema3));
       final List<Schema> iterated = new ArrayList<>();
       index.getObjects().forEach(iterated::add);
-      assertThat(iterated, contains(schema2, schema1, schema3));
+      assertThat(iterated, contains(schema1, schema3, schema2));
       for (final Schema schema : shuffled) {
         assertThat(index.containsKey(schema.key()), is(true));
         assertThat(index.lookup(schema.key()).orElseThrow(), sameInstance(schema));
       }
       assertThat(
           index.lookup(new NamedObjectKey(null, schemaName)).orElseThrow(), sameInstance(schema2));
-      assertThat(index.lookup(schemaName).orElseThrow(), sameInstance(schema2));
+      assertThat(index.lookup(schemaName).orElseThrow(), sameInstance(schema1));
       assertThat(index.toString(), is("SCHEMA, SCHEMA, SCHEMA"));
     }
   }
@@ -268,7 +268,7 @@ public class MapBackedNamedObjectIndexTest {
     final MapBackedNamedObjectIndex<Schema> immutableCopy =
         SerializationUtils.clone(new MapBackedNamedObjectIndex<>(schemas));
     for (final MapBackedNamedObjectIndex<Schema> index : List.of(mutableCopy, immutableCopy)) {
-      assertThat(index.getObjects(), contains(first, second, third));
+      assertThat(index.getObjects(), contains(second, third, first));
       assertThat(index.size(), is(3));
       for (final Schema schema : schemas) {
         assertThat(index.containsKey(schema.key()), is(true));

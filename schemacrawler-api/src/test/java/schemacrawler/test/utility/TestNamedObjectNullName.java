@@ -18,7 +18,10 @@ public class TestNamedObjectNullName implements NamedObject {
 
   @Override
   public int compareTo(final NamedObject o) {
-    return 1;
+    if (o == this) {
+      return 0;
+    }
+    return o == null ? -1 : 1;
   }
 
   @Override

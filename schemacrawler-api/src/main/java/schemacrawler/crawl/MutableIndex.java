@@ -8,12 +8,15 @@
 
 package schemacrawler.crawl;
 
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsLast;
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
@@ -71,12 +74,12 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
       compareTo = CollectionsUtility.compareLists(thisColumns, thatColumns);
     }
 
-    if (compareTo == 0 && isUnique != that.isUnique()) {
-      compareTo = isUnique ? -1 : 1;
+    if (compareTo == 0) {
+      compareTo = Boolean.compare(that.isUnique(), isUnique);
     }
 
     if (compareTo == 0) {
-      compareTo = indexType.ordinal() - that.getIndexType().ordinal();
+      compareTo = Objects.compare(indexType, that.getIndexType(), nullsLast(naturalOrder()));
     }
 
     if (compareTo == 0) {

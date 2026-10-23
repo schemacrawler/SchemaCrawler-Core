@@ -15,12 +15,29 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schemacrawler.SchemaReference;
 
 public class SchemaReferenceTest {
+
+  @Test
+  public void nullSchemasAndNullableComponentsSortLast() {
+    final SchemaReference absentCatalog = new SchemaReference(null, "schema");
+    final SchemaReference absentSchema = new SchemaReference("catalog", null);
+    final SchemaReference named = new SchemaReference("catalog", "schema");
+    final SchemaReference empty = new SchemaReference("catalog", "");
+    assertTrue(named.compareTo(null) < 0);
+    assertTrue(named.compareTo(absentCatalog) < 0);
+    assertTrue(absentCatalog.compareTo(named) > 0);
+    assertTrue(named.compareTo(absentSchema) < 0);
+    assertTrue(absentSchema.compareTo(named) > 0);
+    assertTrue(empty.compareTo(absentSchema) < 0);
+    assertEquals(0, absentSchema.compareTo(new SchemaReference("catalog", null)));
+  }
 
   @Test
   public void schemaRef() {

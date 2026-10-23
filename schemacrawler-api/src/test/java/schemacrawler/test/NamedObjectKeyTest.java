@@ -15,6 +15,23 @@ import schemacrawler.schema.NamedObjectKey;
 public class NamedObjectKeyTest {
 
   @Test
+  public void nullKeysAndComponentsSortLastWithoutCollapsingEmptyComponents() {
+    final NamedObjectKey absent = new NamedObjectKey("catalog", null);
+    final NamedObjectKey empty = new NamedObjectKey("catalog", "");
+    final NamedObjectKey named = new NamedObjectKey("catalog", "schema");
+    assertTrue(named.compareTo(null) < 0);
+    assertTrue(empty.compareTo(absent) < 0);
+    assertTrue(absent.compareTo(empty) > 0);
+    assertTrue(named.compareTo(absent) < 0);
+    assertTrue(named.compareTo(new NamedObjectKey(null, "schema")) < 0);
+    assertTrue(new NamedObjectKey(null, "").compareTo(new NamedObjectKey(null, null)) < 0);
+    assertEquals(0, absent.compareTo(new NamedObjectKey("catalog", null)));
+    final List<NamedObjectKey> keys = new ArrayList<>(List.of(absent, named, empty));
+    Collections.sort(keys);
+    assertEquals(List.of(empty, named, absent), keys);
+  }
+
+  @Test
   public void startsWithMatchesWholeComponentsAndPreservesIdentity() {
     final NamedObjectKey key = new NamedObjectKey(null, "", "a.b", "\"quoted\"", "specific");
     assertThat(key.startsWith(new NamedObjectKey()), is(true));

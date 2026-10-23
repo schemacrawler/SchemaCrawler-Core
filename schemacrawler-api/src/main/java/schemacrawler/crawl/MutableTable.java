@@ -100,7 +100,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
     int comparison = 0;
 
     if (comparison == 0 && obj instanceof final MutableTable table) {
-      comparison = sortIndex - table.sortIndex;
+      comparison = Integer.compare(sortIndex, table.sortIndex);
     }
     if (comparison == 0) {
       comparison = super.compareTo(obj);

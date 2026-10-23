@@ -8,17 +8,21 @@
 
 package schemacrawler.crawl;
 
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsLast;
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DataTypeType;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.JavaSqlType;
+import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.SearchableType;
 
@@ -92,6 +96,23 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
     localizedTypeName = "";
 
     enumValues = new ArrayList<>();
+  }
+
+  /**
+   * Orders system types before user-defined types, then compares schemas and names.
+   *
+   * @param obj Object to compare
+   * @return The comparison result, with null objects and types last
+   */
+  @Override
+  public int compareTo(final NamedObject obj) {
+    if (obj instanceof final ColumnDataType other) {
+      final int comparison = Objects.compare(getType(), other.getType(), nullsLast(naturalOrder()));
+      if (comparison != 0) {
+        return comparison;
+      }
+    }
+    return super.compareTo(obj);
   }
 
   /** {@inheritDoc} */
