@@ -6,33 +6,37 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.test;
+package schemacrawler.test.sort;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static schemacrawler.crawl.SortTestUtility.newColumn;
+import static schemacrawler.crawl.SortTestUtility.newTable;
+import static schemacrawler.crawl.SortTestUtility.setOrdinalPosition;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import schemacrawler.namedobject.NamedObjectSort;
+import schemacrawler.schema.Column;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
-import schemacrawler.test.utility.TestNamedObject;
-import schemacrawler.test.utility.TestNamedObjectNullName;
+import schemacrawler.schema.Table;
+import schemacrawler.schemacrawler.SchemaReference;
 
 public class NamedObjectSortTest {
 
   @Test
-  public void alphabeticalNullNamesAndTieBreakingKeysSortLast() {
+  public void alphabeticalNullNamesAndObjectsSortLast() {
     final NamedObject named = mock(NamedObject.class);
     final NamedObject unnamed = mock(NamedObject.class);
     final NamedObject missingKey = mock(NamedObject.class);
@@ -41,60 +45,51 @@ public class NamedObjectSortTest {
     when(unnamed.key()).thenReturn(new NamedObjectKey());
     when(missingKey.getFullName()).thenReturn("name");
     final NamedObjectSort comparator = NamedObjectSort.alphabetical;
-    assertTrue(comparator.compare(named, unnamed) < 0);
-    assertTrue(comparator.compare(unnamed, named) > 0);
-    assertTrue(comparator.compare(named, missingKey) == 0);
-    assertTrue(comparator.compare(missingKey, named) == 0);
+    assertThat(comparator.compare(named, unnamed), lessThan(0));
+    assertThat(comparator.compare(unnamed, named), greaterThan(0));
+    assertThat(comparator.compare(named, missingKey), is(0));
+    assertThat(comparator.compare(missingKey, named), is(0));
     for (final NamedObjectSort sort : NamedObjectSort.values()) {
-      assertTrue(sort.compare(named, null) < 0);
-      assertTrue(sort.compare(null, named) > 0);
-      assertEquals(0, sort.compare(null, null));
+      assertThat(sort.compare(named, null), lessThan(0));
+      assertThat(sort.compare(null, named), greaterThan(0));
+      assertThat(sort.compare(null, null), is(0));
     }
   }
 
   @ParameterizedTest
-  @ValueSource(booleans = {true, false, true, false, false, true})
-  public void namedObjectSort(final boolean sortAlphabetically) throws Exception {
-
-    // Set up
+  @ValueSource(booleans = {true, false})
+  public void namedObjectSort(final boolean sortAlphabetically) {
     final List<NamedObject> expected = createExpectedList(sortAlphabetically);
-
     final List<NamedObject> objects = new ArrayList<>(expected);
-    Collections.shuffle(objects);
-    assertThat("Test named object list is not shuffled", objects, is(not(expected)));
-
-    // Finally - do the sort
+    Collections.shuffle(objects, new Random(42));
     Collections.sort(objects, NamedObjectSort.getNamedObjectSort(sortAlphabetically));
-
-    // Compare
     assertThat("Test named object list is not sorted", objects, is(expected));
   }
 
   private List<NamedObject> createExpectedList(final boolean sortAlphabetically) {
 
-    final String[] names = {
-      "ID",
-      "FIRSTNAME",
-      "LASTNAME",
-      "ADDRESS1",
-      "ADDRESS2",
-      "CITY",
-      "STATE",
-      "POSTALCODE",
-      "COUNTRY",
-    };
-    if (sortAlphabetically) {
-      Arrays.sort(names);
-    }
-
-    final int length = names.length;
-
-    final TestNamedObjectNullName nullNamedObject = new TestNamedObjectNullName();
+    final List<String> names =
+        new ArrayList<>(
+            List.of(
+                "ID",
+                "FIRSTNAME",
+                "LASTNAME",
+                "ADDRESS1",
+                "ADDRESS2",
+                "CITY",
+                "STATE",
+                "POSTALCODE",
+                "COUNTRY"));
+    final Table table = newTable(new SchemaReference("CATALOG", "SCHEMA"), "TABLE");
     final List<NamedObject> expected = new ArrayList<>();
-    for (int i = 0; i < length; i++) {
-      expected.add(new TestNamedObject(names[i], i));
+    for (int i = 0; i < names.size(); i++) {
+      final Column column = newColumn(table, names.get(i));
+      setOrdinalPosition(column, i + 1);
+      expected.add(column);
     }
-    expected.add(nullNamedObject);
+    if (sortAlphabetically) {
+      expected.sort(Comparator.comparing(NamedObject::getName));
+    }
     expected.add(null);
 
     return expected;

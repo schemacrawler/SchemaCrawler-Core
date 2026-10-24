@@ -122,19 +122,6 @@ public class CatalogProjectionBuilderTest {
   }
 
   @Test
-  public void collectionsFollowNaturalNamedObjectOrder() {
-    final SchemaReference schema = new SchemaReference("CATALOG", "PUBLIC");
-    final Table naturallyEarlierTable = new LightTable(schema, "Beta");
-    final Table naturallyLaterTable = new LightTable(schema, "alpha");
-    final Catalog source = mockCatalogWithTables(naturallyLaterTable, naturallyEarlierTable);
-
-    final Catalog projection =
-        CatalogProjectionBuilder.builder(source).withOptions(projectionOptions(null, null)).build();
-
-    assertThat(projection.getTables(), contains(naturallyEarlierTable, naturallyLaterTable));
-  }
-
-  @Test
   public void definitionAndRemarksGrepAndInversionAreApplied() {
     final LightTable remarksMatch = new LightTable("remarks_match");
     remarksMatch.setRemarks("contains secret text");

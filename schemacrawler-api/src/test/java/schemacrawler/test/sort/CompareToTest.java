@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-package schemacrawler.crawl;
+package schemacrawler.test.sort;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.OrderingComparison.comparesEqualTo;
@@ -16,6 +16,21 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static schemacrawler.crawl.SortTestUtility.newColumn;
+import static schemacrawler.crawl.SortTestUtility.newColumnReference;
+import static schemacrawler.crawl.SortTestUtility.newDatabaseObject;
+import static schemacrawler.crawl.SortTestUtility.newDatabaseProperty;
+import static schemacrawler.crawl.SortTestUtility.newIndex;
+import static schemacrawler.crawl.SortTestUtility.newIndexColumn;
+import static schemacrawler.crawl.SortTestUtility.newProcedure;
+import static schemacrawler.crawl.SortTestUtility.newTable;
+import static schemacrawler.crawl.SortTestUtility.newView;
+import static schemacrawler.crawl.SortTestUtility.setIndexType;
+import static schemacrawler.crawl.SortTestUtility.setKeyOrdinalPosition;
+import static schemacrawler.crawl.SortTestUtility.setOrdinalPosition;
+import static schemacrawler.crawl.SortTestUtility.setSortIndex;
+import static schemacrawler.crawl.SortTestUtility.setTableType;
+import static schemacrawler.crawl.SortTestUtility.setUnique;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -23,12 +38,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
+import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Index;
+import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexType;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Schema;
+import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
+import schemacrawler.schema.View;
 import schemacrawler.schemacrawler.SchemaReference;
 import us.fatehi.utility.property.Property;
 
@@ -37,8 +57,8 @@ public class CompareToTest {
   @Test
   public void nullableRoutineSpecificNamesSortLastAfterEqualKeysAndParameters() {
     final Schema schema = new SchemaReference();
-    final MutableProcedure known = new MutableProcedure(schema, "ROUTINE", "SPECIFIC");
-    final MutableProcedure missing = spy(new MutableProcedure(schema, "ROUTINE", "SPECIFIC"));
+    final Procedure known = newProcedure(schema, "ROUTINE", "SPECIFIC");
+    final Procedure missing = spy(newProcedure(schema, "ROUTINE", "SPECIFIC"));
     doReturn(known.key()).when(missing).key();
     doReturn(null).when(missing).getSpecificName();
     assertThat(known.compareTo(missing), lessThan(0));
@@ -53,15 +73,14 @@ public class CompareToTest {
     assertThat(Property.comparator.compare(named, unnamed), lessThan(0));
     assertThat(Property.comparator.compare(unnamed, named), greaterThan(0));
 
-    final ImmutableDatabaseProperty described =
-        new ImmutableDatabaseProperty("getDatabaseVersion", "value");
+    final Property described = newDatabaseProperty("getDatabaseVersion", "value");
     assertThat(described.compareTo(unnamed), lessThan(0));
   }
 
   @Test
   public void nullableIndexTypesSortLast() {
-    final MutableTable table = new MutableTable(new SchemaReference(), "TABLE");
-    final MutableIndex known = new MutableIndex(table, "INDEX");
+    final Table table = newTable(new SchemaReference(), "TABLE");
+    final Index known = newIndex(table, "INDEX");
     final Index missingType = mock(Index.class);
     when(missingType.getColumns()).thenReturn(List.of());
     assertThat(known.compareTo(missingType), lessThan(0));
@@ -72,9 +91,9 @@ public class CompareToTest {
     final Column named = mock(Column.class);
     final Column unnamed = mock(Column.class);
     when(named.getFullName()).thenReturn("COLUMN");
-    final ColumnReference known = new ImmutableColumnReference(0, named, named);
-    final ColumnReference missingForeignName = new ImmutableColumnReference(0, unnamed, named);
-    final ColumnReference missingPrimaryName = new ImmutableColumnReference(0, named, unnamed);
+    final ColumnReference known = newColumnReference(0, named, named);
+    final ColumnReference missingForeignName = newColumnReference(0, unnamed, named);
+    final ColumnReference missingPrimaryName = newColumnReference(0, named, unnamed);
     assertThat(known.compareTo(missingForeignName), lessThan(0));
     assertThat(missingForeignName.compareTo(known), greaterThan(0));
     assertThat(known.compareTo(missingPrimaryName), lessThan(0));
@@ -85,10 +104,10 @@ public class CompareToTest {
   @Test
   public void nullableTypesSortLastBeforeNames() {
     final Schema schema = new SchemaReference();
-    final MutableTable missingType = spy(new MutableTable(schema, "A"));
+    final Table missingType = spy(newTable(schema, "A"));
     doReturn(null).when(missingType).getType();
-    final MutableTable knownType = new MutableTable(schema, "Z");
-    knownType.setTableType(new TableType("TABLE"));
+    final Table knownType = newTable(schema, "Z");
+    setTableType(knownType, new TableType("TABLE"));
     assertThat(knownType, lessThan(missingType));
     assertThat(missingType, greaterThan(knownType));
   }
@@ -97,63 +116,60 @@ public class CompareToTest {
   @CsvSource({"-2147483648,2147483647", "-2147483648,0", "-1,2147483647", "1,2"})
   public void numericComparisonsPreserveOrderWithoutOverflow(final int lower, final int higher) {
     final Schema schema = new SchemaReference("catalog", "schema");
-    final MutableTable firstTable = new MutableTable(schema, "Z");
-    final MutableTable secondTable = new MutableTable(schema, "A");
-    firstTable.setSortIndex(lower);
-    secondTable.setSortIndex(higher);
+    final Table firstTable = newTable(schema, "Z");
+    final Table secondTable = newTable(schema, "A");
+    setSortIndex(firstTable, lower);
+    setSortIndex(secondTable, higher);
     assertThat(firstTable, lessThan(secondTable));
     assertThat(secondTable, greaterThan(firstTable));
-    secondTable.setSortIndex(lower);
+    setSortIndex(secondTable, lower);
     assertThat(firstTable, greaterThan(secondTable));
 
-    final MutableColumn firstColumn = new MutableColumn(firstTable, "Z");
-    final MutableColumn secondColumn = new MutableColumn(firstTable, "A");
-    firstColumn.setOrdinalPosition(lower);
-    secondColumn.setOrdinalPosition(higher);
+    final Column firstColumn = newColumn(firstTable, "Z");
+    final Column secondColumn = newColumn(firstTable, "A");
+    setOrdinalPosition(firstColumn, lower);
+    setOrdinalPosition(secondColumn, higher);
     assertThat(firstColumn, lessThan(secondColumn));
     assertThat(secondColumn, greaterThan(firstColumn));
-    secondColumn.setOrdinalPosition(lower);
+    setOrdinalPosition(secondColumn, lower);
     assertThat(firstColumn, greaterThan(secondColumn));
 
-    final MutableIndex index = new MutableIndex(firstTable, "INDEX");
-    final MutableIndexColumn firstKeyColumn = new MutableIndexColumn(index, firstColumn);
-    final MutableIndexColumn secondKeyColumn = new MutableIndexColumn(index, secondColumn);
-    firstKeyColumn.setKeyOrdinalPosition(lower);
-    secondKeyColumn.setKeyOrdinalPosition(higher);
+    final Index index = newIndex(firstTable, "INDEX");
+    final IndexColumn firstKeyColumn = newIndexColumn(index, firstColumn);
+    final IndexColumn secondKeyColumn = newIndexColumn(index, secondColumn);
+    setKeyOrdinalPosition(firstKeyColumn, lower);
+    setKeyOrdinalPosition(secondKeyColumn, higher);
     assertThat(firstKeyColumn, lessThan(secondKeyColumn));
     assertThat(secondKeyColumn, greaterThan(firstKeyColumn));
-    secondKeyColumn.setKeyOrdinalPosition(lower);
+    setKeyOrdinalPosition(secondKeyColumn, lower);
     assertThat(firstKeyColumn, greaterThan(secondKeyColumn));
 
-    final ImmutableColumnReference firstReference =
-        new ImmutableColumnReference(lower, firstColumn, firstColumn);
-    final ImmutableColumnReference secondReference =
-        new ImmutableColumnReference(higher, secondColumn, secondColumn);
+    final ColumnReference firstReference = newColumnReference(lower, firstColumn, firstColumn);
+    final ColumnReference secondReference = newColumnReference(higher, secondColumn, secondColumn);
     assertThat(firstReference, lessThan(secondReference));
     assertThat(secondReference, greaterThan(firstReference));
-    final ImmutableColumnReference tiedReference =
-        new ImmutableColumnReference(lower, secondColumn, secondColumn);
+    final ColumnReference tiedReference = newColumnReference(lower, secondColumn, secondColumn);
     assertThat(firstReference, greaterThan(tiedReference));
     assertThat(firstReference, comparesEqualTo(firstReference));
   }
 
   @Test
   public void indexesRetainUniqueFirstOrderingAndTypeAndNameTieBreakers() {
-    final MutableTable table = new MutableTable(new SchemaReference(), "TABLE");
-    final MutableIndex first = new MutableIndex(table, "Z");
-    final MutableIndex second = new MutableIndex(table, "A");
-    first.setUnique(true);
-    second.setUnique(false);
-    first.setIndexType(IndexType.other);
-    second.setIndexType(IndexType.clustered);
+    final Table table = newTable(new SchemaReference(), "TABLE");
+    final Index first = newIndex(table, "Z");
+    final Index second = newIndex(table, "A");
+    setUnique(first, true);
+    setUnique(second, false);
+    setIndexType(first, IndexType.other);
+    setIndexType(second, IndexType.clustered);
     assertThat(first, lessThan(second));
     assertThat(second, greaterThan(first));
 
-    second.setUnique(true);
+    setUnique(second, true);
     assertThat(first, greaterThan(second));
     assertThat(second, lessThan(first));
 
-    second.setIndexType(IndexType.other);
+    setIndexType(second, IndexType.other);
     assertThat(first, greaterThan(second));
     assertThat(second, lessThan(first));
     assertThat(first, comparesEqualTo(first));
@@ -165,13 +181,11 @@ public class CompareToTest {
    */
   @Test
   public void compareTables() {
-    final MutableTable tbl =
-        new MutableTable(new SchemaReference(null, "public"), "booking_detail");
-    tbl.setTableType(new TableType("table"));
+    final Table tbl = newTable(new SchemaReference(null, "public"), "booking_detail");
+    setTableType(tbl, new TableType("table"));
 
-    final MutableView view =
-        new MutableView(new SchemaReference(null, "public"), "blog_monthly_stat_fa");
-    view.setTableType(new TableType("materialized view"));
+    final View view = newView(new SchemaReference(null, "public"), "blog_monthly_stat_fa");
+    setTableType(view, new TableType("materialized view"));
 
     assertThat(view, lessThan(null));
     assertThat(tbl, lessThan(null));
@@ -185,21 +199,11 @@ public class CompareToTest {
 
   @Test
   public void databaseObject() {
-    class TestDatabaseObject extends AbstractDatabaseObject {
-
-      /** */
-      private static final long serialVersionUID = -7594540047157616727L;
-
-      TestDatabaseObject(final Schema schema, final String name) {
-        super(schema, name);
-      }
-    }
-
     final SchemaReference schema = new SchemaReference("catalog", "schema");
     final SchemaReference schema1 = new SchemaReference("catalog", "schema1");
-    final TestDatabaseObject tstDbObj1 = new TestDatabaseObject(schema, "tstDbObj1");
-    final TestDatabaseObject tstDbObj2 = new TestDatabaseObject(schema, "tstDbObj2");
-    final TestDatabaseObject tstDbObj3 = new TestDatabaseObject(schema1, "tstDbObj1");
+    final DatabaseObject tstDbObj1 = newDatabaseObject(schema, "tstDbObj1");
+    final DatabaseObject tstDbObj2 = newDatabaseObject(schema, "tstDbObj2");
+    final DatabaseObject tstDbObj3 = newDatabaseObject(schema1, "tstDbObj1");
 
     assertThat(tstDbObj1, lessThan(null));
     assertThat(tstDbObj2, lessThan(null));

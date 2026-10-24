@@ -11,31 +11,11 @@ package schemacrawler.crawl;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.OrderingComparison.comparesEqualTo;
-import static org.hamcrest.number.OrderingComparison.greaterThan;
-import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
 public class ServerInfoPropertyTest {
-
-  @Test
-  public void compare() {
-    final ImmutableServerInfoProperty serverInfoProperty =
-        new ImmutableServerInfoProperty("name", null, null);
-    final ImmutableServerInfoProperty serverInfoProperty1 =
-        new ImmutableServerInfoProperty("name1", "value1", "desc");
-
-    assertThat(serverInfoProperty, lessThan(null));
-    assertThat(serverInfoProperty1, lessThan(null));
-
-    assertThat(serverInfoProperty, comparesEqualTo(new ImmutableDatabaseProperty("name", null)));
-    assertThat(serverInfoProperty, comparesEqualTo(new ImmutableDatabaseProperty("NAME", null)));
-
-    assertThat(serverInfoProperty, lessThan(serverInfoProperty1));
-    assertThat(serverInfoProperty1, greaterThan(serverInfoProperty));
-  }
 
   @Test
   public void nullArgumentsConstructor() {

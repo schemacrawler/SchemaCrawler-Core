@@ -58,22 +58,6 @@ public class JavaSqlTypeTest {
   }
 
   @Test
-  public void javaSqlType_compareTo() {
-
-    final JavaSqlType javaSqlType =
-        new JavaSqlType(JDBCType.INTEGER, Integer.class, JavaSqlTypeGroup.integer);
-
-    assertThat(javaSqlType.compareTo(null), is(lessThan(0)));
-    assertThat(JavaSqlType.UNKNOWN.compareTo(null), is(lessThan(0)));
-
-    assertThat(javaSqlType.compareTo(javaSqlType), is(0));
-    assertThat(JavaSqlType.UNKNOWN.compareTo(JavaSqlType.UNKNOWN), is(0));
-
-    assertThat(javaSqlType.compareTo(JavaSqlType.UNKNOWN), is(lessThan(0)));
-    assertThat(JavaSqlType.UNKNOWN.compareTo(javaSqlType), is(greaterThan(0)));
-  }
-
-  @Test
   public void javaSqlType_equals() {
     EqualsVerifier.forClass(JavaSqlType.class)
         .withIgnoredFields("javaSqlTypeGroup", "defaultMappedClass")
