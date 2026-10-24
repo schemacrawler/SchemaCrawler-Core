@@ -36,6 +36,7 @@ import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
 import schemacrawler.inclusionrule.ListExclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
+import schemacrawler.schema.BaseColumn;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DependantObject;
@@ -43,8 +44,10 @@ import schemacrawler.schema.Function;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Index;
+import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PrimaryKey;
+import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
@@ -52,7 +55,10 @@ import schemacrawler.schema.Sequence;
 import schemacrawler.schema.SimpleTableType;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableConstraint;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableType;
+import schemacrawler.schema.Trigger;
 import schemacrawler.schema.TypedObject;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
@@ -177,39 +183,72 @@ public class MetadataUtilityTest {
 
   @Test
   public void simpleTypeName() {
-
     final Table view = spy(new LightTable("view"));
     final TableType tableType = mock(TableType.class);
     when(tableType.isView()).thenReturn(true);
     when(tableType.getSimpleTableType()).thenReturn(SimpleTableType.view);
     when(view.getTableType()).thenReturn(tableType);
 
+    final List<DatabaseObject> databaseObjects =
+      List.of(
+        mock(DatabaseObject.class),
+        mock(DependantObject.class),
+        mock(Synonym.class),
+        mock(Sequence.class),
+        mock(Function.class),
+        mock(Procedure.class),
+        view,
+        new LightTable("table"));
+    final List<MetaDataUtility.SimpleDatabaseObjectType> expectedTypes =
+      List.of(
+        MetaDataUtility.SimpleDatabaseObjectType.unknown,
+        MetaDataUtility.SimpleDatabaseObjectType.unknown,
+        MetaDataUtility.SimpleDatabaseObjectType.synonym,
+        MetaDataUtility.SimpleDatabaseObjectType.sequence,
+        MetaDataUtility.SimpleDatabaseObjectType.function,
+        MetaDataUtility.SimpleDatabaseObjectType.procedure,
+        MetaDataUtility.SimpleDatabaseObjectType.view,
+        MetaDataUtility.SimpleDatabaseObjectType.table);
+
     assertThat(
         MetaDataUtility.getSimpleTypeName(null),
         is(MetaDataUtility.SimpleDatabaseObjectType.unknown));
-    assertThat(
-        MetaDataUtility.getSimpleTypeName(mock(DatabaseObject.class)),
-        is(MetaDataUtility.SimpleDatabaseObjectType.unknown));
-    assertThat(
-        MetaDataUtility.getSimpleTypeName(mock(DependantObject.class)),
-        is(MetaDataUtility.SimpleDatabaseObjectType.unknown));
-    assertThat(
-        MetaDataUtility.getSimpleTypeName(mock(Synonym.class)),
-        is(MetaDataUtility.SimpleDatabaseObjectType.synonym));
-    assertThat(
-        MetaDataUtility.getSimpleTypeName(mock(Sequence.class)),
-        is(MetaDataUtility.SimpleDatabaseObjectType.sequence));
-    assertThat(
-        MetaDataUtility.getSimpleTypeName(mock(Function.class)),
-        is(MetaDataUtility.SimpleDatabaseObjectType.function));
-    assertThat(
-        MetaDataUtility.getSimpleTypeName(mock(Procedure.class)),
-        is(MetaDataUtility.SimpleDatabaseObjectType.procedure));
-    assertThat(
-        MetaDataUtility.getSimpleTypeName(view), is(MetaDataUtility.SimpleDatabaseObjectType.view));
-    assertThat(
-        MetaDataUtility.getSimpleTypeName(new LightTable("table")),
-        is(MetaDataUtility.SimpleDatabaseObjectType.table));
+
+    for (int index = 0; index < databaseObjects.size(); index++) {
+      assertThat(
+        MetaDataUtility.getSimpleTypeName(databaseObjects.get(index)),
+        is(expectedTypes.get(index)));
+    }
+  }
+
+  @Test
+  public void simpleDependantObjectType() {
+    final List<DependantObject<?>> dependants =
+        List.of(
+            mock(DependantObject.class),
+            mock(BaseColumn.class),
+            mock(KeyColumn.class),
+            mock(Index.class),
+            mock(TableReference.class),
+            mock(TableConstraint.class),
+            mock(Privilege.class),
+            mock(Trigger.class));
+    final List<MetaDataUtility.SimpleDependantObjectType> expectedTypes =
+        List.of(
+            MetaDataUtility.SimpleDependantObjectType.unknown,
+            MetaDataUtility.SimpleDependantObjectType.column,
+            MetaDataUtility.SimpleDependantObjectType.key_column,
+            MetaDataUtility.SimpleDependantObjectType.index,
+            MetaDataUtility.SimpleDependantObjectType.table_reference,
+            MetaDataUtility.SimpleDependantObjectType.table_constraint,
+            MetaDataUtility.SimpleDependantObjectType.privilege,
+            MetaDataUtility.SimpleDependantObjectType.trigger);
+
+    for (int index = 0; index < dependants.size(); index++) {
+      assertThat(
+          MetaDataUtility.getSimpleDependantObjectType(dependants.get(index)),
+          is(expectedTypes.get(index)));
+    }
   }
 
   @ParameterizedTest(name = "[{index}] {0}: Check database object name is system-generated")

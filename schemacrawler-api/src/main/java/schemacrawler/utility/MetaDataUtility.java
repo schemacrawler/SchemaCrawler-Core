@@ -19,15 +19,19 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
+import schemacrawler.schema.BaseColumn;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.DependantObject;
 import schemacrawler.schema.Function;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.JavaSqlTypeGroup;
+import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PartialDatabaseObject;
+import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
@@ -35,6 +39,8 @@ import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableConstraint;
 import schemacrawler.schema.TableConstraintColumn;
+import schemacrawler.schema.TableReference;
+import schemacrawler.schema.Trigger;
 import schemacrawler.schema.TypedObject;
 import us.fatehi.utility.UtilityMarker;
 
@@ -49,6 +55,17 @@ public final class MetaDataUtility {
     function,
     synonym,
     sequence;
+  }
+
+  public enum SimpleDependantObjectType {
+    key_column,
+    column,
+    index,
+    table_reference,
+    table_constraint,
+    privilege,
+    trigger,
+    unknown;
   }
 
   private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
@@ -154,6 +171,32 @@ public final class MetaDataUtility {
     }
     // Handle null, DependantObject, and unknown subclasses
     return SimpleDatabaseObjectType.unknown;
+  }
+
+  public static SimpleDependantObjectType getSimpleDependantObjectType(
+      final DependantObject<?> dependantObject) {
+    if (dependantObject instanceof KeyColumn) {
+      return SimpleDependantObjectType.key_column;
+    }
+    if (dependantObject instanceof BaseColumn<?>) {
+      return SimpleDependantObjectType.column;
+    }
+    if (dependantObject instanceof Index) {
+      return SimpleDependantObjectType.index;
+    }
+    if (dependantObject instanceof TableReference) {
+      return SimpleDependantObjectType.table_reference;
+    }
+    if (dependantObject instanceof TableConstraint) {
+      return SimpleDependantObjectType.table_constraint;
+    }
+    if (dependantObject instanceof Privilege<?>) {
+      return SimpleDependantObjectType.privilege;
+    }
+    if (dependantObject instanceof Trigger) {
+      return SimpleDependantObjectType.trigger;
+    }
+    return SimpleDependantObjectType.unknown;
   }
 
   public static String getTypeName(final NamedObject namedObject) {
