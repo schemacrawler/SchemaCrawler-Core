@@ -59,16 +59,17 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
       return -1;
     }
 
-    if (obj instanceof final DatabaseObject object2) {
-      final int schemaCompareTo =
-          Objects.compare(getSchema(), object2.getSchema(), nullsLast(naturalOrder()));
+    if (obj instanceof final DatabaseObject databaseObject) {
+      final int schemaCompareTo = getSchema().compareTo(databaseObject.getSchema());
       if (schemaCompareTo != 0) {
         return schemaCompareTo;
       }
-      if (this instanceof final TypedObject object && obj instanceof final TypedObject object1) {
+      if (this instanceof final TypedObject thisTypedObject
+          && obj instanceof final TypedObject typedObject) {
         try {
           final int typeCompareTo =
-              Objects.compare(object.getType(), object1.getType(), nullsLast(naturalOrder()));
+              Objects.compare(
+                  thisTypedObject.getType(), typedObject.getType(), nullsLast(naturalOrder()));
           if (typeCompareTo != 0) {
             return typeCompareTo;
           }
