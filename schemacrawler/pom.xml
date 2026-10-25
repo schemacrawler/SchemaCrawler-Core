@@ -29,7 +29,7 @@
       <groupId>us.fatehi</groupId>
       <artifactId>schemacrawler-ermodel</artifactId>
       <version>${project.version}</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>us.fatehi</groupId>
       <artifactId>schemacrawler-tools</artifactId>
@@ -49,7 +49,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <executions>
           <execution>
-            <id>javadoc-jar</id>
+            <id>attach-javadocs</id>
             <phase>package</phase>
             <goals>
               <goal>jar</goal>
@@ -64,8 +64,9 @@
                 <dependencySourceInclude>us.fatehi:schemacrawler-loader</dependencySourceInclude>
               </dependencySourceIncludes>
               <quiet>true</quiet>
+              <failOnError>true</failOnError>
               <show>public</show>
-              <detectOfflineLinks>true</detectOfflineLinks>
+              <detectOfflineLinks>false</detectOfflineLinks>
               <additionalOptions>
                 <additionalOption>-Xdoclint:none</additionalOption>
               </additionalOptions>

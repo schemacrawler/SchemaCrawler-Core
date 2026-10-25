@@ -109,9 +109,8 @@ public final class TestUtility {
   /**
    * Loads a properties file.
    *
-   * @param inputResource Properties resource.
+   * @param resource Properties resource.
    * @return Properties
-   * @throws IOException
    */
   public static Properties loadPropertiesFromClasspath(final String resource) {
     final Properties props = new Properties();
