@@ -40,10 +40,10 @@ abstract class AbstractDatabaseObjectBacked<DO extends DatabaseObject>
     if (namedObj == null) {
       return -1;
     }
-    final int familyComparison =
+    final int databaseObjectTypeComparison =
         NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(this, namedObj);
-    if (familyComparison != 0) {
-      return familyComparison;
+    if (databaseObjectTypeComparison != 0) {
+      return databaseObjectTypeComparison;
     }
     return NamedObjectComparators.NAME_THEN_KEY_COMPARATOR.compare(this, namedObj);
   }

@@ -69,10 +69,10 @@ abstract sealed class AbstractTableReference extends MutableTableConstraint
       return -1;
     }
 
-    final int familyComparison =
+    final int databaseObjectTypeComparison =
         NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, obj);
-    if (familyComparison != 0) {
-      return familyComparison;
+    if (databaseObjectTypeComparison != 0) {
+      return databaseObjectTypeComparison;
     }
 
     if (obj instanceof final TableReference other) {
