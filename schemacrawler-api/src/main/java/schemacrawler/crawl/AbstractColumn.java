@@ -55,10 +55,10 @@ abstract sealed class AbstractColumn<P extends DatabaseObject> extends AbstractD
       return -1;
     }
 
-    final int familyComparison =
+    final int databaseObjectTypeComparison =
         NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, obj);
-    if (familyComparison != 0) {
-      return familyComparison;
+    if (databaseObjectTypeComparison != 0) {
+      return databaseObjectTypeComparison;
     }
 
     final BaseColumn<P> other = (BaseColumn<P>) obj;

@@ -1,13 +1,36 @@
 package schemacrawler.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.NamedObjectKey;
 
 public class NamedObjectKeyTest {
+
+  @Test
+  public void comparisonPreservesExactComponents() {
+    final NamedObjectKey uppercase = new NamedObjectKey("schema", "AB");
+    final NamedObjectKey lowercase = new NamedObjectKey("schema", "ab");
+    final NamedObjectKey punctuated = new NamedObjectKey("schema", "a-b");
+
+    assertThat(uppercase.compareTo(lowercase), lessThan(0));
+    assertThat(lowercase.compareTo(uppercase), greaterThan(0));
+    assertThat(punctuated.compareTo(lowercase), lessThan(0));
+    assertThat(lowercase.compareTo(punctuated), greaterThan(0));
+    assertThat(
+        new NamedObjectKey("a.b", "c").compareTo(new NamedObjectKey("a", "b.c")), greaterThan(0));
+    assertThat(
+        new NamedObjectKey("schema", "").compareTo(new NamedObjectKey("schema", null)),
+        lessThan(0));
+    assertThat(
+        new NamedObjectKey("schema", null).compareTo(new NamedObjectKey("schema", "")),
+        greaterThan(0));
+    assertThat(uppercase.compareTo(new NamedObjectKey("schema", "AB")), is(0));
+  }
 
   @Test
   public void startsWithMatchesWholeComponentsAndPreservesIdentity() {
