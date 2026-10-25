@@ -35,29 +35,12 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class NamedObjectComparators {
 
+  /** Compares exact text case-sensitively, with nulls last. */
+  public static final Comparator<String> EXACT_TEXT_COMPARATOR = nullsLast(naturalOrder());
+
   /** Compares the existing lossy normalized text without allocating normalized strings. */
   public static final Comparator<String> NORMALIZED_TEXT_COMPARATOR =
       NamedObjectComparators::compareNormalizedText;
-
-  public static final Comparator<NamedObject> DATABASE_OBJECT_ORDER_COMPARATOR =
-      nullsLast(
-          comparingInt(NamedObjectComparators::namedObjectGroup)
-              .thenComparing(
-                  object ->
-                      object instanceof final DatabaseObject databaseObject
-                          ? databaseObject.getSchema()
-                          : null,
-                  Comparator.<Schema>nullsLast(naturalOrder()))
-              .thenComparingInt(NamedObjectComparators::databaseObjectOrder));
-
-  private static final Comparator<NamedObject> DEPENDANT_OBJECT_ORDER_COMPARATOR =
-      NamedObjectComparators::dependantObjectOrder;
-
-  public static final Comparator<NamedObject> DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR =
-      DATABASE_OBJECT_ORDER_COMPARATOR.thenComparing(DEPENDANT_OBJECT_ORDER_COMPARATOR);
-
-  public static final Comparator<NamedObject> TYPED_OBJECT_COMPARATOR =
-      NamedObjectComparators::typeComparator;
 
   public static final Comparator<NamedObject> NORMALIZED_NAME_COMPARATOR =
       nullsLast(comparing(NamedObject::getFullName, nullsLast(NORMALIZED_TEXT_COMPARATOR)));
@@ -67,6 +50,9 @@ public final class NamedObjectComparators {
 
   public static final Comparator<NamedObject> NAME_THEN_KEY_COMPARATOR =
       NORMALIZED_NAME_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR);
+
+  public static final Comparator<NamedObject> TYPED_OBJECT_COMPARATOR =
+      NamedObjectComparators::typeComparator;
 
   /** Compares mapping sequence, then normalized foreign and primary column names; nulls last. */
   public static final Comparator<ColumnReference> COLUMN_REFERENCE_COMPARATOR =
@@ -113,6 +99,23 @@ public final class NamedObjectComparators {
           .thenComparing(routine -> (NamedObject) routine, NORMALIZED_NAME_COMPARATOR)
           .thenComparing(Routine::getSpecificName, nullsLast(naturalOrder()))
           .thenComparing(Routine::key, nullsLast(naturalOrder()));
+
+  public static final Comparator<NamedObject> DATABASE_OBJECT_ORDER_COMPARATOR =
+      nullsLast(
+          comparingInt(NamedObjectComparators::namedObjectGroup)
+              .thenComparing(
+                  object ->
+                      object instanceof final DatabaseObject databaseObject
+                          ? databaseObject.getSchema()
+                          : null,
+                  Comparator.<Schema>nullsLast(naturalOrder()))
+              .thenComparingInt(NamedObjectComparators::databaseObjectOrder));
+
+  private static final Comparator<NamedObject> DEPENDANT_OBJECT_ORDER_COMPARATOR =
+      NamedObjectComparators::dependantObjectOrder;
+
+  public static final Comparator<NamedObject> DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR =
+      DATABASE_OBJECT_ORDER_COMPARATOR.thenComparing(DEPENDANT_OBJECT_ORDER_COMPARATOR);
 
   private static int compareNormalizedText(final String text, final String otherText) {
     final String left = text == null ? "" : text;

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Grant;
 import schemacrawler.schema.Privilege;
@@ -58,7 +59,7 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
       }
 
       final Comparator<String> compareNullableStrings =
-          Comparator.nullsLast(Comparator.naturalOrder());
+          Comparator.nullsLast(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR);
 
       int compare = compareNullableStrings.compare(grantor, otherGrant.getGrantor());
       if (compare == 0) {
