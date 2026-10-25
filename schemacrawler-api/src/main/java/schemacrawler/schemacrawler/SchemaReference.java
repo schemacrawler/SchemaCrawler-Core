@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -49,8 +50,13 @@ public final class SchemaReference implements Schema {
     if (obj == null) {
       return -1;
     }
+
+    final int familyComparison = NamedObjectComparators.FAMILY_COMPARATOR.compare(this, obj);
+    if (familyComparison != 0) {
+      return familyComparison;
+    }
     if (!(obj instanceof final Schema other)) {
-      return 1;
+      return NamedObjectComparators.NAME_THEN_KEY_COMPARATOR.compare(this, obj);
     }
 
     final int result =

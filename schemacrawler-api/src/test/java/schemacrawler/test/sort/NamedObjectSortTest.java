@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -47,12 +49,35 @@ public class NamedObjectSortTest {
     final NamedObjectSort comparator = NamedObjectSort.alphabetical;
     assertThat(comparator.compare(named, unnamed), lessThan(0));
     assertThat(comparator.compare(unnamed, named), greaterThan(0));
-    assertThat(comparator.compare(named, missingKey), is(0));
-    assertThat(comparator.compare(missingKey, named), is(0));
+    assertThat(comparator.compare(named, missingKey), lessThan(0));
+    assertThat(comparator.compare(missingKey, named), greaterThan(0));
     for (final NamedObjectSort sort : NamedObjectSort.values()) {
       assertThat(sort.compare(named, null), lessThan(0));
       assertThat(sort.compare(null, named), greaterThan(0));
       assertThat(sort.compare(null, null), is(0));
+    }
+  }
+
+  @Test
+  public void alphabeticalNormalizedNameCollisionsUseExactKeys() {
+    final NamedObject hyphenated = namedObject("a-b", new NamedObjectKey("schema", "a-b"));
+    final NamedObject spaced = namedObject("a b", new NamedObjectKey("schema", "a b"));
+    final NamedObject plain = namedObject("ab", new NamedObjectKey("schema", "ab"));
+    final List<NamedObject> expected = List.of(spaced, hyphenated, plain);
+    final List<List<NamedObject>> permutations =
+        List.of(
+            List.of(hyphenated, spaced, plain),
+            List.of(hyphenated, plain, spaced),
+            List.of(spaced, hyphenated, plain),
+            List.of(spaced, plain, hyphenated),
+            List.of(plain, hyphenated, spaced),
+            List.of(plain, spaced, hyphenated));
+
+    for (final List<NamedObject> permutation : permutations) {
+      final SortedSet<NamedObject> sorted = new TreeSet<>(NamedObjectSort.alphabetical);
+      sorted.addAll(permutation);
+      assertThat(sorted.size(), is(3));
+      assertThat(List.copyOf(sorted), is(expected));
     }
   }
 
@@ -93,5 +118,12 @@ public class NamedObjectSortTest {
     expected.add(null);
 
     return expected;
+  }
+
+  private NamedObject namedObject(final String fullName, final NamedObjectKey key) {
+    final NamedObject namedObject = mock(NamedObject.class);
+    when(namedObject.getFullName()).thenReturn(fullName);
+    when(namedObject.key()).thenReturn(key);
+    return namedObject;
   }
 }

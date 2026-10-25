@@ -2,12 +2,12 @@
 - PUBLIC.BOOKS.AUTHORS [strong_entity]
 - PUBLIC.BOOKS.BOOKS [strong_entity]
   - SCHCRWLR_B8DA20C0_AFD2BA21
+- PUBLIC.BOOKS."Celebrities" [strong_entity]
+- PUBLIC.BOOKS."Celebrity Updates" [subtype]
 - PUBLIC.BOOKS.COUPONS [strong_entity]
   - SCHCRWLR_3B49BEC4_20BE6F95
 - PUBLIC.BOOKS.CUSTOMERDATA [weak_entity]
 - PUBLIC.BOOKS.CUSTOMERS [strong_entity]
-- PUBLIC.BOOKS."Celebrities" [strong_entity]
-- PUBLIC.BOOKS."Celebrity Updates" [subtype]
 - PUBLIC.BOOKS.PUBLISHERS [strong_entity]
   - SCHCRWLR_B8DA20C0_AFD2BA21
 - PUBLIC.BOOKS.ΒΙΒΛΊΑ [strong_entity]

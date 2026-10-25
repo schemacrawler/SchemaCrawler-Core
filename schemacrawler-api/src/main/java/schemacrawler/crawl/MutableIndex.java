@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
@@ -61,8 +62,17 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    if (obj == null || !(obj instanceof final Index that)) {
+    if (obj == null) {
       return -1;
+    }
+
+    final int familyComparison =
+        NamedObjectComparators.FAMILY_AND_PARENT_COMPARATOR.compare(this, obj);
+    if (familyComparison != 0) {
+      return familyComparison;
+    }
+    if (!(obj instanceof final Index that)) {
+      return NamedObjectComparators.NAME_THEN_KEY_COMPARATOR.compare(this, obj);
     }
 
     int compareTo = 0;

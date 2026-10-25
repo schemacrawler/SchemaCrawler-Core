@@ -38,16 +38,16 @@ schema: PUBLIC.BOOKS
           PUBLIC.BOOKS.BOOKS.PREVIOUSEDITIONID --> PUBLIC.BOOKS.BOOKS.ID
       attributes: 
         PK_NAME: PK_BOOKS
-    foreign-key: FK_SALES_BOOK
-      column references: 
-        key sequence: 1
-          PUBLIC."PUBLISHER SALES".SALES.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
-      attributes: 
-        PK_NAME: PK_BOOKS
     foreign-key: SYS_FK_10121
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKAUTHORS.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
+      attributes: 
+        PK_NAME: PK_BOOKS
+    foreign-key: FK_SALES_BOOK
+      column references: 
+        key sequence: 1
+          PUBLIC."PUBLISHER SALES".SALES.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
       attributes: 
         PK_NAME: PK_BOOKS
     implicit-association: 3_weak_partial_pk
@@ -65,16 +65,16 @@ schema: PUBLIC.BOOKS
         REMARKS: Overwritten remarks line 1
         some tag 1: tagvalue1
         tag2: tag value 2
+    implicit-association: SCHCRWLR_B8DA20C0_AFD2BA21
+      column references: 
+        key sequence: 1
+          PUBLIC.BOOKS.BOOKS.PUBLISHERID --> PUBLIC.BOOKS.PUBLISHERS.ID
     implicit-association: 9_weak_self_reference
       column references: 
         key sequence: 1
           PUBLIC.BOOKS.BOOKS.OTHEREDITIONID --> PUBLIC.BOOKS.BOOKS.ID
       attributes: 
         REMARKS: 
-    implicit-association: SCHCRWLR_B8DA20C0_AFD2BA21
-      column references: 
-        key sequence: 1
-          PUBLIC.BOOKS.BOOKS.PUBLISHERID --> PUBLIC.BOOKS.PUBLISHERS.ID
   table: PUBLIC.BOOKS."Celebrities"
     foreign-key: SYS_FK_10131
       column references: 
@@ -184,10 +184,6 @@ schema: PUBLIC."PUBLISHER SALES"
           PUBLIC."PUBLISHER SALES".SALES.COUNTRY --> PUBLIC."PUBLISHER SALES".REGIONS.COUNTRY
       attributes: 
         PK_NAME: PK_CUSTOMERS
-    implicit-association: SCHCRWLR_3B49BEC4_20BE6F95
-      column references: 
-        key sequence: 1
-          PUBLIC."PUBLISHER SALES".SALES.COUPON_ID --> PUBLIC.BOOKS.COUPONS.ID
     implicit-association: 8_weak_two_references
       column references: 
         key sequence: 1
@@ -196,4 +192,8 @@ schema: PUBLIC."PUBLISHER SALES"
           PRIVATE.ALLSALES.REGIONS.COUNTRY --> PUBLIC."PUBLISHER SALES".SALES.COUNTRY
       attributes: 
         REMARKS: 
+    implicit-association: SCHCRWLR_3B49BEC4_20BE6F95
+      column references: 
+        key sequence: 1
+          PUBLIC."PUBLISHER SALES".SALES.COUPON_ID --> PUBLIC.BOOKS.COUPONS.ID
 schema: PUBLIC.SYSTEM_LOBS

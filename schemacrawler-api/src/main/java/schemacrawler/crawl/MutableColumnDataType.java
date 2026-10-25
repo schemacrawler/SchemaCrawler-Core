@@ -8,16 +8,14 @@
 
 package schemacrawler.crawl;
 
-import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsLast;
 import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DataTypeType;
 import schemacrawler.schema.Identifiers;
@@ -98,21 +96,31 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
     enumValues = new ArrayList<>();
   }
 
-  /**
-   * Orders system types before user-defined types, then compares schemas and names.
-   *
-   * @param obj Object to compare
-   * @return The comparison result, with null objects and types last
-   */
   @Override
   public int compareTo(final NamedObject obj) {
+    if (obj == null) {
+      return -1;
+    }
+
+    final int familyComparison =
+        NamedObjectComparators.FAMILY_AND_PARENT_COMPARATOR.compare(this, obj);
+    if (familyComparison != 0) {
+      return familyComparison;
+    }
+
     if (obj instanceof final ColumnDataType other) {
-      final int comparison = Objects.compare(getType(), other.getType(), nullsLast(naturalOrder()));
-      if (comparison != 0) {
-        return comparison;
+      final int typeComparison =
+          NamedObjectComparators.<DataTypeType>typeComparator().compare(getType(), other.getType());
+      if (typeComparison != 0) {
+        return typeComparison;
       }
     }
-    return super.compareTo(obj);
+
+    final int databaseObjectComparison = compareDatabaseObjectFields(obj);
+    if (databaseObjectComparison != 0) {
+      return databaseObjectComparison;
+    }
+    return NamedObjectComparators.EXACT_KEY_COMPARATOR.compare(this, obj);
   }
 
   /** {@inheritDoc} */

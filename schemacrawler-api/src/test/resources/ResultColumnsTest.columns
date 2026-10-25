@@ -1,35 +1,6 @@
 full-name: 
-columns: PUBLIC.BOOKS.BOOKS.TITLE, C2, PUBLIC.BOOKS.BOOKS.PRICE
+columns: C2, PUBLIC.BOOKS.BOOKS.TITLE, PUBLIC.BOOKS.BOOKS.PRICE
 
-column: PUBLIC.BOOKS.BOOKS.TITLE
-  attributes: {}
-  autoIncrement: false
-  caseSensitive: true
-  columnDataType: PUBLIC.BOOKS."VARCHAR"
-  columnDataTypeKnown: true
-  currency: false
-  decimalDigits: 0
-  definitelyWritable: false
-  displaySize: 255
-  fullName: PUBLIC.BOOKS.BOOKS.TITLE
-  label: BOOK
-  name: TITLE
-  nullable: false
-  ordinalPosition: 1
-  parent: PUBLIC.BOOKS.BOOKS
-  parentPartial: true
-  readOnly: false
-  remarks: 
-  schema: PUBLIC.BOOKS
-  searchable: true
-  shortName: BOOKS.TITLE
-  signed: false
-  size: 0
-  type: PUBLIC.BOOKS."VARCHAR"
-  width: 
-  writable: false
-  database type: VARCHAR
-  type: VARCHAR
 column: C2
   attributes: {}
   autoIncrement: false
@@ -55,6 +26,35 @@ column: C2
   signed: false
   size: 0
   type: VARCHAR
+  width: 
+  writable: false
+  database type: VARCHAR
+  type: VARCHAR
+column: PUBLIC.BOOKS.BOOKS.TITLE
+  attributes: {}
+  autoIncrement: false
+  caseSensitive: true
+  columnDataType: PUBLIC.BOOKS."VARCHAR"
+  columnDataTypeKnown: true
+  currency: false
+  decimalDigits: 0
+  definitelyWritable: false
+  displaySize: 255
+  fullName: PUBLIC.BOOKS.BOOKS.TITLE
+  label: BOOK
+  name: TITLE
+  nullable: false
+  ordinalPosition: 1
+  parent: PUBLIC.BOOKS.BOOKS
+  parentPartial: true
+  readOnly: false
+  remarks: 
+  schema: PUBLIC.BOOKS
+  searchable: true
+  shortName: BOOKS.TITLE
+  signed: false
+  size: 0
+  type: PUBLIC.BOOKS."VARCHAR"
   width: 
   writable: false
   database type: VARCHAR

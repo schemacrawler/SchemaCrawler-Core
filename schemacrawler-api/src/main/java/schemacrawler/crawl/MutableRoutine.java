@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -27,7 +28,6 @@ import schemacrawler.schema.RoutineBodyType;
 import schemacrawler.schema.RoutineParameter;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
-import us.fatehi.utility.CollectionsUtility;
 
 /** Represents a database routine. Created from metadata returned by a JDBC call. */
 abstract sealed class MutableRoutine extends AbstractDatabaseObject implements Routine
@@ -67,14 +67,16 @@ abstract sealed class MutableRoutine extends AbstractDatabaseObject implements R
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    int comparison = super.compareTo(obj);
+    int comparison = compareDatabaseObjectFields(obj);
 
     if (obj instanceof final Routine other) {
       if (comparison == 0) {
         final List<RoutineParameter<? extends Routine>> thisParameters = getParameters();
         final List<RoutineParameter<? extends Routine>> otherParameters = other.getParameters();
 
-        comparison = CollectionsUtility.compareLists(thisParameters, otherParameters);
+        comparison =
+            NamedObjectComparators.ROUTINE_PARAMETER_LIST_COMPARATOR.compare(
+                thisParameters, otherParameters);
       }
 
       if (comparison == 0) {
@@ -83,7 +85,10 @@ abstract sealed class MutableRoutine extends AbstractDatabaseObject implements R
       }
     }
 
-    return comparison;
+    if (comparison != 0) {
+      return comparison;
+    }
+    return NamedObjectComparators.EXACT_KEY_COMPARATOR.compare(this, obj);
   }
 
   /** {@inheritDoc} */

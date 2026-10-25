@@ -53,6 +53,16 @@
     - required: false
     - default: null
     - enum: []
+- PUBLIC.BOOKS."Celebrities"
+  - NAME [string]
+    - required: false
+    - default: null
+    - enum: []
+- PUBLIC.BOOKS."Celebrity Updates"
+  - UPDATE [string]
+    - required: false
+    - default: null
+    - enum: []
 - PUBLIC.BOOKS.COUPONS
   - DATA [string]
     - required: false
@@ -81,16 +91,6 @@
     - default: null
     - enum: []
   - AGE [other]
-    - required: false
-    - default: null
-    - enum: []
-- PUBLIC.BOOKS."Celebrities"
-  - NAME [string]
-    - required: false
-    - default: null
-    - enum: []
-- PUBLIC.BOOKS."Celebrity Updates"
-  - UPDATE [string]
     - required: false
     - default: null
     - enum: []

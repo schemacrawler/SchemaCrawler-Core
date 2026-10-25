@@ -9,6 +9,7 @@
 package schemacrawler.test.sort;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.number.OrderingComparison.comparesEqualTo;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.hamcrest.number.OrderingComparison.lessThan;
@@ -20,6 +21,7 @@ import static schemacrawler.crawl.SortTestUtility.newColumn;
 import static schemacrawler.crawl.SortTestUtility.newColumnReference;
 import static schemacrawler.crawl.SortTestUtility.newDatabaseObject;
 import static schemacrawler.crawl.SortTestUtility.newDatabaseProperty;
+import static schemacrawler.crawl.SortTestUtility.newForeignKey;
 import static schemacrawler.crawl.SortTestUtility.newIndex;
 import static schemacrawler.crawl.SortTestUtility.newIndexColumn;
 import static schemacrawler.crawl.SortTestUtility.newProcedure;
@@ -33,12 +35,15 @@ import static schemacrawler.crawl.SortTestUtility.setTableType;
 import static schemacrawler.crawl.SortTestUtility.setUnique;
 
 import java.util.List;
+import java.util.TreeSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import schemacrawler.namedobject.NamedObjectSort;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.DatabaseObject;
+import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexType;
@@ -53,6 +58,41 @@ import schemacrawler.schemacrawler.SchemaReference;
 import us.fatehi.utility.property.Property;
 
 public class CompareToTest {
+
+  @Test
+  public void naturalKeyTiesRetainAllIdentitiesAcrossPermutations() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final Table child = newTable(schema, "CHILD");
+    final Table parent = newTable(schema, "PARENT");
+    final List<List<NamedObject>> families =
+        List.of(
+            List.of(
+                newProcedure(schema, "a b", "SAME"),
+                newProcedure(schema, "a-b", "SAME"),
+                newProcedure(schema, "ab", "SAME")),
+            List.of(newIndex(child, "a b"), newIndex(child, "a-b"), newIndex(child, "ab")),
+            List.of(
+                newForeignKey("a b", child, parent),
+                newForeignKey("a-b", child, parent),
+                newForeignKey("ab", child, parent)));
+    final List<List<Integer>> permutations =
+        List.of(
+            List.of(0, 1, 2),
+            List.of(0, 2, 1),
+            List.of(1, 0, 2),
+            List.of(1, 2, 0),
+            List.of(2, 0, 1),
+            List.of(2, 1, 0));
+
+    for (final List<NamedObject> family : families) {
+      for (final List<Integer> permutation : permutations) {
+        final TreeSet<NamedObject> sorted = new TreeSet<>(NamedObjectSort.natural);
+        permutation.forEach(index -> sorted.add(family.get(index)));
+        assertThat(sorted.size(), is(3));
+        assertThat(List.copyOf(sorted), is(family));
+      }
+    }
+  }
 
   @Test
   public void nullableRoutineSpecificNamesSortLastAfterEqualKeysAndParameters() {
@@ -198,6 +238,84 @@ public class CompareToTest {
   }
 
   @Test
+  public void compareTablesAndDependantsByFamilyInBothDirections() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final Table table = newTable(schema, "TABLE");
+    final Column column = newColumn(table, "COLUMN");
+    final Index index = newIndex(table, "INDEX");
+
+    assertThat(schema.compareTo(table), lessThan(0));
+    assertThat(table.compareTo(schema), greaterThan(0));
+    assertThat(table.compareTo(column), lessThan(0));
+    assertThat(column.compareTo(table), greaterThan(0));
+    assertThat(table.compareTo(index), lessThan(0));
+    assertThat(index.compareTo(table), greaterThan(0));
+
+    final List<List<NamedObject>> permutations =
+        List.of(
+            List.of(schema, table, column),
+            List.of(schema, column, table),
+            List.of(table, schema, column),
+            List.of(table, column, schema),
+            List.of(column, schema, table),
+            List.of(column, table, schema));
+    for (final List<NamedObject> permutation : permutations) {
+      assertThat(
+          permutation.stream().sorted(NamedObjectSort.natural).toList(),
+          is(List.of(schema, table, column)));
+    }
+  }
+
+  @Test
+  public void dependantComparisonUsesParentBeforeLocalPosition() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final Table firstParent = newTable(schema, "Z_PARENT");
+    final Table secondParent = newTable(schema, "A_PARENT");
+    setSortIndex(firstParent, 0);
+    setSortIndex(secondParent, 1);
+
+    final Column firstColumn = newColumn(firstParent, "Z_COLUMN");
+    final Column secondColumn = newColumn(secondParent, "A_COLUMN");
+    setOrdinalPosition(firstColumn, 2);
+    setOrdinalPosition(secondColumn, 1);
+
+    assertThat(firstColumn.compareTo(secondColumn), lessThan(0));
+    assertThat(secondColumn.compareTo(firstColumn), greaterThan(0));
+  }
+
+  @Test
+  public void routineSpecificNamePrecedesTerminalKey() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final Procedure laterSpecificName = spy(newProcedure(schema, "ROUTINE", "Z_SPECIFIC"));
+    final Procedure earlierSpecificName = spy(newProcedure(schema, "ROUTINE", "A_SPECIFIC"));
+    doReturn(new NamedObjectKey("a-key")).when(laterSpecificName).key();
+    doReturn(new NamedObjectKey("z-key")).when(earlierSpecificName).key();
+
+    assertThat(laterSpecificName.compareTo(earlierSpecificName), greaterThan(0));
+    assertThat(earlierSpecificName.compareTo(laterSpecificName), lessThan(0));
+
+    final Procedure sameSpecificNameFirst = spy(newProcedure(schema, "OTHER", "SAME"));
+    final Procedure sameSpecificNameSecond = spy(newProcedure(schema, "OTHER", "SAME"));
+    doReturn(new NamedObjectKey("a-key")).when(sameSpecificNameFirst).key();
+    doReturn(new NamedObjectKey("b-key")).when(sameSpecificNameSecond).key();
+
+    assertThat(sameSpecificNameFirst.compareTo(sameSpecificNameSecond), lessThan(0));
+    assertThat(sameSpecificNameSecond.compareTo(sameSpecificNameFirst), greaterThan(0));
+  }
+
+  @Test
+  public void tableReferencesUseKeyAfterIdenticalMappings() {
+    final Table child = newTable(new SchemaReference("catalog", "schema"), "CHILD");
+    final Table parent = newTable(new SchemaReference("catalog", "schema"), "PARENT");
+    final ForeignKey first = newForeignKey("FK_A", child, parent);
+    final ForeignKey second = newForeignKey("FK_B", child, parent);
+
+    assertThat(first.getColumnReferences(), is(second.getColumnReferences()));
+    assertThat(first.compareTo(second), lessThan(0));
+    assertThat(second.compareTo(first), greaterThan(0));
+  }
+
+  @Test
   public void databaseObject() {
     final SchemaReference schema = new SchemaReference("catalog", "schema");
     final SchemaReference schema1 = new SchemaReference("catalog", "schema1");
@@ -219,7 +337,7 @@ public class CompareToTest {
 
     assertThat(
         tstDbObj1,
-        greaterThan(
+        lessThan(
             new NamedObject() {
               /** */
               private static final long serialVersionUID = -1308483158535248447L;

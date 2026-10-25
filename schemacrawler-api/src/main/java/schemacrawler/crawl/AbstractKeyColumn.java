@@ -11,6 +11,7 @@ package schemacrawler.crawl;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.Optional;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.KeyColumn;
@@ -45,6 +46,12 @@ abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> i
   public int compareTo(final NamedObject obj) {
     if (obj == null) {
       return -1;
+    }
+
+    final int familyComparison =
+        NamedObjectComparators.FAMILY_AND_PARENT_COMPARATOR.compare(this, obj);
+    if (familyComparison != 0) {
+      return familyComparison;
     }
 
     int comparison = 0;

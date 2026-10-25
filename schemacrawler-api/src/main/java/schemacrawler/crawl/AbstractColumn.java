@@ -9,6 +9,7 @@
 package schemacrawler.crawl;
 
 import java.io.Serial;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.BaseColumn;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DatabaseObject;
@@ -52,6 +53,12 @@ abstract sealed class AbstractColumn<P extends DatabaseObject> extends AbstractD
   public final int compareTo(final NamedObject obj) {
     if (obj == null) {
       return -1;
+    }
+
+    final int familyComparison =
+        NamedObjectComparators.FAMILY_AND_PARENT_COMPARATOR.compare(this, obj);
+    if (familyComparison != 0) {
+      return familyComparison;
     }
 
     final BaseColumn<P> other = (BaseColumn<P>) obj;

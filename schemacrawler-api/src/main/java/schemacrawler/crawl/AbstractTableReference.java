@@ -18,6 +18,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.NamedObject;
@@ -69,11 +70,21 @@ abstract sealed class AbstractTableReference extends MutableTableConstraint
       return -1;
     }
 
+    final int familyComparison =
+        NamedObjectComparators.FAMILY_AND_PARENT_COMPARATOR.compare(this, obj);
+    if (familyComparison != 0) {
+      return familyComparison;
+    }
+
     if (obj instanceof final TableReference other) {
       final List<ColumnReference> thisColumnReferences = getColumnReferences();
       final List<ColumnReference> otherColumnReferences = other.getColumnReferences();
-
-      return CollectionsUtility.compareLists(thisColumnReferences, otherColumnReferences);
+      final int mappingComparison =
+          CollectionsUtility.compareLists(thisColumnReferences, otherColumnReferences);
+      if (mappingComparison != 0) {
+        return mappingComparison;
+      }
+      return super.compareTo(other);
     }
 
     if (obj instanceof NamedObject) {

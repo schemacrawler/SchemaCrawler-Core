@@ -17,6 +17,7 @@ import java.io.Serial;
 import java.util.Map;
 import java.util.Objects;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
@@ -60,6 +61,28 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
     }
 
     if (obj instanceof final DatabaseObject databaseObject) {
+      final int comparison = compareDatabaseObjectFields(obj);
+      if (comparison != 0) {
+        return comparison;
+      }
+      return NamedObjectComparators.EXACT_KEY_COMPARATOR.compare(this, obj);
+    }
+
+    return super.compareTo(obj);
+  }
+
+  protected final int compareDatabaseObjectFields(final NamedObject obj) {
+    if (obj == null) {
+      return -1;
+    }
+
+    final int familyComparison =
+        NamedObjectComparators.FAMILY_AND_PARENT_COMPARATOR.compare(this, obj);
+    if (familyComparison != 0) {
+      return familyComparison;
+    }
+
+    if (obj instanceof final DatabaseObject databaseObject) {
       final int schemaCompareTo = getSchema().compareTo(databaseObject.getSchema());
       if (schemaCompareTo != 0) {
         return schemaCompareTo;
@@ -79,7 +102,7 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
       }
     }
 
-    return super.compareTo(obj);
+    return NamedObjectComparators.NORMALIZED_NAME_COMPARATOR.compare(this, obj);
   }
 
   @Override

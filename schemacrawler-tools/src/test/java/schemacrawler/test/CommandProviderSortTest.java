@@ -64,14 +64,15 @@ public class CommandProviderSortTest {
   @Test
   public void sort() {
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(testCommandProvider, testCommandProvider),
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
+            testCommandProvider, testCommandProvider),
         is(0));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             testCommandProvider, otherCommandProvider),
         is(greaterThan(0)));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             otherCommandProvider, testCommandProvider),
         is(lessThan(0)));
   }
@@ -79,27 +80,27 @@ public class CommandProviderSortTest {
   @Test
   public void sortForFallBack() {
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             fallbackCommandProvider, fallbackCommandProvider),
         is(0));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             testCommandProvider, fallbackCommandProvider),
         is(lessThan(0)));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             fallbackCommandProvider, testCommandProvider),
         is(greaterThan(0)));
   }
 
   @Test
   public void sortNull() {
-    assertThat(CommandRegistry.commandProviderComparator.compare(null, null), is(0));
+    assertThat(CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(null, null), is(0));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(testCommandProvider, null),
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(testCommandProvider, null),
         is(lessThan(0)));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(null, fallbackCommandProvider),
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(null, fallbackCommandProvider),
         is(greaterThan(0)));
   }
 }

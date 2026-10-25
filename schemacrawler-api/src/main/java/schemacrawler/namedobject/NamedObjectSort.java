@@ -8,14 +8,12 @@
 
 package schemacrawler.namedobject;
 
-import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
 
 import java.util.Comparator;
 import java.util.Objects;
 import schemacrawler.schema.NamedObject;
-import us.fatehi.utility.Utility;
 
 /**
  * Comparators for named objects, including case-insensitive alphabetical and natural order. Null
@@ -24,8 +22,7 @@ import us.fatehi.utility.Utility;
 public enum NamedObjectSort implements Comparator<NamedObject> {
 
   /** Alphabetical sort, case-insensitive. */
-  alphabetical(
-      comparing(NamedObject::getFullName, nullsLast(comparing(Utility::convertForComparison)))),
+  alphabetical(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR),
 
   /** Natural sort. */
   natural(naturalOrder());

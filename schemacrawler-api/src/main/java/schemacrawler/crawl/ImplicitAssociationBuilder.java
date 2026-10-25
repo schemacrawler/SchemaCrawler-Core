@@ -29,6 +29,7 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.Builder;
+import us.fatehi.utility.CollectionsUtility;
 import us.fatehi.utility.string.StringFormat;
 
 public final class ImplicitAssociationBuilder implements Builder<TableReference> {
@@ -180,7 +181,7 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
     // NOTE: Use compareTo, not equals (that is, not contains from the set)
     final Optional<TableReference> isPreviouslyBuilt =
         previouslyBuilt.stream()
-            .filter(previous -> previous.compareTo(implicitAssociation) == 0)
+            .filter(previous -> haveSameColumnReferences(previous, implicitAssociation))
             .findFirst();
     if (isPreviouslyBuilt.isPresent()) {
       return isPreviouslyBuilt.get();
@@ -200,11 +201,18 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
     // Search foreign keys by column references
     final Collection<ForeignKey> exportedForeignKeys = referencedTable.getExportedForeignKeys();
     for (final ForeignKey foreignKey : exportedForeignKeys) {
-      if (implicitAssociation.compareTo(foreignKey) == 0) {
+      if (haveSameColumnReferences(implicitAssociation, foreignKey)) {
         return foreignKey;
       }
     }
 
     return null;
+  }
+
+  private boolean haveSameColumnReferences(
+      final TableReference tableReference, final TableReference otherTableReference) {
+    return CollectionsUtility.compareLists(
+            tableReference.getColumnReferences(), otherTableReference.getColumnReferences())
+        == 0;
   }
 }

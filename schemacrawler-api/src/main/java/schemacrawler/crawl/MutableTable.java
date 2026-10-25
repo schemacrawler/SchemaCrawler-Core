@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Column;
@@ -95,6 +96,12 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   public int compareTo(final NamedObject obj) {
     if (obj == null) {
       return -1;
+    }
+
+    final int familyComparison =
+        NamedObjectComparators.FAMILY_AND_PARENT_COMPARATOR.compare(this, obj);
+    if (familyComparison != 0) {
+      return familyComparison;
     }
 
     int comparison = 0;
