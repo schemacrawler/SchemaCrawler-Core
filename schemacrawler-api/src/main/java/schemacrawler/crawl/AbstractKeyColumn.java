@@ -10,6 +10,7 @@ package schemacrawler.crawl;
 
 import java.io.Serial;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Optional;
 import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.Column;
@@ -24,6 +25,11 @@ abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> i
     permits MutableIndexColumn, MutableTableConstraintColumn {
 
   @Serial private static final long serialVersionUID = 6988029161945610279L;
+
+  private static final Comparator<AbstractKeyColumn> KEY_COLUMN_COMPARATOR =
+      Comparator.comparingInt((AbstractKeyColumn column) -> column.keyOrdinalPosition)
+          .thenComparing(NamedObjectComparators.TYPED_OBJECT_COMPARATOR)
+          .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
 
   private final Column column;
   private final boolean isPartial;
@@ -54,17 +60,11 @@ abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> i
       return databaseObjectTypeComparison;
     }
 
-    int comparison = 0;
-
     if (obj instanceof final AbstractKeyColumn other) {
-      comparison = Integer.compare(keyOrdinalPosition, other.keyOrdinalPosition);
+      return KEY_COLUMN_COMPARATOR.compare(this, other);
     }
 
-    if (comparison == 0) {
-      comparison = super.compareTo(obj);
-    }
-
-    return comparison;
+    return super.compareTo(obj);
   }
 
   /** {@inheritDoc} */

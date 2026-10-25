@@ -54,6 +54,11 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
 
   @Serial private static final long serialVersionUID = 3257290248802284852L;
 
+  private static final Comparator<MutableTable> TABLE_COMPARATOR =
+      Comparator.comparingInt((MutableTable table) -> table.sortIndex)
+          .thenComparing(NamedObjectComparators.TYPED_OBJECT_COMPARATOR)
+          .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
+
   private final BuildableDependantObjectIndex<MutableColumn, Table> columns;
   private final BuildableDependantObjectIndex<TableConstraint, Table> constraints;
   private final BuildableDependantObjectIndex<MutableForeignKey, Table> foreignKeys;
@@ -106,10 +111,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
     }
 
     if (obj instanceof final MutableTable table) {
-      final int comparison = Integer.compare(sortIndex, table.sortIndex);
-      if (comparison != 0) {
-        return comparison;
-      }
+      return TABLE_COMPARATOR.compare(this, table);
     }
 
     return super.compareTo(obj);

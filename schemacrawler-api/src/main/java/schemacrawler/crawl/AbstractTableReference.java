@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.Serial;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
@@ -31,6 +32,11 @@ abstract sealed class AbstractTableReference extends MutableTableConstraint
     implements TableReference permits MutableForeignKey, MutableImplicitAssociation {
 
   @Serial private static final long serialVersionUID = -5164664131926303038L;
+
+  private static final Comparator<TableReference> TABLE_REFERENCE_COMPARATOR =
+      NamedObjectComparators.TABLE_REFERENCE_MAPPING_COMPARATOR
+          .thenComparing(NamedObjectComparators.TYPED_OBJECT_COMPARATOR)
+          .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
 
   private static final Logger LOGGER = Logger.getLogger(AbstractTableReference.class.getName());
 
@@ -76,20 +82,10 @@ abstract sealed class AbstractTableReference extends MutableTableConstraint
     }
 
     if (obj instanceof final TableReference other) {
-      final int mappingComparison =
-          NamedObjectComparators.TABLE_REFERENCE_MAPPING_COMPARATOR.compare(this, other);
-      if (mappingComparison != 0) {
-        return mappingComparison;
-      }
-      return super.compareTo(other);
+      return TABLE_REFERENCE_COMPARATOR.compare(this, other);
     }
 
-    if (obj instanceof NamedObject) {
-      final NamedObject other = obj;
-      return super.compareTo(other);
-    }
-
-    return -1;
+    return super.compareTo(obj);
   }
 
   /** {@inheritDoc} */

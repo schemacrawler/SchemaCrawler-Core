@@ -9,6 +9,7 @@
 package schemacrawler.crawl;
 
 import java.io.Serial;
+import java.util.Comparator;
 import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.BaseColumn;
 import schemacrawler.schema.ColumnDataType;
@@ -24,6 +25,11 @@ abstract sealed class AbstractColumn<P extends DatabaseObject> extends AbstractD
     implements BaseColumn<P> permits MutableColumn, MutableResultsColumn, MutableRoutineParameter {
 
   @Serial private static final long serialVersionUID = -8492662324895309485L;
+
+  private static final Comparator<BaseColumn<?>> COLUMN_COMPARATOR =
+      Comparator.comparingInt((BaseColumn<?> column) -> column.getOrdinalPosition())
+          .thenComparing(NamedObjectComparators.TYPED_OBJECT_COMPARATOR)
+          .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
 
   private ColumnDataType columnDataType;
   private int decimalDigits;
@@ -61,17 +67,7 @@ abstract sealed class AbstractColumn<P extends DatabaseObject> extends AbstractD
       return databaseObjectTypeComparison;
     }
 
-    final BaseColumn<P> other = (BaseColumn<P>) obj;
-    int comparison = 0;
-
-    if (comparison == 0) {
-      comparison = Integer.compare(ordinalPosition, other.getOrdinalPosition());
-    }
-    if (comparison == 0) {
-      comparison = super.compareTo(other);
-    }
-
-    return comparison;
+    return COLUMN_COMPARATOR.compare(this, (BaseColumn<?>) obj);
   }
 
   /** {@inheritDoc} */

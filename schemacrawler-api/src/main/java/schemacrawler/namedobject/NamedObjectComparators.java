@@ -117,6 +117,17 @@ public final class NamedObjectComparators {
   public static final Comparator<NamedObject> DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR =
       DATABASE_OBJECT_ORDER_COMPARATOR.thenComparing(DEPENDANT_OBJECT_ORDER_COMPARATOR);
 
+  /** Compares structural order, type, and normalized name without a terminal identity key. */
+  public static final Comparator<NamedObject> DATABASE_OBJECT_FIELDS_COMPARATOR =
+      nullsLast(
+          DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR
+              .thenComparing(TYPED_OBJECT_COMPARATOR)
+              .thenComparing(NORMALIZED_NAME_COMPARATOR));
+
+  /** Compares database-object fields followed by the exact identity key. */
+  public static final Comparator<NamedObject> DATABASE_OBJECT_COMPARATOR =
+      nullsLast(DATABASE_OBJECT_FIELDS_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR));
+
   private static int compareNormalizedText(final String text, final String otherText) {
     final String left = text == null ? "" : text;
     final String right = otherText == null ? "" : otherText;

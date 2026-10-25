@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,12 @@ import us.fatehi.utility.CollectionsUtility;
 final class MutableIndex extends AbstractDependantObject<Table> implements Index {
 
   @Serial private static final long serialVersionUID = 4051326747138079028L;
+
+  private static final Comparator<Index> INDEX_COMPARATOR =
+      Comparator.comparing(Index::getColumns, CollectionsUtility::compareLists)
+          .thenComparing(Index::isUnique, Comparator.reverseOrder())
+          .thenComparing(NamedObjectComparators.TYPED_OBJECT_COMPARATOR)
+          .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
 
   private final BuildableDependantObjectIndex<MutableIndexColumn, Table> columns;
   private String definition;
@@ -68,32 +75,11 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
     if (databaseObjectTypeComparison != 0) {
       return databaseObjectTypeComparison;
     }
-    if (!(obj instanceof final Index that)) {
+    if (!(obj instanceof final Index otherIndex)) {
       return NamedObjectComparators.NAME_THEN_KEY_COMPARATOR.compare(this, obj);
     }
 
-    int compareTo = 0;
-
-    if (compareTo == 0) {
-      final List<IndexColumn> thisColumns = getColumns();
-      final List<IndexColumn> thatColumns = that.getColumns();
-
-      compareTo = CollectionsUtility.compareLists(thisColumns, thatColumns);
-    }
-
-    if (compareTo == 0) {
-      compareTo = Boolean.compare(that.isUnique(), isUnique);
-    }
-
-    if (compareTo == 0) {
-      compareTo = NamedObjectComparators.TYPED_OBJECT_COMPARATOR.compare(this, that);
-    }
-
-    if (compareTo == 0) {
-      compareTo = super.compareTo(obj);
-    }
-
-    return compareTo;
+    return INDEX_COMPARATOR.compare(this, otherIndex);
   }
 
   /** {@inheritDoc} */

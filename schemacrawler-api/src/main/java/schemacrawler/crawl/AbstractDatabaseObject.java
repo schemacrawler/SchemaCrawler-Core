@@ -57,34 +57,11 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
       return -1;
     }
 
-    if (obj instanceof final DatabaseObject databaseObject) {
-      final int comparison = compareDatabaseObjectFields(obj);
-      if (comparison != 0) {
-        return comparison;
-      }
-      return NamedObjectComparators.EXACT_KEY_COMPARATOR.compare(this, obj);
+    if (obj instanceof DatabaseObject) {
+      return NamedObjectComparators.DATABASE_OBJECT_COMPARATOR.compare(this, obj);
     }
 
     return super.compareTo(obj);
-  }
-
-  protected final int compareDatabaseObjectFields(final NamedObject obj) {
-    if (obj == null) {
-      return -1;
-    }
-
-    final int databaseObjectTypeComparison =
-        NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, obj);
-    if (databaseObjectTypeComparison != 0) {
-      return databaseObjectTypeComparison;
-    }
-
-    final int typeComparison = NamedObjectComparators.TYPED_OBJECT_COMPARATOR.compare(this, obj);
-    if (typeComparison != 0) {
-      return typeComparison;
-    }
-
-    return NamedObjectComparators.NORMALIZED_NAME_COMPARATOR.compare(this, obj);
   }
 
   @Override
