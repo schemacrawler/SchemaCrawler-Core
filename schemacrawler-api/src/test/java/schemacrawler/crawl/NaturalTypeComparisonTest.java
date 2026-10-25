@@ -24,15 +24,63 @@ public class NaturalTypeComparisonTest {
 
   @Test
   public void columnDataTypeUsesNaturalDataTypeOrderBeforeName() {
+    final Schema schema = new SchemaReference("catalog", "BOOKS");
     final MutableColumnDataType systemType =
-        new MutableColumnDataType(
-            new SchemaReference("catalog", "SYSTEM_LOBS"), "Z_SYSTEM", DataTypeType.system);
+        new MutableColumnDataType(schema, "Z_SYSTEM", DataTypeType.system);
     final MutableColumnDataType userType =
-        new MutableColumnDataType(
-            new SchemaReference("catalog", "BOOKS"), "A_USER", DataTypeType.user_defined);
+        new MutableColumnDataType(schema, "A_USER", DataTypeType.user_defined);
 
     assertThat(systemType.compareTo(userType), lessThan(0));
     assertThat(userType.compareTo(systemType), greaterThan(0));
+  }
+
+  @Test
+  public void columnDataTypeUsesSchemaOrderBeforeDataTypeOrder() {
+    final MutableColumnDataType systemType =
+        new MutableColumnDataType(
+            new SchemaReference("catalog", "SYSTEM_LOBS"), "A_SYSTEM", DataTypeType.system);
+    final MutableColumnDataType userType =
+        new MutableColumnDataType(
+            new SchemaReference("catalog", "BOOKS"), "Z_USER", DataTypeType.user_defined);
+
+    assertThat(userType.compareTo(systemType), lessThan(0));
+    assertThat(systemType.compareTo(userType), greaterThan(0));
+  }
+
+  @Test
+  public void columnPositionPrecedesColumnDataType() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final MutableTable table = new MutableTable(schema, "TABLE");
+    final MutableColumn firstColumn = new MutableColumn(table, "Z_COLUMN");
+    final MutableColumn secondColumn = new MutableColumn(table, "A_COLUMN");
+    firstColumn.setOrdinalPosition(1);
+    secondColumn.setOrdinalPosition(2);
+    firstColumn.setColumnDataType(new MutableColumnDataType(schema, "Z_TYPE", DataTypeType.system));
+    secondColumn.setColumnDataType(
+        new MutableColumnDataType(schema, "A_TYPE", DataTypeType.system));
+
+    assertThat(firstColumn.compareTo(secondColumn), lessThan(0));
+    assertThat(secondColumn.compareTo(firstColumn), greaterThan(0));
+  }
+
+  @Test
+  public void routineSignatureComparesActualDataTypesBeforeSpecificName() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final MutableProcedure earlierSpecific = new MutableProcedure(schema, "ROUTINE", "A_SPECIFIC");
+    final MutableProcedure laterSpecific = new MutableProcedure(schema, "ROUTINE", "Z_SPECIFIC");
+    final MutableProcedureParameter laterType =
+        new MutableProcedureParameter(earlierSpecific, "PARAMETER");
+    final MutableProcedureParameter earlierType =
+        new MutableProcedureParameter(laterSpecific, "PARAMETER");
+    laterType.setOrdinalPosition(1);
+    earlierType.setOrdinalPosition(1);
+    laterType.setColumnDataType(new MutableColumnDataType(schema, "Z_TYPE", DataTypeType.system));
+    earlierType.setColumnDataType(new MutableColumnDataType(schema, "A_TYPE", DataTypeType.system));
+    earlierSpecific.addParameter(laterType);
+    laterSpecific.addParameter(earlierType);
+
+    assertThat(earlierSpecific.compareTo(laterSpecific), greaterThan(0));
+    assertThat(laterSpecific.compareTo(earlierSpecific), lessThan(0));
   }
 
   @Test

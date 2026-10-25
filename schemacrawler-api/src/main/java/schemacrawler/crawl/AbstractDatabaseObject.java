@@ -8,8 +8,6 @@
 
 package schemacrawler.crawl;
 
-import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsLast;
 import static java.util.Objects.hash;
 import static java.util.Objects.requireNonNull;
 
@@ -23,7 +21,6 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
-import schemacrawler.schema.TypedObject;
 
 /** Represents a database object. */
 abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
@@ -82,24 +79,9 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
       return familyComparison;
     }
 
-    if (obj instanceof final DatabaseObject databaseObject) {
-      final int schemaCompareTo = getSchema().compareTo(databaseObject.getSchema());
-      if (schemaCompareTo != 0) {
-        return schemaCompareTo;
-      }
-      if (this instanceof final TypedObject thisTypedObject
-          && obj instanceof final TypedObject typedObject) {
-        try {
-          final int typeCompareTo =
-              Objects.compare(
-                  thisTypedObject.getType(), typedObject.getType(), nullsLast(naturalOrder()));
-          if (typeCompareTo != 0) {
-            return typeCompareTo;
-          }
-        } catch (final Exception e) {
-          // Ignore, since getType() may not be implemented by partial database objects
-        }
-      }
+    final int typeComparison = NamedObjectComparators.TYPED_OBJECT_COMPARATOR.compare(this, obj);
+    if (typeComparison != 0) {
+      return typeComparison;
     }
 
     return NamedObjectComparators.NORMALIZED_NAME_COMPARATOR.compare(this, obj);

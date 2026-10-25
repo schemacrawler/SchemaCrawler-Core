@@ -10,12 +10,12 @@ package schemacrawler.namedobject;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Comparator;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.DatabaseObject;
@@ -25,13 +25,11 @@ import schemacrawler.schema.Index;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Procedure;
-import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableType;
-import schemacrawler.schema.TypedObject;
 import schemacrawler.schemacrawler.SchemaReference;
 
 public class NamedObjectComparatorsTest {
@@ -51,19 +49,37 @@ public class NamedObjectComparatorsTest {
     final DatabaseUser user = mock(DatabaseUser.class);
     final NamedObject other = mock(NamedObject.class);
 
-    assertBefore(catalog, schema);
-    assertBefore(schema, table);
-    assertThat(NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(table, view), is(0));
-    assertBefore(table, procedure);
-    assertThat(
-        NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(procedure, function),
-        is(0));
-    assertBefore(procedure, index);
-    assertBefore(index, sequence);
-    assertBefore(sequence, synonym);
-    assertBefore(synonym, unknown);
-    assertBefore(unknown, user);
-    assertBefore(user, other);
+    final List<NamedObject> orderedObjects =
+        List.of(
+            catalog, schema, table, view, procedure, function, index, sequence, synonym, unknown,
+            user, other);
+    for (int firstIndex = 0; firstIndex < orderedObjects.size(); firstIndex++) {
+      for (int secondIndex = firstIndex + 1; secondIndex < orderedObjects.size(); secondIndex++) {
+        assertBefore(orderedObjects.get(firstIndex), orderedObjects.get(secondIndex));
+      }
+    }
+  }
+
+  @Test
+  public void schemaOrderingPrecedesDatabaseObjectCategory() {
+    final Schema firstSchema = new SchemaReference("catalog", "A_SCHEMA");
+    final Schema secondSchema = new SchemaReference("catalog", "Z_SCHEMA");
+    final Table firstTable = table("TABLE");
+    final Table firstView = table("VIEW");
+    final Synonym firstSynonym = mock(Synonym.class);
+    final Table secondTable = table("TABLE");
+    when(firstTable.getSchema()).thenReturn(firstSchema);
+    when(firstView.getSchema()).thenReturn(firstSchema);
+    when(firstSynonym.getSchema()).thenReturn(firstSchema);
+    when(secondTable.getSchema()).thenReturn(secondSchema);
+
+    final List<NamedObject> orderedObjects =
+        List.of(firstTable, firstView, firstSynonym, secondTable);
+    for (int firstIndex = 0; firstIndex < orderedObjects.size(); firstIndex++) {
+      for (int secondIndex = firstIndex + 1; secondIndex < orderedObjects.size(); secondIndex++) {
+        assertBefore(orderedObjects.get(firstIndex), orderedObjects.get(secondIndex));
+      }
+    }
   }
 
   @Test
@@ -81,17 +97,6 @@ public class NamedObjectComparatorsTest {
 
     assertThat(comparator.compare(first, second), lessThan(0));
     assertThat(comparator.compare(second, first), greaterThan(0));
-  }
-
-  @Test
-  public void compareTypeUsesNaturalTypeOrdering() {
-    final TypedObject<RoutineType> procedureType = () -> RoutineType.procedure;
-    final TypedObject<RoutineType> functionType = () -> RoutineType.function;
-
-    final Comparator<RoutineType> comparator = NamedObjectComparators.typeComparator();
-
-    assertThat(comparator.compare(procedureType.getType(), functionType.getType()), lessThan(0));
-    assertThat(comparator.compare(functionType.getType(), procedureType.getType()), greaterThan(0));
   }
 
   private void assertBefore(final NamedObject first, final NamedObject second) {

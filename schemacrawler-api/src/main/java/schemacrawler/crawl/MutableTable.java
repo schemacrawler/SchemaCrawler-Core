@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import schemacrawler.namedobject.BuildableDatabaseObjectIndex;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
 import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.namedobject.NamedObjectIndex;
@@ -42,7 +43,6 @@ import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableRelationshipType;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.Trigger;
-import schemacrawler.utility.MetaDataUtility;
 
 sealed class MutableTable extends AbstractDatabaseObject implements Table permits MutableView {
 
@@ -61,7 +61,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   private final BuildableDependantObjectIndex<MutableIndex, Table> indexes;
   private final BuildableDependantObjectIndex<MutablePrivilege<Table>, Table> privileges;
   private final BuildableDependantObjectIndex<MutableTrigger, Table> triggers;
-  private final Set<DatabaseObject> usedByObjects = new HashSet<>();
+  private final BuildableDatabaseObjectIndex<DatabaseObject> usedByObjects;
   private MutablePrimaryKey primaryKey;
   private int sortIndex;
   private TableType tableType;
@@ -79,6 +79,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
     indexes = NamedObjectIndexes.newBuildableDependantObjectIndex();
     privileges = NamedObjectIndexes.newBuildableDependantObjectIndex();
     triggers = NamedObjectIndexes.newBuildableDependantObjectIndex();
+    usedByObjects = NamedObjectIndexes.newBuildableDatabaseObjectIndex();
 
     // Set default values
     definition = "";
@@ -104,16 +105,14 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
       return familyComparison;
     }
 
-    int comparison = 0;
-
-    if (comparison == 0 && obj instanceof final MutableTable table) {
-      comparison = Integer.compare(sortIndex, table.sortIndex);
-    }
-    if (comparison == 0) {
-      comparison = super.compareTo(obj);
+    if (obj instanceof final MutableTable table) {
+      final int comparison = Integer.compare(sortIndex, table.sortIndex);
+      if (comparison != 0) {
+        return comparison;
+      }
     }
 
-    return comparison;
+    return super.compareTo(obj);
   }
 
   /** {@inheritDoc} */
@@ -205,7 +204,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public Collection<TableConstraint> getTableConstraints() {
-    return List.copyOf(constraints.getObjects());
+    return constraints.getObjects();
   }
 
   /** {@inheritDoc} */
@@ -229,14 +228,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
   /** {@inheritDoc} */
   @Override
   public Collection<DatabaseObject> getUsedByObjects() {
-    final List<DatabaseObject> usedByObjectsSorted = new ArrayList<>(usedByObjects);
-    Collections.sort(
-        usedByObjectsSorted,
-        Comparator.comparing(
-                (final DatabaseObject databaseObject) ->
-                    MetaDataUtility.getSimpleTypeName(databaseObject))
-            .thenComparing(DatabaseObject::getFullName));
-    return List.copyOf(usedByObjectsSorted);
+    return usedByObjects.getObjects();
   }
 
   @Override
@@ -348,7 +340,9 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
     if (references == null || references.isEmpty()) {
       return;
     }
-    usedByObjects.addAll(references);
+    for (final DatabaseObject reference : references) {
+      usedByObjects.add(reference);
+    }
   }
 
   final void addTableConstraint(final TableConstraint tableConstraint) {

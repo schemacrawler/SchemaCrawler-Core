@@ -15,12 +15,10 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DataTypeType;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.JavaSqlType;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.SearchableType;
 
@@ -94,33 +92,6 @@ final class MutableColumnDataType extends AbstractDatabaseObject implements Colu
     localizedTypeName = "";
 
     enumValues = new ArrayList<>();
-  }
-
-  @Override
-  public int compareTo(final NamedObject obj) {
-    if (obj == null) {
-      return -1;
-    }
-
-    final int familyComparison =
-        NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, obj);
-    if (familyComparison != 0) {
-      return familyComparison;
-    }
-
-    if (obj instanceof final ColumnDataType other) {
-      final int typeComparison =
-          NamedObjectComparators.<DataTypeType>typeComparator().compare(getType(), other.getType());
-      if (typeComparison != 0) {
-        return typeComparison;
-      }
-    }
-
-    final int databaseObjectComparison = compareDatabaseObjectFields(obj);
-    if (databaseObjectComparison != 0) {
-      return databaseObjectComparison;
-    }
-    return NamedObjectComparators.EXACT_KEY_COMPARATOR.compare(this, obj);
   }
 
   /** {@inheritDoc} */
