@@ -22,12 +22,17 @@ public class SchemaReferenceSortTest {
     final SchemaReference absentSchema = new SchemaReference("catalog", null);
     final SchemaReference named = new SchemaReference("catalog", "schema");
     final SchemaReference empty = new SchemaReference("catalog", "");
+
     assertTrue(named.compareTo(null) < 0);
+
     assertTrue(named.compareTo(absentCatalog) < 0);
     assertTrue(absentCatalog.compareTo(named) > 0);
+
     assertTrue(named.compareTo(absentSchema) < 0);
     assertTrue(absentSchema.compareTo(named) > 0);
+
     assertTrue(empty.compareTo(absentSchema) < 0);
+
     assertEquals(0, absentSchema.compareTo(new SchemaReference("catalog", null)));
   }
 }

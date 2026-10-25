@@ -11,7 +11,6 @@ package schemacrawler.schemacrawler;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,14 +20,17 @@ import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
+import us.fatehi.utility.Immutable;
 
+@Immutable
 public final class SchemaReference implements Schema {
 
   @Serial private static final long serialVersionUID = -5309848447599233878L;
 
-  private final Map<String, Object> attributeMap = new ConcurrentHashMap<>();
   private final String catalogName;
   private final String schemaName;
+  private final Map<String, Object> attributeMap = new ConcurrentHashMap<>();
+
   private transient NamedObjectKey key;
   private transient String fullName;
 
@@ -44,29 +46,12 @@ public final class SchemaReference implements Schema {
   /** {@inheritDoc} */
   @Override
   public int compareTo(final NamedObject obj) {
-    if (this == obj) {
-      return 0;
-    }
-    if (obj == null) {
-      return -1;
-    }
-
-    final int familyComparison = NamedObjectComparators.FAMILY_COMPARATOR.compare(this, obj);
+    final int familyComparison =
+        NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(this, obj);
     if (familyComparison != 0) {
       return familyComparison;
     }
-    if (!(obj instanceof final Schema other)) {
-      return NamedObjectComparators.NAME_THEN_KEY_COMPARATOR.compare(this, obj);
-    }
-
-    final int result =
-        Comparator.nullsLast(String::compareTo).compare(catalogName, other.getCatalogName());
-
-    if (result != 0) {
-      return result;
-    }
-
-    return Comparator.nullsLast(String::compareTo).compare(schemaName, other.getName());
+    return NamedObjectComparators.EXACT_KEY_COMPARATOR.compare(this, obj);
   }
 
   @Override

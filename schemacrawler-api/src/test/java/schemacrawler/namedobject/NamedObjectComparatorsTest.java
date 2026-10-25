@@ -53,9 +53,11 @@ public class NamedObjectComparatorsTest {
 
     assertBefore(catalog, schema);
     assertBefore(schema, table);
-    assertThat(NamedObjectComparators.FAMILY_COMPARATOR.compare(table, view), is(0));
+    assertThat(NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(table, view), is(0));
     assertBefore(table, procedure);
-    assertThat(NamedObjectComparators.FAMILY_COMPARATOR.compare(procedure, function), is(0));
+    assertThat(
+        NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(procedure, function),
+        is(0));
     assertBefore(procedure, index);
     assertBefore(index, sequence);
     assertBefore(sequence, synonym);
@@ -93,7 +95,8 @@ public class NamedObjectComparatorsTest {
   }
 
   private void assertBefore(final NamedObject first, final NamedObject second) {
-    final Comparator<NamedObject> comparator = NamedObjectComparators.FAMILY_COMPARATOR;
+    final Comparator<NamedObject> comparator =
+        NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR;
 
     assertThat(comparator.compare(first, second), lessThan(0));
     assertThat(comparator.compare(second, first), greaterThan(0));

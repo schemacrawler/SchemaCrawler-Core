@@ -27,7 +27,7 @@ public final class TableType implements Serializable, Comparable<TableType> {
 
   public static final TableType UNKNOWN = new TableType("unknown");
 
-  private static final Comparator<TableType> comparator =
+  private static final Comparator<TableType> TABLE_TYPE_COMPARATOR =
       Comparator.comparing(
               TableType::getSimpleTableType,
               Comparator.comparingInt(
@@ -53,7 +53,7 @@ public final class TableType implements Serializable, Comparable<TableType> {
     if (other == null) {
       return -1;
     }
-    return comparator.compare(this, other);
+    return TABLE_TYPE_COMPARATOR.compare(this, other);
   }
 
   /** {@inheritDoc} */

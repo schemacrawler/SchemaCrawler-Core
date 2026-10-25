@@ -41,7 +41,6 @@ public class EqualsTest {
   public void databaseObject() {
     class TestDatabaseObject extends AbstractDatabaseObject {
 
-      /** */
       private static final long serialVersionUID = 6661972079180914099L;
 
       TestDatabaseObject(final Schema schema, final String name) {
@@ -119,7 +118,8 @@ public class EqualsTest {
 
   @Test
   public void schemaReference() {
-    EqualsVerifier.forClass(SchemaReference.class)
+    EqualsVerifier.simple()
+        .forClass(SchemaReference.class)
         .withIgnoredFields("key", "attributeMap")
         .verify();
   }

@@ -34,17 +34,17 @@ public final class NamedObjectComparators {
   public static final Comparator<String> NORMALIZED_TEXT_COMPARATOR =
       NamedObjectComparators::compareNormalizedText;
 
-  public static final Comparator<NamedObject> FAMILY_COMPARATOR =
-      nullsLast(comparingInt(NamedObjectComparators::familyRank));
+  public static final Comparator<NamedObject> DATABASE_OBJECT_ORDER_COMPARATOR =
+      nullsLast(comparingInt(NamedObjectComparators::databaseObjectOrder));
 
-  private static final Comparator<NamedObject> PARENT_AND_DEPENDANT_TYPE_COMPARATOR =
-      NamedObjectComparators::compareParentAndDependantType;
+  private static final Comparator<NamedObject> DEPENDANT_OBJECT_ORDER_COMPARATOR =
+      NamedObjectComparators::dependantObjectOrder;
 
-  public static final Comparator<NamedObject> FAMILY_AND_PARENT_COMPARATOR =
-      FAMILY_COMPARATOR.thenComparing(PARENT_AND_DEPENDANT_TYPE_COMPARATOR);
+  public static final Comparator<NamedObject> DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR =
+      DATABASE_OBJECT_ORDER_COMPARATOR.thenComparing(DEPENDANT_OBJECT_ORDER_COMPARATOR);
 
   public static final Comparator<NamedObject> NORMALIZED_NAME_COMPARATOR =
-      comparing(NamedObject::getFullName, nullsLast(NORMALIZED_TEXT_COMPARATOR));
+      nullsLast(comparing(NamedObject::getFullName, nullsLast(NORMALIZED_TEXT_COMPARATOR)));
 
   public static final Comparator<NamedObject> EXACT_KEY_COMPARATOR =
       comparing(NamedObject::key, nullsLast(naturalOrder()));
@@ -133,19 +133,7 @@ public final class NamedObjectComparators {
     }
   }
 
-  private static int nextRetainedOffset(final String text, final int offset) {
-    int nextOffset = offset;
-    while (nextOffset < text.length()) {
-      final int codePoint = text.codePointAt(nextOffset);
-      if (Character.isLetterOrDigit(codePoint) || codePoint == '_' || codePoint == '.') {
-        break;
-      }
-      nextOffset += Character.charCount(codePoint);
-    }
-    return nextOffset;
-  }
-
-  private static int familyRank(final NamedObject object) {
+  private static int databaseObjectOrder(final NamedObject object) {
     if (object instanceof Catalog) {
       return 0;
     }
@@ -170,8 +158,7 @@ public final class NamedObjectComparators {
     return 9;
   }
 
-  private static int compareParentAndDependantType(
-      final NamedObject object, final NamedObject otherObject) {
+  private static int dependantObjectOrder(final NamedObject object, final NamedObject otherObject) {
     if (object == otherObject) {
       return 0;
     }
@@ -201,6 +188,18 @@ public final class NamedObjectComparators {
           .compareTo(MetaDataUtility.getSimpleDependantObjectType(otherDependantObject));
     }
     return 0;
+  }
+
+  private static int nextRetainedOffset(final String text, final int offset) {
+    int nextOffset = offset;
+    while (nextOffset < text.length()) {
+      final int codePoint = text.codePointAt(nextOffset);
+      if (Character.isLetterOrDigit(codePoint) || codePoint == '_' || codePoint == '.') {
+        break;
+      }
+      nextOffset += Character.charCount(codePoint);
+    }
+    return nextOffset;
   }
 
   private NamedObjectComparators() {

@@ -8,14 +8,11 @@
 
 package schemacrawler.crawl;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsLast;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
-import java.util.Comparator;
 import java.util.Objects;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 
@@ -23,9 +20,6 @@ import schemacrawler.schema.ColumnReference;
 final class ImmutableColumnReference implements ColumnReference {
 
   @Serial private static final long serialVersionUID = -4411771492159843382L;
-
-  private static final Comparator<Column> columnComparator =
-      nullsLast(comparing(Column::getFullName, nullsLast(naturalOrder())));
 
   private final Column foreignKeyColumn;
   private final Column primaryKeyColumn;
@@ -60,10 +54,14 @@ final class ImmutableColumnReference implements ColumnReference {
       compare = Integer.compare(getKeySequence(), other.getKeySequence());
     }
     if (compare == 0) {
-      compare = columnComparator.compare(foreignKeyColumn, columnRef.getForeignKeyColumn());
+      compare =
+          NamedObjectComparators.NORMALIZED_NAME_COMPARATOR.compare(
+              foreignKeyColumn, columnRef.getForeignKeyColumn());
     }
     if (compare == 0) {
-      compare = columnComparator.compare(primaryKeyColumn, columnRef.getPrimaryKeyColumn());
+      compare =
+          NamedObjectComparators.NORMALIZED_NAME_COMPARATOR.compare(
+              primaryKeyColumn, columnRef.getPrimaryKeyColumn());
     }
     return compare;
   }
