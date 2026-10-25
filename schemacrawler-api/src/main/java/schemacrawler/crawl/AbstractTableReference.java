@@ -24,7 +24,6 @@ import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
-import us.fatehi.utility.CollectionsUtility;
 import us.fatehi.utility.string.StringFormat;
 
 /** Represents a foreign-key mapping to a primary key in another table. */
@@ -77,10 +76,8 @@ abstract sealed class AbstractTableReference extends MutableTableConstraint
     }
 
     if (obj instanceof final TableReference other) {
-      final List<ColumnReference> thisColumnReferences = getColumnReferences();
-      final List<ColumnReference> otherColumnReferences = other.getColumnReferences();
       final int mappingComparison =
-          CollectionsUtility.compareLists(thisColumnReferences, otherColumnReferences);
+          NamedObjectComparators.TABLE_REFERENCE_MAPPING_COMPARATOR.compare(this, other);
       if (mappingComparison != 0) {
         return mappingComparison;
       }

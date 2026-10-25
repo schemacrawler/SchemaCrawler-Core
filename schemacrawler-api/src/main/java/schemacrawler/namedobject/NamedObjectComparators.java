@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import schemacrawler.schema.Catalog;
+import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.DependantObject;
@@ -24,8 +25,10 @@ import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineParameter;
 import schemacrawler.schema.Schema;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TypedObject;
 import schemacrawler.utility.MetaDataUtility;
+import us.fatehi.utility.CollectionsUtility;
 import us.fatehi.utility.UtilityMarker;
 
 /** Reusable comparison stages for named objects. */
@@ -64,6 +67,17 @@ public final class NamedObjectComparators {
 
   public static final Comparator<NamedObject> NAME_THEN_KEY_COMPARATOR =
       NORMALIZED_NAME_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR);
+
+  /** Compares mapping sequence, then normalized foreign and primary column names; nulls last. */
+  public static final Comparator<ColumnReference> COLUMN_REFERENCE_COMPARATOR =
+      nullsLast(
+          comparingInt(ColumnReference::getKeySequence)
+              .thenComparing(ColumnReference::getForeignKeyColumn, NORMALIZED_NAME_COMPARATOR)
+              .thenComparing(ColumnReference::getPrimaryKeyColumn, NORMALIZED_NAME_COMPARATOR));
+
+  /** Compares ordered mappings size-first, without relationship names or identity keys. */
+  public static final Comparator<TableReference> TABLE_REFERENCE_MAPPING_COMPARATOR =
+      comparing(TableReference::getColumnReferences, CollectionsUtility::compareLists);
 
   public static final Comparator<RoutineParameter<?>> ROUTINE_PARAMETER_COMPARATOR =
       comparingInt((final RoutineParameter<?> parameter) -> parameter.getOrdinalPosition())

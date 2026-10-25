@@ -42,28 +42,7 @@ final class ImmutableColumnReference implements ColumnReference {
    */
   @Override
   public int compareTo(final ColumnReference columnRef) {
-
-    if (columnRef == null) {
-      return -1;
-    }
-
-    int compare = 0;
-
-    final ColumnReference other = columnRef;
-    if (compare == 0) {
-      compare = Integer.compare(getKeySequence(), other.getKeySequence());
-    }
-    if (compare == 0) {
-      compare =
-          NamedObjectComparators.NORMALIZED_NAME_COMPARATOR.compare(
-              foreignKeyColumn, columnRef.getForeignKeyColumn());
-    }
-    if (compare == 0) {
-      compare =
-          NamedObjectComparators.NORMALIZED_NAME_COMPARATOR.compare(
-              primaryKeyColumn, columnRef.getPrimaryKeyColumn());
-    }
-    return compare;
+    return NamedObjectComparators.COLUMN_REFERENCE_COMPARATOR.compare(this, columnRef);
   }
 
   @Override
