@@ -12,6 +12,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.hamcrest.number.OrderingComparison.lessThan;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.DataTypeType;
@@ -64,7 +67,7 @@ public class NaturalTypeComparisonTest {
   }
 
   @Test
-  public void routineSignatureComparesActualDataTypesBeforeSpecificName() {
+  public void routineSpecificNamePrecedesParameterDataTypes() {
     final Schema schema = new SchemaReference("catalog", "schema");
     final MutableProcedure earlierSpecific = new MutableProcedure(schema, "ROUTINE", "A_SPECIFIC");
     final MutableProcedure laterSpecific = new MutableProcedure(schema, "ROUTINE", "Z_SPECIFIC");
@@ -79,8 +82,8 @@ public class NaturalTypeComparisonTest {
     earlierSpecific.addParameter(laterType);
     laterSpecific.addParameter(earlierType);
 
-    assertThat(earlierSpecific.compareTo(laterSpecific), greaterThan(0));
-    assertThat(laterSpecific.compareTo(earlierSpecific), lessThan(0));
+    assertThat(earlierSpecific.compareTo(laterSpecific), lessThan(0));
+    assertThat(laterSpecific.compareTo(earlierSpecific), greaterThan(0));
   }
 
   @Test
@@ -114,28 +117,24 @@ public class NaturalTypeComparisonTest {
   }
 
   @Test
-  public void routineParameterPositionPrecedesSpecificName() {
+  public void routineComparisonDoesNotReadParameters() {
     final Schema schema = new SchemaReference("catalog", "schema");
-    final MutableProcedure earlierSpecific = new MutableProcedure(schema, "ROUTINE", "A_SPECIFIC");
-    final MutableProcedure laterSpecific = new MutableProcedure(schema, "ROUTINE", "Z_SPECIFIC");
-    final MutableProcedureParameter laterPosition =
-        new MutableProcedureParameter(earlierSpecific, "PARAMETER");
-    final MutableProcedureParameter earlierPosition =
-        new MutableProcedureParameter(laterSpecific, "PARAMETER");
-    laterPosition.setOrdinalPosition(2);
-    earlierPosition.setOrdinalPosition(1);
-    earlierSpecific.addParameter(laterPosition);
-    laterSpecific.addParameter(earlierPosition);
+    final MutableProcedure earlierSpecific =
+        spy(new MutableProcedure(schema, "ROUTINE", "A_SPECIFIC"));
+    final MutableProcedure laterSpecific =
+        spy(new MutableProcedure(schema, "ROUTINE", "Z_SPECIFIC"));
 
-    assertThat(earlierSpecific.compareTo(laterSpecific), greaterThan(0));
-    assertThat(laterSpecific.compareTo(earlierSpecific), lessThan(0));
+    assertThat(earlierSpecific.compareTo(laterSpecific), lessThan(0));
+    assertThat(laterSpecific.compareTo(earlierSpecific), greaterThan(0));
+    verify(earlierSpecific, never()).getParameters();
+    verify(laterSpecific, never()).getParameters();
   }
 
   @Test
-  public void routineParameterListsRemainSizeFirst() {
+  public void routineWithoutSpecificNameIgnoresParameterCount() {
     final Schema schema = new SchemaReference("catalog", "schema");
-    final MutableProcedure twoParameters = new MutableProcedure(schema, "ROUTINE", "SAME");
-    final MutableProcedure oneParameter = new MutableProcedure(schema, "ROUTINE", "SAME");
+    final MutableProcedure twoParameters = new MutableProcedure(schema, "ROUTINE", null);
+    final MutableProcedure oneParameter = new MutableProcedure(schema, "ROUTINE", null);
     final MutableProcedureParameter firstParameter =
         new MutableProcedureParameter(twoParameters, "Z_PARAMETER");
     final MutableProcedureParameter secondParameter =
@@ -149,8 +148,9 @@ public class NaturalTypeComparisonTest {
     twoParameters.addParameter(secondParameter);
     oneParameter.addParameter(earlierParameter);
 
-    assertThat(twoParameters.compareTo(oneParameter), greaterThan(0));
-    assertThat(oneParameter.compareTo(twoParameters), lessThan(0));
+    assertThat(twoParameters.getSpecificName(), is("ROUTINE"));
+    assertThat(twoParameters.compareTo(oneParameter), is(0));
+    assertThat(oneParameter.compareTo(twoParameters), is(0));
   }
 
   @Test

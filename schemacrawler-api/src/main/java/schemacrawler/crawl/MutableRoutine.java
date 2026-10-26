@@ -34,10 +34,7 @@ abstract sealed class MutableRoutine extends AbstractDatabaseObject implements R
   @Serial private static final long serialVersionUID = 3906925686089134130L;
 
   private static final Comparator<Routine> ROUTINE_COMPARATOR =
-      Comparator.comparing(
-              (Routine routine) -> routine.getParameters(),
-              NamedObjectComparators.ROUTINE_PARAMETER_LIST_COMPARATOR)
-          .thenComparing(Routine::getSpecificName, nullsLast(naturalOrder()))
+      Comparator.comparing(Routine::getSpecificName, nullsLast(naturalOrder()))
           .thenComparing(NamedObjectComparators.EXACT_KEY_COMPARATOR);
 
   private transient NamedObjectKey key;

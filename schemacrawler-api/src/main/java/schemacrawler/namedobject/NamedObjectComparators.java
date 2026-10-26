@@ -14,7 +14,6 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnReference;
@@ -22,8 +21,6 @@ import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.DependantObject;
 import schemacrawler.schema.NamedObject;
-import schemacrawler.schema.Routine;
-import schemacrawler.schema.RoutineParameter;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TypedObject;
@@ -64,41 +61,6 @@ public final class NamedObjectComparators {
   /** Compares ordered mappings size-first, without relationship names or identity keys. */
   public static final Comparator<TableReference> TABLE_REFERENCE_MAPPING_COMPARATOR =
       comparing(TableReference::getColumnReferences, CollectionsUtility::compareLists);
-
-  public static final Comparator<RoutineParameter<?>> ROUTINE_PARAMETER_COMPARATOR =
-      comparingInt((final RoutineParameter<?> parameter) -> parameter.getOrdinalPosition())
-          .thenComparing(RoutineParameter::getType, nullsLast(naturalOrder()))
-          .thenComparing(RoutineParameter::getName, nullsLast(NORMALIZED_TEXT_COMPARATOR))
-          .thenComparing(RoutineParameter::getName, nullsLast(naturalOrder()));
-
-  public static final Comparator<List<? extends RoutineParameter<?>>>
-      ROUTINE_PARAMETER_LIST_COMPARATOR =
-          (parameters, otherParameters) -> {
-            if (parameters == otherParameters) {
-              return 0;
-            }
-            if (parameters == null) {
-              return 1;
-            }
-            if (otherParameters == null) {
-              return -1;
-            }
-            int comparison = Integer.compare(parameters.size(), otherParameters.size());
-            final Comparator<RoutineParameter<?>> elementComparator =
-                nullsLast(ROUTINE_PARAMETER_COMPARATOR);
-            for (int index = 0; comparison == 0 && index < parameters.size(); index++) {
-              comparison =
-                  elementComparator.compare(parameters.get(index), otherParameters.get(index));
-            }
-            return comparison;
-          };
-
-  private static final Comparator<Routine> ROUTINE_PARAMETER_PARENT_COMPARATOR =
-      comparing((final Routine routine) -> routine.getSchema(), nullsLast(naturalOrder()))
-          .thenComparing(routine -> (NamedObject) routine, TYPED_OBJECT_COMPARATOR)
-          .thenComparing(routine -> (NamedObject) routine, NORMALIZED_NAME_COMPARATOR)
-          .thenComparing(Routine::getSpecificName, nullsLast(naturalOrder()))
-          .thenComparing(Routine::key, nullsLast(naturalOrder()));
 
   public static final Comparator<NamedObject> DATABASE_OBJECT_ORDER_COMPARATOR =
       nullsLast(
@@ -208,17 +170,9 @@ public final class NamedObjectComparators {
     }
     if (object instanceof final DependantObject<?> dependantObject
         && otherObject instanceof final DependantObject<?> otherDependantObject) {
-      final int parentComparison;
-      if (dependantObject instanceof final RoutineParameter<?> routineParameter
-          && otherDependantObject instanceof final RoutineParameter<?> otherRoutineParameter) {
-        parentComparison =
-            ROUTINE_PARAMETER_PARENT_COMPARATOR.compare(
-                routineParameter.getParent(), otherRoutineParameter.getParent());
-      } else {
-        parentComparison =
-            NamedObjectSort.natural.compare(
-                dependantObject.getParent(), otherDependantObject.getParent());
-      }
+      final int parentComparison =
+          NamedObjectSort.natural.compare(
+              dependantObject.getParent(), otherDependantObject.getParent());
       if (parentComparison != 0) {
         return parentComparison;
       }

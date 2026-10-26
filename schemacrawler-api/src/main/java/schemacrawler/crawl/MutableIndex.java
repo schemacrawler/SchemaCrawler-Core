@@ -24,7 +24,6 @@ import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexType;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Table;
-import us.fatehi.utility.CollectionsUtility;
 
 /** Represents an index on a database table. */
 final class MutableIndex extends AbstractDependantObject<Table> implements Index {
@@ -32,8 +31,7 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
   @Serial private static final long serialVersionUID = 4051326747138079028L;
 
   private static final Comparator<Index> INDEX_COMPARATOR =
-      Comparator.comparing(Index::getColumns, CollectionsUtility::compareLists)
-          .thenComparing(Index::isUnique, Comparator.reverseOrder())
+      Comparator.comparing(Index::isUnique, Comparator.reverseOrder())
           .thenComparing(NamedObjectComparators.TYPED_OBJECT_COMPARATOR)
           .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
 
@@ -61,8 +59,8 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
    * object, but compareTo uses more fields to define a "natural" sorting order. compareTo may
    * return incorrect results until the object is fully built by SchemaCrawler.
    *
-   * <p>Note: Since indexes are not always explicitly named in databases, the sorting routine orders
-   * the indexes by the names of the columns in the index.
+   * <p>Within the same parent, indexes sort by uniqueness, type, name, and exact key without
+   * comparing their columns.
    */
   @Override
   public int compareTo(final NamedObject obj) {

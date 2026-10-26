@@ -80,7 +80,7 @@ public class SortingTest {
   public void indexSort(final Connection connection) throws Exception {
 
     final String[] sortedNatural = {
-      "PK_AUTHORS", "IDX_B_AUTHORS", "IDX_A_AUTHORS",
+      "PK_AUTHORS", "IDX_A_AUTHORS", "IDX_B_AUTHORS",
     };
     final String[] sortedAlpha = Arrays.copyOf(sortedNatural, sortedNatural.length);
     Arrays.sort(sortedAlpha);

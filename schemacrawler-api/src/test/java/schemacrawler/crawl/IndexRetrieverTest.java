@@ -10,6 +10,7 @@ package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -28,6 +29,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.TreeSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -284,7 +288,12 @@ public class IndexRetrieverTest {
         LimitOptionsBuilder.builder()
             .includeSchemas(new RegularExpressionExclusionRule(".*\\.FOR_LINT"));
     final LoadOptionsBuilder loadOptionsBuilder =
-        LoadOptionsBuilder.builder().withSchemaInfoLevel(SchemaInfoLevelBuilder.minimum());
+        LoadOptionsBuilder.builder()
+            .withSchemaInfoLevel(
+                SchemaInfoLevelBuilder.builder()
+                    .fromOptions(SchemaInfoLevelBuilder.minimum())
+                    .setRetrieveTableColumns(true)
+                    .toOptions());
     final SchemaCrawlerOptions schemaCrawlerOptions =
         SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
             .withLimitOptions(limitOptionsBuilder.toOptions())
@@ -323,6 +332,71 @@ public class IndexRetrieverTest {
 
     // The method should handle exceptions gracefully and not throw
     assertDoesNotThrow(() -> indexRetriever.retrieveIndexInformation());
+  }
+
+  @Test
+  @DisplayName("Generate stable distinct names for null and blank index names")
+  public void unnamedIndexesReceiveSyntheticNames(final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    final InformationSchemaViews informationSchemaViews =
+        InformationSchemaViewsBuilder.builder()
+            .withSql(
+                InformationSchemaKey.INDEXES,
+                """
+                SELECT
+                  TABLE_CAT, TABLE_SCHEM, TABLE_NAME,
+                  CASE WHEN INDEX_NAME = 'IDX_A_AUTHORS'
+                  THEN CAST(NULL AS VARCHAR(128)) ELSE '  ' END AS INDEX_NAME,
+                  COLUMN_NAME, NON_UNIQUE, TYPE, ORDINAL_POSITION, ASC_OR_DESC,
+                  CARDINALITY, PAGES, FILTER_CONDITION
+                FROM INFORMATION_SCHEMA.SYSTEM_INDEXINFO
+                WHERE TABLE_SCHEM = 'BOOKS' AND TABLE_NAME = 'AUTHORS'
+                  AND INDEX_NAME IN ('IDX_A_AUTHORS', 'IDX_B_AUTHORS')
+                  AND ORDINAL_POSITION = 1
+                """)
+            .toOptions();
+    final SchemaRetrievalOptions schemaRetrievalOptions =
+        SchemaRetrievalOptionsBuilder.builder()
+            .with(indexesRetrievalStrategy, data_dictionary_all)
+            .withInformationSchemaViews(informationSchemaViews)
+            .toOptions();
+    final RetrieverConnection retrieverConnection =
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
+    final SchemaCrawlerOptions options = SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions();
+    final IndexRetriever indexRetriever =
+        new IndexRetriever(retrieverConnection, catalog, options.crawlOptions());
+
+    indexRetriever.retrieveIndexes(catalog.getAllTables());
+
+    final List<Index> indexes =
+        catalog.getTables().stream().flatMap(table -> table.getIndexes().stream()).toList();
+    assertThat(indexes, hasSize(2));
+    assertThat(
+        indexes.stream()
+            .flatMap(index -> index.getColumns().stream())
+            .map(column -> column.getName())
+            .toList(),
+        containsInAnyOrder("CITY", "LASTNAME"));
+    final TreeSet<Index> sortedIndexes = new TreeSet<>(NamedObjectSort.natural);
+    sortedIndexes.addAll(indexes);
+    assertThat(sortedIndexes, hasSize(2));
+    for (final Index index : indexes) {
+      assertThat(index.getColumns(), hasSize(1));
+      final String columnName = index.getColumns().iterator().next().getName();
+      final String columnFullName =
+          index.getParent().lookupColumn(columnName).orElseThrow().getFullName();
+      final String expectedName =
+          "SC_%s"
+              .formatted(Integer.toHexString(columnFullName.hashCode()).toUpperCase(Locale.ROOT));
+      assertThat(index.getName(), is(expectedName));
+      assertThat(index.isUnique(), is(false));
+    }
+
+    indexRetriever.retrieveIndexes(catalog.getAllTables());
+
+    assertThat(countAllIndexes(), is(2));
+    assertThat(
+        indexes.get(0).getParent().getIndexes(), containsInAnyOrder(indexes.toArray(new Index[0])));
   }
 
   private int countAllIndexes() {

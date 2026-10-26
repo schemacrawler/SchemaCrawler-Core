@@ -15,7 +15,9 @@ import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static schemacrawler.crawl.SortTestUtility.newColumn;
 import static schemacrawler.crawl.SortTestUtility.newColumnReference;
@@ -191,6 +193,18 @@ public class CompareToTest {
     final ColumnReference tiedReference = newColumnReference(lower, secondColumn, secondColumn);
     assertThat(firstReference, greaterThan(tiedReference));
     assertThat(firstReference, comparesEqualTo(firstReference));
+  }
+
+  @Test
+  public void indexComparisonDoesNotReadColumns() {
+    final Table table = newTable(new SchemaReference(), "TABLE");
+    final Index first = spy(newIndex(table, "A_INDEX"));
+    final Index second = spy(newIndex(table, "Z_INDEX"));
+
+    assertThat(first.compareTo(second), lessThan(0));
+    assertThat(second.compareTo(first), greaterThan(0));
+    verify(first, never()).getColumns();
+    verify(second, never()).getColumns();
   }
 
   @Test
