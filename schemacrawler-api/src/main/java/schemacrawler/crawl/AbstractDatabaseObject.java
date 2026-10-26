@@ -53,10 +53,6 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    if (obj == null) {
-      return -1;
-    }
-
     if (obj instanceof DatabaseObject) {
       return NamedObjectComparators.DATABASE_OBJECT_COMPARATOR.compare(this, obj);
     }

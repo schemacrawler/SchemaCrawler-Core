@@ -1,94 +1,3 @@
-PUBLIC.BOOKS.AGE_TYPE
-  user defined column data-type
-  defined with no parameters
-  not nullable
-  not auto-incrementable
-  no literal prefix
-  no literal suffix
-  not searchable
-  precision 0
-  minimum scale 0
-  maximum scale 0
-  java.sql.Types: DISTINCT
-  based on SMALLINT
-PUBLIC.BOOKS."CHARACTER VARYING"
-  user defined column data-type
-  defined with no parameters
-  not nullable
-  not auto-incrementable
-  no literal prefix
-  no literal suffix
-  not searchable
-  precision 0
-  minimum scale 0
-  maximum scale 0
-  java.sql.Types: VARCHAR
-  based on 
-PUBLIC.BOOKS."INTEGER ARRAY"
-  user defined column data-type
-  defined with no parameters
-  not nullable
-  not auto-incrementable
-  no literal prefix
-  no literal suffix
-  not searchable
-  precision 0
-  minimum scale 0
-  maximum scale 0
-  java.sql.Types: ARRAY
-  based on 
-PUBLIC.BOOKS.NAME_TYPE
-  user defined column data-type
-  defined with no parameters
-  not nullable
-  not auto-incrementable
-  no literal prefix
-  no literal suffix
-  not searchable
-  precision 0
-  minimum scale 0
-  maximum scale 0
-  java.sql.Types: DISTINCT
-  based on 
-PUBLIC.BOOKS.VALID_STRING
-  user defined column data-type
-  defined with no parameters
-  not nullable
-  not auto-incrementable
-  no literal prefix
-  no literal suffix
-  not searchable
-  precision 0
-  minimum scale 0
-  maximum scale 0
-  java.sql.Types: VARCHAR
-  based on 
-PUBLIC.BOOKS."VARCHAR(20) ARRAY[10]"
-  user defined column data-type
-  defined with no parameters
-  not nullable
-  not auto-incrementable
-  no literal prefix
-  no literal suffix
-  not searchable
-  precision 0
-  minimum scale 0
-  maximum scale 0
-  java.sql.Types: ARRAY
-  based on 
-PUBLIC.SYSTEM_LOBS."BIGINT ARRAY"
-  user defined column data-type
-  defined with no parameters
-  not nullable
-  not auto-incrementable
-  no literal prefix
-  no literal suffix
-  not searchable
-  precision 0
-  minimum scale 0
-  maximum scale 0
-  java.sql.Types: ARRAY
-  based on 
 BIGINT
   column data-type
   defined with no parameters
@@ -389,3 +298,94 @@ VARCHAR
   minimum scale 0
   maximum scale 0
   java.sql.Types: VARCHAR
+PUBLIC.BOOKS.AGE_TYPE
+  user defined column data-type
+  defined with no parameters
+  not nullable
+  not auto-incrementable
+  no literal prefix
+  no literal suffix
+  not searchable
+  precision 0
+  minimum scale 0
+  maximum scale 0
+  java.sql.Types: DISTINCT
+  based on SMALLINT
+PUBLIC.BOOKS."CHARACTER VARYING"
+  user defined column data-type
+  defined with no parameters
+  not nullable
+  not auto-incrementable
+  no literal prefix
+  no literal suffix
+  not searchable
+  precision 0
+  minimum scale 0
+  maximum scale 0
+  java.sql.Types: VARCHAR
+  based on 
+PUBLIC.BOOKS."INTEGER ARRAY"
+  user defined column data-type
+  defined with no parameters
+  not nullable
+  not auto-incrementable
+  no literal prefix
+  no literal suffix
+  not searchable
+  precision 0
+  minimum scale 0
+  maximum scale 0
+  java.sql.Types: ARRAY
+  based on 
+PUBLIC.BOOKS.NAME_TYPE
+  user defined column data-type
+  defined with no parameters
+  not nullable
+  not auto-incrementable
+  no literal prefix
+  no literal suffix
+  not searchable
+  precision 0
+  minimum scale 0
+  maximum scale 0
+  java.sql.Types: DISTINCT
+  based on 
+PUBLIC.BOOKS.VALID_STRING
+  user defined column data-type
+  defined with no parameters
+  not nullable
+  not auto-incrementable
+  no literal prefix
+  no literal suffix
+  not searchable
+  precision 0
+  minimum scale 0
+  maximum scale 0
+  java.sql.Types: VARCHAR
+  based on 
+PUBLIC.BOOKS."VARCHAR(20) ARRAY[10]"
+  user defined column data-type
+  defined with no parameters
+  not nullable
+  not auto-incrementable
+  no literal prefix
+  no literal suffix
+  not searchable
+  precision 0
+  minimum scale 0
+  maximum scale 0
+  java.sql.Types: ARRAY
+  based on 
+PUBLIC.SYSTEM_LOBS."BIGINT ARRAY"
+  user defined column data-type
+  defined with no parameters
+  not nullable
+  not auto-incrementable
+  no literal prefix
+  no literal suffix
+  not searchable
+  precision 0
+  minimum scale 0
+  maximum scale 0
+  java.sql.Types: ARRAY
+  based on 

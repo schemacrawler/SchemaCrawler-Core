@@ -34,7 +34,7 @@ public final class CommandRegistry extends BasePluginCommandRegistry<SchemaCrawl
   private static CommandRegistry registrySingleton;
 
   public static final Comparator<? super SchemaCrawlerCommandProvider> COMMAND_PROVIDER_COMPARATOR =
-      Comparator.nullsLast(
+      Comparator.nullsFirst(
           Comparator.comparing(
               provider -> provider.getClass().getSimpleName(),
               Comparator.comparing(

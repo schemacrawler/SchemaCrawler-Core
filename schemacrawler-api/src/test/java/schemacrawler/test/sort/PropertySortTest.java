@@ -25,8 +25,8 @@ public class PropertySortTest {
     final Property serverInfoProperty = newServerInfoProperty("name", null, null);
     final Property serverInfoProperty1 = newServerInfoProperty("name1", "value1", "desc");
 
-    assertThat(serverInfoProperty, lessThan(null));
-    assertThat(serverInfoProperty1, lessThan(null));
+    assertThat(serverInfoProperty, greaterThan(null));
+    assertThat(serverInfoProperty1, greaterThan(null));
 
     assertThat(serverInfoProperty, comparesEqualTo(newDatabaseProperty("name", null)));
     assertThat(serverInfoProperty, comparesEqualTo(newDatabaseProperty("NAME", null)));

@@ -23,8 +23,8 @@ public class DatabaseServerTypeSortTest {
     final DatabaseServerType databaseServerType0 = DatabaseServerType.UNKNOWN;
     final DatabaseServerType databaseServerType1 = new DatabaseServerType("newdb", "NewDB");
 
-    assertThat(databaseServerType0, lessThan(null));
-    assertThat(databaseServerType1, lessThan(null));
+    assertThat(databaseServerType0, greaterThan(null));
+    assertThat(databaseServerType1, greaterThan(null));
 
     assertThat(databaseServerType0, comparesEqualTo(databaseServerType0));
     assertThat(databaseServerType1, comparesEqualTo(databaseServerType1));

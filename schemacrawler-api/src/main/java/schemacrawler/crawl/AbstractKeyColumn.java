@@ -50,10 +50,6 @@ abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> i
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    if (obj == null) {
-      return -1;
-    }
-
     final int databaseObjectTypeComparison =
         NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, obj);
     if (databaseObjectTypeComparison != 0) {

@@ -57,10 +57,6 @@ abstract sealed class AbstractColumn<P extends DatabaseObject> extends AbstractD
    */
   @Override
   public final int compareTo(final NamedObject obj) {
-    if (obj == null) {
-      return -1;
-    }
-
     final int databaseObjectTypeComparison =
         NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, obj);
     if (databaseObjectTypeComparison != 0) {

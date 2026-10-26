@@ -38,7 +38,7 @@ import schemacrawler.schemacrawler.SchemaReference;
 public class NamedObjectSortTest {
 
   @Test
-  public void alphabeticalNullNamesAndObjectsSortLast() {
+  public void alphabeticalNullNamesAndObjectsSortFirst() {
     final NamedObject named = mock(NamedObject.class);
     final NamedObject unnamed = mock(NamedObject.class);
     final NamedObject missingKey = mock(NamedObject.class);
@@ -47,13 +47,13 @@ public class NamedObjectSortTest {
     when(unnamed.key()).thenReturn(new NamedObjectKey());
     when(missingKey.getFullName()).thenReturn("name");
     final NamedObjectSort comparator = NamedObjectSort.alphabetical;
-    assertThat(comparator.compare(named, unnamed), lessThan(0));
-    assertThat(comparator.compare(unnamed, named), greaterThan(0));
-    assertThat(comparator.compare(named, missingKey), lessThan(0));
-    assertThat(comparator.compare(missingKey, named), greaterThan(0));
+    assertThat(comparator.compare(named, unnamed), greaterThan(0));
+    assertThat(comparator.compare(unnamed, named), lessThan(0));
+    assertThat(comparator.compare(named, missingKey), greaterThan(0));
+    assertThat(comparator.compare(missingKey, named), lessThan(0));
     for (final NamedObjectSort sort : NamedObjectSort.values()) {
-      assertThat(sort.compare(named, null), lessThan(0));
-      assertThat(sort.compare(null, named), greaterThan(0));
+      assertThat(sort.compare(named, null), greaterThan(0));
+      assertThat(sort.compare(null, named), lessThan(0));
       assertThat(sort.compare(null, null), is(0));
     }
   }
@@ -115,7 +115,7 @@ public class NamedObjectSortTest {
     if (sortAlphabetically) {
       expected.sort(Comparator.comparing(NamedObject::getName));
     }
-    expected.add(null);
+    expected.add(0, null);
 
     return expected;
   }

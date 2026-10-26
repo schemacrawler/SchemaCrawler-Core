@@ -11,7 +11,7 @@ package schemacrawler.crawl;
 import static java.lang.String.CASE_INSENSITIVE_ORDER;
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.nullsLast;
+import static java.util.Comparator.nullsFirst;
 import static java.util.Objects.compare;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
@@ -34,7 +34,7 @@ class ImmutableDatabaseProperty extends AbstractProperty {
   @Serial private static final long serialVersionUID = -7150431683440256142L;
 
   private static final Comparator<Property> DESCRIPTION_COMPARATOR =
-      nullsLast(comparing(Property::getDescription, nullsLast(CASE_INSENSITIVE_ORDER)));
+      nullsFirst(comparing(Property::getDescription, nullsFirst(CASE_INSENSITIVE_ORDER)));
 
   private static final Set<Entry<Pattern, String>> acronyms;
 

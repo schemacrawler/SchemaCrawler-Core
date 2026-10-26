@@ -98,9 +98,9 @@ public class CommandProviderSortTest {
     assertThat(CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(null, null), is(0));
     assertThat(
         CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(testCommandProvider, null),
-        is(lessThan(0)));
+        is(greaterThan(0)));
     assertThat(
         CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(null, fallbackCommandProvider),
-        is(greaterThan(0)));
+        is(lessThan(0)));
   }
 }

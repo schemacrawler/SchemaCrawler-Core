@@ -16,8 +16,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import schemacrawler.namedobject.NamedObjectSort;
 import schemacrawler.schema.DataTypeType;
+import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.TableType;
@@ -48,6 +52,27 @@ public class NaturalTypeComparisonTest {
 
     assertThat(userType.compareTo(systemType), lessThan(0));
     assertThat(systemType.compareTo(userType), greaterThan(0));
+  }
+
+  @Test
+  public void systemSchemaSortsFirstWithoutSpecialDataTypeGrouping() {
+    final MutableColumnDataType systemType =
+        new MutableColumnDataType(new SchemaReference(), "SYSTEM", DataTypeType.system);
+    final MutableColumnDataType userType =
+        new MutableColumnDataType(
+            new SchemaReference("catalog", "A_SCHEMA"), "USER", DataTypeType.user_defined);
+    final MutableTable table =
+        new MutableTable(new SchemaReference("catalog", "M_SCHEMA"), "TABLE");
+
+    assertThat(systemType.compareTo(table), lessThan(0));
+    assertThat(table.compareTo(systemType), greaterThan(0));
+    assertThat(systemType.compareTo(userType), lessThan(0));
+    assertThat(userType.compareTo(systemType), greaterThan(0));
+    assertThat(userType.compareTo(table), lessThan(0));
+    assertThat(table.compareTo(userType), greaterThan(0));
+    final List<NamedObject> sorted = new ArrayList<>(List.of(userType, table, systemType));
+    sorted.sort(NamedObjectSort.natural);
+    assertThat(sorted, is(List.of(systemType, userType, table)));
   }
 
   @Test

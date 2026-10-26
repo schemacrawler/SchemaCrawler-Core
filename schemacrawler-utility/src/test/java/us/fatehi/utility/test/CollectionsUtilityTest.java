@@ -51,14 +51,14 @@ public class CollectionsUtilityTest {
   @Test
   public void nullArgs() {
     assertThat(CollectionsUtility.compareLists(null, null), is(0));
-    assertThat(CollectionsUtility.compareLists(null, new ArrayList<String>()), is(greaterThan(0)));
-    assertThat(CollectionsUtility.compareLists(new ArrayList<String>(), null), is(lessThan(0)));
+    assertThat(CollectionsUtility.compareLists(null, new ArrayList<String>()), is(lessThan(0)));
+    assertThat(CollectionsUtility.compareLists(new ArrayList<String>(), null), is(greaterThan(0)));
     assertThat(
         CollectionsUtility.compareLists(Arrays.asList((String) null), List.of("a")),
-        is(greaterThan(0)));
+        is(lessThan(0)));
     assertThat(
         CollectionsUtility.compareLists(List.of("a"), Arrays.asList((String) null)),
-        is(lessThan(0)));
+        is(greaterThan(0)));
     assertThat(
         CollectionsUtility.compareLists(Arrays.asList("a", null), Arrays.asList("a", null)), is(0));
   }

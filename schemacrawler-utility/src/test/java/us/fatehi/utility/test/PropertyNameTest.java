@@ -10,10 +10,10 @@ package us.fatehi.utility.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
-
 import us.fatehi.utility.property.PropertyName;
 
 public class PropertyNameTest {
@@ -24,7 +24,8 @@ public class PropertyNameTest {
     final PropertyName propertyName2 = new PropertyName("hello", "  ");
     assertThat(propertyName1.compareTo(propertyName2), is(equalTo(1)));
 
-    assertThat(propertyName1.compareTo(null), is(equalTo(-1)));
+    assertThat(propertyName1.compareTo(null), greaterThan(0));
+    assertThat(propertyName1.compareTo(propertyName1), is(0));
   }
 
   @Test

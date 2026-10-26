@@ -25,10 +25,10 @@ public class NamedObjectKeyTest {
         new NamedObjectKey("a.b", "c").compareTo(new NamedObjectKey("a", "b.c")), greaterThan(0));
     assertThat(
         new NamedObjectKey("schema", "").compareTo(new NamedObjectKey("schema", null)),
-        lessThan(0));
+        greaterThan(0));
     assertThat(
         new NamedObjectKey("schema", null).compareTo(new NamedObjectKey("schema", "")),
-        greaterThan(0));
+        lessThan(0));
     assertThat(uppercase.compareTo(new NamedObjectKey("schema", "AB")), is(0));
   }
 

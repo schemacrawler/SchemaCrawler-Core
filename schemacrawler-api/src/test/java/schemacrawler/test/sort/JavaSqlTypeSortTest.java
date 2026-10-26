@@ -26,8 +26,8 @@ public class JavaSqlTypeSortTest {
     final JavaSqlType javaSqlType =
         new JavaSqlType(JDBCType.INTEGER, Integer.class, JavaSqlTypeGroup.integer);
 
-    assertThat(javaSqlType.compareTo(null), is(lessThan(0)));
-    assertThat(JavaSqlType.UNKNOWN.compareTo(null), is(lessThan(0)));
+    assertThat(javaSqlType.compareTo(null), is(greaterThan(0)));
+    assertThat(JavaSqlType.UNKNOWN.compareTo(null), is(greaterThan(0)));
 
     assertThat(javaSqlType.compareTo(javaSqlType), is(0));
     assertThat(JavaSqlType.UNKNOWN.compareTo(JavaSqlType.UNKNOWN), is(0));

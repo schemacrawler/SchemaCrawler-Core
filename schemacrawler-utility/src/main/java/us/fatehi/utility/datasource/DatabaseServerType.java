@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
+import java.util.Comparator;
 import us.fatehi.utility.property.PropertyName;
 
 /**
@@ -26,6 +27,12 @@ public record DatabaseServerType(PropertyName propertyName)
 
   public static final DatabaseServerType UNKNOWN = new DatabaseServerType("unknown", "Unknown");
 
+  private static final Comparator<DatabaseServerType> SERVER_TYPE_COMPARATOR =
+      Comparator.nullsFirst(
+          Comparator.comparing(
+                  DatabaseServerType::isUnknownDatabaseSystem, Comparator.reverseOrder())
+              .thenComparing(DatabaseServerType::propertyName));
+
   public DatabaseServerType(
       final String databaseSystemIdentifier, final String databaseSystemName) {
     this(new PropertyName(databaseSystemIdentifier, databaseSystemName));
@@ -38,18 +45,8 @@ public record DatabaseServerType(PropertyName propertyName)
 
   /** {@inheritDoc} */
   @Override
-  public int compareTo(final DatabaseServerType o) {
-    if (o == null) {
-      return -1;
-    }
-    if (equals(o)) {
-      return 0;
-    }
-    final int comparison = Boolean.compare(o.isUnknownDatabaseSystem(), isUnknownDatabaseSystem());
-    if (comparison != 0) {
-      return comparison;
-    }
-    return propertyName.compareTo(o.propertyName);
+  public int compareTo(final DatabaseServerType other) {
+    return SERVER_TYPE_COMPARATOR.compare(this, other);
   }
 
   public String getDatabaseSystemIdentifier() {

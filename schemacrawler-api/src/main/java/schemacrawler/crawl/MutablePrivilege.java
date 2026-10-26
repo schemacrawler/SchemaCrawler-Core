@@ -110,13 +110,13 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
   @Serial private static final long serialVersionUID = -1117664231494271886L;
 
   private static final Comparator<Grant<?>> GRANT_COMPARATOR =
-      Comparator.nullsLast(
+      Comparator.nullsFirst(
           Comparator.comparing(
                   (Grant<?> grant) -> grant.getGrantor(),
-                  Comparator.nullsLast(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
+                  Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
               .thenComparing(
                   Grant::getGrantee,
-                  Comparator.nullsLast(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
+                  Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
               .thenComparing(grant -> grant.getParent().key())
               .thenComparing(Grant::isGrantable));
 

@@ -9,7 +9,7 @@
 package schemacrawler.crawl;
 
 import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsLast;
+import static java.util.Comparator.nullsFirst;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
@@ -34,7 +34,7 @@ abstract sealed class MutableRoutine extends AbstractDatabaseObject implements R
   @Serial private static final long serialVersionUID = 3906925686089134130L;
 
   private static final Comparator<Routine> ROUTINE_COMPARATOR =
-      Comparator.comparing(Routine::getSpecificName, nullsLast(naturalOrder()))
+      Comparator.comparing(Routine::getSpecificName, nullsFirst(naturalOrder()))
           .thenComparing(NamedObjectComparators.EXACT_KEY_COMPARATOR);
 
   private transient NamedObjectKey key;

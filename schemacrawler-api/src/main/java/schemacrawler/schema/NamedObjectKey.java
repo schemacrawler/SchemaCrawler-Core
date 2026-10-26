@@ -21,7 +21,11 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
   @Serial private static final long serialVersionUID = -5008609072012459037L;
 
   private static final Comparator<String> COMPONENT_COMPARATOR =
-      Comparator.nullsLast(Comparator.naturalOrder());
+      Comparator.nullsFirst(Comparator.naturalOrder());
+
+  private static final Comparator<NamedObjectKey> KEY_COMPARATOR =
+      Comparator.nullsFirst(
+          (left, right) -> Arrays.compare(left.key, right.key, COMPONENT_COMPARATOR));
 
   private final String[] key;
 
@@ -34,17 +38,14 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
   }
 
   /**
-   * Compares whole key components lexicographically, with null components and null keys last.
+   * Compares whole key components lexicographically, with null components and null keys first.
    *
    * @param other Key to compare
    * @return The comparison result
    */
   @Override
   public int compareTo(final NamedObjectKey other) {
-    if (other == null) {
-      return -1;
-    }
-    return Arrays.compare(key, other.key, COMPONENT_COMPARATOR);
+    return KEY_COMPARATOR.compare(this, other);
   }
 
   @Override

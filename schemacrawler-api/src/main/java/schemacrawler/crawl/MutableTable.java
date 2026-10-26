@@ -9,7 +9,7 @@
 package schemacrawler.crawl;
 
 import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsLast;
+import static java.util.Comparator.nullsFirst;
 import static schemacrawler.namedobject.NamedObjectSort.alphabetical;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
@@ -100,10 +100,6 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    if (obj == null) {
-      return -1;
-    }
-
     final int databaseObjectTypeComparison =
         NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, obj);
     if (databaseObjectTypeComparison != 0) {
@@ -419,7 +415,7 @@ sealed class MutableTable extends AbstractDatabaseObject implements Table permit
     // either imported
     // or exported, and no explicit checks for this are done
     final Comparator<R> fkComparator =
-        nullsLast(
+        nullsFirst(
             ((Comparator<R>)
                     (final R one, final R two) -> {
                       final boolean isOneImportedKey = equals(one.getDependentTable());

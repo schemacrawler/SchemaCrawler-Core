@@ -37,9 +37,6 @@ abstract class AbstractDatabaseObjectBacked<DO extends DatabaseObject>
 
   @Override
   public int compareTo(final NamedObject namedObj) {
-    if (namedObj == null) {
-      return -1;
-    }
     final int databaseObjectTypeComparison =
         NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(this, namedObj);
     if (databaseObjectTypeComparison != 0) {

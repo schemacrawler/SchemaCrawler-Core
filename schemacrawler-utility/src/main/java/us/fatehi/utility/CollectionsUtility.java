@@ -24,7 +24,7 @@ import java.util.Set;
 public class CollectionsUtility {
 
   /**
-   * Compares lists by size, then by elements, placing null lists and null elements last.
+   * Compares lists by size, then by elements, placing null lists and null elements first.
    *
    * @param <T> Comparable element type
    * @param list1 First list
@@ -33,21 +33,16 @@ public class CollectionsUtility {
    */
   public static <T extends Comparable<? super T>> int compareLists(
       final List<? extends T> list1, final List<? extends T> list2) {
+    return Comparator.<List<? extends T>>nullsFirst(CollectionsUtility::compareNonNullLists)
+        .compare(list1, list2);
+  }
 
-    if (list1 == null && list2 == null) {
-      return 0;
-    }
-    if (list1 == null) {
-      return 1;
-    }
-    if (list2 == null) {
-      return -1;
-    }
-
+  private static <T extends Comparable<? super T>> int compareNonNullLists(
+      final List<? extends T> list1, final List<? extends T> list2) {
     int comparison = Integer.compare(list1.size(), list2.size());
 
     if (comparison == 0) {
-      final Comparator<T> elementComparator = Comparator.nullsLast(Comparator.naturalOrder());
+      final Comparator<T> elementComparator = Comparator.nullsFirst(Comparator.naturalOrder());
       final Iterator<? extends T> iter1 = list1.iterator();
       final Iterator<? extends T> iter2 = list2.iterator();
 

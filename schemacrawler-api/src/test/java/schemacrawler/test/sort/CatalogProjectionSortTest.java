@@ -75,8 +75,8 @@ public class CatalogProjectionSortTest {
 
     final Collection<Schema> schemas = projection.getSchemas();
     assertThat(schemas.size(), is(3));
-    assertThat(schemas, is(List.of(schema1, schema3, schema2)));
-    assertThat(projection.lookupSchema(schemaName).orElseThrow(), sameInstance(schema1));
+    assertThat(schemas, is(List.of(schema2, schema1, schema3)));
+    assertThat(projection.lookupSchema(schemaName).orElseThrow(), sameInstance(schema2));
   }
 
   @Test

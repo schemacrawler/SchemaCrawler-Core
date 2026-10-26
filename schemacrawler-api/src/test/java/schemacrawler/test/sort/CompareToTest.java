@@ -99,61 +99,61 @@ public class CompareToTest {
   }
 
   @Test
-  public void nullableRoutineSpecificNamesSortLastAfterEqualKeysAndParameters() {
+  public void nullableRoutineSpecificNamesSortFirstAfterEqualKeys() {
     final Schema schema = new SchemaReference();
     final Procedure known = newProcedure(schema, "ROUTINE", "SPECIFIC");
     final Procedure missing = spy(newProcedure(schema, "ROUTINE", "SPECIFIC"));
     doReturn(known.key()).when(missing).key();
     doReturn(null).when(missing).getSpecificName();
-    assertThat(known.compareTo(missing), lessThan(0));
-    assertThat(missing.compareTo(known), greaterThan(0));
+    assertThat(known.compareTo(missing), greaterThan(0));
+    assertThat(missing.compareTo(known), lessThan(0));
   }
 
   @Test
-  public void nullablePropertyFieldsSortLast() {
+  public void nullablePropertyFieldsSortFirst() {
     final Property unnamed = mock(Property.class);
     final Property named = mock(Property.class);
     when(named.getName()).thenReturn("name");
-    assertThat(Property.comparator.compare(named, unnamed), lessThan(0));
-    assertThat(Property.comparator.compare(unnamed, named), greaterThan(0));
+    assertThat(Property.comparator.compare(named, unnamed), greaterThan(0));
+    assertThat(Property.comparator.compare(unnamed, named), lessThan(0));
 
     final Property described = newDatabaseProperty("getDatabaseVersion", "value");
-    assertThat(described.compareTo(unnamed), lessThan(0));
+    assertThat(described.compareTo(unnamed), greaterThan(0));
   }
 
   @Test
-  public void nullableIndexTypesSortLast() {
+  public void nullableIndexTypesSortFirst() {
     final Table table = newTable(new SchemaReference(), "TABLE");
     final Index known = newIndex(table, "INDEX");
     final Index missingType = mock(Index.class);
     when(missingType.getColumns()).thenReturn(List.of());
-    assertThat(known.compareTo(missingType), lessThan(0));
+    assertThat(known.compareTo(missingType), greaterThan(0));
   }
 
   @Test
-  public void nullableColumnReferenceFieldsSortLast() {
+  public void nullableColumnReferenceFieldsSortFirst() {
     final Column named = mock(Column.class);
     final Column unnamed = mock(Column.class);
     when(named.getFullName()).thenReturn("COLUMN");
     final ColumnReference known = newColumnReference(0, named, named);
     final ColumnReference missingForeignName = newColumnReference(0, unnamed, named);
     final ColumnReference missingPrimaryName = newColumnReference(0, named, unnamed);
-    assertThat(known.compareTo(missingForeignName), lessThan(0));
-    assertThat(missingForeignName.compareTo(known), greaterThan(0));
-    assertThat(known.compareTo(missingPrimaryName), lessThan(0));
-    assertThat(missingPrimaryName.compareTo(known), greaterThan(0));
-    assertThat(known.compareTo(mock(ColumnReference.class)), lessThan(0));
+    assertThat(known.compareTo(missingForeignName), greaterThan(0));
+    assertThat(missingForeignName.compareTo(known), lessThan(0));
+    assertThat(known.compareTo(missingPrimaryName), greaterThan(0));
+    assertThat(missingPrimaryName.compareTo(known), lessThan(0));
+    assertThat(known.compareTo(mock(ColumnReference.class)), greaterThan(0));
   }
 
   @Test
-  public void nullableTypesSortLastBeforeNames() {
+  public void nullableTypesSortFirstBeforeNames() {
     final Schema schema = new SchemaReference();
     final Table missingType = spy(newTable(schema, "A"));
     doReturn(null).when(missingType).getType();
     final Table knownType = newTable(schema, "Z");
     setTableType(knownType, new TableType("TABLE"));
-    assertThat(knownType, lessThan(missingType));
-    assertThat(missingType, greaterThan(knownType));
+    assertThat(knownType, greaterThan(missingType));
+    assertThat(missingType, lessThan(knownType));
   }
 
   @ParameterizedTest
@@ -243,8 +243,8 @@ public class CompareToTest {
     final View view = newView(new SchemaReference(null, "public"), "blog_monthly_stat_fa");
     setTableType(view, new TableType("materialized view"));
 
-    assertThat(view, lessThan(null));
-    assertThat(tbl, lessThan(null));
+    assertThat(view, greaterThan(null));
+    assertThat(tbl, greaterThan(null));
 
     assertThat(tbl, comparesEqualTo(tbl));
     assertThat(view, comparesEqualTo(view));
@@ -373,9 +373,9 @@ public class CompareToTest {
     final DatabaseObject tstDbObj2 = newDatabaseObject(schema, "tstDbObj2");
     final DatabaseObject tstDbObj3 = newDatabaseObject(schema1, "tstDbObj1");
 
-    assertThat(tstDbObj1, lessThan(null));
-    assertThat(tstDbObj2, lessThan(null));
-    assertThat(tstDbObj3, lessThan(null));
+    assertThat(tstDbObj1, greaterThan(null));
+    assertThat(tstDbObj2, greaterThan(null));
+    assertThat(tstDbObj3, greaterThan(null));
 
     assertThat(tstDbObj1, lessThan(tstDbObj2));
     assertThat(tstDbObj2, greaterThan(tstDbObj1));

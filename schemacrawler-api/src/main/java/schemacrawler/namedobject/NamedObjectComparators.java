@@ -11,7 +11,7 @@ package schemacrawler.namedobject;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsLast;
+import static java.util.Comparator.nullsFirst;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -32,67 +32,69 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class NamedObjectComparators {
 
-  /** Compares exact text case-sensitively, with nulls last. */
-  public static final Comparator<String> EXACT_TEXT_COMPARATOR = nullsLast(naturalOrder());
+  /** Compares exact text case-sensitively, with nulls first. */
+  public static final Comparator<String> EXACT_TEXT_COMPARATOR = nullsFirst(naturalOrder());
 
   /** Compares the existing lossy normalized text without allocating normalized strings. */
   public static final Comparator<String> NORMALIZED_TEXT_COMPARATOR =
-      NamedObjectComparators::compareNormalizedText;
+      nullsFirst(NamedObjectComparators::compareNormalizedText);
 
   public static final Comparator<NamedObject> NORMALIZED_NAME_COMPARATOR =
-      nullsLast(comparing(NamedObject::getFullName, nullsLast(NORMALIZED_TEXT_COMPARATOR)));
+      nullsFirst(comparing(NamedObject::getFullName, NORMALIZED_TEXT_COMPARATOR));
 
   public static final Comparator<NamedObject> EXACT_KEY_COMPARATOR =
-      comparing(NamedObject::key, nullsLast(naturalOrder()));
+      nullsFirst(comparing(NamedObject::key, nullsFirst(naturalOrder())));
 
   public static final Comparator<NamedObject> NAME_THEN_KEY_COMPARATOR =
       NORMALIZED_NAME_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR);
 
   public static final Comparator<NamedObject> TYPED_OBJECT_COMPARATOR =
-      NamedObjectComparators::typeComparator;
+      nullsFirst(NamedObjectComparators::typeComparator);
 
-  /** Compares mapping sequence, then normalized foreign and primary column names; nulls last. */
+  /** Compares mapping sequence, then normalized foreign and primary column names; nulls first. */
   public static final Comparator<ColumnReference> COLUMN_REFERENCE_COMPARATOR =
-      nullsLast(
+      nullsFirst(
           comparingInt(ColumnReference::getKeySequence)
               .thenComparing(ColumnReference::getForeignKeyColumn, NORMALIZED_NAME_COMPARATOR)
               .thenComparing(ColumnReference::getPrimaryKeyColumn, NORMALIZED_NAME_COMPARATOR));
 
   /** Compares ordered mappings size-first, without relationship names or identity keys. */
   public static final Comparator<TableReference> TABLE_REFERENCE_MAPPING_COMPARATOR =
-      comparing(TableReference::getColumnReferences, CollectionsUtility::compareLists);
+      nullsFirst(
+          comparing(
+              TableReference::getColumnReferences, nullsFirst(CollectionsUtility::compareLists)));
 
   public static final Comparator<NamedObject> DATABASE_OBJECT_ORDER_COMPARATOR =
-      nullsLast(
+      nullsFirst(
           comparingInt(NamedObjectComparators::namedObjectGroup)
               .thenComparing(
                   object ->
                       object instanceof final DatabaseObject databaseObject
                           ? databaseObject.getSchema()
                           : null,
-                  Comparator.<Schema>nullsLast(naturalOrder()))
+                  Comparator.<Schema>nullsFirst(naturalOrder()))
               .thenComparingInt(NamedObjectComparators::databaseObjectOrder));
 
   private static final Comparator<NamedObject> DEPENDANT_OBJECT_ORDER_COMPARATOR =
-      NamedObjectComparators::dependantObjectOrder;
+      nullsFirst(NamedObjectComparators::dependantObjectOrder);
 
   public static final Comparator<NamedObject> DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR =
       DATABASE_OBJECT_ORDER_COMPARATOR.thenComparing(DEPENDANT_OBJECT_ORDER_COMPARATOR);
 
   /** Compares structural order, type, and normalized name without a terminal identity key. */
   public static final Comparator<NamedObject> DATABASE_OBJECT_FIELDS_COMPARATOR =
-      nullsLast(
+      nullsFirst(
           DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR
               .thenComparing(TYPED_OBJECT_COMPARATOR)
               .thenComparing(NORMALIZED_NAME_COMPARATOR));
 
   /** Compares database-object fields followed by the exact identity key. */
   public static final Comparator<NamedObject> DATABASE_OBJECT_COMPARATOR =
-      nullsLast(DATABASE_OBJECT_FIELDS_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR));
+      nullsFirst(DATABASE_OBJECT_FIELDS_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR));
 
   private static int compareNormalizedText(final String text, final String otherText) {
-    final String left = text == null ? "" : text;
-    final String right = otherText == null ? "" : otherText;
+    final String left = text;
+    final String right = otherText;
     int leftOffset = 0;
     int rightOffset = 0;
     while (true) {
@@ -162,12 +164,6 @@ public final class NamedObjectComparators {
     if (object == otherObject) {
       return 0;
     }
-    if (object == null) {
-      return 1;
-    }
-    if (otherObject == null) {
-      return -1;
-    }
     if (object instanceof final DependantObject<?> dependantObject
         && otherObject instanceof final DependantObject<?> otherDependantObject) {
       final int parentComparison =
@@ -214,18 +210,12 @@ public final class NamedObjectComparators {
     if (object == otherObject) {
       return 0;
     }
-    if (object == null) {
-      return 1;
-    }
-    if (otherObject == null) {
-      return -1;
-    }
     if (object instanceof final TypedObject typedObject
         && otherObject instanceof final TypedObject otherTypedObject) {
       try {
         final int typeCompareTo =
             Objects.compare(
-                typedObject.getType(), otherTypedObject.getType(), nullsLast(naturalOrder()));
+                typedObject.getType(), otherTypedObject.getType(), nullsFirst(naturalOrder()));
         if (typeCompareTo != 0) {
           return typeCompareTo;
         }

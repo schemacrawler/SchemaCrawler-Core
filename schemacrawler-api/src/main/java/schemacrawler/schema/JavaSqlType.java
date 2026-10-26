@@ -9,7 +9,7 @@
 package schemacrawler.schema;
 
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.nullsLast;
+import static java.util.Comparator.nullsFirst;
 import static java.util.Objects.compare;
 import static java.util.Objects.requireNonNull;
 
@@ -28,7 +28,7 @@ public final class JavaSqlType implements SQLType, Serializable, Comparable<Java
       new JavaSqlType(unknownSQLType(), Object.class, JavaSqlTypeGroup.unknown);
 
   private static Comparator<JavaSqlType> comparator =
-      nullsLast(comparing(JavaSqlType::getName, nullsLast(String.CASE_INSENSITIVE_ORDER)));
+      nullsFirst(comparing(JavaSqlType::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER)));
 
   private static SQLType unknownSQLType() {
     final class UnknownSQLType implements SQLType, Serializable {

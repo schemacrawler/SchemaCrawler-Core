@@ -34,11 +34,11 @@ public class GrantSortTest {
 
     assertThat(nullGrantor.compareTo(nullGrantor), is(0));
     assertThat(nullGrantor.compareTo(newGrant(table, privilege, null, "grantee", false)), is(0));
-    assertThat(nullGrantor.compareTo(nonNullGrantor), greaterThan(0));
-    assertThat(nonNullGrantor.compareTo(nullGrantor), lessThan(0));
-    assertThat(nullGrantee.compareTo(nonNullGrantee), greaterThan(0));
-    assertThat(nonNullGrantee.compareTo(nullGrantee), lessThan(0));
-    assertThat(nullGrantor.compareTo(null), lessThan(0));
+    assertThat(nullGrantor.compareTo(nonNullGrantor), lessThan(0));
+    assertThat(nonNullGrantor.compareTo(nullGrantor), greaterThan(0));
+    assertThat(nullGrantee.compareTo(nonNullGrantee), lessThan(0));
+    assertThat(nonNullGrantee.compareTo(nullGrantee), greaterThan(0));
+    assertThat(nullGrantor.compareTo(null), greaterThan(0));
   }
 
   @Test

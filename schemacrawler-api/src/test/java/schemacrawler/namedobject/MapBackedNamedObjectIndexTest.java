@@ -183,7 +183,7 @@ public class MapBackedNamedObjectIndexTest {
     final MapBackedNamedObjectIndex<Schema> immutableCopy =
         SerializationUtils.clone(new MapBackedNamedObjectIndex<>(schemas));
     for (final MapBackedNamedObjectIndex<Schema> index : List.of(mutableCopy, immutableCopy)) {
-      assertThat(index.getObjects(), contains(second, third, first));
+      assertThat(index.getObjects(), contains(first, second, third));
       assertThat(index.size(), is(3));
       for (final Schema schema : schemas) {
         assertThat(index.containsKey(schema.key()), is(true));

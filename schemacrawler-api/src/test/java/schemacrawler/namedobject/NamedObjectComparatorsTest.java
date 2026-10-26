@@ -40,6 +40,31 @@ import schemacrawler.schemacrawler.SchemaReference;
 public class NamedObjectComparatorsTest {
 
   @Test
+  public void sharedComparatorsPlaceNullFirst() {
+    final NamedObject named = mock(NamedObject.class);
+    when(named.getFullName()).thenReturn("NAME");
+    when(named.key()).thenReturn(new NamedObjectKey("NAME"));
+    final List<Comparator<NamedObject>> comparators =
+        List.of(
+            NamedObjectComparators.NORMALIZED_NAME_COMPARATOR,
+            NamedObjectComparators.EXACT_KEY_COMPARATOR,
+            NamedObjectComparators.NAME_THEN_KEY_COMPARATOR,
+            NamedObjectComparators.TYPED_OBJECT_COMPARATOR,
+            NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR,
+            NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR,
+            NamedObjectComparators.DATABASE_OBJECT_FIELDS_COMPARATOR,
+            NamedObjectComparators.DATABASE_OBJECT_COMPARATOR);
+    for (final Comparator<NamedObject> comparator : comparators) {
+      assertThat(comparator.compare(null, null), is(0));
+      assertThat(comparator.compare(null, named), lessThan(0));
+      assertThat(comparator.compare(named, null), greaterThan(0));
+    }
+    assertThat(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR.compare(null, ""), lessThan(0));
+    assertThat(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR.compare("", null), greaterThan(0));
+    assertThat(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR.compare(null, null), is(0));
+  }
+
+  @Test
   public void compareFamilyOrdersSimpleDatabaseObjectTypes() {
     final Catalog catalog = mock(Catalog.class);
     final Schema schema = new SchemaReference("catalog", "schema");
@@ -97,8 +122,8 @@ public class NamedObjectComparatorsTest {
     assertThat(comparator.compare(first, second), lessThan(0));
     assertThat(comparator.compare(second, first), greaterThan(0));
     assertThat(comparator.compare(first, first), is(0));
-    assertThat(comparator.compare(first, null), lessThan(0));
-    assertThat(comparator.compare(null, first), greaterThan(0));
+    assertThat(comparator.compare(first, null), greaterThan(0));
+    assertThat(comparator.compare(null, first), lessThan(0));
     assertThat(comparator.compare(null, null), is(0));
     assertThat(
         comparator.compare(
