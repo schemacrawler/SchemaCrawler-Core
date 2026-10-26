@@ -18,12 +18,12 @@ import java.util.Comparator;
 
 public interface Property extends Serializable, Comparable<Property> {
 
-  Comparator<Property> comparator =
+  Comparator<Property> NAME_COMPARATOR =
       nullsFirst(comparing(Property::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER)));
 
   @Override
   default int compareTo(final Property otherProperty) {
-    return compare(this, otherProperty, comparator);
+    return compare(this, otherProperty, NAME_COMPARATOR);
   }
 
   /**

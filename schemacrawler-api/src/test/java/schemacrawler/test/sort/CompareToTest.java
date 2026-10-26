@@ -114,8 +114,8 @@ public class CompareToTest {
     final Property unnamed = mock(Property.class);
     final Property named = mock(Property.class);
     when(named.getName()).thenReturn("name");
-    assertThat(Property.comparator.compare(named, unnamed), greaterThan(0));
-    assertThat(Property.comparator.compare(unnamed, named), lessThan(0));
+    assertThat(Property.NAME_COMPARATOR.compare(named, unnamed), greaterThan(0));
+    assertThat(Property.NAME_COMPARATOR.compare(unnamed, named), lessThan(0));
 
     final Property described = newDatabaseProperty("getDatabaseVersion", "value");
     assertThat(described.compareTo(unnamed), greaterThan(0));
