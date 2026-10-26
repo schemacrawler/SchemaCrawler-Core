@@ -24,6 +24,7 @@ import static schemacrawler.crawl.SortTestUtility.newColumnReference;
 import static schemacrawler.crawl.SortTestUtility.newDatabaseObject;
 import static schemacrawler.crawl.SortTestUtility.newDatabaseProperty;
 import static schemacrawler.crawl.SortTestUtility.newForeignKey;
+import static schemacrawler.crawl.SortTestUtility.newImplicitAssociation;
 import static schemacrawler.crawl.SortTestUtility.newIndex;
 import static schemacrawler.crawl.SortTestUtility.newIndexColumn;
 import static schemacrawler.crawl.SortTestUtility.newProcedure;
@@ -54,6 +55,7 @@ import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.View;
 import schemacrawler.schemacrawler.SchemaReference;
@@ -318,7 +320,41 @@ public class CompareToTest {
   }
 
   @Test
-  public void tableReferencesUseKeyAfterIdenticalMappings() {
+  public void tableReferenceComparisonDoesNotReadMappings() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final Table child = newTable(schema, "CHILD");
+    final Table parent = newTable(schema, "PARENT");
+    final ForeignKey first = spy(newForeignKey("FK_A", child, parent, "Z_COLUMN"));
+    final ForeignKey second = spy(newForeignKey("FK_Z", child, parent, "A_COLUMN"));
+
+    assertThat(first.compareTo(second), lessThan(0));
+    assertThat(second.compareTo(first), greaterThan(0));
+    assertThat(NamedObjectSort.natural.compare(first, second), lessThan(0));
+    verify(first, never()).getColumnReferences();
+    verify(second, never()).getColumnReferences();
+    verify(first, never()).getConstrainedColumns();
+    verify(second, never()).getConstrainedColumns();
+  }
+
+  @Test
+  public void implicitAssociationComparisonDoesNotReadMappings() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final Table child = newTable(schema, "CHILD");
+    final Table parent = newTable(schema, "PARENT");
+    final TableReference first = spy(newImplicitAssociation("IA_A", child, parent, "Z_COLUMN"));
+    final TableReference second = spy(newImplicitAssociation("IA_Z", child, parent, "A_COLUMN"));
+
+    assertThat(first.compareTo(second), lessThan(0));
+    assertThat(second.compareTo(first), greaterThan(0));
+    assertThat(NamedObjectSort.natural.compare(first, second), lessThan(0));
+    verify(first, never()).getColumnReferences();
+    verify(second, never()).getColumnReferences();
+    verify(first, never()).getConstrainedColumns();
+    verify(second, never()).getConstrainedColumns();
+  }
+
+  @Test
+  public void tableReferencesWithIdenticalMappingsSortByName() {
     final Table child = newTable(new SchemaReference("catalog", "schema"), "CHILD");
     final Table parent = newTable(new SchemaReference("catalog", "schema"), "PARENT");
     final ForeignKey first = newForeignKey("FK_A", child, parent);

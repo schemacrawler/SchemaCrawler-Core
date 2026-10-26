@@ -23,6 +23,7 @@ import schemacrawler.schema.IndexType;
 import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
+import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableType;
 import schemacrawler.schema.View;
 import us.fatehi.utility.UtilityMarker;
@@ -75,6 +76,12 @@ public final class SortTestUtility {
     final MutablePrivilege<Table> privilege =
         new MutablePrivilege<>(new TablePointer(table), privilegeName);
     return privilege.new PrivilegeGrant(grantor, grantee, grantable);
+  }
+
+  public static TableReference newImplicitAssociation(
+      final String name, final Table child, final Table parent, final String columnName) {
+    return new MutableImplicitAssociation(
+        name, newColumnReference(1, newColumn(child, columnName), newColumn(parent, columnName)));
   }
 
   public static Index newIndex(final Table table, final String name) {

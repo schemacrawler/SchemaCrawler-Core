@@ -12,17 +12,14 @@ import static java.util.Objects.requireNonNull;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
 
 import java.io.Serial;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.string.StringFormat;
@@ -32,11 +29,6 @@ abstract sealed class AbstractTableReference extends MutableTableConstraint
     implements TableReference permits MutableForeignKey, MutableImplicitAssociation {
 
   @Serial private static final long serialVersionUID = -5164664131926303038L;
-
-  private static final Comparator<TableReference> TABLE_REFERENCE_COMPARATOR =
-      NamedObjectComparators.TABLE_REFERENCE_MAPPING_COMPARATOR
-          .thenComparing(NamedObjectComparators.TYPED_OBJECT_COMPARATOR)
-          .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
 
   private static final Logger LOGGER = Logger.getLogger(AbstractTableReference.class.getName());
 
@@ -57,35 +49,6 @@ abstract sealed class AbstractTableReference extends MutableTableConstraint
     addColumnReference(columnReference);
 
     isSelfReferencing = getParent().equals(pkTable);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * <p>NOTE: compareTo is not compatible with equals. equals compares the full name of a database
-   * object, but compareTo uses more fields to define a "natural" sorting order. compareTo may
-   * return incorrect results until the object is fully built by SchemaCrawler.
-   *
-   * <p>Since foreign keys are not always explicitly named in databases, the sorting routine orders
-   * the foreign keys by the names of the columns in the foreign keys.
-   */
-  @Override
-  public int compareTo(final NamedObject obj) {
-    if (obj == null) {
-      return -1;
-    }
-
-    final int databaseObjectTypeComparison =
-        NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, obj);
-    if (databaseObjectTypeComparison != 0) {
-      return databaseObjectTypeComparison;
-    }
-
-    if (obj instanceof final TableReference other) {
-      return TABLE_REFERENCE_COMPARATOR.compare(this, other);
-    }
-
-    return super.compareTo(obj);
   }
 
   /** {@inheritDoc} */

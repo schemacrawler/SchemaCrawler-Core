@@ -103,8 +103,8 @@ public class ERModelJavaSerializationTest {
     final ManyToManyRelationship bookAuthors =
         (ManyToManyRelationship)
             erModel.lookupRelationship("PUBLIC.BOOKS.BOOKAUTHORS").orElseThrow();
-    assertThat(bookAuthors.getLeftEntity().getFullName(), is("PUBLIC.BOOKS.AUTHORS"));
-    assertThat(bookAuthors.getRightEntity().getFullName(), is("PUBLIC.BOOKS.BOOKS"));
+    assertThat(bookAuthors.getLeftEntity().getFullName(), is("PUBLIC.BOOKS.BOOKS"));
+    assertThat(bookAuthors.getRightEntity().getFullName(), is("PUBLIC.BOOKS.AUTHORS"));
     assertThat(bookAuthors.getBridgeTable().getFullName(), is("PUBLIC.BOOKS.BOOKAUTHORS"));
     assertThat(erModel.lookupByBridgeTable(bookAuthors.getBridgeTable()).isPresent(), is(true));
 
