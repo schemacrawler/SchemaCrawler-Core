@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -52,6 +53,14 @@ public class CollectionsUtilityTest {
     assertThat(CollectionsUtility.compareLists(null, null), is(0));
     assertThat(CollectionsUtility.compareLists(null, new ArrayList<String>()), is(lessThan(0)));
     assertThat(CollectionsUtility.compareLists(new ArrayList<String>(), null), is(greaterThan(0)));
+    assertThat(
+        CollectionsUtility.compareLists(Arrays.asList((String) null), List.of("a")),
+        is(lessThan(0)));
+    assertThat(
+        CollectionsUtility.compareLists(List.of("a"), Arrays.asList((String) null)),
+        is(greaterThan(0)));
+    assertThat(
+        CollectionsUtility.compareLists(Arrays.asList("a", null), Arrays.asList("a", null)), is(0));
   }
 
   @Test

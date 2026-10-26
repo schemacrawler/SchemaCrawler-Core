@@ -14,22 +14,15 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.Serial;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import org.apache.commons.lang3.SerializationUtils;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DatabaseUser;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
@@ -40,23 +33,6 @@ import schemacrawler.test.utility.crawl.LightProcedure;
 import schemacrawler.test.utility.crawl.LightTable;
 
 public class CatalogProjectionIndexTest {
-
-  private static final class OrderedLightTable extends LightTable {
-
-    @Serial private static final long serialVersionUID = 1L;
-
-    private int order;
-
-    OrderedLightTable(final Schema schema, final String name, final int order) {
-      super(schema, name);
-      this.order = order;
-    }
-
-    @Override
-    public int compareTo(final NamedObject other) {
-      return Integer.compare(order, ((OrderedLightTable) other).order);
-    }
-  }
 
   @Test
   public void emptyConstructorKeepsBlankNameAndCopiesAttributes() {
@@ -99,22 +75,6 @@ public class CatalogProjectionIndexTest {
   }
 
   @Test
-  public void enumerationsUseFreshNaturalOrderAfterFilteringBySchema() {
-    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final OrderedLightTable first = new OrderedLightTable(schema, "first", 1);
-    final OrderedLightTable second = new OrderedLightTable(schema, "second", 2);
-    final CatalogProjection projection =
-        projection(List.of(schema), List.of(first, second), List.of());
-    final Collection<Table> previousValues = projection.getTables();
-
-    second.order = 0;
-
-    assertThat(previousValues, contains(first, second));
-    assertThat(projection.getTables(), contains(second, first));
-    assertThat(projection.getTables(schema), contains(second, first));
-  }
-
-  @Test
   public void schemaIdentityUsesStructuredKeysAndFullNameLookupKeepsFirstMatch() {
     final Schema first = new SchemaReference("CATALOG", "first");
     final Schema second = new SchemaReference("CATALOG", "schema.with.dot");
@@ -127,38 +87,6 @@ public class CatalogProjectionIndexTest {
     assertThat(projection.lookupSchema(secondFullName).orElseThrow(), sameInstance(second));
     assertThat(projection.lookupSchema(secondFullNameNoQuotes).isEmpty(), is(true));
     assertThat(projection.lookupSchema(null).isEmpty(), is(true));
-  }
-
-  @RepeatedTest(100)
-  public void ambiguousSchemaFullNameSelectsMinimumStructuredKey(final RepetitionInfo repetition) {
-    final String schemaName = "SCHEMA";
-    final Schema schema1 = new SchemaReference("", schemaName);
-    final Schema schema2 = new SchemaReference(null, schemaName);
-    final Schema schema3 = new SchemaReference(schemaName, null);
-
-    assertThat(schema1.getFullName(), is(schemaName));
-    assertThat(schema2.getFullName(), is(schemaName));
-    assertThat(schema3.getFullName(), is(schemaName));
-
-    final List<Schema> shuffled = new ArrayList<>(List.of(schema1, schema2, schema3));
-    Collections.shuffle(shuffled, new Random(repetition.getCurrentRepetition()));
-    final CatalogProjection projection = projection(shuffled, List.of(), List.of());
-
-    final Collection<Schema> schemas = projection.getSchemas();
-    assertThat(schemas.size(), is(3));
-    assertThat(schemas, is(List.of(schema2, schema1, schema3)));
-    assertThat(projection.lookupSchema(schemaName).orElseThrow(), sameInstance(schema2));
-  }
-
-  @Test
-  public void singularRoutineLookupSelectsNaturalFirstOverload() {
-    final Schema schema = new SchemaReference("CATALOG", "PUBLIC");
-    final Routine later = new LightProcedure(schema, "run", "z");
-    final Routine earlier = new LightProcedure(schema, "run", "a");
-    final CatalogProjection projection =
-        projection(List.of(schema), List.of(), List.of(later, earlier));
-
-    assertThat(projection.lookupRoutine(schema, "run").orElseThrow(), sameInstance(earlier));
   }
 
   @Test

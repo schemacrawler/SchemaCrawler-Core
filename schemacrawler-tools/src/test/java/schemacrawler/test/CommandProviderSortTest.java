@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -65,14 +64,15 @@ public class CommandProviderSortTest {
   @Test
   public void sort() {
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(testCommandProvider, testCommandProvider),
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
+            testCommandProvider, testCommandProvider),
         is(0));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             testCommandProvider, otherCommandProvider),
         is(greaterThan(0)));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             otherCommandProvider, testCommandProvider),
         is(lessThan(0)));
   }
@@ -80,29 +80,27 @@ public class CommandProviderSortTest {
   @Test
   public void sortForFallBack() {
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             fallbackCommandProvider, fallbackCommandProvider),
         is(0));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             testCommandProvider, fallbackCommandProvider),
         is(lessThan(0)));
     assertThat(
-        CommandRegistry.commandProviderComparator.compare(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(
             fallbackCommandProvider, testCommandProvider),
         is(greaterThan(0)));
   }
 
   @Test
   public void sortNull() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> CommandRegistry.commandProviderComparator.compare(null, null));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> CommandRegistry.commandProviderComparator.compare(testCommandProvider, null));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> CommandRegistry.commandProviderComparator.compare(null, fallbackCommandProvider));
+    assertThat(CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(null, null), is(0));
+    assertThat(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(testCommandProvider, null),
+        is(greaterThan(0)));
+    assertThat(
+        CommandRegistry.COMMAND_PROVIDER_COMPARATOR.compare(null, fallbackCommandProvider),
+        is(lessThan(0)));
   }
 }

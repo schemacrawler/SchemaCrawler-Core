@@ -12,22 +12,28 @@ import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import schemacrawler.namedobject.BuildableDependantObjectIndex;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.namedobject.NamedObjectIndexes;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexType;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Table;
-import us.fatehi.utility.CollectionsUtility;
 
 /** Represents an index on a database table. */
 final class MutableIndex extends AbstractDependantObject<Table> implements Index {
 
   @Serial private static final long serialVersionUID = 4051326747138079028L;
+
+  private static final Comparator<Index> INDEX_COMPARATOR =
+      Comparator.comparing(Index::isUnique, Comparator.reverseOrder())
+          .thenComparing(NamedObjectComparators.TYPED_OBJECT_COMPARATOR)
+          .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
 
   private final BuildableDependantObjectIndex<MutableIndexColumn, Table> columns;
   private String definition;
@@ -53,37 +59,21 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
    * object, but compareTo uses more fields to define a "natural" sorting order. compareTo may
    * return incorrect results until the object is fully built by SchemaCrawler.
    *
-   * <p>Note: Since indexes are not always explicitly named in databases, the sorting routine orders
-   * the indexes by the names of the columns in the index.
+   * <p>Within the same parent, indexes sort by uniqueness, type, name, and exact key without
+   * comparing their columns.
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    if (obj == null || !(obj instanceof final Index that)) {
-      return -1;
+    final int databaseObjectTypeComparison =
+        NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, obj);
+    if (databaseObjectTypeComparison != 0) {
+      return databaseObjectTypeComparison;
+    }
+    if (!(obj instanceof final Index otherIndex)) {
+      return NamedObjectComparators.NAME_THEN_KEY_COMPARATOR.compare(this, obj);
     }
 
-    int compareTo = 0;
-
-    if (compareTo == 0) {
-      final List<IndexColumn> thisColumns = getColumns();
-      final List<IndexColumn> thatColumns = that.getColumns();
-
-      compareTo = CollectionsUtility.compareLists(thisColumns, thatColumns);
-    }
-
-    if (compareTo == 0 && isUnique != that.isUnique()) {
-      compareTo = isUnique ? -1 : 1;
-    }
-
-    if (compareTo == 0) {
-      compareTo = indexType.ordinal() - that.getIndexType().ordinal();
-    }
-
-    if (compareTo == 0) {
-      compareTo = super.compareTo(obj);
-    }
-
-    return compareTo;
+    return INDEX_COMPARATOR.compare(this, otherIndex);
   }
 
   /** {@inheritDoc} */

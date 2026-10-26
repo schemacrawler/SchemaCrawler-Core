@@ -5,23 +5,23 @@ PUBLIC.BOOKS.AUTHORS
     cardinality: 0
     pages: 0
     index type: other
-  index: IDX_B_AUTHORS
-    columns: [PUBLIC.BOOKS.AUTHORS.LASTNAME, PUBLIC.BOOKS.AUTHORS.FIRSTNAME]
-    is unique: false
-    cardinality: 0
-    pages: 0
-    index type: other
   index: IDX_A_AUTHORS
     columns: [PUBLIC.BOOKS.AUTHORS.CITY, PUBLIC.BOOKS.AUTHORS.STATE, PUBLIC.BOOKS.AUTHORS.POSTALCODE, PUBLIC.BOOKS.AUTHORS.COUNTRY]
     is unique: false
     cardinality: 0
     pages: 0
     index type: other
+  index: IDX_B_AUTHORS
+    columns: [PUBLIC.BOOKS.AUTHORS.LASTNAME, PUBLIC.BOOKS.AUTHORS.FIRSTNAME]
+    is unique: false
+    cardinality: 0
+    pages: 0
+    index type: other
 PUBLIC.BOOKS.AUTHORSLIST
 PUBLIC.BOOKS.BOOKAUTHORS
-  index: Z_FK_AUTHOR
-    columns: [PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID]
-    is unique: false
+  index: UIDX_BOOKAUTHORS
+    columns: [PUBLIC.BOOKS.BOOKAUTHORS.BOOKID, PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID]
+    is unique: true
     cardinality: 0
     pages: 0
     index type: other
@@ -31,9 +31,9 @@ PUBLIC.BOOKS.BOOKAUTHORS
     cardinality: 0
     pages: 0
     index type: other
-  index: UIDX_BOOKAUTHORS
-    columns: [PUBLIC.BOOKS.BOOKAUTHORS.BOOKID, PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID]
-    is unique: true
+  index: Z_FK_AUTHOR
+    columns: [PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID]
+    is unique: false
     cardinality: 0
     pages: 0
     index type: other
@@ -84,15 +84,15 @@ PUBLIC.BOOKS.COUPONS
     pages: 0
     index type: other
 PUBLIC.BOOKS.CUSTOMERDATA
-  index: FK_CUSTOMER
-    columns: [PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID]
-    is unique: false
-    cardinality: 0
-    pages: 0
-    index type: other
   index: PK_CUSTOMERDATA
     columns: [PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID, PUBLIC.BOOKS.CUSTOMERDATA.DATAID]
     is unique: true
+    cardinality: 0
+    pages: 0
+    index type: other
+  index: FK_CUSTOMER
+    columns: [PUBLIC.BOOKS.CUSTOMERDATA.CUSTOMERID]
+    is unique: false
     cardinality: 0
     pages: 0
     index type: other
@@ -111,15 +111,15 @@ PUBLIC.BOOKS.PUBLISHERS
     pages: 0
     index type: other
 PUBLIC.BOOKS.ΒΙΒΛΊΑ
-  index: FK_ΒΙΒΛΊΑ_PUBLISHERS
-    columns: [PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΕΚΔΌΤΗΣ]
-    is unique: false
-    cardinality: 0
-    pages: 0
-    index type: other
   index: PK_ΒΙΒΛΊΑ
     columns: [PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΜΟΝΑΔΙΚΌΣ]
     is unique: true
+    cardinality: 0
+    pages: 0
+    index type: other
+  index: FK_ΒΙΒΛΊΑ_PUBLISHERS
+    columns: [PUBLIC.BOOKS.ΒΙΒΛΊΑ.ΕΚΔΌΤΗΣ]
+    is unique: false
     cardinality: 0
     pages: 0
     index type: other
@@ -137,14 +137,14 @@ PUBLIC."PUBLISHER SALES".SALES
     cardinality: 0
     pages: 0
     index type: other
-  index: FK_SALES_SALESDATA
-    columns: [PUBLIC."PUBLISHER SALES".SALES.SALESDATAID]
+  index: FK_SALES_REGIONS
+    columns: [PUBLIC."PUBLISHER SALES".SALES.POSTALCODE, PUBLIC."PUBLISHER SALES".SALES.COUNTRY]
     is unique: false
     cardinality: 0
     pages: 0
     index type: other
-  index: FK_SALES_REGIONS
-    columns: [PUBLIC."PUBLISHER SALES".SALES.POSTALCODE, PUBLIC."PUBLISHER SALES".SALES.COUNTRY]
+  index: FK_SALES_SALESDATA
+    columns: [PUBLIC."PUBLISHER SALES".SALES.SALESDATAID]
     is unique: false
     cardinality: 0
     pages: 0

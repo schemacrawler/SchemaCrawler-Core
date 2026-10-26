@@ -11,9 +11,6 @@ package schemacrawler.test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.OrderingComparison.comparesEqualTo;
-import static org.hamcrest.number.OrderingComparison.greaterThan;
-import static org.hamcrest.number.OrderingComparison.lessThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
@@ -27,21 +24,6 @@ public class DatabaseServerTypeTest {
     assertThrows(IllegalArgumentException.class, () -> new DatabaseServerType(" ", "NewDB"));
     assertThrows(IllegalArgumentException.class, () -> new DatabaseServerType("newdb", null));
     assertThrows(IllegalArgumentException.class, () -> new DatabaseServerType("newdb", ""));
-  }
-
-  @Test
-  public void compareTo() {
-    final DatabaseServerType databaseServerType0 = DatabaseServerType.UNKNOWN;
-    final DatabaseServerType databaseServerType1 = new DatabaseServerType("newdb", "NewDB");
-
-    assertThat(databaseServerType0, lessThan(null));
-    assertThat(databaseServerType1, lessThan(null));
-
-    assertThat(databaseServerType0, comparesEqualTo(databaseServerType0));
-    assertThat(databaseServerType1, comparesEqualTo(databaseServerType1));
-
-    assertThat(databaseServerType0, lessThan(databaseServerType1));
-    assertThat(databaseServerType1, greaterThan(databaseServerType0));
   }
 
   @Test

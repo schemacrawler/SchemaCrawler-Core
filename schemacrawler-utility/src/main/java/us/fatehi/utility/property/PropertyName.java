@@ -9,7 +9,7 @@
 package us.fatehi.utility.property;
 
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.nullsLast;
+import static java.util.Comparator.nullsFirst;
 import static java.util.Objects.compare;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
@@ -25,8 +25,8 @@ public final class PropertyName implements Serializable, Comparable<PropertyName
 
   @Serial private static final long serialVersionUID = 2444083929278551904L;
 
-  private static Comparator<PropertyName> comparator =
-      nullsLast(comparing(PropertyName::getName, String.CASE_INSENSITIVE_ORDER));
+  private static final Comparator<PropertyName> NAME_COMPARATOR =
+      nullsFirst(comparing(PropertyName::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER)));
 
   private final String name;
   private final String description;
@@ -42,7 +42,7 @@ public final class PropertyName implements Serializable, Comparable<PropertyName
 
   @Override
   public int compareTo(final PropertyName otherProperty) {
-    return compare(this, otherProperty, comparator);
+    return compare(this, otherProperty, NAME_COMPARATOR);
   }
 
   @Override

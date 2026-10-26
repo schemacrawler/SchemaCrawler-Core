@@ -7,14 +7,6 @@
     - relationship: BOOKAUTHORS
     - relationship: FK_PREVIOUSEDITION
     - relationship: FK_SALES_BOOK
-- PUBLIC.BOOKS.COUPONS [strong_entity]
-  - relationships
-- PUBLIC.BOOKS.CUSTOMERDATA [weak_entity]
-  - relationships
-    - relationship: FK_CUSTOMER
-- PUBLIC.BOOKS.CUSTOMERS [strong_entity]
-  - relationships
-    - relationship: FK_CUSTOMER
 - PUBLIC.BOOKS."Celebrities" [strong_entity]
   - relationships
     - relationship: SYS_FK_10131
@@ -24,6 +16,14 @@
     - relationship: SYS_FK_10131
   - identifying relationship
     - relationship: SYS_FK_10131
+- PUBLIC.BOOKS.COUPONS [strong_entity]
+  - relationships
+- PUBLIC.BOOKS.CUSTOMERDATA [weak_entity]
+  - relationships
+    - relationship: FK_CUSTOMER
+- PUBLIC.BOOKS.CUSTOMERS [strong_entity]
+  - relationships
+    - relationship: FK_CUSTOMER
 - PUBLIC.BOOKS.PUBLISHERS [strong_entity]
   - relationships
     - relationship: FK_ΒΙΒΛΊΑ_PUBLISHERS

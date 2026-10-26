@@ -18,22 +18,6 @@ schema: PUBLIC.BOOKS
           constrained column: PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID
   table: PUBLIC.BOOKS.AUTHORSLIST
   table: PUBLIC.BOOKS.BOOKAUTHORS
-    foreign key: Z_FK_AUTHOR
-      definition: 
-      deferrability: not deferrable
-      initially deferred: false
-      optional: false
-      self-referencing: false
-      delete rule: no action
-      update rule: no action
-      dependent table: PUBLIC.BOOKS.BOOKAUTHORS
-      referenced table: PUBLIC.BOOKS.AUTHORS
-      column references: 
-        key sequence: 1
-          PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID --> PUBLIC.BOOKS.AUTHORS.ID
-      table constraint: 
-        parent (dependent table): PUBLIC.BOOKS.BOOKAUTHORS
-          constrained column: PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID
     foreign key: SYS_FK_10121
       definition: 
       deferrability: not deferrable
@@ -50,6 +34,22 @@ schema: PUBLIC.BOOKS
       table constraint: 
         parent (dependent table): PUBLIC.BOOKS.BOOKAUTHORS
           constrained column: PUBLIC.BOOKS.BOOKAUTHORS.BOOKID
+    foreign key: Z_FK_AUTHOR
+      definition: 
+      deferrability: not deferrable
+      initially deferred: false
+      optional: false
+      self-referencing: false
+      delete rule: no action
+      update rule: no action
+      dependent table: PUBLIC.BOOKS.BOOKAUTHORS
+      referenced table: PUBLIC.BOOKS.AUTHORS
+      column references: 
+        key sequence: 1
+          PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID --> PUBLIC.BOOKS.AUTHORS.ID
+      table constraint: 
+        parent (dependent table): PUBLIC.BOOKS.BOOKAUTHORS
+          constrained column: PUBLIC.BOOKS.BOOKAUTHORS.AUTHORID
   table: PUBLIC.BOOKS.BOOKS
     foreign key: FK_PREVIOUSEDITION
       definition: 
@@ -67,22 +67,6 @@ schema: PUBLIC.BOOKS
       table constraint: 
         parent (dependent table): PUBLIC.BOOKS.BOOKS
           constrained column: PUBLIC.BOOKS.BOOKS.PREVIOUSEDITIONID
-    foreign key: FK_SALES_BOOK
-      definition: 
-      deferrability: not deferrable
-      initially deferred: false
-      optional: true
-      self-referencing: false
-      delete rule: no action
-      update rule: no action
-      dependent table: PUBLIC."PUBLISHER SALES".SALES
-      referenced table: PUBLIC.BOOKS.BOOKS
-      column references: 
-        key sequence: 1
-          PUBLIC."PUBLISHER SALES".SALES.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
-      table constraint: 
-        parent (dependent table): PUBLIC."PUBLISHER SALES".SALES
-          constrained column: PUBLIC."PUBLISHER SALES".SALES.BOOKID
     foreign key: SYS_FK_10121
       definition: 
       deferrability: not deferrable
@@ -99,6 +83,22 @@ schema: PUBLIC.BOOKS
       table constraint: 
         parent (dependent table): PUBLIC.BOOKS.BOOKAUTHORS
           constrained column: PUBLIC.BOOKS.BOOKAUTHORS.BOOKID
+    foreign key: FK_SALES_BOOK
+      definition: 
+      deferrability: not deferrable
+      initially deferred: false
+      optional: true
+      self-referencing: false
+      delete rule: no action
+      update rule: no action
+      dependent table: PUBLIC."PUBLISHER SALES".SALES
+      referenced table: PUBLIC.BOOKS.BOOKS
+      column references: 
+        key sequence: 1
+          PUBLIC."PUBLISHER SALES".SALES.BOOKID --> PUBLIC.BOOKS.BOOKS.ID
+      table constraint: 
+        parent (dependent table): PUBLIC."PUBLISHER SALES".SALES
+          constrained column: PUBLIC."PUBLISHER SALES".SALES.BOOKID
   table: PUBLIC.BOOKS."Celebrities"
     foreign key: SYS_FK_10131
       definition: 
@@ -242,22 +242,6 @@ schema: PUBLIC."PUBLISHER SALES"
       table constraint: 
         parent (dependent table): PUBLIC."PUBLISHER SALES".SALES
           constrained column: PUBLIC."PUBLISHER SALES".SALES.BOOKID
-    foreign key: FK_SALES_SALESDATA
-      definition: 
-      deferrability: not deferrable
-      initially deferred: false
-      optional: true
-      self-referencing: false
-      delete rule: no action
-      update rule: no action
-      dependent table: PUBLIC."PUBLISHER SALES".SALES
-      referenced table: PUBLIC."PUBLISHER SALES".SALESDATA
-      column references: 
-        key sequence: 1
-          PUBLIC."PUBLISHER SALES".SALES.SALESDATAID --> PUBLIC."PUBLISHER SALES".SALESDATA.SALESDATAID
-      table constraint: 
-        parent (dependent table): PUBLIC."PUBLISHER SALES".SALES
-          constrained column: PUBLIC."PUBLISHER SALES".SALES.SALESDATAID
     foreign key: FK_SALES_REGIONS
       definition: 
       deferrability: not deferrable
@@ -277,6 +261,22 @@ schema: PUBLIC."PUBLISHER SALES"
         parent (dependent table): PUBLIC."PUBLISHER SALES".SALES
           constrained column: PUBLIC."PUBLISHER SALES".SALES.POSTALCODE
           constrained column: PUBLIC."PUBLISHER SALES".SALES.COUNTRY
+    foreign key: FK_SALES_SALESDATA
+      definition: 
+      deferrability: not deferrable
+      initially deferred: false
+      optional: true
+      self-referencing: false
+      delete rule: no action
+      update rule: no action
+      dependent table: PUBLIC."PUBLISHER SALES".SALES
+      referenced table: PUBLIC."PUBLISHER SALES".SALESDATA
+      column references: 
+        key sequence: 1
+          PUBLIC."PUBLISHER SALES".SALES.SALESDATAID --> PUBLIC."PUBLISHER SALES".SALESDATA.SALESDATAID
+      table constraint: 
+        parent (dependent table): PUBLIC."PUBLISHER SALES".SALES
+          constrained column: PUBLIC."PUBLISHER SALES".SALES.SALESDATAID
   table: PUBLIC."PUBLISHER SALES".SALESDATA
     foreign key: FK_SALES_SALESDATA
       definition: 

@@ -8,29 +8,34 @@
 
 package schemacrawler.crawl;
 
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsFirst;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.io.Serial;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.RoutineBodyType;
-import schemacrawler.schema.RoutineParameter;
 import schemacrawler.schema.RoutineType;
 import schemacrawler.schema.Schema;
-import us.fatehi.utility.CollectionsUtility;
 
 /** Represents a database routine. Created from metadata returned by a JDBC call. */
 abstract sealed class MutableRoutine extends AbstractDatabaseObject implements Routine
     permits MutableFunction, MutableProcedure {
 
   @Serial private static final long serialVersionUID = 3906925686089134130L;
+
+  private static final Comparator<Routine> ROUTINE_COMPARATOR =
+      Comparator.comparing(Routine::getSpecificName, nullsFirst(naturalOrder()))
+          .thenComparing(NamedObjectComparators.EXACT_KEY_COMPARATOR);
 
   private transient NamedObjectKey key;
   private final String specificName;
@@ -64,22 +69,15 @@ abstract sealed class MutableRoutine extends AbstractDatabaseObject implements R
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    int comparison = super.compareTo(obj);
-
-    if (obj instanceof final Routine other) {
-      if (comparison == 0) {
-        final List<RoutineParameter<? extends Routine>> thisParameters = getParameters();
-        final List<RoutineParameter<? extends Routine>> otherParameters = other.getParameters();
-
-        comparison = CollectionsUtility.compareLists(thisParameters, otherParameters);
-      }
-
-      if (comparison == 0) {
-        comparison = getSpecificName().compareTo(other.getSpecificName());
-      }
+    final int comparison =
+        NamedObjectComparators.DATABASE_OBJECT_FIELDS_COMPARATOR.compare(this, obj);
+    if (comparison != 0) {
+      return comparison;
     }
-
-    return comparison;
+    if (obj instanceof final Routine other) {
+      return ROUTINE_COMPARATOR.compare(this, other);
+    }
+    return NamedObjectComparators.EXACT_KEY_COMPARATOR.compare(this, obj);
   }
 
   /** {@inheritDoc} */

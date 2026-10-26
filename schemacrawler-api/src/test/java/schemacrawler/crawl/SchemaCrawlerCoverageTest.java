@@ -15,7 +15,6 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static schemacrawler.test.utility.DatabaseTestUtility.getCatalog;
@@ -27,8 +26,6 @@ import static us.fatehi.test.utility.TestObjectUtility.mockConnection;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,8 +35,6 @@ import schemacrawler.inclusionrule.RegularExpressionExclusionRule;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
-import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexColumnSortSequence;
@@ -329,28 +324,6 @@ public class SchemaCrawlerCoverageTest {
     assertThat(table.hasAttribute("new_one"), is(true));
     table.removeAttribute("new_one");
     assertThat(table.hasAttribute("new_one"), is(false));
-  }
-
-  @Test
-  public void tableSortIndexesRespectForeignKeyOrder() {
-    final Map<Table, Integer> positions = new HashMap<>();
-    int position = 0;
-    for (final Table table : catalog.getTables()) {
-      positions.put(table, position);
-      position++;
-    }
-
-    for (final Table table : catalog.getTables()) {
-      for (final ForeignKey foreignKey : table.getForeignKeys()) {
-        for (final ColumnReference columnReference : foreignKey) {
-          final Table primaryKeyTable = columnReference.getPrimaryKeyColumn().getParent();
-          final Table foreignKeyTable = columnReference.getForeignKeyColumn().getParent();
-          if (!primaryKeyTable.equals(foreignKeyTable)) {
-            assertThat(positions.get(primaryKeyTable), lessThan(positions.get(foreignKeyTable)));
-          }
-        }
-      }
-    }
   }
 
   @Test

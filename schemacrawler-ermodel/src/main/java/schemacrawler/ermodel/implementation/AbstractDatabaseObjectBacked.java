@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import schemacrawler.ermodel.model.DatabaseObjectBacked;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
@@ -36,10 +37,12 @@ abstract class AbstractDatabaseObjectBacked<DO extends DatabaseObject>
 
   @Override
   public int compareTo(final NamedObject namedObj) {
-    if (namedObj == null) {
-      return 1;
+    final int databaseObjectTypeComparison =
+        NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(this, namedObj);
+    if (databaseObjectTypeComparison != 0) {
+      return databaseObjectTypeComparison;
     }
-    return key().compareTo(namedObj.key());
+    return NamedObjectComparators.NAME_THEN_KEY_COMPARATOR.compare(this, namedObj);
   }
 
   @Override

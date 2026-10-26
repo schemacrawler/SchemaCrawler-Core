@@ -15,10 +15,12 @@ import static us.fatehi.utility.Utility.trimToEmpty;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Grant;
 import schemacrawler.schema.Privilege;
@@ -49,20 +51,10 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
      */
     @Override
     public int compareTo(final Grant<D> otherGrant) {
-      int compare = 0;
-      if (compare == 0) {
-        if (grantor == null) {
-          return -1;
-        }
-        compare = grantor.compareTo(otherGrant.getGrantor());
+      if (this == otherGrant) {
+        return 0;
       }
-      if (compare == 0) {
-        if (grantee == null) {
-          return -1;
-        }
-        compare = grantee.compareTo(otherGrant.getGrantee());
-      }
-      return compare;
+      return GRANT_COMPARATOR.compare(this, otherGrant);
     }
 
     @Override
@@ -75,8 +67,8 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
       }
       final PrivilegeGrant other = (PrivilegeGrant) obj;
       return Objects.equals(getParent(), other.getParent())
-          && Objects.equals(grantee, other.grantee)
           && Objects.equals(grantor, other.grantor)
+          && Objects.equals(grantee, other.grantee)
           && isGrantable == other.isGrantable;
     }
 
@@ -117,6 +109,17 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
 
   @Serial private static final long serialVersionUID = -1117664231494271886L;
 
+  private static final Comparator<Grant<?>> GRANT_COMPARATOR =
+      Comparator.nullsFirst(
+          Comparator.comparing(
+                  (Grant<?> grant) -> grant.getGrantor(),
+                  Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
+              .thenComparing(
+                  Grant::getGrantee,
+                  Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
+              .thenComparing(grant -> grant.getParent().key())
+              .thenComparing(Grant::isGrantable));
+
   private final Set<Grant<D>> grants;
 
   MutablePrivilege(final DatabaseObjectReference<D> parent, final String name) {
@@ -132,7 +135,7 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
   }
 
   void addGrant(final String grantor, final String grantee, final boolean isGrantable) {
-    if (!(isBlank(grantor) && isBlank(grantee))) {
+    if ((!isBlank(grantor) || !isBlank(grantee))) {
       grants.add(new PrivilegeGrant(grantor, grantee, isGrantable));
     }
   }

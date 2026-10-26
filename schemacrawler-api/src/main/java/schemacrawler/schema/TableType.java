@@ -27,17 +27,18 @@ public final class TableType implements Serializable, Comparable<TableType> {
 
   public static final TableType UNKNOWN = new TableType("unknown");
 
-  private static final Comparator<TableType> comparator =
-      Comparator.comparing(
-              TableType::getSimpleTableType,
-              Comparator.comparingInt(
-                  simpleTableType ->
-                      switch (simpleTableType) {
-                        case table -> 0;
-                        case view -> 1;
-                        case unknown -> 2;
-                      }))
-          .thenComparing(TableType::toString);
+  private static final Comparator<TableType> TABLE_TYPE_COMPARATOR =
+      Comparator.nullsFirst(
+          Comparator.comparing(
+                  TableType::getSimpleTableType,
+                  Comparator.comparingInt(
+                      simpleTableType ->
+                          switch (simpleTableType) {
+                            case table -> 0;
+                            case view -> 1;
+                            case unknown -> 2;
+                          }))
+              .thenComparing(TableType::toString));
 
   private final String tableType;
 
@@ -50,10 +51,7 @@ public final class TableType implements Serializable, Comparable<TableType> {
   /** {@inheritDoc} */
   @Override
   public int compareTo(final TableType other) {
-    if (other == null) {
-      return -1;
-    }
-    return comparator.compare(this, other);
+    return TABLE_TYPE_COMPARATOR.compare(this, other);
   }
 
   /** {@inheritDoc} */

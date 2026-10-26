@@ -2,13 +2,17 @@ package schemacrawler.ermodel.implementation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static schemacrawler.ermodel.model.EntityType.strong_entity;
 
+import java.io.Serial;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import schemacrawler.namedobject.AbstractNamedObject;
 import schemacrawler.schema.Table;
 import schemacrawler.test.utility.crawl.LightForeignKey;
 import schemacrawler.test.utility.crawl.LightTable;
@@ -59,6 +63,23 @@ public class ERModelImplementationTest {
   }
 
   @Test
+  public void testTableBackedComparisonWithGenericNamedObjects() {
+    final MutableEntity wrapped = new MutableEntity(new LightTable("Z_WRAPPED"), strong_entity);
+    final GenericNamedObject generic = new GenericNamedObject("A_GENERIC");
+
+    assertThat(wrapped.compareTo(generic), greaterThan(0));
+    assertThat(generic.compareTo(wrapped), lessThan(0));
+
+    final MutableEntity wrappedCollision = new MutableEntity(new LightTable("A-B"), strong_entity);
+    final GenericNamedObject genericCollision = new GenericNamedObject("A B");
+    final int wrapperComparison = wrappedCollision.compareTo(genericCollision);
+    final int genericComparison = genericCollision.compareTo(wrappedCollision);
+
+    assertThat(Integer.signum(wrapperComparison), is(-Integer.signum(genericComparison)));
+    assertThat(wrappedCollision.key().compareTo(genericCollision.key()) == 0, is(false));
+  }
+
+  @Test
   public void testMutableManyToManyRelationshipNamedObjectMethods() {
     final LightTable table1 = new LightTable("TABLE1");
     final MutableManyToManyRelationship rel1 = new MutableManyToManyRelationship(table1);
@@ -70,7 +91,7 @@ public class ERModelImplementationTest {
     assertThat(rel1.compareTo(rel2) < 0, is(true));
     assertThat(rel2.compareTo(rel1) > 0, is(true));
     assertThat(rel1.compareTo(rel1), is(0));
-    assertThat(rel1.compareTo(null), is(1));
+    assertThat(rel1.compareTo(null), greaterThan(0));
 
     // equals
     assertThat(rel1.equals(rel1), is(true));
@@ -129,7 +150,7 @@ public class ERModelImplementationTest {
     assertThat(rel.compareTo(rel2) < 0, is(true));
     assertThat(rel2.compareTo(rel) > 0, is(true));
     assertThat(rel.compareTo(rel), is(0));
-    assertThat(rel.compareTo(null), is(1));
+    assertThat(rel.compareTo(null), greaterThan(0));
 
     // equals
     assertThat(rel.equals(rel), is(true));
@@ -139,5 +160,14 @@ public class ERModelImplementationTest {
 
     // hashCode
     assertThat(rel.hashCode(), is(tableRef.key().hashCode()));
+  }
+
+  private static final class GenericNamedObject extends AbstractNamedObject {
+
+    @Serial private static final long serialVersionUID = -3178421622581031907L;
+
+    GenericNamedObject(final String name) {
+      super(name);
+    }
   }
 }

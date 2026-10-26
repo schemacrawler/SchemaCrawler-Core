@@ -20,10 +20,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
-import us.fatehi.utility.CollectionsUtility;
 import us.fatehi.utility.string.StringFormat;
 
 /** Represents a foreign-key mapping to a primary key in another table. */
@@ -51,37 +49,6 @@ abstract sealed class AbstractTableReference extends MutableTableConstraint
     addColumnReference(columnReference);
 
     isSelfReferencing = getParent().equals(pkTable);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * <p>NOTE: compareTo is not compatible with equals. equals compares the full name of a database
-   * object, but compareTo uses more fields to define a "natural" sorting order. compareTo may
-   * return incorrect results until the object is fully built by SchemaCrawler.
-   *
-   * <p>Since foreign keys are not always explicitly named in databases, the sorting routine orders
-   * the foreign keys by the names of the columns in the foreign keys.
-   */
-  @Override
-  public int compareTo(final NamedObject obj) {
-    if (obj == null) {
-      return -1;
-    }
-
-    if (obj instanceof final TableReference other) {
-      final List<ColumnReference> thisColumnReferences = getColumnReferences();
-      final List<ColumnReference> otherColumnReferences = other.getColumnReferences();
-
-      return CollectionsUtility.compareLists(thisColumnReferences, otherColumnReferences);
-    }
-
-    if (obj instanceof NamedObject) {
-      final NamedObject other = obj;
-      return super.compareTo(other);
-    }
-
-    return -1;
   }
 
   /** {@inheritDoc} */

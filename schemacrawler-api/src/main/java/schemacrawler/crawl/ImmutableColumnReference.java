@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
 import java.util.Objects;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 
@@ -41,26 +42,7 @@ final class ImmutableColumnReference implements ColumnReference {
    */
   @Override
   public int compareTo(final ColumnReference columnRef) {
-
-    if (columnRef == null) {
-      return -1;
-    }
-
-    int compare = 0;
-
-    final ColumnReference other = columnRef;
-    if (compare == 0) {
-      compare = getKeySequence() - other.getKeySequence();
-    }
-    if (compare == 0) {
-      compare =
-          foreignKeyColumn.getFullName().compareTo(columnRef.getForeignKeyColumn().getFullName());
-    }
-    if (compare == 0) {
-      compare =
-          primaryKeyColumn.getFullName().compareTo(columnRef.getPrimaryKeyColumn().getFullName());
-    }
-    return compare;
+    return NamedObjectComparators.COLUMN_REFERENCE_COMPARATOR.compare(this, columnRef);
   }
 
   @Override

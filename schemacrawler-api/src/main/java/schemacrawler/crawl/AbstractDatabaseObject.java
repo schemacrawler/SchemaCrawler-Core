@@ -15,12 +15,12 @@ import java.io.Serial;
 import java.util.Map;
 import java.util.Objects;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
+import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Schema;
-import schemacrawler.schema.TypedObject;
 
 /** Represents a database object. */
 abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
@@ -53,25 +53,8 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    if (obj == null) {
-      return -1;
-    }
-
-    if (obj instanceof final DatabaseObject object2) {
-      final int schemaCompareTo = getSchema().compareTo(object2.getSchema());
-      if (schemaCompareTo != 0) {
-        return schemaCompareTo;
-      }
-      if (this instanceof final TypedObject object && obj instanceof final TypedObject object1) {
-        try {
-          final int typeCompareTo = object.getType().compareTo(object1.getType());
-          if (typeCompareTo != 0) {
-            return typeCompareTo;
-          }
-        } catch (final Exception e) {
-          // Ignore, since getType() may not be implemented by partial database objects
-        }
-      }
+    if (obj instanceof DatabaseObject) {
+      return NamedObjectComparators.DATABASE_OBJECT_COMPARATOR.compare(this, obj);
     }
 
     return super.compareTo(obj);

@@ -10,7 +10,9 @@ package schemacrawler.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -144,6 +146,61 @@ public class PrimaryKeyRetrieverTest {
             table.getPrimaryKey(),
             is(not(nullValue())));
       }
+    }
+  }
+
+  @Test
+  @DisplayName("Retrieve unnamed primary keys with their constrained columns")
+  public void unnamedPrimaryKeysRetrieveColumns(
+      final Connection connection, final DatabaseConnectionSource connectionSource)
+      throws Exception {
+    final SchemaCrawlerOptions options =
+        SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
+            .withLoadOptions(
+                LoadOptionsBuilder.builder()
+                    .withSchemaInfoLevel(
+                        SchemaInfoLevelBuilder.builder()
+                            .fromOptions(SchemaInfoLevelBuilder.minimum())
+                            .setRetrieveTableColumns(true)
+                            .toOptions())
+                    .toOptions());
+    final MutableCatalog unnamedCatalog = (MutableCatalog) getCatalog(connection, options);
+    final InformationSchemaViews informationSchemaViews =
+        InformationSchemaViewsBuilder.builder()
+            .withSql(
+                InformationSchemaKey.PRIMARY_KEYS,
+                """
+                SELECT TABLE_CAT, TABLE_SCHEM, TABLE_NAME, COLUMN_NAME, KEY_SEQ,
+                  CAST(NULL AS VARCHAR(128)) AS PK_NAME
+                FROM INFORMATION_SCHEMA.SYSTEM_PRIMARYKEYS
+                WHERE TABLE_SCHEM = 'BOOKS' AND TABLE_NAME IN ('AUTHORS', 'BOOKS')
+                """)
+            .toOptions();
+    final SchemaRetrievalOptions schemaRetrievalOptions =
+        SchemaRetrievalOptionsBuilder.builder()
+            .with(primaryKeysRetrievalStrategy, data_dictionary_all)
+            .withInformationSchemaViews(informationSchemaViews)
+            .toOptions();
+    final RetrieverConnection retrieverConnection =
+        new RetrieverConnection(connectionSource, schemaRetrievalOptions);
+    final PrimaryKeyRetriever primaryKeyRetriever =
+        new PrimaryKeyRetriever(retrieverConnection, unnamedCatalog, options.crawlOptions());
+
+    primaryKeyRetriever.retrievePrimaryKeys(unnamedCatalog.getAllTables());
+
+    final List<PrimaryKey> primaryKeys =
+        unnamedCatalog.getTables().stream()
+            .filter(Table::hasPrimaryKey)
+            .map(Table::getPrimaryKey)
+            .toList();
+    assertThat(primaryKeys, hasSize(2));
+    assertThat(
+        primaryKeys.stream().map(primaryKey -> primaryKey.getParent().getName()).toList(),
+        containsInAnyOrder("AUTHORS", "BOOKS"));
+    for (final PrimaryKey primaryKey : primaryKeys) {
+      assertThat(primaryKey.getName(), is(emptyOrNullString()));
+      assertThat(primaryKey.getConstrainedColumns(), hasSize(1));
+      assertThat(primaryKey.getConstrainedColumns().iterator().next().getName(), is("ID"));
     }
   }
 }

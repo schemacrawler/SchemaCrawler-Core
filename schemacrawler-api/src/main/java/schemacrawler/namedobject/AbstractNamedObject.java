@@ -8,9 +8,7 @@
 
 package schemacrawler.namedobject;
 
-import static java.util.Objects.compare;
 import static java.util.Objects.hash;
-import static schemacrawler.namedobject.NamedObjectSort.alphabetical;
 
 import java.io.Serial;
 import java.util.Objects;
@@ -38,7 +36,9 @@ public abstract class AbstractNamedObject implements NamedObject {
   /** {@inheritDoc} */
   @Override
   public int compareTo(final NamedObject obj) {
-    return compare(this, obj, alphabetical);
+    return NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR
+        .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR)
+        .compare(this, obj);
   }
 
   @Override

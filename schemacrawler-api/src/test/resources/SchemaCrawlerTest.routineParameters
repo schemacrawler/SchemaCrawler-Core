@@ -9,16 +9,6 @@ routine: GETBOOKSCOUNT
   - remarks=
   - attibutes=
 routine: NEW_PUBLISHER
-  parameter: PUBLISHER
-  - data-type=PUBLIC.BOOKS."CHARACTER VARYING"
-  - size=0
-  - decimal digits=50
-  - width=
-  - nullable=true
-  - ordinal position=1
-  - remarks=
-  - attibutes=
-routine: NEW_PUBLISHER
   parameter: NEWPUBLISHER
   - data-type=PUBLIC.BOOKS."CHARACTER VARYING"
   - size=0
@@ -37,11 +27,11 @@ routine: NEW_PUBLISHER
   - ordinal position=2
   - remarks=
   - attibutes=
-routine: CUSTOMADD
-  parameter: ONE
-  - data-type=INTEGER
+routine: NEW_PUBLISHER
+  parameter: PUBLISHER
+  - data-type=PUBLIC.BOOKS."CHARACTER VARYING"
   - size=0
-  - decimal digits=32
+  - decimal digits=50
   - width=
   - nullable=true
   - ordinal position=1
@@ -64,6 +54,16 @@ routine: CUSTOMADD
   - width=
   - nullable=true
   - ordinal position=2
+  - remarks=
+  - attibutes=
+routine: CUSTOMADD
+  parameter: ONE
+  - data-type=INTEGER
+  - size=0
+  - decimal digits=32
+  - width=
+  - nullable=true
+  - ordinal position=1
   - remarks=
   - attibutes=
 

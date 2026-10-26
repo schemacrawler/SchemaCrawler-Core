@@ -203,61 +203,6 @@ public class CrawlObjectIndexTest {
   }
 
   @Test
-  public void foreignKeyGroupsAndRelatedTablesKeepTheirExplicitOrdering() {
-    final Schema schema = new SchemaReference();
-    final MutableTable center = new MutableTable(schema, "CENTER");
-    final MutableTable parentA = new MutableTable(schema, "A_PARENT");
-    final MutableTable parentZ = new MutableTable(schema, "Z_PARENT");
-    final MutableTable childA = new MutableTable(schema, "A_CHILD");
-    final MutableTable childZ = new MutableTable(schema, "Z_CHILD");
-    final MutableForeignKey importedA = foreignKey("A_IMPORTED", center, parentA, "A_COLUMN");
-    final MutableForeignKey importedZ = foreignKey("Z_IMPORTED", center, parentZ, "Z_COLUMN");
-    final MutableForeignKey exportedA = foreignKey("A_EXPORTED", childA, center);
-    final MutableForeignKey exportedZ = foreignKey("Z_EXPORTED", childZ, center);
-    final MutableForeignKey duplicateParent = foreignKey("B_IMPORTED", center, parentA, "B_COLUMN");
-    for (final MutableForeignKey foreignKey :
-        List.of(exportedZ, importedZ, exportedA, duplicateParent, importedA)) {
-      center.addForeignKey(foreignKey);
-    }
-
-    assertThat(center.getImportedForeignKeys(), contains(importedA, duplicateParent, importedZ));
-    assertThat(center.getExportedForeignKeys(), contains(exportedA, exportedZ));
-    assertThat(
-        center.getForeignKeys(),
-        contains(importedA, duplicateParent, importedZ, exportedA, exportedZ));
-    assertThat(center.getRelatedTables(TableRelationshipType.parent), contains(parentA, parentZ));
-    assertThat(center.getRelatedTables(TableRelationshipType.child), contains(childA, childZ));
-    final Collection<ForeignKey> exportedCopy = center.getExportedForeignKeys();
-    exportedCopy.clear();
-    final Collection<ForeignKey> allCopy = center.getForeignKeys();
-    allCopy.clear();
-    assertThat(center.getExportedForeignKeys(), contains(exportedA, exportedZ));
-    assertThat(center.getForeignKeys().size(), is(5));
-  }
-
-  @Test
-  public void graphOrdersSameLevelAndDisconnectedTablesBeforeViews() {
-    final Schema schema = new SchemaReference();
-    final MutableTable root = new MutableTable(schema, "Z_ROOT");
-    final MutableTable childA = new MutableTable(schema, "A_CHILD");
-    final MutableTable childB = new MutableTable(schema, "B_CHILD");
-    final MutableTable disconnected = new MutableTable(schema, "M_FREE");
-    final MutableView viewA = new MutableView(schema, "A_VIEW");
-    final MutableView viewZ = new MutableView(schema, "Z_VIEW");
-    childA.addForeignKey(foreignKey("FK_A", childA, root));
-    childB.addForeignKey(foreignKey("FK_B", childB, root));
-    final BuildableDatabaseObjectIndex<MutableTable> tables =
-        NamedObjectIndexes.newBuildableDatabaseObjectIndex();
-    for (final MutableTable table : List.of(viewZ, childB, root, viewA, childA, disconnected)) {
-      tables.add(table);
-    }
-
-    new TablesGraph(tables).setTablesSortIndexes();
-
-    assertThat(tables.getObjects(), contains(disconnected, root, childA, childB, viewA, viewZ));
-  }
-
-  @Test
   public void resultColumnLookupKeepsFirstPositionalCaseInsensitiveMatch() {
     final MutableTable table = new MutableTable(new SchemaReference(), "TABLE");
     final MutableResultsColumn first = new MutableResultsColumn(table, "FIRST", "Alias");

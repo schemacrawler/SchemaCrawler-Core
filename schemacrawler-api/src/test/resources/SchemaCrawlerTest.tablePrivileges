@@ -6,8 +6,8 @@ PUBLIC.BOOKS.AUTHORS
   privilege: REFERENCES
     _SYSTEM --> SA (grantable)
   privilege: SELECT
-    SA --> OTHERUSER
     _SYSTEM --> SA (grantable)
+    SA --> OTHERUSER
   privilege: TRIGGER
     _SYSTEM --> SA (grantable)
   privilege: UPDATE

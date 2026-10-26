@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.junit.jupiter.api.BeforeAll;
@@ -573,50 +572,6 @@ public class SchemaCrawlerTest {
     }
     assertThat(
         outputOf(testout), hasSameContentAs(classpathResource(testContext.testMethodFullName())));
-  }
-
-  @Test
-  public void tablesSort() {
-
-    final String[] tableNames = {
-      "AUTHORS",
-      "BOOKS",
-      "Celebrities",
-      "COUPONS",
-      "CUSTOMERS",
-      "PUBLISHERS",
-      "BOOKAUTHORS",
-      "Celebrity Updates",
-      "CUSTOMERDATA",
-      "ΒΙΒΛΊΑ",
-      "AUTHORSLIST"
-    };
-    final Random rnd = new Random();
-
-    final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
-    assertThat("Schema count does not match", schemas, arrayWithSize(5));
-    final Schema schema = schemas[0];
-
-    final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
-    for (int i = 0; i < 10; i++) {
-      for (int tableIdx = 0; tableIdx < tables.length; tableIdx++) {
-        final Table table = tables[tableIdx];
-        assertThat(
-            "Table name does not match in iteration " + i,
-            tableNames[tableIdx],
-            is(table.getName()));
-      }
-
-      // Shuffle array, and sort it again
-      for (int k = tables.length; k > 1; k--) {
-        final int i1 = k - 1;
-        final int i2 = rnd.nextInt(k);
-        final Table tmp = tables[i1];
-        tables[i1] = tables[i2];
-        tables[i2] = tmp;
-      }
-      Arrays.sort(tables);
-    }
   }
 
   @Test

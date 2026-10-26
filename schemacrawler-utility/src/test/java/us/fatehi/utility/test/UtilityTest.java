@@ -53,6 +53,16 @@ public class UtilityTest {
     assertThat(convertForComparison("ABC!@#123"), is("abc123"));
     assertThat(convertForComparison("ABC_123.DEF"), is("abc_123.def"));
     assertThat(convertForComparison("ABC 123"), is("abc123"));
+    assertThat(convertForComparison("\"ABC\".[123]"), is("abc.123"));
+    assertThat(convertForComparison(" \t\r\n!@#$-"), is(""));
+    assertThat(convertForComparison("a-b"), is("ab"));
+    assertThat(convertForComparison("a b"), is("ab"));
+    assertThat(convertForComparison("a$b"), is("ab"));
+    assertThat(convertForComparison("\uD801\uDC00"), is("\uD801\uDC28"));
+    assertThat(convertForComparison("\u00c9"), is("\u00e9"));
+    assertThat(convertForComparison("\u00e9"), is("\u00e9"));
+    assertThat(convertForComparison("e\u0301"), is("e"));
+    assertThat(convertForComparison("\u0301"), is(""));
   }
 
   @Test
