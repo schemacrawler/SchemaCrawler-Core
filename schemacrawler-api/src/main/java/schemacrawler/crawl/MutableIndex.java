@@ -31,7 +31,8 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
   @Serial private static final long serialVersionUID = 4051326747138079028L;
 
   private static final Comparator<Index> INDEX_COMPARATOR =
-      Comparator.comparing(Index::isUnique, Comparator.reverseOrder())
+      Comparator.comparing(Index::isPrimaryKeyIndex, Comparator.reverseOrder())
+          .thenComparing(Index::isUnique, Comparator.reverseOrder())
           .thenComparing(NamedObjectComparators.TYPED_OBJECT_COMPARATOR)
           .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
 

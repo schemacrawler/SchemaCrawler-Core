@@ -16,24 +16,18 @@ import static java.util.Comparator.nullsFirst;
 import java.util.Comparator;
 import java.util.Objects;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.DependantObject;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.Schema;
-import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TypedObject;
 import schemacrawler.utility.MetaDataUtility;
-import us.fatehi.utility.CollectionsUtility;
 import us.fatehi.utility.UtilityMarker;
 
 /** Reusable comparison stages for named objects. */
 @UtilityMarker
 public final class NamedObjectComparators {
-
-  /** Compares exact text case-sensitively, with nulls first. */
-  public static final Comparator<String> EXACT_TEXT_COMPARATOR = nullsFirst(naturalOrder());
 
   /** Compares the existing lossy normalized text without allocating normalized strings. */
   public static final Comparator<String> NORMALIZED_TEXT_COMPARATOR =
@@ -50,19 +44,6 @@ public final class NamedObjectComparators {
 
   public static final Comparator<NamedObject> TYPED_OBJECT_COMPARATOR =
       nullsFirst(NamedObjectComparators::typeComparator);
-
-  /** Compares mapping sequence, then normalized foreign and primary column names; nulls first. */
-  public static final Comparator<ColumnReference> COLUMN_REFERENCE_COMPARATOR =
-      nullsFirst(
-          comparingInt(ColumnReference::getKeySequence)
-              .thenComparing(ColumnReference::getForeignKeyColumn, NORMALIZED_NAME_COMPARATOR)
-              .thenComparing(ColumnReference::getPrimaryKeyColumn, NORMALIZED_NAME_COMPARATOR));
-
-  /** Compares ordered mappings size-first, without relationship names or identity keys. */
-  public static final Comparator<TableReference> TABLE_REFERENCE_MAPPING_COMPARATOR =
-      nullsFirst(
-          comparing(
-              TableReference::getColumnReferences, nullsFirst(CollectionsUtility::compareLists)));
 
   public static final Comparator<NamedObject> DATABASE_OBJECT_ORDER_COMPARATOR =
       nullsFirst(
