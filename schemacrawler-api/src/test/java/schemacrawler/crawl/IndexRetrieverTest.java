@@ -61,6 +61,28 @@ import us.fatehi.utility.datasource.DatabaseConnectionSource;
 @ResolveTestContext
 public class IndexRetrieverTest {
 
+  public static void verifyPrimaryKeyIndexes(final Catalog catalog) throws IOException {
+    final TestWriter testout = new TestWriter();
+    try (final TestWriter out = testout) {
+      final Schema[] schemas = catalog.getSchemas().toArray(new Schema[0]);
+      assertThat("Schema count does not match", schemas, arrayWithSize(5));
+      for (final Schema schema : schemas) {
+        final Table[] tables = catalog.getTables(schema).toArray(new Table[0]);
+        Arrays.sort(tables, NamedObjectSort.alphabetical);
+        for (final Table table : tables) {
+          out.println(table.getFullName());
+          final Collection<Index> indexes = table.getIndexes();
+          for (final Index index : indexes) {
+            out.println("  index: %s".formatted(index.getName()));
+            out.println("    supports pk: %s".formatted(index.isPrimaryKeyIndex()));
+          }
+        }
+      }
+    }
+    assertThat(
+        outputOf(testout), hasSameContentAs(classpathResource("SchemaCrawlerTest.pk_indexes")));
+  }
+
   public static void verifyRetrieveIndexes(final Catalog catalog) throws IOException {
     final TestWriter testout = new TestWriter();
     try (final TestWriter out = testout) {

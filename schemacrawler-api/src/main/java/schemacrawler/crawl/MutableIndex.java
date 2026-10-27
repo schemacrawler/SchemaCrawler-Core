@@ -40,6 +40,7 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
   private long cardinality;
   private IndexType indexType;
   private boolean isUnique;
+  private boolean isPrimaryKeyIndex;
   private long pages;
   private String filterCondition;
 
@@ -127,6 +128,11 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
     return !isBlank(filterCondition);
   }
 
+  @Override
+  public boolean isPrimaryKeyIndex() {
+    return isPrimaryKeyIndex;
+  }
+
   /** {@inheritDoc} */
   @Override
   public boolean isUnique() {
@@ -168,6 +174,10 @@ final class MutableIndex extends AbstractDependantObject<Table> implements Index
 
   void setIndexType(final IndexType indexType) {
     this.indexType = requireNonNull(indexType, "Null index type");
+  }
+
+  void setIsPrimaryKeyIndex() {
+    isPrimaryKeyIndex = true;
   }
 
   void setPages(final long pages) {

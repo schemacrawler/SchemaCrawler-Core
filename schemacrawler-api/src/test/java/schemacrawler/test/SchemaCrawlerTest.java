@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static schemacrawler.crawl.ForeignKeyRetrieverTest.verifyRetrieveForeignKeys;
+import static schemacrawler.crawl.IndexRetrieverTest.verifyPrimaryKeyIndexes;
 import static schemacrawler.crawl.IndexRetrieverTest.verifyRetrieveIndexes;
 import static schemacrawler.crawl.PrimaryKeyRetrieverTest.verifyRetrievePrimaryKeys;
 import static schemacrawler.crawl.TableColumnRetrieverTest.verifyRetrieveTableColumns;
@@ -292,6 +293,7 @@ public class SchemaCrawlerTest {
   @Test
   public void indexes(final TestContext testContext) throws Exception {
     verifyRetrieveIndexes(catalog);
+    verifyPrimaryKeyIndexes(catalog);
   }
 
   @BeforeAll
