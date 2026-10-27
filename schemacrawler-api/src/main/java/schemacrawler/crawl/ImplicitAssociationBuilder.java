@@ -8,6 +8,8 @@
 
 package schemacrawler.crawl;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.nullsFirst;
 import static java.util.Objects.requireNonNull;
 import static schemacrawler.crawl.RetrieverUtility.lookupOrCreateColumn;
 import static schemacrawler.utility.MetaDataUtility.isPartial;
@@ -16,12 +18,12 @@ import static us.fatehi.utility.Utility.requireNotBlank;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
@@ -30,9 +32,16 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.TableReference;
 import us.fatehi.utility.Builder;
+import us.fatehi.utility.CollectionsUtility;
 import us.fatehi.utility.string.StringFormat;
 
 public final class ImplicitAssociationBuilder implements Builder<TableReference> {
+
+  /** Compares ordered mappings size-first, without relationship names or identity keys. */
+  private static final Comparator<TableReference> TABLE_REFERENCE_MAPPING_COMPARATOR =
+      nullsFirst(
+          comparing(
+              TableReference::getColumnReferences, nullsFirst(CollectionsUtility::compareLists)));
 
   public static record ImplicitAssociationColumn(
       Schema schema, String tableName, String columnName) {
@@ -211,8 +220,6 @@ public final class ImplicitAssociationBuilder implements Builder<TableReference>
 
   private boolean haveSameColumnReferences(
       final TableReference tableReference, final TableReference otherTableReference) {
-    return NamedObjectComparators.TABLE_REFERENCE_MAPPING_COMPARATOR.compare(
-            tableReference, otherTableReference)
-        == 0;
+    return TABLE_REFERENCE_MAPPING_COMPARATOR.compare(tableReference, otherTableReference) == 0;
   }
 }

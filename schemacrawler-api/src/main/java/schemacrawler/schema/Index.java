@@ -55,6 +55,13 @@ public interface Index
   boolean hasFilterCondition();
 
   /**
+   * Index supports primary key.
+   *
+   * @return True if the index supports the primary key.
+   */
+  boolean isPrimaryKeyIndex();
+
+  /**
    * If the index is unique.
    *
    * @return If the index is unique

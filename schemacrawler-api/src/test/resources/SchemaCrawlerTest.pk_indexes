@@ -1,0 +1,62 @@
+PUBLIC.BOOKS.AUTHORS
+  index: PK_AUTHORS
+    supports pk: true
+  index: IDX_A_AUTHORS
+    supports pk: false
+  index: IDX_B_AUTHORS
+    supports pk: false
+PUBLIC.BOOKS.AUTHORSLIST
+PUBLIC.BOOKS.BOOKAUTHORS
+  index: UIDX_BOOKAUTHORS
+    supports pk: false
+  index: SYS_FK_10121
+    supports pk: false
+  index: Z_FK_AUTHOR
+    supports pk: false
+PUBLIC.BOOKS.BOOKS
+  index: PK_BOOKS
+    supports pk: true
+  index: U_PREVIOUSEDITION
+    supports pk: false
+  index: FK_PREVIOUSEDITION
+    supports pk: false
+PUBLIC.BOOKS."Celebrities"
+  index: PK_Celebrities
+    supports pk: true
+PUBLIC.BOOKS."Celebrity Updates"
+  index: PK Celebrity Updates
+    supports pk: true
+  index: SYS_FK_10131
+    supports pk: false
+PUBLIC.BOOKS.COUPONS
+  index: PK_COUPONS
+    supports pk: true
+PUBLIC.BOOKS.CUSTOMERDATA
+  index: PK_CUSTOMERDATA
+    supports pk: true
+  index: FK_CUSTOMER
+    supports pk: false
+PUBLIC.BOOKS.CUSTOMERS
+  index: PK_CUSTOMERS
+    supports pk: true
+PUBLIC.BOOKS.PUBLISHERS
+  index: SYS_PK_10127
+    supports pk: true
+PUBLIC.BOOKS.ΒΙΒΛΊΑ
+  index: PK_ΒΙΒΛΊΑ
+    supports pk: true
+  index: FK_ΒΙΒΛΊΑ_PUBLISHERS
+    supports pk: false
+PUBLIC."PUBLISHER SALES".REGIONS
+  index: PK_CUSTOMERS
+    supports pk: true
+PUBLIC."PUBLISHER SALES".SALES
+  index: FK_SALES_BOOK
+    supports pk: false
+  index: FK_SALES_REGIONS
+    supports pk: false
+  index: FK_SALES_SALESDATA
+    supports pk: false
+PUBLIC."PUBLISHER SALES".SALESDATA
+  index: UQ_CUSTOMERS
+    supports pk: false

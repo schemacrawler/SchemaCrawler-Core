@@ -384,8 +384,13 @@ public final class SchemaCrawler {
         .add(retrieveTriggerInformation, triggerRetriever::retrieveTriggerInformation)
         .submit();
 
-    // Sort indexes are computed independently of table retrieval.
     taskRunner
+        .add(
+            "setPrimaryKeyIndex",
+            () -> {
+              indexRetriever.setPrimaryKeyIndexes(allTables);
+            })
+        // Sort indexes are computed independently of table retrieval.
         .add(
             "sortTables",
             () -> {

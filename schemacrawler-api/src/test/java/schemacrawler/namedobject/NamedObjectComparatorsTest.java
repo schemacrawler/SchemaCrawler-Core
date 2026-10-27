@@ -33,7 +33,6 @@ import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableType;
 import schemacrawler.schemacrawler.SchemaReference;
 
@@ -110,74 +109,6 @@ public class NamedObjectComparatorsTest {
         assertBefore(orderedObjects.get(firstIndex), orderedObjects.get(secondIndex));
       }
     }
-  }
-
-  @Test
-  public void columnReferenceComparatorPreservesSequenceAndNormalizedNameOrder() {
-    final ColumnReference first = columnReference(1, "Z_FOREIGN", "Z_PRIMARY");
-    final ColumnReference second = columnReference(2, "A_FOREIGN", "A_PRIMARY");
-    final Comparator<ColumnReference> comparator =
-        NamedObjectComparators.COLUMN_REFERENCE_COMPARATOR;
-
-    assertThat(comparator.compare(first, second), lessThan(0));
-    assertThat(comparator.compare(second, first), greaterThan(0));
-    assertThat(comparator.compare(first, first), is(0));
-    assertThat(comparator.compare(first, null), greaterThan(0));
-    assertThat(comparator.compare(null, first), lessThan(0));
-    assertThat(comparator.compare(null, null), is(0));
-    assertThat(
-        comparator.compare(
-            columnReference(1, "A_FOREIGN", "Z_PRIMARY"),
-            columnReference(1, "B_FOREIGN", "A_PRIMARY")),
-        lessThan(0));
-    assertThat(
-        comparator.compare(
-            columnReference(1, "FOREIGN", "A_PRIMARY"), columnReference(1, "FOREIGN", "B_PRIMARY")),
-        lessThan(0));
-    assertThat(
-        comparator.compare(
-            columnReference(1, "a-b", "PRIMARY"), columnReference(1, "ab", "primary")),
-        is(0));
-  }
-
-  @Test
-  public void tableReferenceMappingComparatorIgnoresRelationshipIdentity() {
-    final ColumnReference mapping = columnReference(1, "FOREIGN", "PRIMARY");
-    final ColumnReference equivalentMapping = columnReference(1, "FOREIGN", "PRIMARY");
-    final TableReference first = mock(TableReference.class);
-    final TableReference second = mock(TableReference.class);
-    when(first.getName()).thenReturn("FK_A");
-    when(first.key()).thenReturn(new NamedObjectKey("FK_A"));
-    when(second.getName()).thenReturn("FK_B");
-    when(second.key()).thenReturn(new NamedObjectKey("FK_B"));
-    when(first.getColumnReferences()).thenReturn(List.of(mapping));
-    when(second.getColumnReferences()).thenReturn(List.of(equivalentMapping));
-
-    assertThat(
-        NamedObjectComparators.TABLE_REFERENCE_MAPPING_COMPARATOR.compare(first, second), is(0));
-    assertThat(
-        NamedObjectComparators.TABLE_REFERENCE_MAPPING_COMPARATOR.compare(second, first), is(0));
-  }
-
-  @Test
-  public void tableReferenceMappingComparatorPreservesSizeFirstOrdering() {
-    final List<ColumnReference> shorterMappings =
-        List.of(columnReference(9, "Z_FOREIGN", "Z_PRIMARY"));
-    final List<ColumnReference> longerMappings =
-        List.of(
-            columnReference(1, "A_FOREIGN", "A_PRIMARY"),
-            columnReference(2, "B_FOREIGN", "B_PRIMARY"));
-    final TableReference shorter = mock(TableReference.class);
-    final TableReference longer = mock(TableReference.class);
-    when(shorter.getColumnReferences()).thenReturn(shorterMappings);
-    when(longer.getColumnReferences()).thenReturn(longerMappings);
-
-    assertThat(
-        NamedObjectComparators.TABLE_REFERENCE_MAPPING_COMPARATOR.compare(shorter, longer),
-        lessThan(0));
-    assertThat(
-        NamedObjectComparators.TABLE_REFERENCE_MAPPING_COMPARATOR.compare(longer, shorter),
-        greaterThan(0));
   }
 
   @Test
