@@ -27,7 +27,7 @@ abstract class ObjectAttributes implements Serializable, Comparable<ObjectAttrib
 
   @Serial private static final long serialVersionUID = -6819484903391182146L;
 
-  private static Comparator<ObjectAttributes> comparator =
+  private static final Comparator<ObjectAttributes> NAME_COMPARATOR =
       nullsFirst(comparing(ObjectAttributes::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER)));
 
   private final String name;
@@ -56,7 +56,7 @@ abstract class ObjectAttributes implements Serializable, Comparable<ObjectAttrib
 
   @Override
   public int compareTo(final ObjectAttributes o) {
-    return compare(this, o, comparator);
+    return compare(this, o, NAME_COMPARATOR);
   }
 
   public Map<String, String> getAttributes() {

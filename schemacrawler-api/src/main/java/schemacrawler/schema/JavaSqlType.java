@@ -27,7 +27,7 @@ public final class JavaSqlType implements SQLType, Serializable, Comparable<Java
   public static final JavaSqlType UNKNOWN =
       new JavaSqlType(unknownSQLType(), Object.class, JavaSqlTypeGroup.unknown);
 
-  private static Comparator<JavaSqlType> comparator =
+  private static final Comparator<JavaSqlType> NAME_COMPARATOR =
       nullsFirst(comparing(JavaSqlType::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER)));
 
   private static SQLType unknownSQLType() {
@@ -70,7 +70,7 @@ public final class JavaSqlType implements SQLType, Serializable, Comparable<Java
 
   @Override
   public int compareTo(final JavaSqlType otherSqlDataType) {
-    return compare(this, otherSqlDataType, comparator);
+    return compare(this, otherSqlDataType, NAME_COMPARATOR);
   }
 
   @Override
