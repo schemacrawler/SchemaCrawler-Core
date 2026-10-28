@@ -14,7 +14,6 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
 
 import java.util.Comparator;
-import java.util.Objects;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
@@ -28,6 +27,9 @@ import us.fatehi.utility.UtilityMarker;
 /** Reusable comparison stages for named objects. */
 @UtilityMarker
 public final class NamedObjectComparators {
+
+  /** Checks null ordering before comparison proceeds to other criteria. */
+  public static final Comparator<NamedObject> NULL_COMPARATOR = nullsFirst((o1, o2) -> 0);
 
   /** Compares the existing lossy normalized text without allocating normalized strings. */
   public static final Comparator<String> NORMALIZED_TEXT_COMPARATOR =
@@ -194,9 +196,18 @@ public final class NamedObjectComparators {
     if (object instanceof final TypedObject typedObject
         && otherObject instanceof final TypedObject otherTypedObject) {
       try {
-        final int typeCompareTo =
-            Objects.compare(
-                typedObject.getType(), otherTypedObject.getType(), nullsFirst(naturalOrder()));
+        final Comparable type = typedObject.getType();
+        final Comparable otherType = otherTypedObject.getType();
+        if (type == otherType) {
+          return 0;
+        }
+        if (type == null) {
+          return -1;
+        }
+        if (otherType == null) {
+          return 1;
+        }
+        final int typeCompareTo = type.compareTo(otherType);
         if (typeCompareTo != 0) {
           return typeCompareTo;
         }

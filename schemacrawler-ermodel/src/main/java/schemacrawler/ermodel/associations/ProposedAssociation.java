@@ -26,6 +26,12 @@ record ProposedAssociation(Column foreignKeyColumn, Column primaryKeyColumn)
 
   @Override
   public int compareTo(final ColumnReference o) {
+    if (this == o) {
+      return 0;
+    }
+    if (o == null) {
+      return 1;
+    }
     throw new UnsupportedOperationException("Prevent adding to collection");
   }
 

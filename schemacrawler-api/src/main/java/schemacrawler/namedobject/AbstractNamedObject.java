@@ -36,6 +36,10 @@ public abstract class AbstractNamedObject implements NamedObject {
   /** {@inheritDoc} */
   @Override
   public int compareTo(final NamedObject obj) {
+    final int nullComparison = NamedObjectComparators.NULL_COMPARATOR.compare(this, obj);
+    if (nullComparison != 0 || this == obj) {
+      return nullComparison;
+    }
     return NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR
         .thenComparing(NamedObjectComparators.NAME_THEN_KEY_COMPARATOR)
         .compare(this, obj);

@@ -10,7 +10,6 @@ package us.fatehi.utility.property;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.nullsFirst;
-import static java.util.Objects.compare;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serializable;
@@ -19,11 +18,17 @@ import java.util.Comparator;
 public interface Property extends Serializable, Comparable<Property> {
 
   Comparator<Property> NAME_COMPARATOR =
-      nullsFirst(comparing(Property::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER)));
+      comparing(Property::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER));
 
   @Override
   default int compareTo(final Property otherProperty) {
-    return compare(this, otherProperty, NAME_COMPARATOR);
+    if (this == otherProperty) {
+      return 0;
+    }
+    if (otherProperty == null) {
+      return 1;
+    }
+    return NAME_COMPARATOR.compare(this, otherProperty);
   }
 
   /**

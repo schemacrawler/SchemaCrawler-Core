@@ -28,10 +28,8 @@ public record DatabaseServerType(PropertyName propertyName)
   public static final DatabaseServerType UNKNOWN = new DatabaseServerType("unknown", "Unknown");
 
   private static final Comparator<DatabaseServerType> SERVER_TYPE_COMPARATOR =
-      Comparator.nullsFirst(
-          Comparator.comparing(
-                  DatabaseServerType::isUnknownDatabaseSystem, Comparator.reverseOrder())
-              .thenComparing(DatabaseServerType::propertyName));
+      Comparator.comparing(DatabaseServerType::isUnknownDatabaseSystem, Comparator.reverseOrder())
+          .thenComparing(DatabaseServerType::propertyName);
 
   public DatabaseServerType(
       final String databaseSystemIdentifier, final String databaseSystemName) {
@@ -46,6 +44,12 @@ public record DatabaseServerType(PropertyName propertyName)
   /** {@inheritDoc} */
   @Override
   public int compareTo(final DatabaseServerType other) {
+    if (this == other) {
+      return 0;
+    }
+    if (other == null) {
+      return 1;
+    }
     return SERVER_TYPE_COMPARATOR.compare(this, other);
   }
 

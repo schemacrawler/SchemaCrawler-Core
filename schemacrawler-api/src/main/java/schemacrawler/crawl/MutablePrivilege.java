@@ -54,6 +54,9 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
       if (this == otherGrant) {
         return 0;
       }
+      if (otherGrant == null) {
+        return 1;
+      }
       return GRANT_COMPARATOR.compare(this, otherGrant);
     }
 
@@ -110,15 +113,14 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
   @Serial private static final long serialVersionUID = -1117664231494271886L;
 
   private static final Comparator<Grant<?>> GRANT_COMPARATOR =
-      Comparator.nullsFirst(
-          Comparator.comparing(
-                  (Grant<?> grant) -> grant.getGrantor(),
-                  Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
-              .thenComparing(
-                  Grant::getGrantee,
-                  Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
-              .thenComparing(grant -> grant.getParent().key())
-              .thenComparing(Grant::isGrantable));
+      Comparator.comparing(
+              (Grant<?> grant) -> grant.getGrantor(),
+              Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
+          .thenComparing(
+              Grant::getGrantee,
+              Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
+          .thenComparing(grant -> grant.getParent().key())
+          .thenComparing(Grant::isGrantable);
 
   private final Set<Grant<D>> grants;
 

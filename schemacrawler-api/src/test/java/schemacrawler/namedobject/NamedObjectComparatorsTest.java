@@ -39,6 +39,19 @@ import schemacrawler.schemacrawler.SchemaReference;
 public class NamedObjectComparatorsTest {
 
   @Test
+  public void nullComparatorChecksNullsAndReferenceIdentity() {
+    final NamedObject named = mock(NamedObject.class);
+    final NamedObject otherNamed = mock(NamedObject.class);
+    final Comparator<NamedObject> comparator = NamedObjectComparators.NULL_COMPARATOR;
+
+    assertThat(comparator.compare(null, null), is(0));
+    assertThat(comparator.compare(named, named), is(0));
+    assertThat(comparator.compare(null, named), lessThan(0));
+    assertThat(comparator.compare(named, null), greaterThan(0));
+    assertThat(comparator.compare(named, otherNamed), is(0));
+  }
+
+  @Test
   public void sharedComparatorsPlaceNullFirst() {
     final NamedObject named = mock(NamedObject.class);
     when(named.getFullName()).thenReturn("NAME");
