@@ -9,7 +9,6 @@
 package schemacrawler.namedobject;
 
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
 
@@ -42,24 +41,11 @@ public final class NamedObjectComparators {
       NORMALIZED_NAME_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR);
 
   public static final Comparator<NamedObject> TYPED_OBJECT_COMPARATOR =
-      nullsFirst(NamedObjectComparators::typeComparator);
-
-  public static final Comparator<NamedObject> DATABASE_OBJECT_ORDER_COMPARATOR =
-      nullsFirst(
-          comparingInt(NamedObjectComparators::namedObjectGroup)
-              .thenComparing(
-                  object ->
-                      object instanceof final DatabaseObject databaseObject
-                          ? databaseObject.getSchema()
-                          : null,
-                  Comparator.<Schema>nullsFirst(naturalOrder()))
-              .thenComparingInt(NamedObjectComparators::databaseObjectOrder));
-
-  private static final Comparator<NamedObject> DEPENDANT_OBJECT_ORDER_COMPARATOR =
-      nullsFirst(NamedObjectComparators::dependantObjectOrder);
+      nullsFirst(NamedObjectComparators::compareTypes);
 
   public static final Comparator<NamedObject> DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR =
-      DATABASE_OBJECT_ORDER_COMPARATOR.thenComparing(DEPENDANT_OBJECT_ORDER_COMPARATOR);
+      nullsFirst(NamedObjectComparators::compareDatabaseObjects)
+          .thenComparing(NamedObjectComparators::compareDependantObjects);
 
   /** Compares structural order, type, and normalized name without a terminal identity key. */
   public static final Comparator<NamedObject> DATABASE_OBJECT_FIELDS_COMPARATOR =
@@ -71,6 +57,42 @@ public final class NamedObjectComparators {
   /** Compares database-object fields followed by the exact identity key. */
   public static final Comparator<NamedObject> DATABASE_OBJECT_COMPARATOR =
       nullsFirst(DATABASE_OBJECT_FIELDS_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR));
+
+  private static int compareDatabaseObjects(
+      final NamedObject object, final NamedObject otherObject) {
+    if (object == otherObject) {
+      return 0;
+    }
+    if (object instanceof final DatabaseObject databaseObject
+        && otherObject instanceof final DatabaseObject otherDatabaseObject) {
+      final int schemaComparison =
+          NamedObjectSort.natural.compare(
+              databaseObject.getSchema(), otherDatabaseObject.getSchema());
+      if (schemaComparison != 0) {
+        return schemaComparison;
+      }
+    }
+    return Integer.compare(databaseObjectOrder(object), databaseObjectOrder(otherObject));
+  }
+
+  private static int compareDependantObjects(
+      final NamedObject object, final NamedObject otherObject) {
+    if (object == otherObject) {
+      return 0;
+    }
+    if (object instanceof final DependantObject<?> dependantObject
+        && otherObject instanceof final DependantObject<?> otherDependantObject) {
+      final int parentComparison =
+          NamedObjectSort.natural.compare(
+              dependantObject.getParent(), otherDependantObject.getParent());
+      if (parentComparison != 0) {
+        return parentComparison;
+      }
+      return MetaDataUtility.getSimpleDependantObjectType(dependantObject)
+          .compareTo(MetaDataUtility.getSimpleDependantObjectType(otherDependantObject));
+    }
+    return 0;
+  }
 
   private static int compareNormalizedText(final String text, final String otherText) {
     final String left = text;
@@ -113,9 +135,40 @@ public final class NamedObjectComparators {
     }
   }
 
+  private static int compareTypes(final NamedObject object, final NamedObject otherObject) {
+    final int nullComparison = Comparator.nullsFirst(null).compare(object, otherObject);
+    if (nullComparison != 0 || object == otherObject) {
+      return nullComparison;
+    }
+
+    if (object instanceof final TypedObject typedObject
+        && otherObject instanceof final TypedObject otherTypedObject) {
+      try {
+        final Comparable type = typedObject.getType();
+        final Comparable otherType = otherTypedObject.getType();
+        if (type == otherType) {
+          return 0;
+        }
+        if (type == null) {
+          return -1;
+        }
+        if (otherType == null) {
+          return 1;
+        }
+        final int typeCompareTo = type.compareTo(otherType);
+        if (typeCompareTo != 0) {
+          return typeCompareTo;
+        }
+      } catch (final Exception e) {
+        // Ignore, since getType() may not be implemented by partial database objects
+      }
+    }
+    return 0;
+  }
+
   private static int databaseObjectOrder(final NamedObject object) {
     if (object instanceof Catalog) {
-      return 0;
+      throw new UnsupportedOperationException("Cannot sort catalogs");
     }
     if (object instanceof Schema) {
       return 1;
@@ -140,40 +193,6 @@ public final class NamedObjectComparators {
     return 11;
   }
 
-  private static int dependantObjectOrder(final NamedObject object, final NamedObject otherObject) {
-    if (object == otherObject) {
-      return 0;
-    }
-    if (object instanceof final DependantObject<?> dependantObject
-        && otherObject instanceof final DependantObject<?> otherDependantObject) {
-      final int parentComparison =
-          NamedObjectSort.natural.compare(
-              dependantObject.getParent(), otherDependantObject.getParent());
-      if (parentComparison != 0) {
-        return parentComparison;
-      }
-      return MetaDataUtility.getSimpleDependantObjectType(dependantObject)
-          .compareTo(MetaDataUtility.getSimpleDependantObjectType(otherDependantObject));
-    }
-    return 0;
-  }
-
-  private static int namedObjectGroup(final NamedObject object) {
-    if (object instanceof Catalog) {
-      return 0;
-    }
-    if (object instanceof Schema) {
-      return 1;
-    }
-    if (object instanceof DatabaseObject) {
-      return 2;
-    }
-    if (object instanceof DatabaseUser) {
-      return 3;
-    }
-    return 4;
-  }
-
   private static int nextRetainedOffset(final String text, final int offset) {
     int nextOffset = offset;
     while (nextOffset < text.length()) {
@@ -184,35 +203,6 @@ public final class NamedObjectComparators {
       nextOffset += Character.charCount(codePoint);
     }
     return nextOffset;
-  }
-
-  private static int typeComparator(final NamedObject object, final NamedObject otherObject) {
-    if (object == otherObject) {
-      return 0;
-    }
-    if (object instanceof final TypedObject typedObject
-        && otherObject instanceof final TypedObject otherTypedObject) {
-      try {
-        final Comparable type = typedObject.getType();
-        final Comparable otherType = otherTypedObject.getType();
-        if (type == otherType) {
-          return 0;
-        }
-        if (type == null) {
-          return -1;
-        }
-        if (otherType == null) {
-          return 1;
-        }
-        final int typeCompareTo = type.compareTo(otherType);
-        if (typeCompareTo != 0) {
-          return typeCompareTo;
-        }
-      } catch (final Exception e) {
-        // Ignore, since getType() may not be implemented by partial database objects
-      }
-    }
-    return 0;
   }
 
   private NamedObjectComparators() {

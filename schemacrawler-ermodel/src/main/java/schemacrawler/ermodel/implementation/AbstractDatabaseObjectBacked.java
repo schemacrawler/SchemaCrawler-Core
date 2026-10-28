@@ -43,7 +43,7 @@ abstract class AbstractDatabaseObjectBacked<DO extends DatabaseObject>
       return nullComparison;
     }
     final int databaseObjectTypeComparison =
-        NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(this, namedObj);
+        NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, namedObj);
     if (databaseObjectTypeComparison != 0) {
       return databaseObjectTypeComparison;
     }

@@ -51,10 +51,8 @@ public final class SchemaReference implements Schema {
     if (nullComparison != 0 || this == obj) {
       return nullComparison;
     }
-    final int databaseObjectTypeComparison =
-        NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(this, obj);
-    if (databaseObjectTypeComparison != 0) {
-      return databaseObjectTypeComparison;
+    if (!(obj instanceof Schema)) {
+      return -1;
     }
     return NamedObjectComparators.EXACT_KEY_COMPARATOR.compare(this, obj);
   }
