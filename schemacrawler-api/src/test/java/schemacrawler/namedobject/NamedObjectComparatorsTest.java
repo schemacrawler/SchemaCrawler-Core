@@ -58,8 +58,7 @@ public class NamedObjectComparatorsTest {
             NamedObjectComparators.NAME_THEN_KEY_COMPARATOR,
             NamedObjectComparators.TYPED_OBJECT_COMPARATOR,
             NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR,
-            NamedObjectComparators.DATABASE_OBJECT_FIELDS_COMPARATOR,
-            NamedObjectComparators.DATABASE_OBJECT_COMPARATOR);
+            NamedObjectComparators.DATABASE_OBJECT_FIELDS_COMPARATOR);
     for (final Comparator<NamedObject> comparator : comparators) {
       assertThat(comparator.compare(null, null), is(0));
       assertThat(comparator.compare(null, named), lessThan(0));

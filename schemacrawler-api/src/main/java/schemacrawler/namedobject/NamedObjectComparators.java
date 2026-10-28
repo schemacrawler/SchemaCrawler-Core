@@ -53,10 +53,6 @@ public final class NamedObjectComparators {
               .thenComparing(TYPED_OBJECT_COMPARATOR)
               .thenComparing(NORMALIZED_NAME_COMPARATOR));
 
-  /** Compares database-object fields followed by the exact identity key. */
-  public static final Comparator<NamedObject> DATABASE_OBJECT_COMPARATOR =
-      nullsFirst(DATABASE_OBJECT_FIELDS_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR));
-
   private static int compareDatabaseObjects(
       final NamedObject object, final NamedObject otherObject) {
     if (object == otherObject) {
