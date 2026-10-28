@@ -50,7 +50,7 @@ abstract sealed class AbstractKeyColumn extends AbstractDependantObject<Table> i
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    final int nullComparison = NamedObjectComparators.NULL_COMPARATOR.compare(this, obj);
+    final int nullComparison = Comparator.nullsFirst(null).compare(this, obj);
     if (nullComparison != 0 || this == obj) {
       return nullComparison;
     }

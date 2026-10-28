@@ -28,9 +28,6 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class NamedObjectComparators {
 
-  /** Checks null ordering before comparison proceeds to other criteria. */
-  public static final Comparator<NamedObject> NULL_COMPARATOR = nullsFirst((o1, o2) -> 0);
-
   /** Compares the existing lossy normalized text without allocating normalized strings. */
   public static final Comparator<String> NORMALIZED_TEXT_COMPARATOR =
       nullsFirst(NamedObjectComparators::compareNormalizedText);
@@ -219,6 +216,6 @@ public final class NamedObjectComparators {
   }
 
   private NamedObjectComparators() {
-    throw new UnsupportedOperationException();
+    // Prevent instantiation
   }
 }

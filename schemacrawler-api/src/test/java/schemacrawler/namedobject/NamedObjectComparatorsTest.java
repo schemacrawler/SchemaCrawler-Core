@@ -42,7 +42,7 @@ public class NamedObjectComparatorsTest {
   public void nullComparatorChecksNullsAndReferenceIdentity() {
     final NamedObject named = mock(NamedObject.class);
     final NamedObject otherNamed = mock(NamedObject.class);
-    final Comparator<NamedObject> comparator = NamedObjectComparators.NULL_COMPARATOR;
+    final Comparator<NamedObject> comparator = Comparator.nullsFirst(null);
 
     assertThat(comparator.compare(null, null), is(0));
     assertThat(comparator.compare(named, named), is(0));

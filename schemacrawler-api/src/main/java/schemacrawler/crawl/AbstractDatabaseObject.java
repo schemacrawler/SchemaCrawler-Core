@@ -12,6 +12,7 @@ import static java.util.Objects.hash;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
@@ -53,7 +54,7 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    final int nullComparison = NamedObjectComparators.NULL_COMPARATOR.compare(this, obj);
+    final int nullComparison = Comparator.nullsFirst(null).compare(this, obj);
     if (nullComparison != 0 || this == obj) {
       return nullComparison;
     }
