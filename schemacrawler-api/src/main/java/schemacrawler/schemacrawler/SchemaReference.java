@@ -46,6 +46,10 @@ public final class SchemaReference implements Schema {
   /** {@inheritDoc} */
   @Override
   public int compareTo(final NamedObject obj) {
+    final int nullComparison = NamedObjectComparators.NULL_COMPARATOR.compare(this, obj);
+    if (nullComparison != 0 || this == obj) {
+      return nullComparison;
+    }
     final int databaseObjectTypeComparison =
         NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(this, obj);
     if (databaseObjectTypeComparison != 0) {

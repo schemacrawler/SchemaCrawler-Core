@@ -10,7 +10,6 @@ package schemacrawler.loader.catalog.model;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.nullsFirst;
-import static java.util.Objects.compare;
 import static us.fatehi.utility.Utility.isBlank;
 
 import java.io.Serial;
@@ -27,8 +26,8 @@ abstract class ObjectAttributes implements Serializable, Comparable<ObjectAttrib
 
   @Serial private static final long serialVersionUID = -6819484903391182146L;
 
-  private static Comparator<ObjectAttributes> comparator =
-      nullsFirst(comparing(ObjectAttributes::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER)));
+  private static final Comparator<ObjectAttributes> NAME_COMPARATOR =
+      comparing(ObjectAttributes::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER));
 
   private final String name;
   private final List<String> remarks;
@@ -56,7 +55,13 @@ abstract class ObjectAttributes implements Serializable, Comparable<ObjectAttrib
 
   @Override
   public int compareTo(final ObjectAttributes o) {
-    return compare(this, o, comparator);
+    if (this == o) {
+      return 0;
+    }
+    if (o == null) {
+      return 1;
+    }
+    return NAME_COMPARATOR.compare(this, o);
   }
 
   public Map<String, String> getAttributes() {

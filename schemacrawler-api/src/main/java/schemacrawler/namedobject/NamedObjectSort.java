@@ -9,10 +9,8 @@
 package schemacrawler.namedobject;
 
 import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsFirst;
 
 import java.util.Comparator;
-import java.util.Objects;
 import schemacrawler.schema.NamedObject;
 
 /**
@@ -43,12 +41,17 @@ public enum NamedObjectSort implements Comparator<NamedObject> {
   private final Comparator<NamedObject> comparator;
 
   NamedObjectSort(final Comparator<NamedObject> comparator) {
-    this.comparator = nullsFirst(comparator);
+    this.comparator = comparator;
   }
 
   /** {@inheritDoc} */
   @Override
   public int compare(final NamedObject namedObject1, final NamedObject namedObject2) {
-    return Objects.compare(namedObject1, namedObject2, comparator);
+    final int nullComparison =
+        NamedObjectComparators.NULL_COMPARATOR.compare(namedObject1, namedObject2);
+    if (nullComparison != 0 || namedObject1 == namedObject2) {
+      return nullComparison;
+    }
+    return comparator.compare(namedObject1, namedObject2);
   }
 }

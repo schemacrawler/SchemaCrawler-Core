@@ -10,7 +10,6 @@ package schemacrawler.schema;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.nullsFirst;
-import static java.util.Objects.compare;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
@@ -27,8 +26,8 @@ public final class JavaSqlType implements SQLType, Serializable, Comparable<Java
   public static final JavaSqlType UNKNOWN =
       new JavaSqlType(unknownSQLType(), Object.class, JavaSqlTypeGroup.unknown);
 
-  private static Comparator<JavaSqlType> comparator =
-      nullsFirst(comparing(JavaSqlType::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER)));
+  private static final Comparator<JavaSqlType> NAME_COMPARATOR =
+      comparing(JavaSqlType::getName, nullsFirst(String.CASE_INSENSITIVE_ORDER));
 
   private static SQLType unknownSQLType() {
     final class UnknownSQLType implements SQLType, Serializable {
@@ -70,7 +69,13 @@ public final class JavaSqlType implements SQLType, Serializable, Comparable<Java
 
   @Override
   public int compareTo(final JavaSqlType otherSqlDataType) {
-    return compare(this, otherSqlDataType, comparator);
+    if (this == otherSqlDataType) {
+      return 0;
+    }
+    if (otherSqlDataType == null) {
+      return 1;
+    }
+    return NAME_COMPARATOR.compare(this, otherSqlDataType);
   }
 
   @Override

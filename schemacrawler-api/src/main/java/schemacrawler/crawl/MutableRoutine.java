@@ -69,6 +69,10 @@ abstract sealed class MutableRoutine extends AbstractDatabaseObject implements R
    */
   @Override
   public int compareTo(final NamedObject obj) {
+    final int nullComparison = NamedObjectComparators.NULL_COMPARATOR.compare(this, obj);
+    if (nullComparison != 0 || this == obj) {
+      return nullComparison;
+    }
     final int comparison =
         NamedObjectComparators.DATABASE_OBJECT_FIELDS_COMPARATOR.compare(this, obj);
     if (comparison != 0) {

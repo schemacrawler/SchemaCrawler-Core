@@ -9,7 +9,6 @@
 package schemacrawler.crawl;
 
 import static java.util.Comparator.comparingInt;
-import static java.util.Comparator.nullsFirst;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
@@ -26,14 +25,13 @@ final class ImmutableColumnReference implements ColumnReference {
 
   /** Compares mapping sequence, then normalized foreign and primary column names; nulls first. */
   private static final Comparator<ColumnReference> COLUMN_REFERENCE_COMPARATOR =
-      nullsFirst(
-          comparingInt(ColumnReference::getKeySequence)
-              .thenComparing(
-                  ColumnReference::getForeignKeyColumn,
-                  NamedObjectComparators.NORMALIZED_NAME_COMPARATOR)
-              .thenComparing(
-                  ColumnReference::getPrimaryKeyColumn,
-                  NamedObjectComparators.NORMALIZED_NAME_COMPARATOR));
+      comparingInt(ColumnReference::getKeySequence)
+          .thenComparing(
+              ColumnReference::getForeignKeyColumn,
+              NamedObjectComparators.NORMALIZED_NAME_COMPARATOR)
+          .thenComparing(
+              ColumnReference::getPrimaryKeyColumn,
+              NamedObjectComparators.NORMALIZED_NAME_COMPARATOR);
 
   private final Column foreignKeyColumn;
   private final Column primaryKeyColumn;
@@ -56,6 +54,12 @@ final class ImmutableColumnReference implements ColumnReference {
    */
   @Override
   public int compareTo(final ColumnReference columnRef) {
+    if (this == columnRef) {
+      return 0;
+    }
+    if (columnRef == null) {
+      return 1;
+    }
     return COLUMN_REFERENCE_COMPARATOR.compare(this, columnRef);
   }
 

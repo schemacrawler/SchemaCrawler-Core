@@ -42,7 +42,7 @@ public class CollectionsUtility {
     int comparison = Integer.compare(list1.size(), list2.size());
 
     if (comparison == 0) {
-      final Comparator<T> elementComparator = Comparator.nullsFirst(Comparator.naturalOrder());
+      final Comparator<T> elementComparator = Comparator.naturalOrder();
       final Iterator<? extends T> iter1 = list1.iterator();
       final Iterator<? extends T> iter2 = list2.iterator();
 
@@ -50,7 +50,15 @@ public class CollectionsUtility {
         final T object1 = iter1.next();
         final T object2 = iter2.next();
 
-        comparison = Objects.compare(object1, object2, elementComparator);
+        if (object1 == object2) {
+          comparison = 0;
+        } else if (object1 == null) {
+          comparison = -1;
+        } else if (object2 == null) {
+          comparison = 1;
+        } else {
+          comparison = elementComparator.compare(object1, object2);
+        }
       }
     }
 

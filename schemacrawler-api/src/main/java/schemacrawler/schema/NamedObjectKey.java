@@ -24,8 +24,7 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
       Comparator.nullsFirst(Comparator.naturalOrder());
 
   private static final Comparator<NamedObjectKey> KEY_COMPARATOR =
-      Comparator.nullsFirst(
-          (left, right) -> Arrays.compare(left.key, right.key, COMPONENT_COMPARATOR));
+      (left, right) -> Arrays.compare(left.key, right.key, COMPONENT_COMPARATOR);
 
   private final String[] key;
 
@@ -45,6 +44,12 @@ public final class NamedObjectKey implements Serializable, Comparable<NamedObjec
    */
   @Override
   public int compareTo(final NamedObjectKey other) {
+    if (this == other) {
+      return 0;
+    }
+    if (other == null) {
+      return 1;
+    }
     return KEY_COMPARATOR.compare(this, other);
   }
 
