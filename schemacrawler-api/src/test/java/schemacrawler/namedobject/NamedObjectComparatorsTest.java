@@ -54,7 +54,6 @@ public class NamedObjectComparatorsTest {
     when(named.key()).thenReturn(new NamedObjectKey("NAME"));
     final List<Comparator<NamedObject>> comparators =
         List.of(
-            NamedObjectComparators.NORMALIZED_NAME_COMPARATOR,
             NamedObjectComparators.EXACT_KEY_COMPARATOR,
             NamedObjectComparators.NAME_THEN_KEY_COMPARATOR,
             NamedObjectComparators.TYPED_OBJECT_COMPARATOR,
@@ -66,9 +65,6 @@ public class NamedObjectComparatorsTest {
       assertThat(comparator.compare(null, named), lessThan(0));
       assertThat(comparator.compare(named, null), greaterThan(0));
     }
-    assertThat(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR.compare(null, ""), lessThan(0));
-    assertThat(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR.compare("", null), greaterThan(0));
-    assertThat(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR.compare(null, null), is(0));
   }
 
   @Test
@@ -127,9 +123,7 @@ public class NamedObjectComparatorsTest {
     when(second.getFullName()).thenReturn("a b");
     when(second.key()).thenReturn(new NamedObjectKey("a", "c"));
 
-    final Comparator<NamedObject> comparator =
-        NamedObjectComparators.NORMALIZED_NAME_COMPARATOR.thenComparing(
-            NamedObjectComparators.EXACT_KEY_COMPARATOR);
+    final Comparator<NamedObject> comparator = NamedObjectComparators.NAME_THEN_KEY_COMPARATOR;
 
     assertThat(comparator.compare(first, second), lessThan(0));
     assertThat(comparator.compare(second, first), greaterThan(0));

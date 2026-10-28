@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import schemacrawler.namedobject.NamedObjectComparators;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.Grant;
 import schemacrawler.schema.Privilege;
@@ -115,10 +114,8 @@ final class MutablePrivilege<D extends DatabaseObject> extends AbstractDependant
   private static final Comparator<Grant<?>> GRANT_COMPARATOR =
       Comparator.comparing(
               (Grant<?> grant) -> grant.getGrantor(),
-              Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
-          .thenComparing(
-              Grant::getGrantee,
-              Comparator.nullsFirst(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR))
+              Comparator.nullsFirst(String.CASE_INSENSITIVE_ORDER))
+          .thenComparing(Grant::getGrantee, Comparator.nullsFirst(String.CASE_INSENSITIVE_ORDER))
           .thenComparing(grant -> grant.getParent().key())
           .thenComparing(Grant::isGrantable);
 

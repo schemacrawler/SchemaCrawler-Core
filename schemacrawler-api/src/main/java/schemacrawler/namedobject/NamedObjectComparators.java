@@ -11,8 +11,10 @@ package schemacrawler.namedobject;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
+import static us.fatehi.utility.Utility.convertForComparison;
 
 import java.util.Comparator;
+import java.util.Objects;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
@@ -27,12 +29,9 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class NamedObjectComparators {
 
-  /** Compares the existing lossy normalized text without allocating normalized strings. */
-  public static final Comparator<String> NORMALIZED_TEXT_COMPARATOR =
-      nullsFirst(NamedObjectComparators::compareNormalizedText);
-
   public static final Comparator<NamedObject> NORMALIZED_NAME_COMPARATOR =
-      nullsFirst(comparing(NamedObject::getFullName, NORMALIZED_TEXT_COMPARATOR));
+      nullsFirst(
+          comparing(NamedObject::getFullName, NamedObjectComparators::compareNormalizedText));
 
   public static final Comparator<NamedObject> EXACT_KEY_COMPARATOR =
       nullsFirst(comparing(NamedObject::key, nullsFirst(naturalOrder())));
@@ -95,44 +94,8 @@ public final class NamedObjectComparators {
   }
 
   private static int compareNormalizedText(final String text, final String otherText) {
-    final String left = text;
-    final String right = otherText;
-    int leftOffset = 0;
-    int rightOffset = 0;
-    while (true) {
-      leftOffset = nextRetainedOffset(left, leftOffset);
-      rightOffset = nextRetainedOffset(right, rightOffset);
-      if (leftOffset == left.length() || rightOffset == right.length()) {
-        return Integer.compare(left.length() - leftOffset, right.length() - rightOffset);
-      }
-      final int leftCodePoint = left.codePointAt(leftOffset);
-      final int rightCodePoint = right.codePointAt(rightOffset);
-      final int lowerLeft = Character.toLowerCase(leftCodePoint);
-      final int lowerRight = Character.toLowerCase(rightCodePoint);
-      final char leftUnit =
-          Character.isSupplementaryCodePoint(lowerLeft)
-              ? Character.highSurrogate(lowerLeft)
-              : (char) lowerLeft;
-      final char rightUnit =
-          Character.isSupplementaryCodePoint(lowerRight)
-              ? Character.highSurrogate(lowerRight)
-              : (char) lowerRight;
-      final int comparison = Character.compare(leftUnit, rightUnit);
-      if (comparison != 0) {
-        return comparison;
-      }
-      if (Character.isSupplementaryCodePoint(lowerLeft)
-          && Character.isSupplementaryCodePoint(lowerRight)) {
-        final int trailingComparison =
-            Character.compare(
-                Character.lowSurrogate(lowerLeft), Character.lowSurrogate(lowerRight));
-        if (trailingComparison != 0) {
-          return trailingComparison;
-        }
-      }
-      leftOffset += Character.charCount(leftCodePoint);
-      rightOffset += Character.charCount(rightCodePoint);
-    }
+    return Objects.compare(
+        convertForComparison(text), convertForComparison(otherText), naturalOrder());
   }
 
   private static int compareTypes(final NamedObject object, final NamedObject otherObject) {
@@ -191,18 +154,6 @@ public final class NamedObjectComparators {
       return 10;
     }
     return 11;
-  }
-
-  private static int nextRetainedOffset(final String text, final int offset) {
-    int nextOffset = offset;
-    while (nextOffset < text.length()) {
-      final int codePoint = text.codePointAt(nextOffset);
-      if (Character.isLetterOrDigit(codePoint) || codePoint == '_' || codePoint == '.') {
-        break;
-      }
-      nextOffset += Character.charCount(codePoint);
-    }
-    return nextOffset;
   }
 
   private NamedObjectComparators() {

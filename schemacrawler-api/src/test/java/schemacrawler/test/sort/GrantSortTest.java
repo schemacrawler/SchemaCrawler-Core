@@ -46,8 +46,8 @@ public class GrantSortTest {
     final Grant<Table> punctuated = newGrant(table, "privilege", "A-B", "C D", false);
     final Grant<Table> plain = newGrant(table, "privilege", "ab", "cd", false);
 
-    assertThat(punctuated.compareTo(plain), is(0));
-    assertThat(plain.compareTo(punctuated), is(0));
+    assertThat(punctuated.compareTo(plain), lessThan(0));
+    assertThat(plain.compareTo(punctuated), greaterThan(0));
 
     final Grant<Table> earlierGrantee = newGrant(table, "privilege", "a b", "A_USER", false);
     final Grant<Table> laterGrantee = newGrant(table, "privilege", "AB", "Z_USER", false);

@@ -27,11 +27,10 @@ final class ImmutableColumnReference implements ColumnReference {
   private static final Comparator<ColumnReference> COLUMN_REFERENCE_COMPARATOR =
       comparingInt(ColumnReference::getKeySequence)
           .thenComparing(
-              ColumnReference::getForeignKeyColumn,
-              NamedObjectComparators.NORMALIZED_NAME_COMPARATOR)
+              ColumnReference::getForeignKeyColumn, NamedObjectComparators.NAME_THEN_KEY_COMPARATOR)
           .thenComparing(
               ColumnReference::getPrimaryKeyColumn,
-              NamedObjectComparators.NORMALIZED_NAME_COMPARATOR);
+              NamedObjectComparators.NAME_THEN_KEY_COMPARATOR);
 
   private final Column foreignKeyColumn;
   private final Column primaryKeyColumn;
