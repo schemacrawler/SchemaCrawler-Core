@@ -267,6 +267,7 @@ public class CompareToTest {
     assertThat(table.compareTo(index), lessThan(0));
     assertThat(index.compareTo(table), greaterThan(0));
 
+    final List<Object> expectedSortOrder = List.of(schema, table, column);
     final List<List<NamedObject>> permutations =
         List.of(
             List.of(schema, table, column),
@@ -277,8 +278,9 @@ public class CompareToTest {
             List.of(column, table, schema));
     for (final List<NamedObject> permutation : permutations) {
       assertThat(
+          "Expected: %s%nActual:  %s".formatted(expectedSortOrder, permutation),
           permutation.stream().sorted(NamedObjectSort.natural).toList(),
-          is(List.of(schema, table, column)));
+          is(expectedSortOrder));
     }
   }
 
@@ -389,8 +391,6 @@ public class CompareToTest {
         tstDbObj1,
         lessThan(
             new NamedObject() {
-              /** */
-              private static final long serialVersionUID = -1308483158535248447L;
 
               @Override
               public int compareTo(final NamedObject o) {

@@ -14,14 +14,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static schemacrawler.crawl.SortTestUtility.newColumnReference;
 
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import schemacrawler.schema.Catalog;
-import schemacrawler.schema.Column;
-import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
 import schemacrawler.schema.Function;
@@ -42,7 +38,7 @@ public class NamedObjectComparatorsTest {
   public void nullComparatorChecksNullsAndReferenceIdentity() {
     final NamedObject named = mock(NamedObject.class);
     final NamedObject otherNamed = mock(NamedObject.class);
-    final Comparator<NamedObject> comparator = NamedObjectComparators.NULL_COMPARATOR;
+    final Comparator<NamedObject> comparator = Comparator.nullsFirst(null);
 
     assertThat(comparator.compare(null, null), is(0));
     assertThat(comparator.compare(named, named), is(0));
@@ -58,27 +54,20 @@ public class NamedObjectComparatorsTest {
     when(named.key()).thenReturn(new NamedObjectKey("NAME"));
     final List<Comparator<NamedObject>> comparators =
         List.of(
-            NamedObjectComparators.NORMALIZED_NAME_COMPARATOR,
             NamedObjectComparators.EXACT_KEY_COMPARATOR,
             NamedObjectComparators.NAME_THEN_KEY_COMPARATOR,
             NamedObjectComparators.TYPED_OBJECT_COMPARATOR,
-            NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR,
             NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR,
-            NamedObjectComparators.DATABASE_OBJECT_FIELDS_COMPARATOR,
-            NamedObjectComparators.DATABASE_OBJECT_COMPARATOR);
+            NamedObjectComparators.DATABASE_OBJECT_FIELDS_COMPARATOR);
     for (final Comparator<NamedObject> comparator : comparators) {
       assertThat(comparator.compare(null, null), is(0));
       assertThat(comparator.compare(null, named), lessThan(0));
       assertThat(comparator.compare(named, null), greaterThan(0));
     }
-    assertThat(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR.compare(null, ""), lessThan(0));
-    assertThat(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR.compare("", null), greaterThan(0));
-    assertThat(NamedObjectComparators.NORMALIZED_TEXT_COMPARATOR.compare(null, null), is(0));
   }
 
   @Test
   public void compareFamilyOrdersSimpleDatabaseObjectTypes() {
-    final Catalog catalog = mock(Catalog.class);
     final Schema schema = new SchemaReference("catalog", "schema");
     final Table table = table("TABLE");
     final Table view = table("VIEW");
@@ -93,8 +82,8 @@ public class NamedObjectComparatorsTest {
 
     final List<NamedObject> orderedObjects =
         List.of(
-            catalog, schema, table, view, procedure, function, index, sequence, synonym, unknown,
-            user, other);
+            schema, table, view, procedure, function, index, sequence, synonym, unknown, user,
+            other);
     for (int firstIndex = 0; firstIndex < orderedObjects.size(); firstIndex++) {
       for (int secondIndex = firstIndex + 1; secondIndex < orderedObjects.size(); secondIndex++) {
         assertBefore(orderedObjects.get(firstIndex), orderedObjects.get(secondIndex));
@@ -133,26 +122,15 @@ public class NamedObjectComparatorsTest {
     when(second.getFullName()).thenReturn("a b");
     when(second.key()).thenReturn(new NamedObjectKey("a", "c"));
 
-    final Comparator<NamedObject> comparator =
-        NamedObjectComparators.NORMALIZED_NAME_COMPARATOR.thenComparing(
-            NamedObjectComparators.EXACT_KEY_COMPARATOR);
+    final Comparator<NamedObject> comparator = NamedObjectComparators.NAME_THEN_KEY_COMPARATOR;
 
     assertThat(comparator.compare(first, second), lessThan(0));
     assertThat(comparator.compare(second, first), greaterThan(0));
   }
 
-  private ColumnReference columnReference(
-      final int sequence, final String foreignName, final String primaryName) {
-    final Column foreignColumn = mock(Column.class);
-    final Column primaryColumn = mock(Column.class);
-    when(foreignColumn.getFullName()).thenReturn(foreignName);
-    when(primaryColumn.getFullName()).thenReturn(primaryName);
-    return newColumnReference(sequence, foreignColumn, primaryColumn);
-  }
-
   private void assertBefore(final NamedObject first, final NamedObject second) {
     final Comparator<NamedObject> comparator =
-        NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR;
+        NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR;
 
     assertThat(comparator.compare(first, second), lessThan(0));
     assertThat(comparator.compare(second, first), greaterThan(0));

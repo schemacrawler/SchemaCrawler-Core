@@ -9,11 +9,12 @@
 package schemacrawler.namedobject;
 
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
+import static us.fatehi.utility.Utility.convertForComparison;
 
 import java.util.Comparator;
+import java.util.Objects;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DatabaseUser;
@@ -28,15 +29,9 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class NamedObjectComparators {
 
-  /** Checks null ordering before comparison proceeds to other criteria. */
-  public static final Comparator<NamedObject> NULL_COMPARATOR = nullsFirst((o1, o2) -> 0);
-
-  /** Compares the existing lossy normalized text without allocating normalized strings. */
-  public static final Comparator<String> NORMALIZED_TEXT_COMPARATOR =
-      nullsFirst(NamedObjectComparators::compareNormalizedText);
-
   public static final Comparator<NamedObject> NORMALIZED_NAME_COMPARATOR =
-      nullsFirst(comparing(NamedObject::getFullName, NORMALIZED_TEXT_COMPARATOR));
+      nullsFirst(
+          comparing(NamedObject::getFullName, NamedObjectComparators::compareNormalizedText));
 
   public static final Comparator<NamedObject> EXACT_KEY_COMPARATOR =
       nullsFirst(comparing(NamedObject::key, nullsFirst(naturalOrder())));
@@ -45,24 +40,11 @@ public final class NamedObjectComparators {
       NORMALIZED_NAME_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR);
 
   public static final Comparator<NamedObject> TYPED_OBJECT_COMPARATOR =
-      nullsFirst(NamedObjectComparators::typeComparator);
-
-  public static final Comparator<NamedObject> DATABASE_OBJECT_ORDER_COMPARATOR =
-      nullsFirst(
-          comparingInt(NamedObjectComparators::namedObjectGroup)
-              .thenComparing(
-                  object ->
-                      object instanceof final DatabaseObject databaseObject
-                          ? databaseObject.getSchema()
-                          : null,
-                  Comparator.<Schema>nullsFirst(naturalOrder()))
-              .thenComparingInt(NamedObjectComparators::databaseObjectOrder));
-
-  private static final Comparator<NamedObject> DEPENDANT_OBJECT_ORDER_COMPARATOR =
-      nullsFirst(NamedObjectComparators::dependantObjectOrder);
+      nullsFirst(NamedObjectComparators::compareTypes);
 
   public static final Comparator<NamedObject> DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR =
-      DATABASE_OBJECT_ORDER_COMPARATOR.thenComparing(DEPENDANT_OBJECT_ORDER_COMPARATOR);
+      nullsFirst(NamedObjectComparators::compareDatabaseObjects)
+          .thenComparing(NamedObjectComparators::compareDependantObjects);
 
   /** Compares structural order, type, and normalized name without a terminal identity key. */
   public static final Comparator<NamedObject> DATABASE_OBJECT_FIELDS_COMPARATOR =
@@ -71,79 +53,25 @@ public final class NamedObjectComparators {
               .thenComparing(TYPED_OBJECT_COMPARATOR)
               .thenComparing(NORMALIZED_NAME_COMPARATOR));
 
-  /** Compares database-object fields followed by the exact identity key. */
-  public static final Comparator<NamedObject> DATABASE_OBJECT_COMPARATOR =
-      nullsFirst(DATABASE_OBJECT_FIELDS_COMPARATOR.thenComparing(EXACT_KEY_COMPARATOR));
-
-  private static int compareNormalizedText(final String text, final String otherText) {
-    final String left = text;
-    final String right = otherText;
-    int leftOffset = 0;
-    int rightOffset = 0;
-    while (true) {
-      leftOffset = nextRetainedOffset(left, leftOffset);
-      rightOffset = nextRetainedOffset(right, rightOffset);
-      if (leftOffset == left.length() || rightOffset == right.length()) {
-        return Integer.compare(left.length() - leftOffset, right.length() - rightOffset);
-      }
-      final int leftCodePoint = left.codePointAt(leftOffset);
-      final int rightCodePoint = right.codePointAt(rightOffset);
-      final int lowerLeft = Character.toLowerCase(leftCodePoint);
-      final int lowerRight = Character.toLowerCase(rightCodePoint);
-      final char leftUnit =
-          Character.isSupplementaryCodePoint(lowerLeft)
-              ? Character.highSurrogate(lowerLeft)
-              : (char) lowerLeft;
-      final char rightUnit =
-          Character.isSupplementaryCodePoint(lowerRight)
-              ? Character.highSurrogate(lowerRight)
-              : (char) lowerRight;
-      final int comparison = Character.compare(leftUnit, rightUnit);
-      if (comparison != 0) {
-        return comparison;
-      }
-      if (Character.isSupplementaryCodePoint(lowerLeft)
-          && Character.isSupplementaryCodePoint(lowerRight)) {
-        final int trailingComparison =
-            Character.compare(
-                Character.lowSurrogate(lowerLeft), Character.lowSurrogate(lowerRight));
-        if (trailingComparison != 0) {
-          return trailingComparison;
-        }
-      }
-      leftOffset += Character.charCount(leftCodePoint);
-      rightOffset += Character.charCount(rightCodePoint);
-    }
-  }
-
-  private static int databaseObjectOrder(final NamedObject object) {
-    if (object instanceof Catalog) {
+  private static int compareDatabaseObjects(
+      final NamedObject object, final NamedObject otherObject) {
+    if (object == otherObject) {
       return 0;
     }
-    if (object instanceof Schema) {
-      return 1;
+    if (object instanceof final DatabaseObject databaseObject
+        && otherObject instanceof final DatabaseObject otherDatabaseObject) {
+      final int schemaComparison =
+          NamedObjectSort.natural.compare(
+              databaseObject.getSchema(), otherDatabaseObject.getSchema());
+      if (schemaComparison != 0) {
+        return schemaComparison;
+      }
     }
-    if (object instanceof DependantObject<?>) {
-      return 6;
-    }
-    if (object instanceof final DatabaseObject databaseObject) {
-      return switch (MetaDataUtility.getSimpleTypeName(databaseObject)) {
-        case table -> 2;
-        case view -> 3;
-        case procedure -> 4;
-        case function -> 5;
-        case sequence -> 7;
-        case synonym -> 8;
-        case unknown -> 9;
-      };
-    }
-    if (object instanceof DatabaseUser) {
-      return 10;
-    }
-    return 11;
+    return Integer.compare(databaseObjectOrder(object), databaseObjectOrder(otherObject));
   }
 
-  private static int dependantObjectOrder(final NamedObject object, final NamedObject otherObject) {
+  private static int compareDependantObjects(
+      final NamedObject object, final NamedObject otherObject) {
     if (object == otherObject) {
       return 0;
     }
@@ -161,38 +89,17 @@ public final class NamedObjectComparators {
     return 0;
   }
 
-  private static int namedObjectGroup(final NamedObject object) {
-    if (object instanceof Catalog) {
-      return 0;
-    }
-    if (object instanceof Schema) {
-      return 1;
-    }
-    if (object instanceof DatabaseObject) {
-      return 2;
-    }
-    if (object instanceof DatabaseUser) {
-      return 3;
-    }
-    return 4;
+  private static int compareNormalizedText(final String text, final String otherText) {
+    return Objects.compare(
+        convertForComparison(text), convertForComparison(otherText), naturalOrder());
   }
 
-  private static int nextRetainedOffset(final String text, final int offset) {
-    int nextOffset = offset;
-    while (nextOffset < text.length()) {
-      final int codePoint = text.codePointAt(nextOffset);
-      if (Character.isLetterOrDigit(codePoint) || codePoint == '_' || codePoint == '.') {
-        break;
-      }
-      nextOffset += Character.charCount(codePoint);
+  private static int compareTypes(final NamedObject object, final NamedObject otherObject) {
+    final int nullComparison = Comparator.nullsFirst(null).compare(object, otherObject);
+    if (nullComparison != 0 || object == otherObject) {
+      return nullComparison;
     }
-    return nextOffset;
-  }
 
-  private static int typeComparator(final NamedObject object, final NamedObject otherObject) {
-    if (object == otherObject) {
-      return 0;
-    }
     if (object instanceof final TypedObject typedObject
         && otherObject instanceof final TypedObject otherTypedObject) {
       try {
@@ -218,7 +125,34 @@ public final class NamedObjectComparators {
     return 0;
   }
 
+  private static int databaseObjectOrder(final NamedObject object) {
+    if (object instanceof Catalog) {
+      throw new UnsupportedOperationException("Cannot sort catalogs");
+    }
+    if (object instanceof Schema) {
+      return 1;
+    }
+    if (object instanceof DependantObject<?>) {
+      return 6;
+    }
+    if (object instanceof final DatabaseObject databaseObject) {
+      return switch (MetaDataUtility.getSimpleTypeName(databaseObject)) {
+        case table -> 2;
+        case view -> 3;
+        case procedure -> 4;
+        case function -> 5;
+        case sequence -> 7;
+        case synonym -> 8;
+        case unknown -> 9;
+      };
+    }
+    if (object instanceof DatabaseUser) {
+      return 10;
+    }
+    return 11;
+  }
+
   private NamedObjectComparators() {
-    throw new UnsupportedOperationException();
+    // Prevent instantiation
   }
 }

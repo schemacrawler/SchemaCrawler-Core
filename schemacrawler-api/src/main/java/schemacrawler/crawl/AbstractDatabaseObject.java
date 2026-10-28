@@ -8,10 +8,12 @@
 
 package schemacrawler.crawl;
 
+import static java.util.Comparator.nullsFirst;
 import static java.util.Objects.hash;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serial;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
@@ -27,6 +29,12 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
     implements DatabaseObject {
 
   @Serial private static final long serialVersionUID = 3099561832386790624L;
+
+  /** Compares database-object fields followed by the exact identity key. */
+  private static final Comparator<NamedObject> DATABASE_OBJECT_COMPARATOR =
+      nullsFirst(
+          NamedObjectComparators.DATABASE_OBJECT_FIELDS_COMPARATOR.thenComparing(
+              NamedObjectComparators.EXACT_KEY_COMPARATOR));
 
   private final Schema schema;
   private transient NamedObjectKey key;
@@ -53,12 +61,12 @@ abstract class AbstractDatabaseObject extends AbstractNamedObjectWithAttributes
    */
   @Override
   public int compareTo(final NamedObject obj) {
-    final int nullComparison = NamedObjectComparators.NULL_COMPARATOR.compare(this, obj);
+    final int nullComparison = Comparator.nullsFirst(null).compare(this, obj);
     if (nullComparison != 0 || this == obj) {
       return nullComparison;
     }
     if (obj instanceof DatabaseObject) {
-      return NamedObjectComparators.DATABASE_OBJECT_COMPARATOR.compare(this, obj);
+      return DATABASE_OBJECT_COMPARATOR.compare(this, obj);
     }
 
     return super.compareTo(obj);

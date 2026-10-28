@@ -47,8 +47,7 @@ public enum NamedObjectSort implements Comparator<NamedObject> {
   /** {@inheritDoc} */
   @Override
   public int compare(final NamedObject namedObject1, final NamedObject namedObject2) {
-    final int nullComparison =
-        NamedObjectComparators.NULL_COMPARATOR.compare(namedObject1, namedObject2);
+    final int nullComparison = Comparator.nullsFirst(null).compare(namedObject1, namedObject2);
     if (nullComparison != 0 || namedObject1 == namedObject2) {
       return nullComparison;
     }

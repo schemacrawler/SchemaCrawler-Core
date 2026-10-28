@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serial;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
@@ -37,12 +38,12 @@ abstract class AbstractDatabaseObjectBacked<DO extends DatabaseObject>
 
   @Override
   public int compareTo(final NamedObject namedObj) {
-    final int nullComparison = NamedObjectComparators.NULL_COMPARATOR.compare(this, namedObj);
+    final int nullComparison = Comparator.nullsFirst(null).compare(this, namedObj);
     if (nullComparison != 0 || this == namedObj) {
       return nullComparison;
     }
     final int databaseObjectTypeComparison =
-        NamedObjectComparators.DATABASE_OBJECT_ORDER_COMPARATOR.compare(this, namedObj);
+        NamedObjectComparators.DATABASE_OBJECT_SIMPLE_TYPE_COMPARATOR.compare(this, namedObj);
     if (databaseObjectTypeComparison != 0) {
       return databaseObjectTypeComparison;
     }

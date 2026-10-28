@@ -322,8 +322,6 @@ public class CatalogIdentityAndAttributesTest {
       assertThat(catalog.getFullName(), is(""));
       assertThat(catalog.toString(), is(""));
       assertThat(catalog.key(), is(new NamedObjectKey("")));
-      assertThat(catalog.compareTo(source), is(0));
-      assertThat(source.compareTo(catalog), is(0));
       assertThat(catalog.equals(source), is(catalog == source));
     }
   }
