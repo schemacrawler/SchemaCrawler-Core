@@ -24,10 +24,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import schemacrawler.namedobject.NamedObjectIndex;
 import schemacrawler.schema.Column;
-import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumnSortSequence;
 import schemacrawler.schema.IndexType;
-import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Schema;
 import schemacrawler.schemacrawler.CrawlOptions;
 import schemacrawler.schemacrawler.InformationSchemaViews;
@@ -150,12 +149,10 @@ final class IndexRetriever extends AbstractRetriever {
       if (!table.hasPrimaryKey()) {
         continue;
       }
-      final NamedObjectKey primaryKeykey = table.getPrimaryKey().key();
-      for (final Index index : table.getIndexes()) {
-        if (index.key().equals(primaryKeykey)) {
-          ((MutableIndex) index).setIsPrimaryKeyIndex();
-          continue;
-        }
+      final PrimaryKey primaryKey = table.getPrimaryKey();
+      final Optional<MutableIndex> lookedupIndex = table.lookupIndex(primaryKey.getName());
+      if (lookedupIndex.isPresent()) {
+        lookedupIndex.get().setIsPrimaryKeyIndex();
       }
     }
     retrievalCounts.log();
