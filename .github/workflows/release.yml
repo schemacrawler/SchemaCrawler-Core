@@ -49,6 +49,10 @@ jobs:
           --no-transfer-progress \
           --batch-mode \
           clean install
+        
+        # Extract project version for use in artifact paths
+        PROJECT_VERSION=$(mvn --no-transfer-progress --batch-mode help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "project-version=${PROJECT_VERSION}" >> $GITHUB_OUTPUT
 
 # CREATE GITHUB RELEASE AND ADD ASSETS
     - id: create-release
@@ -65,10 +69,10 @@ jobs:
           See the change history at https://www.schemacrawler.com/changes-report.html
         generate_release_notes: true
         files: |
-          ./schemacrawler-distrib/target/schemacrawler-17.16.0-distribution.zip
-          ./schemacrawler-distrib/target/schemacrawler-17.16.0-distribution.zip.SHA-512
-          ./schemacrawler-distrib/target/schemacrawler-17.16.0-bin.zip
-          ./schemacrawler-distrib/target/schemacrawler-17.16.0-bin.zip.SHA-512
+          ./schemacrawler-distrib/target/schemacrawler-${{ steps.build.outputs.project-version }}-distribution.zip
+          ./schemacrawler-distrib/target/schemacrawler-${{ steps.build.outputs.project-version }}-distribution.zip.SHA-512
+          ./schemacrawler-distrib/target/schemacrawler-${{ steps.build.outputs.project-version }}-bin.zip
+          ./schemacrawler-distrib/target/schemacrawler-${{ steps.build.outputs.project-version }}-bin.zip.SHA-512
 
 # PUBLISH TO CENTRAL REPOSITORY
     - id: publish-to-central

@@ -19,9 +19,11 @@ public final class Version extends BaseProductVersion {
 
   @Serial private static final long serialVersionUID = 1143606778430634288L;
 
+  private static final String PRODUCT_VERSION = "17.16.0";
+
   private static final String ABOUT =
       """
-      SchemaCrawler 17.16.0
+      SchemaCrawler %s
       Database schema discovery and comprehension tool
       https://www.schemacrawler.com/
       Copyright (c) 2000-2026, Sualeh Fatehi <sualeh@hotmail.com>.
@@ -32,9 +34,10 @@ public final class Version extends BaseProductVersion {
       database documentation is designed to be diff-ed against other database
       schemas. SchemaCrawler also generates schema diagrams.
       """
-          .stripIndent();
+          .stripIndent()
+          .formatted(PRODUCT_VERSION);
 
-  private static final Version VERSION = new Version("SchemaCrawler", "17.16.0");
+  private static final Version VERSION = new Version("SchemaCrawler", PRODUCT_VERSION);
 
   /**
    * Information about this product.

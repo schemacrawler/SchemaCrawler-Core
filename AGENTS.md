@@ -38,6 +38,33 @@ Modules must be built in dependency order:
 
 **Dependency order:** `utility` → `api` → `ermodel` / `loader` → `tools` → `schemacrawler` (shaded)
 
+## Build Artifacts and Manifest Metadata
+
+All non-test JAR artifacts include consistent Git metadata and standard implementation attributes in their manifests:
+
+- **Git-Commit-Id**: Full commit hash from the current checkout's HEAD
+- **Git-Commit-Time**: ISO 8601 UTC timestamp of the commit (`yyyy-MM-dd'T'HH:mm:ss'Z'`)
+- **Git-Branch**: Current Git branch name (includes detached HEAD)
+- **Implementation-Title**: Product name
+- **Implementation-Version**: Maven project version
+- **Implementation-Vendor**: Organization name
+- **Specification-Title** and **Specification-Version**: JAR specification identity
+
+The `git-commit-id-maven-plugin` (version 8.0.1) runs in the initialize phase before packaging to populate these properties from the live Git repository. **Requires a Git checkout with accessible `.git/` directory**; builds from detached HEAD are supported. Missing Git metadata results in a build failure with a clear error message.
+
+The shade plugin produces the final `schemacrawler` uber-JAR with manifest attributes identifying `us.fatehi:schemacrawler`, not its constituent modules. The `moditect-maven-plugin` adds JPMS module metadata after shading and preserves all manifest entries.
+
+## Version Management
+
+All SchemaCrawler products maintain independent, centralized version literals:
+
+- **SchemaCrawler Core** and its modules use a single `PRODUCT_VERSION = "17.16.0"` constant in `Version.java`
+- **SchemaCrawler AI** uses an independent constant in `SchemaCrawlerAiVersion.java` (currently `"17.16.0-1"`)
+
+These literals drive the version object, about banner, and all Maven coordinates for same-product dependencies (enforced through `${project.version}` and library BOMs). Maven and Java version consistency is validated by test suite automation.
+
+Do not add new literals or embed versions in resource files; consolidate any new version references through the existing constants and version APIs.
+
 ## Architecture
 
 ### Key Packages

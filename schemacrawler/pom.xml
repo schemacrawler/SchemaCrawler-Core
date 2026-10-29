@@ -90,6 +90,7 @@
               <createDependencyReducedPom>true</createDependencyReducedPom>
               <createSourcesJar>true</createSourcesJar>
               <useDependencyReducedPomInJar>true</useDependencyReducedPomInJar>
+              <sourcesJarExecutionId>attach-sources</sourcesJarExecutionId>
               <artifactSet>
                 <includes>
                   <include>us.fatehi:schemacrawler-utility</include>
@@ -104,6 +105,14 @@
                 <transformer
                     implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
+                    <Implementation-Title>${project.name}</Implementation-Title>
+                    <Implementation-Version>${project.version}</Implementation-Version>
+                    <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                    <Specification-Title>${project.name}</Specification-Title>
+                    <Specification-Version>${project.version}</Specification-Version>
+                    <Git-Commit-Id>${git.commit.id.full}</Git-Commit-Id>
+                    <Git-Commit-Time>${git.commit.time}</Git-Commit-Time>
+                    <Git-Branch>${git.branch}</Git-Branch>
                     <Product>SchemaCrawler</Product>
                     <Version>${project.version}</Version>
                     <Author>Sualeh Fatehi sualeh@hotmail.com</Author>
