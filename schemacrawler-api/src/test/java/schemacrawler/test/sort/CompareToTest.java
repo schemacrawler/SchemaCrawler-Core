@@ -10,6 +10,7 @@ package schemacrawler.test.sort;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.number.OrderingComparison.comparesEqualTo;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.hamcrest.number.OrderingComparison.lessThan;
@@ -24,10 +25,12 @@ import static schemacrawler.crawl.SortTestUtility.newColumnReference;
 import static schemacrawler.crawl.SortTestUtility.newDatabaseObject;
 import static schemacrawler.crawl.SortTestUtility.newDatabaseProperty;
 import static schemacrawler.crawl.SortTestUtility.newForeignKey;
+import static schemacrawler.crawl.SortTestUtility.newGrant;
 import static schemacrawler.crawl.SortTestUtility.newImplicitAssociation;
 import static schemacrawler.crawl.SortTestUtility.newIndex;
 import static schemacrawler.crawl.SortTestUtility.newIndexColumn;
 import static schemacrawler.crawl.SortTestUtility.newProcedure;
+import static schemacrawler.crawl.SortTestUtility.newServerInfoProperty;
 import static schemacrawler.crawl.SortTestUtility.newTable;
 import static schemacrawler.crawl.SortTestUtility.newView;
 import static schemacrawler.crawl.SortTestUtility.setIndexType;
@@ -37,7 +40,10 @@ import static schemacrawler.crawl.SortTestUtility.setSortIndex;
 import static schemacrawler.crawl.SortTestUtility.setTableType;
 import static schemacrawler.crawl.SortTestUtility.setUnique;
 
+import java.sql.JDBCType;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,6 +56,8 @@ import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.IndexType;
+import schemacrawler.schema.JavaSqlType;
+import schemacrawler.schema.JavaSqlTypeGroup;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Procedure;
@@ -60,8 +68,104 @@ import schemacrawler.schema.TableType;
 import schemacrawler.schema.View;
 import schemacrawler.schemacrawler.SchemaReference;
 import us.fatehi.utility.property.Property;
+import us.fatehi.utility.property.PropertyName;
 
 public class CompareToTest {
+
+  private static <T extends Comparable<? super T>> void assertConsistent(
+      final T first, final T equalToFirst, final T different) {
+    assertThat(first.equals(equalToFirst), is(true));
+    assertThat(equalToFirst.equals(first), is(true));
+    assertThat(first.hashCode(), is(equalToFirst.hashCode()));
+    assertThat(first.compareTo(equalToFirst), is(0));
+    assertThat(equalToFirst.compareTo(first), is(0));
+
+    assertThat(first.equals(different), is(false));
+    assertThat(different.equals(first), is(false));
+    assertThat(first.compareTo(different), not(0));
+    assertThat(different.compareTo(first), not(0));
+    assertThat(
+        Integer.signum(first.compareTo(different)),
+        is(-Integer.signum(different.compareTo(first))));
+
+    final Map<T, String> hashMap = new HashMap<>();
+    hashMap.put(first, "first");
+    assertThat(hashMap.get(equalToFirst), is("first"));
+    assertThat(hashMap.containsKey(different), is(false));
+    hashMap.put(equalToFirst, "second");
+    assertThat(hashMap.size(), is(1));
+
+    final TreeSet<T> treeSet = new TreeSet<>();
+    treeSet.add(first);
+    assertThat(treeSet.contains(equalToFirst), is(true));
+    assertThat(treeSet.add(equalToFirst), is(false));
+    assertThat(treeSet.add(different), is(true));
+  }
+
+  @Test
+  public void equalsHashCodeAndCompareToAreConsistent() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final Schema otherSchema = new SchemaReference("catalog", "other");
+    assertConsistent(schema, new SchemaReference("catalog", "schema"), otherSchema);
+
+    assertConsistent(
+        new NamedObjectKey("a", "b"), new NamedObjectKey("a", "b"), new NamedObjectKey("a", "c"));
+    assertConsistent(new TableType("table"), new TableType("table"), new TableType("view"));
+
+    final Table table = newTable(schema, "TABLE");
+    assertConsistent(table, newTable(schema, "TABLE"), newTable(schema, "OTHER"));
+
+    assertConsistent(
+        newColumn(table, "COLUMN"), newColumn(table, "COLUMN"), newColumn(table, "OTHER"));
+    assertConsistent(newIndex(table, "INDEX"), newIndex(table, "INDEX"), newIndex(table, "OTHER"));
+    assertConsistent(
+        newProcedure(schema, "ROUTINE", "SPECIFIC"),
+        newProcedure(schema, "ROUTINE", "SPECIFIC"),
+        newProcedure(schema, "OTHER", "SPECIFIC"));
+  }
+
+  @Test
+  public void equalsHashCodeAndCompareToAreConsistentForRelatedObjects() {
+    final Schema schema = new SchemaReference("catalog", "schema");
+    final Table child = newTable(schema, "CHILD");
+    final Table parent = newTable(schema, "PARENT");
+
+    assertConsistent(
+        new JavaSqlType(JDBCType.INTEGER, Integer.class, JavaSqlTypeGroup.integer),
+        new JavaSqlType(JDBCType.INTEGER, Integer.class, JavaSqlTypeGroup.integer),
+        new JavaSqlType(JDBCType.VARCHAR, String.class, JavaSqlTypeGroup.character));
+
+    assertConsistent(new PropertyName("name"), new PropertyName("NAME"), new PropertyName("other"));
+    assertConsistent(
+        newDatabaseProperty("getDatabaseVersion", "1"),
+        newDatabaseProperty("getDatabaseVersion", "1"),
+        newDatabaseProperty("getDriverVersion", "1"));
+    assertConsistent(
+        newServerInfoProperty("name", "value", "description"),
+        newServerInfoProperty("name", "value", "description"),
+        newServerInfoProperty("other", "value", "description"));
+
+    final Column childColumn = newColumn(child, "COLUMN");
+    final Column parentColumn = newColumn(parent, "COLUMN");
+    assertConsistent(
+        newColumnReference(1, childColumn, parentColumn),
+        newColumnReference(1, childColumn, parentColumn),
+        newColumnReference(1, newColumn(child, "OTHER"), parentColumn));
+
+    assertConsistent(
+        newForeignKey("FK", child, parent),
+        newForeignKey("FK", child, parent),
+        newForeignKey("OTHER_FK", child, parent));
+    assertConsistent(
+        newImplicitAssociation("IA", child, parent, "COLUMN"),
+        newImplicitAssociation("IA", child, parent, "COLUMN"),
+        newImplicitAssociation("OTHER_IA", child, parent, "COLUMN"));
+
+    assertConsistent(
+        newGrant(child, "SELECT", "grantor", "grantee", true),
+        newGrant(child, "SELECT", "grantor", "grantee", true),
+        newGrant(child, "SELECT", "grantor", "other", true));
+  }
 
   @Test
   public void naturalKeyTiesRetainAllIdentitiesAcrossPermutations() {
