@@ -39,12 +39,12 @@ public final class TableType implements Serializable, Comparable<TableType> {
                       }))
           .thenComparing(TableType::toString);
 
-  private final String tableType;
+  private final String name;
 
   /** Constructor for table type. Table type is case-sensitive. */
   public TableType(final String tableTypeString) {
     requireNotBlank(tableTypeString, "No table type provided");
-    tableType = tableTypeString.strip();
+    name = tableTypeString.strip();
   }
 
   /** {@inheritDoc} */
@@ -68,10 +68,10 @@ public final class TableType implements Serializable, Comparable<TableType> {
     if (obj == null || !(obj instanceof final TableType other)) {
       return false;
     }
-    if (tableType == null) {
-      return other.tableType == null;
+    if (name == null) {
+      return other.name == null;
     }
-    return tableType.equalsIgnoreCase(other.tableType);
+    return name.equalsIgnoreCase(other.name);
   }
 
   /**
@@ -80,7 +80,7 @@ public final class TableType implements Serializable, Comparable<TableType> {
    * @return The table type
    */
   public String getName() {
-    return tableType;
+    return name;
   }
 
   /**
@@ -98,23 +98,12 @@ public final class TableType implements Serializable, Comparable<TableType> {
     return SimpleTableType.table;
   }
 
-  /**
-   * The table type, with the case preserved.
-   *
-   * @return The table type
-   * @deprecated See {@code getName()}
-   */
-  @Deprecated
-  public String getTableType() {
-    return tableType;
-  }
-
   /** {@inheritDoc} */
   @Override
   public int hashCode() {
     final int prime = 31;
     final int result = 1;
-    return prime * result + (tableType == null ? 0 : tableType.toLowerCase(Locale.ROOT).hashCode());
+    return prime * result + (name == null ? 0 : name.toLowerCase(Locale.ROOT).hashCode());
   }
 
   /**
@@ -126,19 +115,19 @@ public final class TableType implements Serializable, Comparable<TableType> {
     if (isBlank(testTableType)) {
       return false;
     }
-    return tableType.equalsIgnoreCase(testTableType.strip());
+    return name.equalsIgnoreCase(testTableType.strip());
   }
 
   /** Checks if the table type is a view of any kind. */
   public boolean isView() {
-    return tableType != null
-        && (tableType.toUpperCase(Locale.ROOT).contains("VIEW")
-            || tableType.toUpperCase().contains("MATERIALIZED"));
+    return name != null
+        && (name.toUpperCase(Locale.ROOT).contains("VIEW")
+            || name.toUpperCase().contains("MATERIALIZED"));
   }
 
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return tableType.toLowerCase(Locale.ROOT);
+    return name.toLowerCase(Locale.ROOT);
   }
 }
