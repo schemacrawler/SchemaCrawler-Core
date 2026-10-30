@@ -58,8 +58,8 @@ The shade plugin produces the final `schemacrawler` uber-JAR with manifest attri
 
 All SchemaCrawler products maintain independent, centralized version literals:
 
-- **SchemaCrawler Core** and its modules use a single `PRODUCT_VERSION = "17.16.0"` constant in `Version.java`
-- **SchemaCrawler AI** uses an independent constant in `SchemaCrawlerAiVersion.java` (currently `"17.16.0-1"`)
+- **SchemaCrawler Core** and its modules use a single `PRODUCT_VERSION = "18.0.1"` constant in `Version.java`
+- **SchemaCrawler AI** uses an independent constant in `SchemaCrawlerAiVersion.java` (currently `"18.0.1-1"`)
 
 These literals drive the version object, about banner, and all Maven coordinates for same-product dependencies (enforced through `${project.version}` and library BOMs). Maven and Java version consistency is validated by test suite automation.
 

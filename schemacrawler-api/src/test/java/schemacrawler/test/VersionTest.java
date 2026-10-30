@@ -18,7 +18,7 @@ import schemacrawler.schemacrawler.Version;
 
 public class VersionTest {
 
-  private static final String majorVersion = "17";
+  private static final String majorVersion = "18";
   private static final String semverPatternString =
       majorVersion
           + "\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?";
