@@ -98,17 +98,6 @@ public final class TableType implements Serializable, Comparable<TableType> {
     return SimpleTableType.table;
   }
 
-  /**
-   * The table type, with the case preserved.
-   *
-   * @return The table type
-   * @deprecated See {@code getName()}
-   */
-  @Deprecated
-  public String getTableType() {
-    return tableType;
-  }
-
   /** {@inheritDoc} */
   @Override
   public int hashCode() {
