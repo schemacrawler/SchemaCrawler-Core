@@ -52,7 +52,7 @@ final class NeuteredLinesFilter implements Predicate<String> {
               .asMatchPredicate(),
           Pattern.compile("\\sby:\\s*.*schemacrawler.*").asMatchPredicate(),
           // Versions
-          Pattern.compile(".*1[67]\\.\\d{1,2}\\.\\d{1,2}.*").asMatchPredicate(),
+          Pattern.compile(".*(1[6-9]|2\\d)\\.\\d{1,2}\\.\\d{1,2}.*").asMatchPredicate(),
           // Operating systems and environment
           Pattern.compile(".*(Windows|Linux|Mac OS).*").asMatchPredicate(),
           Pattern.compile(".*(Java|OpenJDK).*").asMatchPredicate(),

@@ -5,7 +5,7 @@
   <parent>
     <groupId>us.fatehi</groupId>
     <artifactId>schemacrawler-parent</artifactId>
-    <version>17.16.0</version>
+    <version>18.0.1</version>
     <relativePath>../schemacrawler-parent/pom.xml</relativePath>
   </parent>
   <artifactId>schemacrawler-jdbc-drivers</artifactId>
@@ -92,7 +92,7 @@
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
-      <version>3.53.4.0</version>
+      <version>3.54.1.0</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>

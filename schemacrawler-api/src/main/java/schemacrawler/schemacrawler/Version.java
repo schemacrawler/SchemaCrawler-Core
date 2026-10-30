@@ -19,7 +19,7 @@ public final class Version extends BaseProductVersion {
 
   @Serial private static final long serialVersionUID = 1143606778430634288L;
 
-  private static final String PRODUCT_VERSION = "17.16.0";
+  private static final String PRODUCT_VERSION = "18.0.1";
 
   private static final String ABOUT =
       """

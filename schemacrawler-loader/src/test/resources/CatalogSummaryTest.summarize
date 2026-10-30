@@ -1,11 +1,11 @@
 catalog: 
 crawl-info:
-  generated-by: SchemaCrawler 17.14.0
-  generated-on: '2026-08-21 17:16:38'
+  generated-by: SchemaCrawler 18.0.1
+  generated-on: '2026-10-30 01:00:17'
   database: HSQL Database Engine 2.7.4
   jdbc-driver: HSQL Database Engine Driver 2.7.4
   os: Windows 11 10.0
-  jvm: Microsoft OpenJDK 64-Bit Server VM 21.0.11+10-LTS
+  jvm: Eclipse Adoptium OpenJDK 64-Bit Server VM 23.0.1+11
 counts:
   schemas: 6
   data-types: 32
