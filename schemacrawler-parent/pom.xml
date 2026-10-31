@@ -494,7 +494,7 @@
               <goal>revision</goal>
             </goals>
             <configuration>
-              <failOnNoGit>true</failOnNoGit>
+              <failOnNoGitDirectory>true</failOnNoGitDirectory>
               <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
               <offline>false</offline>
               <skip>false</skip>
