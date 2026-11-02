@@ -8,9 +8,14 @@
 
 package us.fatehi.test.utility;
 
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 public final class Utility {
+
+  public static final Pattern TEST_LOCATIONS =
+      Pattern.compile(
+          ".*(/test-classes/|-tests\\.jar|/schemacrawler-test[^/]*|/schemacrawler/test/).*");
 
   /**
    * Checks if the text is null or empty, and throws an exception if it is.

@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import java.lang.reflect.Modifier;
-import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -29,6 +28,7 @@ import schemacrawler.namedobject.AbstractCatalog;
 import schemacrawler.namedobject.AbstractNamedObject;
 import schemacrawler.namedobject.AbstractNamedObjectWithAttributes;
 import schemacrawler.schemacrawler.ModelImplementation;
+import us.fatehi.test.utility.Utility;
 
 @TestInstance(PER_CLASS)
 public class ModelTest {
@@ -45,7 +45,7 @@ public class ModelTest {
     classes =
         new ClassFileImporter()
             .withImportOption(DO_NOT_INCLUDE_TESTS)
-            .withImportOption(location -> !location.matches(Pattern.compile(".*[Tt]est.*")))
+            .withImportOption(location -> !location.matches(Utility.TEST_LOCATIONS))
             .importPackages("schemacrawler..")
             .as(description);
     assertThat(description + " classes not found", classes.isEmpty(), is(false));

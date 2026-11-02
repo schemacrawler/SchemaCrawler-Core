@@ -31,10 +31,10 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import us.fatehi.test.utility.Utility;
 
 @TestInstance(PER_CLASS)
 public abstract class BaseArchitectureTest {
@@ -47,7 +47,7 @@ public abstract class BaseArchitectureTest {
     classes =
         new ClassFileImporter()
             .withImportOption(DO_NOT_INCLUDE_TESTS)
-            .withImportOption(location -> !location.matches(Pattern.compile(".*[Tt]est.*")))
+            .withImportOption(location -> !location.matches(Utility.TEST_LOCATIONS))
             .importPackages(classesSpecification())
             .as(description);
     assertThat(description + " classes not found", classes.isEmpty(), is(false));
