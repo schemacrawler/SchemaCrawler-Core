@@ -488,7 +488,7 @@
         <artifactId>git-commit-id-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>get-the-git-infos</id>
+            <id>git-info</id>
             <phase>initialize</phase>
             <goals>
               <goal>revision</goal>
