@@ -16,6 +16,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+/**
+ * Predicate that matches class names which must never be deserialized. It returns {@code true} when
+ * a class name is <em>denied</em>, so it must be negated with {@link Predicate#not(Predicate)} to
+ * be used as an allow check, for example {@code Predicate.not(new
+ * DeniedClassesFilter()).and(allowed)}.
+ *
+ * <p>Denied classes are identified by package prefix or by exact class name. Array descriptors are
+ * unwrapped, so an array of a denied class is also denied. A blank name is not denied by this
+ * filter. Other classes, such as the {@code java.util.concurrent} collections used by catalogs, are
+ * not denied here, and remain subject to the allow policy of the serialization format.
+ */
 final class DeniedClassesFilter implements Predicate<String> {
 
   private static final Logger LOGGER = Logger.getLogger(DeniedClassesFilter.class.getName());
@@ -77,6 +88,13 @@ final class DeniedClassesFilter implements Predicate<String> {
         : className;
   }
 
+  /**
+   * Tests whether a class name is denied.
+   *
+   * @param text Serialized class name, which may be an array descriptor
+   * @return {@code true} if the class must not be deserialized; {@code false} if it is not denied
+   *     by this filter or the name is blank
+   */
   @Override
   public boolean test(final String className) {
     if (isBlank(className)) {
