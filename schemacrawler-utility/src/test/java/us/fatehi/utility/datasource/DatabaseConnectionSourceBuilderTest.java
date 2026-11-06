@@ -8,10 +8,12 @@
 
 package us.fatehi.utility.datasource;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -24,6 +26,35 @@ import org.junit.jupiter.api.Test;
 import us.fatehi.test.utility.TestConnection;
 
 public class DatabaseConnectionSourceBuilderTest {
+
+  @Test
+  public void threadingAliasesSelectConnectionSource() throws Exception {
+    restoreSystemProperties(
+        () -> {
+          System.clearProperty("SCHCRWLR_SINGLE_THREADED");
+          System.setProperty("SC_SINGLE_THREADED", "true");
+          final DatabaseConnectionSourceBuilder builder =
+              DatabaseConnectionSourceBuilder.builder("jdbc:test-db:localhost:0/alias");
+          assertThat(builder.build(), instanceOf(SingleDatabaseConnectionSource.class));
+          System.setProperty("SCHCRWLR_SINGLE_THREADED", "false");
+          assertThat(builder.build(), instanceOf(SimpleDatabaseConnectionSource.class));
+          System.setProperty("SCHCRWLR_SINGLE_THREADED", "true");
+          System.setProperty("SC_SINGLE_THREADED", "false");
+          assertThat(builder.build(), instanceOf(SingleDatabaseConnectionSource.class));
+        });
+  }
+
+  @Test
+  public void defaultConnectionSourceRemainsMultiThreaded() throws Exception {
+    restoreSystemProperties(
+        () -> {
+          System.clearProperty("SCHCRWLR_SINGLE_THREADED");
+          System.clearProperty("SC_SINGLE_THREADED");
+          assertThat(
+              DatabaseConnectionSourceBuilder.builder("jdbc:test-db:localhost:0/default").build(),
+              instanceOf(SimpleDatabaseConnectionSource.class));
+        });
+  }
 
   @Test
   public void connectionInitializer() throws SQLException {

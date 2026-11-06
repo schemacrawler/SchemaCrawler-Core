@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
-import us.fatehi.utility.readconfig.SystemPropertiesConfig;
+import us.fatehi.utility.scheduler.TaskRunners;
 
 public class DatabaseConnectionSources {
 
@@ -34,9 +34,7 @@ public class DatabaseConnectionSources {
       final Map<String, String> connectionProperties,
       final UserCredentials userCredentials) {
 
-    final boolean isSingleThreaded =
-        new SystemPropertiesConfig().getBooleanValue("SC_SINGLE_THREADED");
-    if (isSingleThreaded) {
+    if (TaskRunners.isSingleThreaded()) {
       LOGGER.log(Level.CONFIG, "Loading database schema in the main thread");
       return new SingleDatabaseConnectionSource(
           connectionUrl, additionalDriverProperties, connectionProperties, userCredentials);
