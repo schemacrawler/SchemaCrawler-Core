@@ -25,6 +25,10 @@ final class DeniedClassesFilter implements Predicate<String> {
           Stream.of(
                   "java.lang.reflect.",
                   "java.lang.invoke.",
+                  "java.lang.ref.",
+                  "java.lang.module.",
+                  "java.lang.foreign.",
+                  "java.lang.management.",
                   "java.util.logging.",
                   "java.util.prefs.")
               .anyMatch(className::startsWith);
@@ -39,7 +43,19 @@ final class DeniedClassesFilter implements Predicate<String> {
               "java.lang.Thread",
               "java.lang.ThreadGroup",
               "java.lang.ClassLoader",
-              "java.util.ServiceLoader")
+              "java.lang.ThreadLocal",
+              "java.lang.InheritableThreadLocal",
+              "java.util.ServiceLoader",
+              "java.util.Timer",
+              "java.util.TimerTask",
+              "java.net.Socket",
+              "java.net.ServerSocket",
+              "java.net.DatagramSocket",
+              "java.util.concurrent.ThreadPoolExecutor",
+              "java.util.concurrent.ScheduledThreadPoolExecutor",
+              "java.util.concurrent.ForkJoinPool",
+              "java.util.concurrent.FutureTask",
+              "java.util.concurrent.CompletableFuture")
           ::contains;
 
   private static final Predicate<String> DENIED_CLASS = DENIED_PACKAGE.or(DENIED_TYPE);

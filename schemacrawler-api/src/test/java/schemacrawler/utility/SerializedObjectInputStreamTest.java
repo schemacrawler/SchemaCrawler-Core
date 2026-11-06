@@ -47,6 +47,10 @@ public class SerializedObjectInputStreamTest {
   public void deniedPrefixes() {
     assertThat(DENY_CLASSES.test("java.lang.reflect.Method"), is(true));
     assertThat(DENY_CLASSES.test("java.lang.invoke.MethodHandle"), is(true));
+    assertThat(DENY_CLASSES.test("java.lang.ref.SoftReference"), is(true));
+    assertThat(DENY_CLASSES.test("java.lang.module.ModuleDescriptor"), is(true));
+    assertThat(DENY_CLASSES.test("java.lang.foreign.Arena"), is(true));
+    assertThat(DENY_CLASSES.test("java.lang.management.ManagementFactory"), is(true));
     assertThat(DENY_CLASSES.test("java.util.logging.Level"), is(true));
     assertThat(DENY_CLASSES.test("java.util.prefs.Preferences"), is(true));
   }
@@ -63,7 +67,19 @@ public class SerializedObjectInputStreamTest {
           "java.lang.Thread",
           "java.lang.ThreadGroup",
           "java.lang.ClassLoader",
-          "java.util.ServiceLoader"
+          "java.lang.ThreadLocal",
+          "java.lang.InheritableThreadLocal",
+          "java.util.ServiceLoader",
+          "java.util.Timer",
+          "java.util.TimerTask",
+          "java.net.Socket",
+          "java.net.ServerSocket",
+          "java.net.DatagramSocket",
+          "java.util.concurrent.ThreadPoolExecutor",
+          "java.util.concurrent.ScheduledThreadPoolExecutor",
+          "java.util.concurrent.ForkJoinPool",
+          "java.util.concurrent.FutureTask",
+          "java.util.concurrent.CompletableFuture"
         }) {
       assertThat(className, DENY_CLASSES.test(className), is(true));
     }

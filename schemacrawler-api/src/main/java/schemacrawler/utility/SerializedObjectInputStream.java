@@ -33,6 +33,8 @@ public final class SerializedObjectInputStream extends ObjectInputStream {
   public static <C extends Serializable> C read(
       final InputStream in, final Predicate<String> allowedClassName) {
     requireNonNull(in, "No input stream provided");
+    requireNonNull(allowedClassName, "No allowed class predicate provided");
+
     try (final SerializedObjectInputStream objIn =
         new SerializedObjectInputStream(in, allowedClassName)) {
       return (C) objIn.readObject();
