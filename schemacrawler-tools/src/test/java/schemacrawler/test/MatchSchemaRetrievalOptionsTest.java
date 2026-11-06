@@ -8,6 +8,7 @@
 
 package schemacrawler.test;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -32,6 +33,33 @@ import us.fatehi.utility.datasource.DatabaseServerType;
 
 @WithTestDatabase
 public class MatchSchemaRetrievalOptionsTest {
+
+  @Test
+  public void canonicalPluginOverrideWins() throws Exception {
+    restoreSystemProperties(
+        () -> {
+          System.clearProperty("SC_WITHOUT_DATABASE_PLUGIN");
+          System.setProperty("SCHCRWLR_WITHOUT_DATABASE_PLUGIN", "oracle");
+          assertThat(
+              DatabaseConnectorUtility.matchSchemaRetrievalOptions(mockOracleConnectionSource())
+                  .getDatabaseServerType()
+                  .isUnknownDatabaseSystem(),
+              is(true));
+          System.setProperty("SC_WITHOUT_DATABASE_PLUGIN", "newdb");
+          assertThat(
+              DatabaseConnectorUtility.matchSchemaRetrievalOptions(mockOracleConnectionSource())
+                  .getDatabaseServerType()
+                  .isUnknownDatabaseSystem(),
+              is(true));
+          System.setProperty("SCHCRWLR_WITHOUT_DATABASE_PLUGIN", "");
+          System.setProperty("SC_WITHOUT_DATABASE_PLUGIN", "oracle");
+          assertThrows(
+              InternalRuntimeException.class,
+              () ->
+                  DatabaseConnectorUtility.matchSchemaRetrievalOptions(
+                      mockOracleConnectionSource()));
+        });
+  }
 
   @DisplayName("1: Controlled + on classpath + no exception = use plugin")
   @Disabled

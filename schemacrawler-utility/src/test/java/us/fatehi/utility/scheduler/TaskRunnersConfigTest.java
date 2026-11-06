@@ -20,6 +20,27 @@ import org.junit.jupiter.api.Test;
 public class TaskRunnersConfigTest {
 
   @Test
+  public void canonicalSettingsWinConflicts() {
+    System.setProperty("SC_SINGLE_THREADED", "true");
+    System.setProperty("SC_LOAD_MAX_THREADS", "9");
+    System.setProperty("SC_LOAD_TIMEOUT_SECONDS", "90");
+    System.setProperty("SCHCRWLR_SINGLE_THREADED", "false");
+    System.setProperty("SCHCRWLR_LOAD_MAX_THREADS", "3");
+    System.setProperty("SCHCRWLR_LOAD_TIMEOUT_SECONDS", "42");
+
+    assertThat(TaskRunners.isSingleThreaded(), is(false));
+    final ThreadingOptions options = TaskRunners.getThreadingOptions();
+    assertThat(options.maxThreads(), is(3));
+    assertThat(options.timeoutSeconds(), is(42));
+  }
+
+  @Test
+  public void canonicalSingleThreadedSettingIsUsed() {
+    System.setProperty("SCHCRWLR_SINGLE_THREADED", "true");
+    assertTaskRunnerReturnsSingleThreaded();
+  }
+
+  @Test
   public void invalidThreadingSettingsUseDefaults() {
     System.setProperty("SC_SINGLE_THREADED", "false");
     System.setProperty("SC_LOAD_MAX_THREADS", "not-a-number");
@@ -96,6 +117,9 @@ public class TaskRunnersConfigTest {
 
   @AfterEach
   public void tearDown() {
+    System.clearProperty("SCHCRWLR_SINGLE_THREADED");
+    System.clearProperty("SCHCRWLR_LOAD_MAX_THREADS");
+    System.clearProperty("SCHCRWLR_LOAD_TIMEOUT_SECONDS");
     System.clearProperty("SC_SINGLE_THREADED");
     System.clearProperty("SC_LOAD_MAX_THREADS");
     System.clearProperty("SC_LOAD_TIMEOUT_SECONDS");

@@ -14,15 +14,17 @@
  * properties take precedence over environment variables when both are set:
  *
  * <ul>
- *   <li>{@code SC_SINGLE_THREADED=true} runs tasks on the main thread.
- *   <li>{@code SC_LOAD_MAX_THREADS} sets the multi-threaded runner's thread count, from 1 through
- *       10. The default is 5.
- *   <li>{@code SC_LOAD_TIMEOUT_SECONDS} sets the timeout for each batch of tasks, in seconds. The
- *       default is 3600 seconds. A value of 0 or less disables the timeout.
+ *   <li>{@code SCHCRWLR_SINGLE_THREADED=true} runs tasks on the main thread.
+ *   <li>{@code SCHCRWLR_LOAD_MAX_THREADS} sets the multi-threaded runner's thread count, from 1
+ *       through 10. The default is 5.
+ *   <li>{@code SCHCRWLR_LOAD_TIMEOUT_SECONDS} sets the timeout for each batch of tasks, in seconds.
+ *       The default is 3600 seconds. A value of 0 or less disables the timeout.
  * </ul>
  *
  * <p>For Java system properties, pass the same names with {@code -D}, such as {@code
- * -DSC_SINGLE_THREADED=true}. These settings apply to each batch of tasks, not to the overall
+ * -DSCHCRWLR_SINGLE_THREADED=true}. The corresponding {@code SC_*} names remain deprecated
+ * compatibility aliases. Within each source the canonical name wins; both system-property names
+ * precede both environment names. These settings apply to each batch of tasks, not to the overall
  * database metadata load.
  *
  * <p>{@link us.fatehi.utility.scheduler.MultiThreadedTaskRunner} throws a {@link
