@@ -12,8 +12,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import schemacrawler.ermodel.model.ERModel;
 import schemacrawler.utility.SerializedObjectInputStream;
@@ -22,27 +21,30 @@ import us.fatehi.utility.UtilityMarker;
 @UtilityMarker
 public final class SerializedERModelUtility {
 
-  private static final List<Pattern> ERMODEL_CLASS_PATTERNS =
-      Arrays.asList(
-          Pattern.compile("us\\.fatehi\\.utility\\.CloudProvider"),
-          Pattern.compile("us\\.fatehi\\.utility\\.HostType"),
-          Pattern.compile("us\\.fatehi\\.utility\\.property\\.[A-Z].*"),
-          Pattern.compile("us\\.fatehi\\.utility\\.database\\.[A-Z].*"),
-          Pattern.compile("us\\.fatehi\\.utility\\.Multimap"),
-          Pattern.compile("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.namedobject\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.ermodel\\.model\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.ermodel\\.implementation\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.ermodel\\.associations\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.utility\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.[A-Z].*"),
-          Pattern.compile("(\\[L)?java\\.(lang|util)\\..*"),
-          Pattern.compile("java\\.(sql|math|time|net)\\..*"),
-          Pattern.compile("\\[[BC]"));
+  private static final Predicate<String> ERMODEL_CLASS_NAME =
+      matching("us\\.fatehi\\.utility\\.CloudProvider")
+          .or(matching("us\\.fatehi\\.utility\\.HostType"))
+          .or(matching("us\\.fatehi\\.utility\\.property\\.[A-Z].*"))
+          .or(matching("us\\.fatehi\\.utility\\.database\\.[A-Z].*"))
+          .or(matching("us\\.fatehi\\.utility\\.Multimap"))
+          .or(matching("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.namedobject\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.ermodel\\.model\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.ermodel\\.implementation\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.ermodel\\.associations\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.utility\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.[A-Z].*"))
+          .or(matching("(\\[L)?java\\.(lang|util)\\..*"))
+          .or(matching("java\\.(sql|math|time|net)\\..*"))
+          .or(matching("\\[[BC]"));
+
+  private static Predicate<String> matching(final String regex) {
+    return Pattern.compile(regex).asMatchPredicate();
+  }
 
   public static ERModel readERModel(final InputStream in) {
     requireNonNull(in, "No input stream provided");
-    return SerializedObjectInputStream.read(in, ERMODEL_CLASS_PATTERNS);
+    return SerializedObjectInputStream.read(in, ERMODEL_CLASS_NAME);
   }
 
   public static void saveERModel(final ERModel erModel, final OutputStream out) {
