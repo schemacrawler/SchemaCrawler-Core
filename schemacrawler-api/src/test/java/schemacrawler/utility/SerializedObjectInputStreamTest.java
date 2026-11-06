@@ -26,6 +26,7 @@ import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 public class SerializedObjectInputStreamTest {
 
   private static final Predicate<String> ALLOW_ALL = className -> true;
+  private static final Predicate<String> DENY_CLASSES = new DeniedClassesFilter();
 
   @Test
   public void allowedConcurrentClassesAreRead() {
@@ -38,16 +39,16 @@ public class SerializedObjectInputStreamTest {
 
   @Test
   public void deniedArrayComponents() {
-    assertThat(SerializedObjectInputStream.isDenied("[Ljava.util.logging.Level;"), is(true));
-    assertThat(SerializedObjectInputStream.isDenied("[[Ljava.lang.Thread;"), is(true));
+    assertThat(DENY_CLASSES.test("[Ljava.util.logging.Level;"), is(true));
+    assertThat(DENY_CLASSES.test("[[Ljava.lang.Thread;"), is(true));
   }
 
   @Test
   public void deniedPrefixes() {
-    assertThat(SerializedObjectInputStream.isDenied("java.lang.reflect.Method"), is(true));
-    assertThat(SerializedObjectInputStream.isDenied("java.lang.invoke.MethodHandle"), is(true));
-    assertThat(SerializedObjectInputStream.isDenied("java.util.logging.Level"), is(true));
-    assertThat(SerializedObjectInputStream.isDenied("java.util.prefs.Preferences"), is(true));
+    assertThat(DENY_CLASSES.test("java.lang.reflect.Method"), is(true));
+    assertThat(DENY_CLASSES.test("java.lang.invoke.MethodHandle"), is(true));
+    assertThat(DENY_CLASSES.test("java.util.logging.Level"), is(true));
+    assertThat(DENY_CLASSES.test("java.util.prefs.Preferences"), is(true));
   }
 
   @Test
@@ -64,7 +65,7 @@ public class SerializedObjectInputStreamTest {
           "java.lang.ClassLoader",
           "java.util.ServiceLoader"
         }) {
-      assertThat(className, SerializedObjectInputStream.isDenied(className), is(true));
+      assertThat(className, DENY_CLASSES.test(className), is(true));
     }
   }
 
@@ -87,13 +88,12 @@ public class SerializedObjectInputStreamTest {
 
   @Test
   public void notDenied() {
-    assertThat(SerializedObjectInputStream.isDenied("java.lang.Threading"), is(false));
-    assertThat(SerializedObjectInputStream.isDenied("java.lang.Thread$State"), is(false));
-    assertThat(SerializedObjectInputStream.isDenied("java.lang.reflection.Foo"), is(false));
-    assertThat(
-        SerializedObjectInputStream.isDenied("java.util.concurrent.ConcurrentHashMap"), is(false));
-    assertThat(SerializedObjectInputStream.isDenied("[Ljava.lang.String;"), is(false));
-    assertThat(SerializedObjectInputStream.isDenied("[B"), is(false));
+    assertThat(DENY_CLASSES.test("java.lang.Threading"), is(false));
+    assertThat(DENY_CLASSES.test("java.lang.Thread$State"), is(false));
+    assertThat(DENY_CLASSES.test("java.lang.reflection.Foo"), is(false));
+    assertThat(DENY_CLASSES.test("java.util.concurrent.ConcurrentHashMap"), is(false));
+    assertThat(DENY_CLASSES.test("[Ljava.lang.String;"), is(false));
+    assertThat(DENY_CLASSES.test("[B"), is(false));
   }
 
   @Test
