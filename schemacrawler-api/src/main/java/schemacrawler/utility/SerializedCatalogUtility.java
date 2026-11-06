@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -28,21 +28,24 @@ public final class SerializedCatalogUtility {
 
   private static final Logger LOGGER = Logger.getLogger(SerializedCatalogUtility.class.getName());
 
-  private static final List<Pattern> CATALOG_CLASS_PATTERNS =
-      List.of(
-          Pattern.compile("us\\.fatehi\\.utility\\.[A-Z].*"),
-          Pattern.compile("us\\.fatehi\\.utility\\.property\\.[A-Z].*"),
-          Pattern.compile("us\\.fatehi\\.utility\\.database\\.[A-Z].*"),
-          Pattern.compile("us\\.fatehi\\.utility\\.jdbc\\.driver\\.[A-Z].*"),
-          Pattern.compile("us\\.fatehi\\.utility\\.jdbc\\.serverfingerprint\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.filter\\.CatalogProjection"),
-          Pattern.compile("schemacrawler\\.namedobject\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.utility\\.[A-Z].*"),
-          Pattern.compile("schemacrawler\\.[A-Z].*"),
-          Pattern.compile("(\\[L)?java\\.(lang|util)\\..*"),
-          Pattern.compile("java\\.(sql|math|time|net)\\..*"),
-          Pattern.compile("\\[[BC]"));
+  private static final Predicate<String> CATALOG_CLASS_NAME =
+      matching("us\\.fatehi\\.utility\\.[A-Z].*")
+          .or(matching("us\\.fatehi\\.utility\\.property\\.[A-Z].*"))
+          .or(matching("us\\.fatehi\\.utility\\.database\\.[A-Z].*"))
+          .or(matching("us\\.fatehi\\.utility\\.jdbc\\.driver\\.[A-Z].*"))
+          .or(matching("us\\.fatehi\\.utility\\.jdbc\\.serverfingerprint\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.filter\\.CatalogProjection"))
+          .or(matching("schemacrawler\\.namedobject\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.utility\\.[A-Z].*"))
+          .or(matching("schemacrawler\\.[A-Z].*"))
+          .or(matching("(\\[L)?java\\.(lang|util)\\..*"))
+          .or(matching("java\\.(sql|math|time|net)\\..*"))
+          .or(matching("\\[[BC]"));
+
+  private static Predicate<String> matching(final String regex) {
+    return Pattern.compile(regex).asMatchPredicate();
+  }
 
   public static Catalog deserializeCatalog(final Path offlineDatabasePath) throws IOException {
     final Catalog catalog;
@@ -56,7 +59,7 @@ public final class SerializedCatalogUtility {
 
   public static Catalog readCatalog(final InputStream in) {
     requireNonNull(in, "No input stream provided");
-    return SerializedObjectInputStream.read(in, CATALOG_CLASS_PATTERNS);
+    return SerializedObjectInputStream.read(in, CATALOG_CLASS_NAME);
   }
 
   public static void saveCatalog(final Catalog catalog, final OutputStream out) {

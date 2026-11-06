@@ -19,10 +19,9 @@ import java.io.ObjectStreamClass;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.UncheckedIOException;
-import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 import us.fatehi.utility.string.StringFormat;
 
@@ -32,10 +31,12 @@ public final class SerializedObjectInputStream extends ObjectInputStream {
       Logger.getLogger(SerializedObjectInputStream.class.getName());
 
   public static <C extends Serializable> C read(
-      final InputStream in, final List<Pattern> acceptClassPatterns) {
+      final InputStream in, final Predicate<String> allowedClassName) {
     requireNonNull(in, "No input stream provided");
+    requireNonNull(allowedClassName, "No allowed class predicate provided");
+
     try (final SerializedObjectInputStream objIn =
-        new SerializedObjectInputStream(in, acceptClassPatterns)) {
+        new SerializedObjectInputStream(in, allowedClassName)) {
       return (C) objIn.readObject();
     } catch (ClassNotFoundException | IOException e) {
       throw new ExecutionRuntimeException("Cannot deserialize object", e);
@@ -52,15 +53,14 @@ public final class SerializedObjectInputStream extends ObjectInputStream {
     }
   }
 
-  private final List<Pattern> acceptClassPatterns;
+  private final Predicate<String> allowedClassName;
 
   private SerializedObjectInputStream(
-      final InputStream input, final List<Pattern> acceptClassPatterns) throws IOException {
+      final InputStream input, final Predicate<String> allowedClassName) throws IOException {
     super(requireNonNull(input, "No input stream provided"));
-    if (acceptClassPatterns == null || acceptClassPatterns.isEmpty()) {
-      throw new IllegalArgumentException("No accept class patterns provided");
-    }
-    this.acceptClassPatterns = List.copyOf(acceptClassPatterns);
+
+    requireNonNull(allowedClassName, "No allowed class predicate provided");
+    this.allowedClassName = Predicate.not(new DeniedClassesFilter()).and(allowedClassName);
   }
 
   @Override
@@ -71,11 +71,9 @@ public final class SerializedObjectInputStream extends ObjectInputStream {
   }
 
   private void validateClassName(final String className) throws InvalidClassException {
-    for (final Pattern pattern : acceptClassPatterns) {
-      if (pattern.matcher(className).matches()) {
-        LOGGER.log(Level.FINER, new StringFormat("Deserializing class <%s>", className));
-        return;
-      }
+    if (allowedClassName.test(className)) {
+      LOGGER.log(Level.FINER, new StringFormat("Deserializing class <%s>", className));
+      return;
     }
     throw new InvalidClassException("Not deserializing class <%s>".formatted(className));
   }
