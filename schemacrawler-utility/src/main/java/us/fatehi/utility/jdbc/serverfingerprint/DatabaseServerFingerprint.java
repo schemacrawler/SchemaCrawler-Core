@@ -34,4 +34,17 @@ public record DatabaseServerFingerprint(
   public DatabaseServerFingerprint() {
     this(null, HostClassification.UNKNOWN, null, FingerprintConfidence.LOW);
   }
+
+  public boolean isEmpty() {
+    return isBlank(databaseSystemIdentifier);
+  }
+
+  @Override
+  public String toString() {
+    if (isEmpty()) {
+      return "database {unknown}";
+    }
+    return "database {type=%s, host classification=%s, fingerprint=%s[%s]}"
+        .formatted(databaseSystemIdentifier, hostClassification, fingerprint, confidence);
+  }
 }

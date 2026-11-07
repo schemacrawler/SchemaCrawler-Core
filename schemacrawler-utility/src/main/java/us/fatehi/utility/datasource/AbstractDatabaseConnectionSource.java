@@ -26,6 +26,8 @@ import us.fatehi.utility.database.DatabaseUtility;
 import us.fatehi.utility.jdbc.driver.JdbcDriverMetadata;
 import us.fatehi.utility.jdbc.driver.JdbcDriverProperty;
 import us.fatehi.utility.jdbc.driver.JdbcDriverRegistry;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprint;
+import us.fatehi.utility.jdbc.serverfingerprint.DatabaseServerFingerprintBuilder;
 import us.fatehi.utility.string.StringFormat;
 
 abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSource {
@@ -87,20 +89,10 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
   protected static Connection getConnection(
       final String connectionUrl, final Properties jdbcConnectionProperties) {
 
-    final String username;
-    final String user = jdbcConnectionProperties.getProperty("user");
-    if (user != null) {
-      username = "user '%s'".formatted(user);
-    } else {
-      username = "unspecified user";
-    }
+    final String description = connectionDescription(connectionUrl);
 
     try {
-      LOGGER.log(
-          Level.INFO,
-          new StringFormat(
-              "Making connection to %s%nfor user '%s', with properties %s",
-              connectionUrl, username, safeProperties(jdbcConnectionProperties)));
+      LOGGER.log(Level.INFO, new StringFormat("Making connection to %s", description));
       // (Using java.sql.DriverManager.getConnection(String, Properties)
       // to make a connection is not the best idea,
       // since for some strange reason, it does not check if a Driver
@@ -114,9 +106,22 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
       return connection;
     } catch (final SQLException e) {
       throw new SQLRuntimeException(
-          "Could not connect to <%s>, for <%s>, with properties <%s>"
-              .formatted(connectionUrl, username, safeProperties(jdbcConnectionProperties)),
+          ("""
+          Could not connect to %s.
+          Run `schemacrawler -T` with the same connection arguments for connection diagnostics.
+          """)
+              .formatted(description),
           e);
+    }
+  }
+
+  private static String connectionDescription(final String connectionUrl) {
+    try {
+      final DatabaseServerFingerprint fingerprint =
+          DatabaseServerFingerprintBuilder.builder(connectionUrl).build();
+      return fingerprint.toString();
+    } catch (final RuntimeException e) {
+      return "database {description unavailable}";
     }
   }
 
@@ -143,12 +148,6 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
           .forEach(jdbcDriverProperties::add);
     }
     return jdbcDriverProperties;
-  }
-
-  private static Properties safeProperties(final Properties properties) {
-    final Properties logProperties = new Properties(properties);
-    logProperties.remove("password");
-    return logProperties;
   }
 
   private volatile Consumer<Connection> connectionInitializer;
