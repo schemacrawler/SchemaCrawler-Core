@@ -16,7 +16,7 @@ import org.testcontainers.utility.DockerImageName;
 public final class SqlServerTestUtility {
 
   public static JdbcDatabaseContainer<?> newSqlServerContainer() {
-    return newSqlServerContainer("2022-CU17-ubuntu-22.04");
+    return newSqlServerContainer("2022-CU27-ubuntu-22.04");
   }
 
   @SuppressWarnings("resource")

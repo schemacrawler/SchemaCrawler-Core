@@ -29,7 +29,8 @@ public final class MariaDBTestUtility {
         .withEnv("MARIADB_PASSWORD", "schemacrawler")
         .withDatabaseName("books")
         .withUsername("root")
-        .withPassword("schemacrawler");
+        .withPassword("schemacrawler")
+        .withUrlParam("sslMode", "disable");
   }
 
   private MariaDBTestUtility() {
