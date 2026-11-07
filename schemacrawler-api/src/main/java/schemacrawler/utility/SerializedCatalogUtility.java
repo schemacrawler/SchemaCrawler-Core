@@ -18,9 +18,9 @@ import java.nio.file.Path;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import schemacrawler.schema.Catalog;
+import us.fatehi.utility.Utility;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
@@ -29,23 +29,17 @@ public final class SerializedCatalogUtility {
   private static final Logger LOGGER = Logger.getLogger(SerializedCatalogUtility.class.getName());
 
   private static final Predicate<String> CATALOG_CLASS_NAME =
-      matching("us\\.fatehi\\.utility\\.[A-Z].*")
-          .or(matching("us\\.fatehi\\.utility\\.property\\.[A-Z].*"))
-          .or(matching("us\\.fatehi\\.utility\\.database\\.[A-Z].*"))
-          .or(matching("us\\.fatehi\\.utility\\.jdbc\\.driver\\.[A-Z].*"))
-          .or(matching("us\\.fatehi\\.utility\\.jdbc\\.serverfingerprint\\.[A-Z].*"))
-          .or(matching("schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*"))
-          .or(matching("schemacrawler\\.filter\\.CatalogProjection"))
-          .or(matching("schemacrawler\\.namedobject\\.[A-Z].*"))
-          .or(matching("schemacrawler\\.utility\\.[A-Z].*"))
-          .or(matching("schemacrawler\\.[A-Z].*"))
-          .or(matching("(\\[L)?java\\.(lang|util)\\..*"))
-          .or(matching("java\\.(sql|math|time|net)\\..*"))
-          .or(matching("\\[[BC]"));
-
-  private static Predicate<String> matching(final String regex) {
-    return Pattern.compile(regex).asMatchPredicate();
-  }
+      Utility.patternsToPredicate(
+          "us\\.fatehi\\.utility\\.[A-Z].*",
+          "us\\.fatehi\\.utility\\.property\\.[A-Z].*",
+          "us\\.fatehi\\.utility\\.database\\.[A-Z].*",
+          "us\\.fatehi\\.utility\\.jdbc\\.driver\\.[A-Z].*",
+          "us\\.fatehi\\.utility\\.jdbc\\.serverfingerprint\\.[A-Z].*",
+          "schemacrawler\\.(schema(crawler)?|crawl)\\.[A-Z].*",
+          "schemacrawler\\.filter\\.CatalogProjection",
+          "schemacrawler\\.namedobject\\.[A-Z].*",
+          "schemacrawler\\.utility\\.[A-Z].*",
+          "schemacrawler\\.[A-Z].*");
 
   public static Catalog deserializeCatalog(final Path offlineDatabasePath) throws IOException {
     final Catalog catalog;

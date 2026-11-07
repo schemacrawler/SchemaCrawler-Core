@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringJoiner;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 @UtilityMarker
@@ -69,19 +70,6 @@ public final class Utility {
     return identifier;
   }
 
-  /**
-   * Checks if the text is all lowercase.
-   *
-   * @param text Text to check.
-   * @return Whether the string is all lowercase.
-   */
-  public static boolean hasNoUpperCase(final String text) {
-    if (text == null) {
-      return false;
-    }
-    return text.chars().noneMatch(Character::isUpperCase);
-  }
-
   public static String hash(final Object object) {
     if (object == null) {
       return null;
@@ -97,6 +85,19 @@ public final class Utility {
     } catch (final NoSuchAlgorithmException e) {
       throw new IllegalStateException("SHA-256 not available", e);
     }
+  }
+
+  /**
+   * Checks if the text is all lowercase.
+   *
+   * @param text Text to check.
+   * @return Whether the string is all lowercase.
+   */
+  public static boolean hasNoUpperCase(final String text) {
+    if (text == null) {
+      return false;
+    }
+    return text.chars().noneMatch(Character::isUpperCase);
   }
 
   /**
@@ -154,6 +155,20 @@ public final class Utility {
     }
 
     return joiner.toString();
+  }
+
+  public static Predicate<String> patternsToPredicate(final String... predicateText) {
+    Predicate<String> predicate = text -> false;
+    if (predicateText == null || predicateText.length == 0) {
+      return predicate;
+    }
+    for (final String regex : predicateText) {
+      if (isBlank(regex)) {
+        continue;
+      }
+      predicate = predicate.or(Pattern.compile(regex).asMatchPredicate());
+    }
+    return predicate;
   }
 
   /**

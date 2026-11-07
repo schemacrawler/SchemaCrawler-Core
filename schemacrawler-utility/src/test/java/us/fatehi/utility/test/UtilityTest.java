@@ -19,6 +19,7 @@ import static us.fatehi.utility.Utility.hash;
 import static us.fatehi.utility.Utility.isBlank;
 import static us.fatehi.utility.Utility.isIntegral;
 import static us.fatehi.utility.Utility.join;
+import static us.fatehi.utility.Utility.patternsToPredicate;
 import static us.fatehi.utility.Utility.toCamelCase;
 import static us.fatehi.utility.Utility.toKebabCase;
 import static us.fatehi.utility.Utility.toSnakeCase;
@@ -29,9 +30,27 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 
 public class UtilityTest {
+
+  @Test
+  public void patternsToPredicateMatchesAnyFullPattern() {
+    final Predicate<String> predicate = patternsToPredicate(null, "", "  ", "cat", "dog\\d+");
+    assertThat(predicate.test("cat"), is(true));
+    assertThat(predicate.test("dog12"), is(true));
+    assertThat(predicate.test("a cat"), is(false));
+    assertThat(predicate.test("dog"), is(false));
+    assertThat(predicate.test(""), is(false));
+  }
+
+  @Test
+  public void patternsToPredicateHandlesMissingPatterns() {
+    assertThat(patternsToPredicate((String[]) null).test("anything"), is(false));
+    assertThat(patternsToPredicate().test("anything"), is(false));
+    assertThat(patternsToPredicate(null, "", "  ").test("anything"), is(false));
+  }
 
   @Test
   public void commonPrefixTest() {
