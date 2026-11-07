@@ -14,9 +14,9 @@ import static us.fatehi.utility.Utility.isBlank;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
 import schemacrawler.schema.BaseColumn;
@@ -42,6 +42,7 @@ import schemacrawler.schema.TableConstraintColumn;
 import schemacrawler.schema.TableReference;
 import schemacrawler.schema.Trigger;
 import schemacrawler.schema.TypedObject;
+import us.fatehi.utility.Utility;
 import us.fatehi.utility.UtilityMarker;
 
 @UtilityMarker
@@ -70,18 +71,18 @@ public final class MetaDataUtility {
 
   private static final Logger LOGGER = Logger.getLogger(MetaDataUtility.class.getName());
 
-  private static final List<Pattern> SYSTEM_GENERATED_NAME_PATTERNS =
-      List.of(
-          Pattern.compile("INTEG_[0-9]+"), // Firebird
-          Pattern.compile("CONSTRAINT_[A-Z0-9]+"), // H2
-          Pattern.compile("SYS_[FP]K_[0-9]{5}"), // HSQLDB
-          Pattern.compile("SQL[0-9]{15}"), // DB2
-          Pattern.compile(".+_ibfk_1"), // MySQL, MariaDB
-          Pattern.compile("SYS_C.+"), // Oracle
-          Pattern.compile(".+_[pf]key"), // PostgreSQL
-          Pattern.compile(
-              "(FK__[^_]+__[^_]+__[A-Z0-9]+|PK__[^_]+__[A-Z0-9]+|IDX_[^_]+_[^_]+)"), // SQL Server
-          Pattern.compile("SCHCRWLR_[A-Z0-9]{8}_[A-Z0-9]{8}")); // SchemaCrawler
+  private static final Predicate<String> SYSTEM_GENERATED_NAME_PATTERNS =
+      Utility.patternsToPredicate(
+          "INTEG_[0-9]+", // Firebird
+          "CONSTRAINT_[A-Z0-9]+", // H2
+          "SYS_[FP]K_[0-9]{5}", // HSQLDB
+          "SQL[0-9]{15}", // DB2
+          ".+_ibfk_1", // MySQL, MariaDB
+          "\\d+", // MariaDB 12.1+
+          "SYS_C.+", // Oracle
+          ".+_[pf]key", // PostgreSQL
+          "(FK__[^_]+__[^_]+__[A-Z0-9]+|PK__[^_]+__[A-Z0-9]+|IDX_[^_]+_[^_]+)", // SQL Server
+          "SCHCRWLR_[A-Z0-9]{8}_[A-Z0-9]{8}"); // SchemaCrawler
 
   /**
    * Gets a comma-separated list of columns for an index.
@@ -144,6 +145,32 @@ public final class MetaDataUtility {
     }
   }
 
+  public static SimpleDependantObjectType getSimpleDependantObjectType(
+      final DependantObject<?> dependantObject) {
+    if (dependantObject instanceof KeyColumn) {
+      return SimpleDependantObjectType.key_column;
+    }
+    if (dependantObject instanceof BaseColumn<?>) {
+      return SimpleDependantObjectType.column;
+    }
+    if (dependantObject instanceof Index) {
+      return SimpleDependantObjectType.index;
+    }
+    if (dependantObject instanceof TableReference) {
+      return SimpleDependantObjectType.table_reference;
+    }
+    if (dependantObject instanceof TableConstraint) {
+      return SimpleDependantObjectType.table_constraint;
+    }
+    if (dependantObject instanceof Privilege<?>) {
+      return SimpleDependantObjectType.privilege;
+    }
+    if (dependantObject instanceof Trigger) {
+      return SimpleDependantObjectType.trigger;
+    }
+    return SimpleDependantObjectType.unknown;
+  }
+
   /**
    * Returns the type of database object. Does not support dependant database objects like columns.
    *
@@ -173,32 +200,6 @@ public final class MetaDataUtility {
     return SimpleDatabaseObjectType.unknown;
   }
 
-  public static SimpleDependantObjectType getSimpleDependantObjectType(
-      final DependantObject<?> dependantObject) {
-    if (dependantObject instanceof KeyColumn) {
-      return SimpleDependantObjectType.key_column;
-    }
-    if (dependantObject instanceof BaseColumn<?>) {
-      return SimpleDependantObjectType.column;
-    }
-    if (dependantObject instanceof Index) {
-      return SimpleDependantObjectType.index;
-    }
-    if (dependantObject instanceof TableReference) {
-      return SimpleDependantObjectType.table_reference;
-    }
-    if (dependantObject instanceof TableConstraint) {
-      return SimpleDependantObjectType.table_constraint;
-    }
-    if (dependantObject instanceof Privilege<?>) {
-      return SimpleDependantObjectType.privilege;
-    }
-    if (dependantObject instanceof Trigger) {
-      return SimpleDependantObjectType.trigger;
-    }
-    return SimpleDependantObjectType.unknown;
-  }
-
   public static String getTypeName(final NamedObject namedObject) {
     if (namedObject instanceof final TypedObject<?> typedObject) {
       return typedObject.getType().toString();
@@ -226,12 +227,11 @@ public final class MetaDataUtility {
     if (dbObject == null || isBlank(dbObject.getName())) {
       return false;
     }
-    for (final Pattern pattern : SYSTEM_GENERATED_NAME_PATTERNS) {
-      if (pattern.matcher(dbObject.getName()).matches()) {
-        return true;
-      }
+    final String dbObjectName = dbObject.getName();
+    if (isBlank(dbObject.getName())) {
+      return false;
     }
-    return false;
+    return SYSTEM_GENERATED_NAME_PATTERNS.test(dbObjectName);
   }
 
   public static String inclusionRuleString(final InclusionRule inclusionRule) {

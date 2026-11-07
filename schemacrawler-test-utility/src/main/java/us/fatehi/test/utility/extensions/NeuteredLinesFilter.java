@@ -92,6 +92,6 @@ final class NeuteredLinesFilter implements Predicate<String> {
   /** Should we keep the line - that is, not ignore it? */
   @Override
   public boolean test(final String line) {
-    return neuters.test(line);
+    return !neuters.test(line);
   }
 }

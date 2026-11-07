@@ -16,7 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -25,7 +24,13 @@ import schemacrawler.schemacrawler.exceptions.ExecutionRuntimeException;
 
 public class SerializedObjectInputStreamTest {
 
+  private static final class UnallowedSerializable implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+  }
+
   private static final Predicate<String> ALLOW_ALL = className -> true;
+
   private static final Predicate<String> DENY_CLASSES = new DeniedClassesFilter();
 
   @Test
@@ -35,6 +40,16 @@ public class SerializedObjectInputStreamTest {
     final ConcurrentHashMap<String, String> result =
         SerializedObjectInputStream.read(serialize(map), ALLOW_ALL);
     assertThat(result.get("a"), is("b"));
+  }
+
+  @Test
+  public void denialWinsOverAllowPredicate() {
+    assertThrows(
+        ExecutionRuntimeException.class,
+        () -> SerializedObjectInputStream.read(serialize(Level.INFO), ALLOW_ALL));
+    assertThrows(
+        ExecutionRuntimeException.class,
+        () -> SerializedObjectInputStream.read(serialize(new Level[] {Level.INFO}), ALLOW_ALL));
   }
 
   @Test
@@ -86,20 +101,12 @@ public class SerializedObjectInputStreamTest {
   }
 
   @Test
-  public void denialWinsOverAllowPredicate() {
-    assertThrows(
-        ExecutionRuntimeException.class,
-        () -> SerializedObjectInputStream.read(serialize(Level.INFO), ALLOW_ALL));
-    assertThrows(
-        ExecutionRuntimeException.class,
-        () -> SerializedObjectInputStream.read(serialize(new Level[] {Level.INFO}), ALLOW_ALL));
-  }
-
-  @Test
   public void notAllowedIsRejected() {
     assertThrows(
         ExecutionRuntimeException.class,
-        () -> SerializedObjectInputStream.read(serialize(new ArrayList<>()), className -> false));
+        () ->
+            SerializedObjectInputStream.read(
+                serialize(new UnallowedSerializable()), className -> false));
   }
 
   @Test

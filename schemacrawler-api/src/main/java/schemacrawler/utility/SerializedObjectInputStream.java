@@ -60,7 +60,9 @@ public final class SerializedObjectInputStream extends ObjectInputStream {
     super(requireNonNull(input, "No input stream provided"));
 
     requireNonNull(allowedClassName, "No allowed class predicate provided");
-    this.allowedClassName = Predicate.not(new DeniedClassesFilter()).and(allowedClassName);
+    this.allowedClassName =
+        Predicate.not(new DeniedClassesFilter())
+            .and(new AllowedClassesFilter().or(allowedClassName));
   }
 
   @Override
