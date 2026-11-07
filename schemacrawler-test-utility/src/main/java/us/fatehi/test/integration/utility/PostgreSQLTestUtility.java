@@ -19,7 +19,7 @@ public final class PostgreSQLTestUtility {
   }
 
   public static JdbcDatabaseContainer<?> newPostgreSQLContainer() {
-    return newPostgreSQLContainer("17.6-bookworm");
+    return newPostgreSQLContainer("17.11-bookworm");
   }
 
   @SuppressWarnings("resource")

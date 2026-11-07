@@ -15,11 +15,11 @@ import org.testcontainers.utility.DockerImageName;
 public final class MariaDBTestUtility {
 
   public static JdbcDatabaseContainer<?> newMariaDBContainer() {
-    return newMariaDBContainer("11.8.5-noble");
+    return newMariaDBContainer("12.3.3-noble");
   }
 
   @SuppressWarnings("resource")
-  public static JdbcDatabaseContainer<?> newMariaDBContainer(final String version) {
+  private static JdbcDatabaseContainer<?> newMariaDBContainer(final String version) {
     final DockerImageName imageName = DockerImageName.parse(MariaDBContainer.NAME);
     return new MariaDBContainer(imageName.withTag(version))
         .withEnv("MARIADB_DATABASE", "books")
