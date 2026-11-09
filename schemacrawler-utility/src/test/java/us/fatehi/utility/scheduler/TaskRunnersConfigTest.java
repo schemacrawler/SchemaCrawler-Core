@@ -21,12 +21,12 @@ public class TaskRunnersConfigTest {
 
   @Test
   public void canonicalSettingsWinConflicts() {
-    System.setProperty("SC_SINGLE_THREADED", "true");
-    System.setProperty("SC_LOAD_MAX_THREADS", "9");
-    System.setProperty("SC_LOAD_TIMEOUT_SECONDS", "90");
-    System.setProperty("SCHCRWLR_SINGLE_THREADED", "false");
-    System.setProperty("SCHCRWLR_LOAD_MAX_THREADS", "3");
-    System.setProperty("SCHCRWLR_LOAD_TIMEOUT_SECONDS", "42");
+    System.setProperty("SC_SINGLE_THREADED", "false");
+    System.setProperty("SC_LOAD_MAX_THREADS", "3");
+    System.setProperty("SC_LOAD_TIMEOUT_SECONDS", "42");
+    System.setProperty("SCHCRWLR_SINGLE_THREADED", "true");
+    System.setProperty("SCHCRWLR_LOAD_MAX_THREADS", "9");
+    System.setProperty("SCHCRWLR_LOAD_TIMEOUT_SECONDS", "90");
 
     assertThat(TaskRunners.isSingleThreaded(), is(false));
     final ThreadingOptions options = TaskRunners.getThreadingOptions();
@@ -36,6 +36,13 @@ public class TaskRunnersConfigTest {
 
   @Test
   public void canonicalSingleThreadedSettingIsUsed() {
+    System.setProperty("SC_SINGLE_THREADED", "true");
+    assertTaskRunnerReturnsSingleThreaded();
+  }
+
+  @Test
+  public void compatibilitySingleThreadedSettingIsUsed() {
+    System.clearProperty("SC_SINGLE_THREADED");
     System.setProperty("SCHCRWLR_SINGLE_THREADED", "true");
     assertTaskRunnerReturnsSingleThreaded();
   }

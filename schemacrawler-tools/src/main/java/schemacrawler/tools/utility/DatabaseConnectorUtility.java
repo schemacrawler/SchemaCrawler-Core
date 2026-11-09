@@ -37,18 +37,12 @@ public final class DatabaseConnectorUtility {
 
   private static final Logger LOGGER = Logger.getLogger(DatabaseConnectorUtility.class.getName());
 
-  private static final String SCHCRWLR_WITHOUT_DATABASE_PLUGIN = "SCHCRWLR_WITHOUT_DATABASE_PLUGIN";
-
-  /**
-   * @deprecated Use SCHCRWLR_WITHOUT_DATABASE_PLUGIN.
-   */
-  @Deprecated(forRemoval = true)
   private static final String SC_WITHOUT_DATABASE_PLUGIN = "SC_WITHOUT_DATABASE_PLUGIN";
 
   private static final ReadConfig CONFIG =
       SystemConfigBuilder.builder()
           .withSystemProperties()
-          .withAlias(SCHCRWLR_WITHOUT_DATABASE_PLUGIN, SC_WITHOUT_DATABASE_PLUGIN)
+          .withAlias(SC_WITHOUT_DATABASE_PLUGIN, "SCHCRWLR_WITHOUT_DATABASE_PLUGIN")
           .build();
 
   /**
@@ -158,12 +152,12 @@ public final class DatabaseConnectorUtility {
             "sqlite",
             "sqlserver");
     final String allowedDatabaseConnector =
-        normalizedIdentifier(CONFIG.getStringValue(SCHCRWLR_WITHOUT_DATABASE_PLUGIN));
+        normalizedIdentifier(CONFIG.getStringValue(SC_WITHOUT_DATABASE_PLUGIN));
     final boolean isAllowed = databaseSystemIdentifier.equalsIgnoreCase(allowedDatabaseConnector);
 
     // Fail fast when a known database should have a plugin but none is available,
     // unless that database is explicitly allow-listed via
-    // `SCHCRWLR_WITHOUT_DATABASE_PLUGIN`
+    // `SC_WITHOUT_DATABASE_PLUGIN`
     if (dbServerType.isUnknownDatabaseSystem()
         && connectorsRequired.contains(databaseSystemIdentifier)
         && !isAllowed) {
@@ -171,7 +165,7 @@ public final class DatabaseConnectorUtility {
           """
           Add the SchemaCrawler database connector plugin for <%s> to the CLASSPATH
           or set
-          SCHCRWLR_WITHOUT_DATABASE_PLUGIN=%s
+          SC_WITHOUT_DATABASE_PLUGIN=%s
           either as an environmental variable or as a Java system property
           """
               .formatted(databaseSystemIdentifier, databaseSystemIdentifier));
