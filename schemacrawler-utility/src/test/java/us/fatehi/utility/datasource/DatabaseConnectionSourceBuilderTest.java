@@ -28,7 +28,7 @@ import us.fatehi.test.utility.TestConnection;
 public class DatabaseConnectionSourceBuilderTest {
 
   @Test
-  public void threadingAliasesSelectConnectionSource() throws Exception {
+  public void canonicalThreadingSettingWinsOverCompatibilityAlias() throws Exception {
     restoreSystemProperties(
         () -> {
           System.clearProperty("SCHCRWLR_SINGLE_THREADED");
@@ -37,9 +37,21 @@ public class DatabaseConnectionSourceBuilderTest {
               DatabaseConnectionSourceBuilder.builder("jdbc:test-db:localhost:0/alias");
           assertThat(builder.build(), instanceOf(SingleDatabaseConnectionSource.class));
           System.setProperty("SCHCRWLR_SINGLE_THREADED", "false");
-          assertThat(builder.build(), instanceOf(SimpleDatabaseConnectionSource.class));
+          assertThat(builder.build(), instanceOf(SingleDatabaseConnectionSource.class));
           System.setProperty("SCHCRWLR_SINGLE_THREADED", "true");
           System.setProperty("SC_SINGLE_THREADED", "false");
+          assertThat(builder.build(), instanceOf(SimpleDatabaseConnectionSource.class));
+        });
+  }
+
+  @Test
+  public void compatibilityThreadingSettingSelectsConnectionSource() throws Exception {
+    restoreSystemProperties(
+        () -> {
+          System.clearProperty("SC_SINGLE_THREADED");
+          System.setProperty("SCHCRWLR_SINGLE_THREADED", "true");
+          final DatabaseConnectionSourceBuilder builder =
+              DatabaseConnectionSourceBuilder.builder("jdbc:test-db:localhost:0/alias");
           assertThat(builder.build(), instanceOf(SingleDatabaseConnectionSource.class));
         });
   }

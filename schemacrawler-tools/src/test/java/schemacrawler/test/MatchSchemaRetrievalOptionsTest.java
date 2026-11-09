@@ -38,6 +38,33 @@ public class MatchSchemaRetrievalOptionsTest {
   public void canonicalPluginOverrideWins() throws Exception {
     restoreSystemProperties(
         () -> {
+          System.clearProperty("SCHCRWLR_WITHOUT_DATABASE_PLUGIN");
+          System.setProperty("SC_WITHOUT_DATABASE_PLUGIN", "oracle");
+          assertThat(
+              DatabaseConnectorUtility.matchSchemaRetrievalOptions(mockOracleConnectionSource())
+                  .getDatabaseServerType()
+                  .isUnknownDatabaseSystem(),
+              is(true));
+          System.setProperty("SCHCRWLR_WITHOUT_DATABASE_PLUGIN", "newdb");
+          assertThat(
+              DatabaseConnectorUtility.matchSchemaRetrievalOptions(mockOracleConnectionSource())
+                  .getDatabaseServerType()
+                  .isUnknownDatabaseSystem(),
+              is(true));
+          System.setProperty("SC_WITHOUT_DATABASE_PLUGIN", "");
+          System.setProperty("SCHCRWLR_WITHOUT_DATABASE_PLUGIN", "oracle");
+          assertThrows(
+              InternalRuntimeException.class,
+              () ->
+                  DatabaseConnectorUtility.matchSchemaRetrievalOptions(
+                      mockOracleConnectionSource()));
+        });
+  }
+
+  @Test
+  public void compatibilityPluginOverrideIsUsed() throws Exception {
+    restoreSystemProperties(
+        () -> {
           System.clearProperty("SC_WITHOUT_DATABASE_PLUGIN");
           System.setProperty("SCHCRWLR_WITHOUT_DATABASE_PLUGIN", "oracle");
           assertThat(
@@ -45,19 +72,6 @@ public class MatchSchemaRetrievalOptionsTest {
                   .getDatabaseServerType()
                   .isUnknownDatabaseSystem(),
               is(true));
-          System.setProperty("SC_WITHOUT_DATABASE_PLUGIN", "newdb");
-          assertThat(
-              DatabaseConnectorUtility.matchSchemaRetrievalOptions(mockOracleConnectionSource())
-                  .getDatabaseServerType()
-                  .isUnknownDatabaseSystem(),
-              is(true));
-          System.setProperty("SCHCRWLR_WITHOUT_DATABASE_PLUGIN", "");
-          System.setProperty("SC_WITHOUT_DATABASE_PLUGIN", "oracle");
-          assertThrows(
-              InternalRuntimeException.class,
-              () ->
-                  DatabaseConnectorUtility.matchSchemaRetrievalOptions(
-                      mockOracleConnectionSource()));
         });
   }
 
