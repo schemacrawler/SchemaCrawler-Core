@@ -16,5 +16,12 @@ public interface DatabaseConnectionSource extends AutoCloseable, Supplier<Connec
 
   boolean releaseConnection(Connection connection);
 
-  void setFirstConnectionInitializer(Consumer<Connection> connectionInitializer);
+  default void withConnectionInitializer(Consumer<Connection> connectionInitializer) {
+    setFirstConnectionInitializer(connectionInitializer);
+  }
+
+  @Deprecated(forRemoval = true)
+  default void setFirstConnectionInitializer(Consumer<Connection> connectionInitializer) {
+    throw new UnsupportedOperationException("Deprecated for removal");
+  }
 }

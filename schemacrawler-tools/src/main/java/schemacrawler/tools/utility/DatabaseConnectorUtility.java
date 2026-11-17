@@ -90,8 +90,7 @@ public final class DatabaseConnectorUtility {
     // Plugin-provided initializer must run on first connection to set
     // server-specific
     // session state before metadata crawling starts.
-    connectionSource.setFirstConnectionInitializer(
-        schemaRetrievalOptions.getConnectionInitializer());
+    connectionSource.withConnectionInitializer(schemaRetrievalOptions.getConnectionInitializer());
   }
 
   private static DatabaseConnector findDatabaseConnector(final Connection connection) {

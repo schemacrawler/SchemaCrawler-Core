@@ -157,7 +157,7 @@ abstract class AbstractDatabaseConnectionSource implements DatabaseConnectionSou
   }
 
   @Override
-  public synchronized void setFirstConnectionInitializer(
+  public synchronized void withConnectionInitializer(
       final Consumer<Connection> connectionInitializer) {
     if (connectionInitializer != null) {
       this.connectionInitializer = connectionInitializer.andThen(this.connectionInitializer);
