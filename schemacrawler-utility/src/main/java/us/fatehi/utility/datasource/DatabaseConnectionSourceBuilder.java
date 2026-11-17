@@ -67,7 +67,7 @@ public class DatabaseConnectionSourceBuilder implements Builder<DatabaseConnecti
     final DatabaseConnectionSource connectionSource =
         DatabaseConnectionSources.newDatabaseConnectionSource(
             connectionUrl, additionalDriverProperties, connectionUrlx, userCredentials);
-    connectionSource.setFirstConnectionInitializer(connectionInitializer);
+    connectionSource.withConnectionInitializer(connectionInitializer);
     return connectionSource;
   }
 
