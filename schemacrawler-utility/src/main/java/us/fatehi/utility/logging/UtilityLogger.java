@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import us.fatehi.utility.PropertiesUtility;
 
+@LoggerMarker
 public final class UtilityLogger {
 
   private final Logger logger;

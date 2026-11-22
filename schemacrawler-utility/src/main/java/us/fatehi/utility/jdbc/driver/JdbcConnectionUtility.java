@@ -37,7 +37,7 @@ public final class JdbcConnectionUtility {
       // JDBC metadata URL is the canonical source for connector resolution.
       dbMetaData = connection.getMetaData();
     } catch (final SQLException e) {
-      // Callers treat blank URL as "cannot infer connector from URL".
+      // Callers treat blank URL as "cannot infer connector from URL"
       logException(e);
       return "";
     }
