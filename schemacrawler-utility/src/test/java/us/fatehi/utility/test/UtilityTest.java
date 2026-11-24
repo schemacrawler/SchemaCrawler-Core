@@ -221,4 +221,20 @@ public class UtilityTest {
     assertThat(toSnakeCase("-leading-kebab"), equalTo("leading_kebab"));
     assertThat(toSnakeCase("trailing-kebab-"), equalTo("trailing_kebab"));
   }
+
+  @Test
+  public void toSnakeCaseUnicodeTest() {
+    // Lowercase to uppercase boundaries, for non-ASCII letters
+    assertThat(toSnakeCase("ŻółtyKot"), equalTo("żółty_kot"));
+    assertThat(toSnakeCase("kotŻółty"), equalTo("kot_żółty"));
+    assertThat(toSnakeCase("ÜberUser"), equalTo("über_user"));
+    assertThat(toSnakeCase("customerÉtat"), equalTo("customer_état"));
+    // Acronym boundary, for non-ASCII letters
+    assertThat(toSnakeCase("ÉCOLEParis"), equalTo("école_paris"));
+    // Non-Latin scripts without case are not split
+    assertThat(toSnakeCase("顧客注文"), equalTo("顧客注文"));
+    // Behavior for ASCII is unchanged
+    assertThat(toSnakeCase("URLId"), equalTo("url_id"));
+    assertThat(toSnakeCase("customerOrder2Item"), equalTo("customer_order2_item"));
+  }
 }

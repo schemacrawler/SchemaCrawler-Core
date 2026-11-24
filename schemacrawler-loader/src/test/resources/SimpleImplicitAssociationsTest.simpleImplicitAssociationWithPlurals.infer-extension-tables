@@ -13,4 +13,10 @@ table: PUBLIC.PUBLIC.BOOKS
   implicit association:
     column reference: PUBLIC.PUBLIC.BOOKREF.BOOK_ID --> PUBLIC.PUBLIC.BOOKS.ID
                       (fk is part of pk)
+  implicit association:
+    column reference: PUBLIC.PUBLIC.BOOKSREF.BOOKS_ID --> PUBLIC.PUBLIC.BOOKS.ID
+                      (fk is part of pk)
 table: PUBLIC.PUBLIC.BOOKSREF
+  implicit association:
+    column reference: PUBLIC.PUBLIC.BOOKSREF.BOOKS_ID --> PUBLIC.PUBLIC.BOOKS.ID
+                      (fk is part of pk)

@@ -9,6 +9,7 @@
 package schemacrawler.ermodel.associations;
 
 import static java.util.Objects.requireNonNull;
+import static schemacrawler.ermodel.associations.ImplicitAssociationsUtility.normalizeMatchKeyName;
 import static us.fatehi.utility.CollectionsUtility.splitList;
 import static us.fatehi.utility.Utility.isBlank;
 
@@ -64,7 +65,9 @@ final class PrefixMatches {
   }
 
   /**
-   * Returns normalized match keys for the supplied key.
+   * Returns normalized match keys for the supplied key. Each key is included in its singularized
+   * form and, when that is different, as written, so that a plural column name such as {@code
+   * books_id} matches only the table {@code books} and not the table {@code book}.
    *
    * @param key Key to look up
    * @return Normalized match keys
@@ -73,7 +76,7 @@ final class PrefixMatches {
     if (keyPrefixes.containsKey(key)) {
       return keyPrefixes.get(key);
     }
-    return Arrays.asList(key);
+    return Arrays.asList(normalizeMatchKeyName(key));
   }
 
   /**
@@ -91,8 +94,15 @@ final class PrefixMatches {
       return;
     }
 
-    final Collection<String> prefixes = findPrefixes(keys);
-    mapPrefixes(keys, prefixes);
+    // Prefixes are found on normalized names, so that case boundaries, spaces and hyphens
+    // separate words in the same way as underscores
+    final List<String> normalizedKeys = new ArrayList<>();
+    for (final String key : keys) {
+      normalizedKeys.add(normalizeMatchKeyName(key));
+    }
+
+    final Collection<String> prefixes = findPrefixes(normalizedKeys);
+    mapPrefixes(keys, normalizedKeys, prefixes);
 
     LOGGER.log(Level.FINE, new StringFormat("Key prefixes=%s", prefixes));
     LOGGER.log(
@@ -152,14 +162,22 @@ final class PrefixMatches {
     return prefixes;
   }
 
-  private void mapPrefixes(final List<String> keys, final Collection<String> prefixes) {
-    for (final String key : keys) {
+  private void mapPrefixes(
+      final List<String> keys,
+      final List<String> normalizedKeys,
+      final Collection<String> prefixes) {
+    for (int i = 0; i < keys.size(); i++) {
+      final String key = keys.get(i);
+      final String normalizedKey = normalizedKeys.get(i);
       for (final String prefix : prefixes) {
-        String matchKeyName = key.toLowerCase(Locale.ROOT);
+        String matchKeyName = normalizedKey.toLowerCase(Locale.ROOT);
         if (matchKeyName.startsWith(prefix)) {
           matchKeyName = matchKeyName.substring(prefix.length());
-          matchKeyName = Inflection.singularize(matchKeyName);
-          if (!isBlank(matchKeyName)) {
+          final String singularKeyName = Inflection.singularize(matchKeyName);
+          if (!isBlank(singularKeyName)) {
+            keyPrefixes.add(key, singularKeyName);
+          }
+          if (!isBlank(matchKeyName) && !matchKeyName.equals(singularKeyName)) {
             keyPrefixes.add(key, matchKeyName);
           }
         }
