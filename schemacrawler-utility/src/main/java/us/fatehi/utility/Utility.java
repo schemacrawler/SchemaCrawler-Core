@@ -24,8 +24,10 @@ import java.util.regex.Pattern;
 @UtilityMarker
 public final class Utility {
 
-  private static final Pattern camelCaseBoundaryPattern = Pattern.compile("([a-z0-9])([A-Z])");
-  private static final Pattern acronymBoundaryPattern = Pattern.compile("([A-Z]+)([A-Z][a-z])");
+  private static final Pattern camelCaseBoundaryPattern =
+      Pattern.compile("([\\p{Ll}\\p{Nd}])(\\p{Lu})");
+  private static final Pattern acronymBoundaryPattern =
+      Pattern.compile("(\\p{Lu}+)(\\p{Lu}\\p{Ll})");
   private static final Pattern repeatedUnderscorePattern = Pattern.compile("_+");
 
   public static String commonPrefix(final String string1, final String string2) {
@@ -216,6 +218,15 @@ public final class Utility {
     return toSnakeCase(identifier).replace('_', '-');
   }
 
+  /**
+   * Converts an identifier to lowercase snake case. Word boundaries are found at spaces, hyphens,
+   * underscores, lowercase-to-uppercase transitions, and the end of an acronym, as in {@code
+   * URLId}. Boundaries are detected for letters and digits in any script, so {@code ÜberUser}
+   * becomes {@code über_user}.
+   *
+   * @param identifier Identifier to convert
+   * @return Snake case identifier, or the input if it is null or blank
+   */
   public static String toSnakeCase(final String identifier) {
     if (isBlank(identifier)) {
       return identifier;

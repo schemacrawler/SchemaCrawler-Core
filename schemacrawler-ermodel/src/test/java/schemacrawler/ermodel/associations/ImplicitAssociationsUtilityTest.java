@@ -34,4 +34,11 @@ public class ImplicitAssociationsUtilityTest {
     assertThat(normalizeMatchKeyName("CUSTOMER_ORDER"), is("customer_order"));
     assertThat(normalizeMatchKeyName("customer_order"), is("customer_order"));
   }
+
+  @Test
+  public void normalizeMatchKeyName_unicode() {
+    assertThat(normalizeMatchKeyName("ŻółtyKot"), is("żółty_kot"));
+    assertThat(normalizeMatchKeyName("kotŻółty"), is("kot_żółty"));
+    assertThat(normalizeMatchKeyName("CustomerÉtatId"), is("customer_état_id"));
+  }
 }

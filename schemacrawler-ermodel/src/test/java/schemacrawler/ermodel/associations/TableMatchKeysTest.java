@@ -100,6 +100,19 @@ public class TableMatchKeysTest {
     assertThat(matchkeys.get("books"), containsInAnyOrder(books));
   }
 
+  @Test
+  public void tableMatchKeys_unicode_boundaries() {
+    final LightTable table = new LightTable("KotŻółty");
+    final LightTable other = new LightTable("Other");
+    final Column column = other.addColumn("KotŻółtyId");
+
+    final TableMatchKeys tableKeys = new TableMatchKeys(List.of(table));
+    final ColumnMatchKeys columnKeys = new ColumnMatchKeys(List.of(other));
+
+    assertThat(tableKeys.get(table), hasItem("kot_żółty"));
+    assertThat(columnKeys.get(column), containsInAnyOrder("kot_żółty"));
+  }
+
   /** Table key of X and column key of XId must be equal in every naming style. */
   @Test
   public void tableMatchKeys_symmetry_with_column_keys() {

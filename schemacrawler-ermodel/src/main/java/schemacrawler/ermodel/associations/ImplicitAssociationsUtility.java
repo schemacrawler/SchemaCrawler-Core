@@ -30,8 +30,9 @@ public class ImplicitAssociationsUtility {
    * example, {@code CustomerOrder}, {@code customerOrder}, {@code Customer Order} and {@code
    * CUSTOMER_ORDER} all become {@code customer_order}.
    *
-   * <p>Case boundaries are detected only between ASCII letters and digits. Boundaries between
-   * non-ASCII letters are not split, so such names keep their words glued together.
+   * <p>Case boundaries are detected between letters and digits of any script, so {@code ŻółtyKot}
+   * becomes {@code żółty_kot}. Scripts without letter case, such as Chinese, have no case
+   * boundaries and are not split.
    *
    * @param name Table or column name, may be null
    * @return Normalized name, or an empty string if the name is null or blank
