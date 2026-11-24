@@ -40,7 +40,7 @@ public class ColumnMatchKeysMapTest {
     assertThat(
         columnMatchKeysMap.toString(),
         is(
-            "{nonentity=[Table5.NonEntity], entity=[Table1.EntityId, Table2.Entity_Id,"
+            "{non_entity=[Table5.NonEntity], entity=[Table1.EntityId, Table2.Entity_Id,"
                 + " Table3.Entity_ID, Table4.EntityID]}"));
 
     assertThat(columnMatchKeysMap.containsKey("entity"), is(true));
@@ -56,6 +56,39 @@ public class ColumnMatchKeysMapTest {
     assertThat(
         columnMatchKeysMap.get(column).stream().collect(Collectors.toSet()),
         containsInAnyOrder("entity"));
+  }
+
+  @Test
+  public void columnMatchKeysMap_naming_styles() {
+
+    final LightTable table = new LightTable("Table1");
+    final Column pascal = table.addColumn("CustomerOrderId");
+    final Column acronym = table.addColumn("CustomerID");
+    final Column camel = table.addColumn("customerOrderId");
+    final Column snake = table.addColumn("customer_order_id");
+    final Column idOnly = table.addColumn("Id");
+
+    final ColumnMatchKeys columnMatchKeysMap = new ColumnMatchKeys(List.of(table));
+
+    assertThat(columnMatchKeysMap.get(pascal), containsInAnyOrder("customer_order"));
+    assertThat(columnMatchKeysMap.get(acronym), containsInAnyOrder("customer"));
+    assertThat(columnMatchKeysMap.get(camel), containsInAnyOrder("customer_order"));
+    assertThat(columnMatchKeysMap.get(snake), containsInAnyOrder("customer_order"));
+    assertThat(columnMatchKeysMap.containsKey(idOnly), is(false));
+    assertThat(columnMatchKeysMap.get("customer_order").size(), is(3));
+  }
+
+  @Test
+  public void columnMatchKeysMap_plural_names_are_not_singularized() {
+
+    final LightTable table = new LightTable("Table1");
+    final Column snake = table.addColumn("order_details_id");
+    final Column pascal = table.addColumn("OrderDetailsId");
+
+    final ColumnMatchKeys columnMatchKeysMap = new ColumnMatchKeys(List.of(table));
+
+    assertThat(columnMatchKeysMap.get(snake), containsInAnyOrder("order_details"));
+    assertThat(columnMatchKeysMap.get(pascal), containsInAnyOrder("order_details"));
   }
 
   @Test

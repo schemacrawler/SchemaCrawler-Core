@@ -10,6 +10,8 @@ package us.fatehi.utility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -27,6 +29,41 @@ public class Inflection {
   private static final List<Inflection> singular = new ArrayList<>();
 
   private static final List<String> uncountable = new ArrayList<>();
+
+  /**
+   * Singular nouns that end in "s", and would otherwise be mistaken for plurals. Their regular
+   * plurals (word plus "es", such as "bonuses") are also recognized.
+   */
+  private static final Set<String> singularNounsEndingInS =
+      Set.of(
+          "alias",
+          "apparatus",
+          "atlas",
+          "axis",
+          "bias",
+          "bonus",
+          "bus",
+          "campus",
+          "canvas",
+          "census",
+          "corpus",
+          "focus",
+          "gas",
+          "genus",
+          "iris",
+          "lens",
+          "locus",
+          "metropolis",
+          "nexus",
+          "nucleus",
+          "pancreas",
+          "plus",
+          "radius",
+          "status",
+          "surplus",
+          "syllabus",
+          "thesaurus",
+          "virus");
 
   static {
     // plural is "singular to plural form"
@@ -51,10 +88,16 @@ public class Inflection {
     plural("(quiz)$", "$1zes");
 
     singular("s$", "");
+    // Singular words ending in "ss" (address, class) and "sis" (basis, analysis)
+    singular("(ss|sis)$", "$1");
+    // Adjectives ending in "ous" (previous, various, anonymous)
+    singular("(ous)$", "$1");
     singular("(n)ews$", "$1ews");
     singular("([ti])a$", "$1um");
     singular("((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$", "$1$2sis");
     singular("(^analy)ses$", "$1sis");
+    // "database" and "base" (not "basis"), which the "(b)a...ses" rule above would mangle
+    singular("(base)s$", "$1");
     singular("([^f])ves$", "$1fe");
     singular("(hive)s$", "$1");
     singular("(tive)s$", "$1");
@@ -137,8 +180,12 @@ public class Inflection {
    * @return The singularized word
    */
   public static String singularize(final String word) {
-    if (Inflection.isUncountable(word)) {
+    if (Inflection.isUncountable(word) || Inflection.isSingularWordEndingInS(word)) {
       return word;
+    }
+
+    if (Inflection.isPluralOfSingularNounEndingInS(word)) {
+      return word.substring(0, word.length() - 2);
     }
 
     for (final Inflection inflection : singular) {
@@ -150,6 +197,22 @@ public class Inflection {
       }
     }
     return word;
+  }
+
+  private static boolean isSingularWordEndingInS(final String word) {
+    if (word == null) {
+      return false;
+    }
+    return singularNounsEndingInS.contains(word.toLowerCase(Locale.ROOT));
+  }
+
+  /** Is the word the regular plural (word plus "es") of a singular noun that ends in "s"? */
+  private static boolean isPluralOfSingularNounEndingInS(final String word) {
+    if (word == null || !word.toLowerCase(Locale.ROOT).endsWith("es")) {
+      return false;
+    }
+    final String lowerCaseWord = word.toLowerCase(Locale.ROOT);
+    return singularNounsEndingInS.contains(lowerCaseWord.substring(0, lowerCaseWord.length() - 2));
   }
 
   private static void irregular(final String s, final String p) {
