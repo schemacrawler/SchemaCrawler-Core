@@ -9,7 +9,7 @@
 package schemacrawler.schema;
 
 @FunctionalInterface
-public interface ContainedObject<P> {
+public interface ContainedObject<P extends NamedObject> {
 
   /**
    * Gets the parent.

@@ -83,7 +83,7 @@ public class LightTrigger extends AbstractLightDatabaseObject implements Trigger
 
   @Override
   public NamedObjectKey key() {
-    return null;
+    return table.key().with(getName());
   }
 
   public void setActionStatement(final String actionStatement) {

@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collection;
 import java.util.List;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
@@ -23,6 +24,9 @@ import schemacrawler.schema.DatabaseInfo;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
+import schemacrawler.schema.Routine;
+import schemacrawler.schema.Sequence;
+import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.Version;
 import us.fatehi.test.utility.TestObjectUtility;
@@ -78,13 +82,16 @@ public class LightCatalogUtility {
     return lightCatalog(new Table[0]);
   }
 
-  public static Catalog lightCatalog(final Table... tables) {
-    final List<Table> tablesList;
-    if (tables == null) {
-      tablesList = List.of();
-    } else {
-      tablesList = List.of(tables);
-    }
+  /** Makes a catalog that holds the given objects, and nothing else. */
+  public static Catalog lightCatalog(
+      final Collection<Table> tables,
+      final Collection<Routine> routines,
+      final Collection<Sequence> sequences,
+      final Collection<Synonym> synonyms) {
+    final List<Table> tablesList = copyOf(tables);
+    final List<Routine> routinesList = copyOf(routines);
+    final List<Sequence> sequencesList = copyOf(sequences);
+    final List<Synonym> synonymsList = copyOf(synonyms);
 
     final InvocationHandler handler =
         (proxy, method, args) -> {
@@ -99,6 +106,9 @@ public class LightCatalogUtility {
             case "getJdbcDriverInfo" -> TestObjectUtility.makeTestObject(JdbcDriverInfo.class);
             case "getDatabaseInfo" -> lightDatabaseInfo();
             case "getTables" -> tablesList;
+            case "getRoutines" -> args == null ? routinesList : returnEmpty(method);
+            case "getSequences" -> args == null ? sequencesList : returnEmpty(method);
+            case "getSynonyms" -> args == null ? synonymsList : returnEmpty(method);
             default -> returnEmpty(method);
           };
         };
@@ -106,6 +116,11 @@ public class LightCatalogUtility {
     return (Catalog)
         Proxy.newProxyInstance(
             Catalog.class.getClassLoader(), new Class<?>[] {Catalog.class}, handler);
+  }
+
+  public static Catalog lightCatalog(final Table... tables) {
+    return lightCatalog(
+        tables == null ? List.of() : List.of(tables), List.of(), List.of(), List.of());
   }
 
   public static DatabaseInfo lightDatabaseInfo() {
@@ -146,5 +161,9 @@ public class LightCatalogUtility {
             NamedObject.class.getClassLoader(),
             new Class<?>[] {clazz},
             new NamedObjectInvocationHandler(name));
+  }
+
+  private static <T> List<T> copyOf(final Collection<T> items) {
+    return items == null ? List.of() : List.copyOf(items);
   }
 }
