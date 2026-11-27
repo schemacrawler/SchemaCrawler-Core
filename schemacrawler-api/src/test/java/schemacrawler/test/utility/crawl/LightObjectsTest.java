@@ -9,12 +9,14 @@
 package schemacrawler.test.utility.crawl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Column;
+import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Function;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.RoutineType;
@@ -94,5 +96,55 @@ public class LightObjectsTest {
 
     assertThat(first.key().equals(second.key()), is(false));
     assertThat(first.compareTo(second), is(lessThan(0)));
+  }
+
+  @Test
+  public void tableHoldsForeignKeysAndConstraints() {
+    final LightTable other = new LightTable(new SchemaReference("catalog", "schema"), "orders");
+    final ForeignKey foreignKey = new LightForeignKey("fk_orders", other, table);
+    final ForeignKey imported = new LightForeignKey("fk_customer", table, other);
+
+    assertThat(table.hasForeignKeys(), is(false));
+    assertThat(table.getForeignKeys().isEmpty(), is(true));
+    assertThat(table.getImportedForeignKeys().isEmpty(), is(true));
+    assertThat(table.getTableConstraints().isEmpty(), is(true));
+
+    table.addForeignKey(foreignKey);
+    table.addImportedForeignKey(imported);
+    table.addTableConstraint(foreignKey);
+
+    assertThat(table.hasForeignKeys(), is(true));
+    assertThat(table.getForeignKeys(), contains(foreignKey));
+    assertThat(table.getImportedForeignKeys(), contains(imported));
+    assertThat(table.getTableConstraints(), contains(foreignKey));
+  }
+
+  @Test
+  public void columnFlagsKeepTheirDefaultsAndCanBeSet() {
+    final LightColumn column = table.addColumn("customer_id");
+
+    assertThat(column.isPartOfPrimaryKey(), is(true));
+    assertThat(column.isPartOfUniqueIndex(), is(true));
+    assertThat(column.isPartOfForeignKey(), is(false));
+
+    column.setPartOfPrimaryKey(false);
+    column.setPartOfUniqueIndex(false);
+    column.setPartOfForeignKey(true);
+
+    assertThat(column.isPartOfPrimaryKey(), is(false));
+    assertThat(column.isPartOfUniqueIndex(), is(false));
+    assertThat(column.isPartOfForeignKey(), is(true));
+  }
+
+  @Test
+  public void foreignKeyIsNotOptionalUnlessSet() {
+    final LightTable other = new LightTable(new SchemaReference("catalog", "schema"), "orders");
+    final LightForeignKey foreignKey = new LightForeignKey("fk_orders", other, table);
+
+    assertThat(foreignKey.isOptional(), is(false));
+
+    foreignKey.setOptional(true);
+
+    assertThat(foreignKey.isOptional(), is(true));
   }
 }

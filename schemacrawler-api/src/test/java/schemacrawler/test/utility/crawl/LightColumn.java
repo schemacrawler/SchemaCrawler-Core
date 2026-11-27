@@ -62,6 +62,9 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
   private final ColumnDataType columnDataType;
   private final boolean isHidden;
   private final boolean isGenerated;
+  private boolean partOfPrimaryKey = true;
+  private boolean partOfForeignKey;
+  private boolean partOfUniqueIndex = true;
 
   private LightColumn(
       final Table parent,
@@ -175,7 +178,7 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Override
   public boolean isPartOfForeignKey() {
-    return false;
+    return partOfForeignKey;
   }
 
   @Override
@@ -185,7 +188,7 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Override
   public boolean isPartOfPrimaryKey() {
-    return true;
+    return partOfPrimaryKey;
   }
 
   @Override
@@ -195,7 +198,7 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Override
   public boolean isPartOfUniqueIndex() {
-    return true;
+    return partOfUniqueIndex;
   }
 
   @Override
@@ -206,6 +209,18 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
   @Override
   public <P extends Privilege<Column>> Optional<P> lookupPrivilege(final String name) {
     return Optional.empty();
+  }
+
+  public void setPartOfForeignKey(final boolean partOfForeignKey) {
+    this.partOfForeignKey = partOfForeignKey;
+  }
+
+  public void setPartOfPrimaryKey(final boolean partOfPrimaryKey) {
+    this.partOfPrimaryKey = partOfPrimaryKey;
+  }
+
+  public void setPartOfUniqueIndex(final boolean partOfUniqueIndex) {
+    this.partOfUniqueIndex = partOfUniqueIndex;
   }
 
   @Override

@@ -38,6 +38,9 @@ public class LightTable extends AbstractLightDatabaseObject implements Table {
   private final List<Column> columns;
   private final List<Column> hiddenColumns;
   private final Collection<Trigger> triggers;
+  private final List<ForeignKey> foreignKeys = new ArrayList<>();
+  private final List<ForeignKey> importedForeignKeys = new ArrayList<>();
+  private final List<TableConstraint> tableConstraints = new ArrayList<>();
   private PrimaryKey primaryKey;
   private TableType tableType = new TableType("table");
   private String definition;
@@ -90,6 +93,29 @@ public class LightTable extends AbstractLightDatabaseObject implements Table {
     return column;
   }
 
+  /** Adds a foreign key of the table, which is returned by {@link #getForeignKeys()}. */
+  public void addForeignKey(final ForeignKey foreignKey) {
+    if (foreignKey != null) {
+      foreignKeys.add(foreignKey);
+    }
+  }
+
+  /**
+   * Adds a foreign key that refers from this table to another, which is returned by {@link
+   * #getImportedForeignKeys()}.
+   */
+  public void addImportedForeignKey(final ForeignKey foreignKey) {
+    if (foreignKey != null) {
+      importedForeignKeys.add(foreignKey);
+    }
+  }
+
+  public void addTableConstraint(final TableConstraint tableConstraint) {
+    if (tableConstraint != null) {
+      tableConstraints.add(tableConstraint);
+    }
+  }
+
   public void addTrigger(final Trigger trigger) {
     if (trigger != null) {
       triggers.add(trigger);
@@ -113,7 +139,7 @@ public class LightTable extends AbstractLightDatabaseObject implements Table {
 
   @Override
   public Collection<ForeignKey> getForeignKeys() {
-    return List.of();
+    return List.copyOf(foreignKeys);
   }
 
   @Override
@@ -123,7 +149,7 @@ public class LightTable extends AbstractLightDatabaseObject implements Table {
 
   @Override
   public Collection<ForeignKey> getImportedForeignKeys() {
-    return List.of();
+    return List.copyOf(importedForeignKeys);
   }
 
   @Override
@@ -148,7 +174,7 @@ public class LightTable extends AbstractLightDatabaseObject implements Table {
 
   @Override
   public Collection<TableConstraint> getTableConstraints() {
-    return List.of();
+    return List.copyOf(tableConstraints);
   }
 
   @Override
@@ -178,7 +204,7 @@ public class LightTable extends AbstractLightDatabaseObject implements Table {
 
   @Override
   public boolean hasForeignKeys() {
-    return false;
+    return !foreignKeys.isEmpty();
   }
 
   @Override
