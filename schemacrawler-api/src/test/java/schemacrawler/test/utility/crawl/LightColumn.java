@@ -19,7 +19,6 @@ import java.util.Optional;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.Identifiers;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
@@ -63,6 +62,9 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
   private final ColumnDataType columnDataType;
   private final boolean isHidden;
   private final boolean isGenerated;
+  private boolean partOfPrimaryKey = true;
+  private boolean partOfForeignKey;
+  private boolean partOfUniqueIndex = true;
 
   private LightColumn(
       final Table parent,
@@ -75,11 +77,6 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
     this.columnDataType = requireNonNull(columnDataType, "No column data type provided");
     this.isHidden = isHidden;
     this.isGenerated = isGenerated;
-  }
-
-  @Override
-  public int compareTo(final NamedObject o) {
-    return 0;
   }
 
   @Override
@@ -181,7 +178,7 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Override
   public boolean isPartOfForeignKey() {
-    return false;
+    return partOfForeignKey;
   }
 
   @Override
@@ -191,7 +188,7 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Override
   public boolean isPartOfPrimaryKey() {
-    return true;
+    return partOfPrimaryKey;
   }
 
   @Override
@@ -201,7 +198,7 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
 
   @Override
   public boolean isPartOfUniqueIndex() {
-    return true;
+    return partOfUniqueIndex;
   }
 
   @Override
@@ -212,6 +209,18 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
   @Override
   public <P extends Privilege<Column>> Optional<P> lookupPrivilege(final String name) {
     return Optional.empty();
+  }
+
+  public void setPartOfForeignKey(final boolean partOfForeignKey) {
+    this.partOfForeignKey = partOfForeignKey;
+  }
+
+  public void setPartOfPrimaryKey(final boolean partOfPrimaryKey) {
+    this.partOfPrimaryKey = partOfPrimaryKey;
+  }
+
+  public void setPartOfUniqueIndex(final boolean partOfUniqueIndex) {
+    this.partOfUniqueIndex = partOfUniqueIndex;
   }
 
   @Override

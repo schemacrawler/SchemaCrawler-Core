@@ -26,6 +26,8 @@ import schemacrawler.schema.Synonym;
 import schemacrawler.schemacrawler.GrepOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.crawl.LightProcedure;
+import schemacrawler.test.utility.crawl.LightSequence;
+import schemacrawler.test.utility.crawl.LightSynonym;
 import schemacrawler.test.utility.crawl.LightTable;
 
 class FindFilterTest {
@@ -88,12 +90,8 @@ class FindFilterTest {
 
   @Test
   void testFindSequences() {
-    final Sequence salesSequence = mock(Sequence.class);
-    when(salesSequence.getName()).thenReturn("sales_seq");
-    when(salesSequence.getFullName()).thenReturn("sales_seq");
-    final Sequence inventorySequence = mock(Sequence.class);
-    when(inventorySequence.getName()).thenReturn("inventory_seq");
-    when(inventorySequence.getFullName()).thenReturn("inventory_seq");
+    final Sequence salesSequence = new LightSequence("sales_seq");
+    final Sequence inventorySequence = new LightSequence("inventory_seq");
     when(catalog.getSequences()).thenReturn(List.of(salesSequence, inventorySequence));
 
     final CatalogSearcher searcher = CatalogSearcher.search(catalog);
@@ -105,12 +103,8 @@ class FindFilterTest {
 
   @Test
   void testFindSynonyms() {
-    final Synonym salesSynonym = mock(Synonym.class);
-    when(salesSynonym.getName()).thenReturn("sales_syn");
-    when(salesSynonym.getFullName()).thenReturn("sales_syn");
-    final Synonym inventorySynonym = mock(Synonym.class);
-    when(inventorySynonym.getName()).thenReturn("inventory_syn");
-    when(inventorySynonym.getFullName()).thenReturn("inventory_syn");
+    final Synonym salesSynonym = new LightSynonym("sales_syn");
+    final Synonym inventorySynonym = new LightSynonym("inventory_syn");
     when(catalog.getSynonyms()).thenReturn(List.of(salesSynonym, inventorySynonym));
 
     final CatalogSearcher searcher = CatalogSearcher.search(catalog);

@@ -18,6 +18,8 @@ import schemacrawler.inclusionrule.RegularExpressionRule;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Table;
+import schemacrawler.schemacrawler.SchemaReference;
+import schemacrawler.test.utility.crawl.LightProcedure;
 
 class QuoteTolerantFullNameInclusionRuleFilterTest {
 
@@ -65,10 +67,9 @@ class QuoteTolerantFullNameInclusionRuleFilterTest {
 
   @Test
   void testRoutineKeyDropsSpecificName() {
-    final Routine routine = mock(Routine.class);
-    when(routine.getFullName()).thenReturn("sales_schema.list_sales");
-    when(routine.key())
-        .thenReturn(new NamedObjectKey("sales_schema", "list_sales", "list_sales_17"));
+    final Routine routine =
+        new LightProcedure(
+            new SchemaReference(null, "sales_schema"), "list_sales", "list_sales_17");
     final QuoteTolerantFullNameInclusionRuleFilter<Routine> filter =
         new QuoteTolerantFullNameInclusionRuleFilter<>(
             new RegularExpressionRule(".*sales_schema\\.list_sales$", null));

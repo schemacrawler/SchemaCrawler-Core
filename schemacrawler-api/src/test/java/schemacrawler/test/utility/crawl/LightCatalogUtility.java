@@ -16,15 +16,21 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.DatabaseInfo;
+import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.JdbcDriverInfo;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Routine;
+import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
 import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
@@ -79,10 +85,14 @@ public class LightCatalogUtility {
   }
 
   public static Catalog lightCatalog() {
-    return lightCatalog(new Table[0]);
+    return lightCatalog(List.of(), List.of(), List.of(), List.of());
   }
 
-  /** Makes a catalog that holds the given objects, and nothing else. */
+  /**
+   * Makes a catalog that holds the given objects, and nothing else. The schemas of the catalog are
+   * the distinct schemas of the objects, in the order first seen, and the lookups by schema return
+   * the objects of that schema. Methods that are not covered return empty values.
+   */
   public static Catalog lightCatalog(
       final Collection<Table> tables,
       final Collection<Routine> routines,
@@ -92,6 +102,8 @@ public class LightCatalogUtility {
     final List<Routine> routinesList = copyOf(routines);
     final List<Sequence> sequencesList = copyOf(sequences);
     final List<Synonym> synonymsList = copyOf(synonyms);
+    final List<Schema> schemasList =
+        schemasOf(tablesList, routinesList, sequencesList, synonymsList);
 
     final InvocationHandler handler =
         (proxy, method, args) -> {
@@ -105,10 +117,16 @@ public class LightCatalogUtility {
             case "getCrawlInfo" -> new LightCrawlInfo();
             case "getJdbcDriverInfo" -> TestObjectUtility.makeTestObject(JdbcDriverInfo.class);
             case "getDatabaseInfo" -> lightDatabaseInfo();
-            case "getTables" -> tablesList;
-            case "getRoutines" -> args == null ? routinesList : returnEmpty(method);
-            case "getSequences" -> args == null ? sequencesList : returnEmpty(method);
-            case "getSynonyms" -> args == null ? synonymsList : returnEmpty(method);
+            case "getSchemas" -> schemasList;
+            case "hasSchemas" -> !schemasList.isEmpty();
+            case "getTables" -> inSchema(tablesList, args);
+            case "hasTables" -> !inSchema(tablesList, args).isEmpty();
+            case "getRoutines" -> inSchema(routinesList, args);
+            case "hasRoutines" -> !inSchema(routinesList, args).isEmpty();
+            case "getSequences" -> inSchema(sequencesList, args);
+            case "hasSequences" -> !inSchema(sequencesList, args).isEmpty();
+            case "getSynonyms" -> inSchema(synonymsList, args);
+            case "hasSynonyms" -> !inSchema(synonymsList, args).isEmpty();
             default -> returnEmpty(method);
           };
         };
@@ -165,5 +183,45 @@ public class LightCatalogUtility {
 
   private static <T> List<T> copyOf(final Collection<T> items) {
     return items == null ? List.of() : List.copyOf(items);
+  }
+
+  /**
+   * Selects the objects for a call of a lookup method. With no arguments, all objects are returned.
+   * With a schema, the objects of that schema are returned, and with a schema and a name, those of
+   * the schema that have the name.
+   */
+  private static <T extends DatabaseObject> List<T> inSchema(
+      final List<T> items, final Object[] args) {
+    if (args == null || args.length == 0) {
+      return items;
+    }
+    final Schema schema = (Schema) args[0];
+    final String name = args.length > 1 ? (String) args[1] : null;
+    final List<T> selected = new ArrayList<>();
+    for (final T item : items) {
+      final boolean isInSchema =
+          item.getSchema() != null
+              && schema != null
+              && Objects.equals(item.getSchema().key(), schema.key());
+      if (isInSchema && (name == null || name.equals(item.getName()))) {
+        selected.add(item);
+      }
+    }
+    return selected;
+  }
+
+  /** The distinct schemas of the objects, in the order in which they are first seen. */
+  @SafeVarargs
+  private static List<Schema> schemasOf(final List<? extends DatabaseObject>... groups) {
+    final Map<NamedObjectKey, Schema> schemas = new LinkedHashMap<>();
+    for (final List<? extends DatabaseObject> group : groups) {
+      for (final DatabaseObject item : group) {
+        final Schema schema = item.getSchema();
+        if (schema != null) {
+          schemas.putIfAbsent(schema.key(), schema);
+        }
+      }
+    }
+    return List.copyOf(schemas.values());
   }
 }

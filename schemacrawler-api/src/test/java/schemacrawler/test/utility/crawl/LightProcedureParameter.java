@@ -11,7 +11,6 @@ package schemacrawler.test.utility.crawl;
 import java.io.Serial;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.Identifiers;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.ParameterModeType;
 import schemacrawler.schema.Procedure;
@@ -28,11 +27,6 @@ public class LightProcedureParameter extends AbstractLightDatabaseObject
   public LightProcedureParameter(final Procedure procedure, final String name) {
     super(procedure.getSchema(), name);
     this.procedure = procedure;
-  }
-
-  @Override
-  public int compareTo(final NamedObject o) {
-    return 0;
   }
 
   @Override

@@ -32,10 +32,8 @@ import schemacrawler.test.utility.crawl.LightTable;
 class NamedObjectFiltersTest {
 
   private static Table viewTypeTable(final String name) {
-    final Table table = mock(Table.class);
-    when(table.getName()).thenReturn(name);
-    when(table.getFullName()).thenReturn(name);
-    when(table.getTableType()).thenReturn(new TableType("view"));
+    final LightTable table = new LightTable(name);
+    table.setTableType(new TableType("view"));
     return table;
   }
 
@@ -80,10 +78,9 @@ class NamedObjectFiltersTest {
     // its full name never has. fullNameRegex must derive the joined-key candidate
     // from the
     // qualified name (without that trailing component), not the raw key.
-    final Routine procedure = mock(Routine.class);
-    when(procedure.getFullName()).thenReturn("sales_schema.list_sales");
-    when(procedure.key())
-        .thenReturn(new NamedObjectKey("sales_schema", "list_sales", "list_sales_17"));
+    final Routine procedure =
+        new LightProcedure(
+            new SchemaReference(null, "sales_schema"), "list_sales", "list_sales_17");
 
     assertThat(
         NamedObjectFilters.fullNameRegex(".*sales_schema\\.list_sales").test(procedure), is(true));

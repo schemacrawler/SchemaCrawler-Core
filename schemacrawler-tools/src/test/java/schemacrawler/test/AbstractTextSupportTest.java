@@ -84,12 +84,8 @@ public class AbstractTextSupportTest {
     final LightTable fkTableZeroMany = new LightTable("fk_table_zero_many");
     final LightColumn fkCol3 = fkTableZeroMany.addColumn("fk_col");
     final LightColumn pkCol3 = pkTable.addColumn("pk_col3");
-    final LightColumnReference colRef3 = new LightColumnReference(fkCol3, pkCol3);
-    final TableReference optionalFkZeroMany = mock(TableReference.class);
-    when(optionalFkZeroMany.getForeignKeyTable()).thenReturn(fkTableZeroMany);
-    when(optionalFkZeroMany.isOptional()).thenReturn(true);
-    when(optionalFkZeroMany.getColumnReferences()).thenReturn(List.of(colRef3));
-    when(optionalFkZeroMany.key()).thenReturn(new NamedObjectKey("schema", "FK_ZERO_MANY"));
+    final LightForeignKey optionalFkZeroMany = new LightForeignKey("FK_ZERO_MANY", fkCol3, pkCol3);
+    optionalFkZeroMany.setOptional(true);
     assertThat(support.cardinality(optionalFkZeroMany), is(RelationshipCardinality.zero_many));
 
     // Unique (FK col matches FK-table's PK) + optional → zero_one
@@ -97,12 +93,8 @@ public class AbstractTextSupportTest {
     final LightColumn fkCol4 = fkTableZeroOne.addColumn("fk_col");
     final LightColumn pkCol4 = pkTable.addColumn("pk_col4");
     fkTableZeroOne.setPrimaryKey(new LightPrimaryKey(fkCol4));
-    final LightColumnReference colRef4 = new LightColumnReference(fkCol4, pkCol4);
-    final TableReference optionalFkZeroOne = mock(TableReference.class);
-    when(optionalFkZeroOne.getForeignKeyTable()).thenReturn(fkTableZeroOne);
-    when(optionalFkZeroOne.isOptional()).thenReturn(true);
-    when(optionalFkZeroOne.getColumnReferences()).thenReturn(List.of(colRef4));
-    when(optionalFkZeroOne.key()).thenReturn(new NamedObjectKey("schema", "FK_ZERO_ONE"));
+    final LightForeignKey optionalFkZeroOne = new LightForeignKey("FK_ZERO_ONE", fkCol4, pkCol4);
+    optionalFkZeroOne.setOptional(true);
     assertThat(support.cardinality(optionalFkZeroOne), is(RelationshipCardinality.zero_one));
   }
 
@@ -262,8 +254,8 @@ public class AbstractTextSupportTest {
   @Test
   public void hasUserDefinedName() {
 
-    final ForeignKey fk = mock(ForeignKey.class);
-    when(fk.getName()).thenReturn("FK_TABLE_OTHER");
+    final ForeignKey fk =
+        new LightForeignKey("FK_TABLE_OTHER", new LightTable("fk_table"), new LightTable("other"));
 
     assertThat(support.hasUserDefinedName(fk), is(true));
 
@@ -297,12 +289,9 @@ public class AbstractTextSupportTest {
     final LightTable fkTableZeroMany = new LightTable("fk_table_to_many_zero_many");
     final LightColumn fkCol2 = fkTableZeroMany.addColumn("fk_col");
     final LightColumn pkCol2 = pkTableToMany.addColumn("pk_col2");
-    final LightColumnReference colRef2 = new LightColumnReference(fkCol2, pkCol2);
-    final TableReference optionalFkZeroMany = mock(TableReference.class);
-    when(optionalFkZeroMany.getForeignKeyTable()).thenReturn(fkTableZeroMany);
-    when(optionalFkZeroMany.isOptional()).thenReturn(true);
-    when(optionalFkZeroMany.getColumnReferences()).thenReturn(List.of(colRef2));
-    when(optionalFkZeroMany.key()).thenReturn(new NamedObjectKey("schema", "FK_TO_MANY_ZERO_MANY"));
+    final LightForeignKey optionalFkZeroMany =
+        new LightForeignKey("FK_TO_MANY_ZERO_MANY", fkCol2, pkCol2);
+    optionalFkZeroMany.setOptional(true);
     assertThat(support.isToMany(optionalFkZeroMany), is(true));
 
     // Unique (FK col = PK), non-optional → one_one → not to-many
@@ -318,12 +307,9 @@ public class AbstractTextSupportTest {
     final LightColumn fkCol4 = fkTableZeroOne.addColumn("fk_col");
     final LightColumn pkCol4 = pkTableToMany.addColumn("pk_col4");
     fkTableZeroOne.setPrimaryKey(new LightPrimaryKey(fkCol4));
-    final LightColumnReference colRef4 = new LightColumnReference(fkCol4, pkCol4);
-    final TableReference optionalFkZeroOne = mock(TableReference.class);
-    when(optionalFkZeroOne.getForeignKeyTable()).thenReturn(fkTableZeroOne);
-    when(optionalFkZeroOne.isOptional()).thenReturn(true);
-    when(optionalFkZeroOne.getColumnReferences()).thenReturn(List.of(colRef4));
-    when(optionalFkZeroOne.key()).thenReturn(new NamedObjectKey("schema", "FK_TO_MANY_ZERO_ONE"));
+    final LightForeignKey optionalFkZeroOne =
+        new LightForeignKey("FK_TO_MANY_ZERO_ONE", fkCol4, pkCol4);
+    optionalFkZeroOne.setOptional(true);
     assertThat(support.isToMany(optionalFkZeroOne), is(false));
   }
 

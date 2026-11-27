@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static schemacrawler.schema.IdentifierQuotingStrategy.quote_all;
@@ -36,11 +35,9 @@ import schemacrawler.inclusionrule.InclusionRule;
 import schemacrawler.inclusionrule.InclusionRuleWithRegularExpression;
 import schemacrawler.inclusionrule.ListExclusionRule;
 import schemacrawler.inclusionrule.RegularExpressionInclusionRule;
-import schemacrawler.schema.BaseColumn;
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.DatabaseObject;
 import schemacrawler.schema.DependantObject;
-import schemacrawler.schema.Function;
 import schemacrawler.schema.Identifiers;
 import schemacrawler.schema.IdentifiersBuilder;
 import schemacrawler.schema.Index;
@@ -48,23 +45,25 @@ import schemacrawler.schema.KeyColumn;
 import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.PrimaryKey;
 import schemacrawler.schema.Privilege;
-import schemacrawler.schema.Procedure;
 import schemacrawler.schema.Routine;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Sequence;
-import schemacrawler.schema.SimpleTableType;
-import schemacrawler.schema.Synonym;
 import schemacrawler.schema.Table;
-import schemacrawler.schema.TableConstraint;
-import schemacrawler.schema.TableReference;
 import schemacrawler.schema.TableType;
-import schemacrawler.schema.Trigger;
 import schemacrawler.schema.TypedObject;
 import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaReference;
 import schemacrawler.test.utility.WithTestDatabase;
+import schemacrawler.test.utility.crawl.LightColumn;
+import schemacrawler.test.utility.crawl.LightForeignKey;
+import schemacrawler.test.utility.crawl.LightFunction;
+import schemacrawler.test.utility.crawl.LightIndex;
+import schemacrawler.test.utility.crawl.LightPrimaryKey;
 import schemacrawler.test.utility.crawl.LightProcedure;
+import schemacrawler.test.utility.crawl.LightSequence;
+import schemacrawler.test.utility.crawl.LightSynonym;
 import schemacrawler.test.utility.crawl.LightTable;
+import schemacrawler.test.utility.crawl.LightTrigger;
 import schemacrawler.utility.MetaDataUtility;
 import us.fatehi.test.utility.extensions.ResolveTestContext;
 
@@ -183,32 +182,29 @@ public class MetadataUtilityTest {
 
   @Test
   public void simpleTypeName() {
-    final Table view = spy(new LightTable("view"));
-    final TableType tableType = mock(TableType.class);
-    when(tableType.isView()).thenReturn(true);
-    when(tableType.getSimpleTableType()).thenReturn(SimpleTableType.view);
-    when(view.getTableType()).thenReturn(tableType);
+    final LightTable view = new LightTable("view");
+    view.setTableType(new TableType("view"));
 
     final List<DatabaseObject> databaseObjects =
-      List.of(
-        mock(DatabaseObject.class),
-        mock(DependantObject.class),
-        mock(Synonym.class),
-        mock(Sequence.class),
-        mock(Function.class),
-        mock(Procedure.class),
-        view,
-        new LightTable("table"));
+        List.of(
+            mock(DatabaseObject.class),
+            mock(DependantObject.class),
+            new LightSynonym("synonym"),
+            new LightSequence("sequence"),
+            new LightFunction("function"),
+            new LightProcedure("procedure"),
+            view,
+            new LightTable("table"));
     final List<MetaDataUtility.SimpleDatabaseObjectType> expectedTypes =
-      List.of(
-        MetaDataUtility.SimpleDatabaseObjectType.unknown,
-        MetaDataUtility.SimpleDatabaseObjectType.unknown,
-        MetaDataUtility.SimpleDatabaseObjectType.synonym,
-        MetaDataUtility.SimpleDatabaseObjectType.sequence,
-        MetaDataUtility.SimpleDatabaseObjectType.function,
-        MetaDataUtility.SimpleDatabaseObjectType.procedure,
-        MetaDataUtility.SimpleDatabaseObjectType.view,
-        MetaDataUtility.SimpleDatabaseObjectType.table);
+        List.of(
+            MetaDataUtility.SimpleDatabaseObjectType.unknown,
+            MetaDataUtility.SimpleDatabaseObjectType.unknown,
+            MetaDataUtility.SimpleDatabaseObjectType.synonym,
+            MetaDataUtility.SimpleDatabaseObjectType.sequence,
+            MetaDataUtility.SimpleDatabaseObjectType.function,
+            MetaDataUtility.SimpleDatabaseObjectType.procedure,
+            MetaDataUtility.SimpleDatabaseObjectType.view,
+            MetaDataUtility.SimpleDatabaseObjectType.table);
 
     assertThat(
         MetaDataUtility.getSimpleTypeName(null),
@@ -216,23 +212,26 @@ public class MetadataUtilityTest {
 
     for (int index = 0; index < databaseObjects.size(); index++) {
       assertThat(
-        MetaDataUtility.getSimpleTypeName(databaseObjects.get(index)),
-        is(expectedTypes.get(index)));
+          MetaDataUtility.getSimpleTypeName(databaseObjects.get(index)),
+          is(expectedTypes.get(index)));
     }
   }
 
   @Test
   public void simpleDependantObjectType() {
+    final LightTable table = new LightTable("table");
+    final LightColumn column = table.addColumn("column");
+    final LightTable other = new LightTable("other");
     final List<DependantObject<?>> dependants =
         List.of(
             mock(DependantObject.class),
-            mock(BaseColumn.class),
+            column,
             mock(KeyColumn.class),
-            mock(Index.class),
-            mock(TableReference.class),
-            mock(TableConstraint.class),
+            new LightIndex(table, "index"),
+            new LightForeignKey("foreign_key", table, other),
+            new LightPrimaryKey(column),
             mock(Privilege.class),
-            mock(Trigger.class));
+            new LightTrigger(table, "trigger"));
     final List<MetaDataUtility.SimpleDependantObjectType> expectedTypes =
         List.of(
             MetaDataUtility.SimpleDependantObjectType.unknown,
@@ -289,13 +288,13 @@ public class MetadataUtilityTest {
     when(typedObject.getType()).thenReturn(new TableType("MATERIALIZED VIEW"));
     assertThat(MetaDataUtility.getTypeName(typedNamedObject), is("materialized view"));
 
-    final Schema schema = mock(Schema.class);
+    final Schema schema = new SchemaReference("catalog", "schema");
     assertThat(MetaDataUtility.getTypeName(schema), is("schema"));
 
     final Table table = new LightTable("table");
     assertThat(MetaDataUtility.getTypeName(table), is("table"));
 
-    final Sequence sequence = mock(Sequence.class);
+    final Sequence sequence = new LightSequence("sequence");
     assertThat(MetaDataUtility.getTypeName(sequence), is("sequence"));
 
     final DatabaseObject unknownDatabaseObject = mock(DatabaseObject.class);

@@ -10,15 +10,13 @@ package schemacrawler.tools.state;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static schemacrawler.test.utility.crawl.LightCatalogUtility.lightCatalog;
 
-import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import schemacrawler.schema.Catalog;
-import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
+import schemacrawler.test.utility.crawl.LightTable;
 
 public class AbstractExecutionStateTest {
 
@@ -45,14 +43,10 @@ public class AbstractExecutionStateTest {
   }
 
   private Catalog catalogWithTables(final Table... tables) {
-    final Catalog catalog = mock(Catalog.class);
-    when(catalog.getTables()).thenReturn(List.of(tables));
-    return catalog;
+    return lightCatalog(tables);
   }
 
   private Table table(final String name) {
-    final Table table = mock(Table.class);
-    when(table.key()).thenReturn(new NamedObjectKey(name));
-    return table;
+    return new LightTable(name);
   }
 }

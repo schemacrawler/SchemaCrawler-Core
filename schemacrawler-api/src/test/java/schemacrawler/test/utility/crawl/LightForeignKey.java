@@ -32,6 +32,7 @@ public class LightForeignKey extends AbstractLightDatabaseObject implements Fore
   private final Table fkTable;
   private final Table pkTable;
   private final ColumnReference columnReference;
+  private boolean optional;
 
   public LightForeignKey(final String name, final Column fkColumn, final Column pkColumn) {
     super(requireNonNull(fkColumn, "No foreign key column provided").getSchema(), name);
@@ -132,7 +133,7 @@ public class LightForeignKey extends AbstractLightDatabaseObject implements Fore
 
   @Override
   public boolean isOptional() {
-    return false;
+    return optional;
   }
 
   @Override
@@ -148,6 +149,10 @@ public class LightForeignKey extends AbstractLightDatabaseObject implements Fore
   @Override
   public Iterator<ColumnReference> iterator() {
     return getColumnReferences().iterator();
+  }
+
+  public void setOptional(final boolean optional) {
+    this.optional = optional;
   }
 
   @Override
