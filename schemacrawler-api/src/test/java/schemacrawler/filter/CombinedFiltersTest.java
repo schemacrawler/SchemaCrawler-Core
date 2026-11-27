@@ -10,8 +10,6 @@ package schemacrawler.filter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
@@ -23,10 +21,8 @@ import schemacrawler.test.utility.crawl.LightTable;
 class CombinedFiltersTest {
 
   private static Table viewTypeTable(final String name) {
-    final Table table = mock(Table.class);
-    when(table.getName()).thenReturn(name);
-    when(table.getFullName()).thenReturn(name);
-    when(table.getTableType()).thenReturn(new TableType("view"));
+    final LightTable table = new LightTable(name);
+    table.setTableType(new TableType("view"));
     return table;
   }
 

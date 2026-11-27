@@ -19,7 +19,6 @@ import java.util.Optional;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnDataType;
 import schemacrawler.schema.Identifiers;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Privilege;
 import schemacrawler.schema.Schema;
@@ -75,11 +74,6 @@ public class LightColumn extends AbstractLightDatabaseObject implements Column {
     this.columnDataType = requireNonNull(columnDataType, "No column data type provided");
     this.isHidden = isHidden;
     this.isGenerated = isGenerated;
-  }
-
-  @Override
-  public int compareTo(final NamedObject o) {
-    return 0;
   }
 
   @Override

@@ -14,7 +14,6 @@ import schemacrawler.schema.ActionOrientationType;
 import schemacrawler.schema.ConditionTimingType;
 import schemacrawler.schema.EventManipulationType;
 import schemacrawler.schema.Identifiers;
-import schemacrawler.schema.NamedObject;
 import schemacrawler.schema.NamedObjectKey;
 import schemacrawler.schema.Table;
 import schemacrawler.schema.Trigger;
@@ -29,11 +28,6 @@ public class LightTrigger extends AbstractLightDatabaseObject implements Trigger
   public LightTrigger(final Table table, final String name) {
     super(table.getSchema(), name);
     this.table = table;
-  }
-
-  @Override
-  public int compareTo(final NamedObject o) {
-    return 0;
   }
 
   @Override

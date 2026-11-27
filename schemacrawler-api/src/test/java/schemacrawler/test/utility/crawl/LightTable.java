@@ -8,6 +8,7 @@
 
 package schemacrawler.test.utility.crawl;
 
+import static java.util.Objects.requireNonNull;
 import static us.fatehi.utility.Utility.trimToEmpty;
 
 import java.io.Serial;
@@ -38,6 +39,7 @@ public class LightTable extends AbstractLightDatabaseObject implements Table {
   private final List<Column> hiddenColumns;
   private final Collection<Trigger> triggers;
   private PrimaryKey primaryKey;
+  private TableType tableType = new TableType("table");
   private String definition;
 
   public LightTable(final Schema schema, final String name) {
@@ -151,7 +153,7 @@ public class LightTable extends AbstractLightDatabaseObject implements Table {
 
   @Override
   public TableType getTableType() {
-    return new TableType("table");
+    return tableType;
   }
 
   @Override
@@ -245,5 +247,9 @@ public class LightTable extends AbstractLightDatabaseObject implements Table {
 
   public void setPrimaryKey(final PrimaryKey primaryKey) {
     this.primaryKey = primaryKey;
+  }
+
+  public void setTableType(final TableType tableType) {
+    this.tableType = requireNonNull(tableType, "No table type provided");
   }
 }
