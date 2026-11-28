@@ -237,4 +237,19 @@ public class UtilityTest {
     assertThat(toSnakeCase("URLId"), equalTo("url_id"));
     assertThat(toSnakeCase("customerOrder2Item"), equalTo("customer_order2_item"));
   }
+
+  @Test
+  public void toSnakeCaseUnicodeSpaceTest() {
+    // Ideographic space and no-break space separate words like an ASCII space
+    assertThat(toSnakeCase("customer　order"), equalTo("customer_order"));
+    assertThat(toSnakeCase("customer order"), equalTo("customer_order"));
+    assertThat(toSnakeCase("a　b c d-e"), equalTo("a_b_c_d_e"));
+    assertThat(toKebabCase("customer　order"), equalTo("customer-order"));
+    assertThat(toKebabCase("customer order"), equalTo("customer-order"));
+    assertThat(toKebabCase("a　b c d"), equalTo("a-b-c-d"));
+    // Tabs are not treated as separators, as before
+    assertThat(toSnakeCase("customer	order"), equalTo("customer	order"));
+    // ASCII behavior is unchanged
+    assertThat(toSnakeCase("Order Details"), equalTo("order_details"));
+  }
 }

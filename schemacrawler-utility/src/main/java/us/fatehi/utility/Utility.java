@@ -219,10 +219,11 @@ public final class Utility {
   }
 
   /**
-   * Converts an identifier to lowercase snake case. Word boundaries are found at spaces, hyphens,
-   * underscores, lowercase-to-uppercase transitions, and the end of an acronym, as in {@code
-   * URLId}. Boundaries are detected for letters and digits in any script, so {@code ÜberUser}
-   * becomes {@code über_user}.
+   * Converts an identifier to lowercase snake case. Word boundaries are found at spaces (any
+   * Unicode space separator, such as the no-break space or the ideographic space, but not a tab or
+   * a newline), hyphens, underscores, lowercase-to-uppercase transitions, and the end of an
+   * acronym, as in {@code URLId}. Boundaries are detected for letters and digits in any script, so
+   * {@code ÜberUser} becomes {@code über_user}.
    *
    * @param identifier Identifier to convert
    * @return Snake case identifier, or the input if it is null or blank
@@ -231,7 +232,18 @@ public final class Utility {
     if (isBlank(identifier)) {
       return identifier;
     }
-    String normalizedIdentifier = identifier.replace('-', '_').replace(' ', '_');
+    final StringBuilder separated = new StringBuilder(identifier.length());
+    identifier
+        .codePoints()
+        .forEach(
+            codePoint -> {
+              if (codePoint == '-' || Character.isSpaceChar(codePoint)) {
+                separated.append('_');
+              } else {
+                separated.appendCodePoint(codePoint);
+              }
+            });
+    String normalizedIdentifier = separated.toString();
     normalizedIdentifier = acronymBoundaryPattern.matcher(normalizedIdentifier).replaceAll("$1_$2");
     normalizedIdentifier =
         camelCaseBoundaryPattern.matcher(normalizedIdentifier).replaceAll("$1_$2");
